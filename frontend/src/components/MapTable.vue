@@ -16,6 +16,8 @@ const props = defineProps({
 const emit = defineEmits(['select'])
 
 const tabela = ref(null)
+const pagina = ref(1)
+const porPagina = 25
 const partidoPorNumero = computed(() => {
   const mapa = new Map()
   for (const candidato of props.candidatos) {
@@ -51,6 +53,17 @@ const linhas = computed(() =>
     }
   }),
 )
+
+const totalPaginas = computed(() => Math.max(1, Math.ceil(linhas.value.length / porPagina)))
+const linhasPagina = computed(() => {
+  if (pagina.value > totalPaginas.value) pagina.value = totalPaginas.value
+  const inicio = (pagina.value - 1) * porPagina
+  return linhas.value.slice(inicio, inicio + porPagina)
+})
+
+function irPara(p) {
+  pagina.value = Math.min(Math.max(1, p), totalPaginas.value)
+}
 
 function selecionar(area) {
   if (!area) return
@@ -121,7 +134,7 @@ function aoClicarLinha(linha) {
           </tr>
         </thead>
         <tbody @keydown="navegarLinhas">
-          <tr v-for="linha in linhas" :key="linha.chave">
+          <tr v-for="linha in linhasPagina" :key="linha.chave">
             <th scope="row">
               <span class="area-rotulo">
                 <span
@@ -169,5 +182,27 @@ function aoClicarLinha(linha) {
         </tbody>
       </table>
     </div>
+
+    <footer v-if="linhas.length > porPagina" class="paginacao">
+      <span>Página {{ pagina }} de {{ totalPaginas }} · {{ linhas.length }} áreas</span>
+      <div class="paginacao__botoes">
+        <button
+          type="button"
+          class="button button--ghost button--compacto"
+          :disabled="pagina === 1"
+          @click="irPara(pagina - 1)"
+        >
+          Anterior
+        </button>
+        <button
+          type="button"
+          class="button button--ghost button--compacto"
+          :disabled="pagina === totalPaginas"
+          @click="irPara(pagina + 1)"
+        >
+          Próxima
+        </button>
+      </div>
+    </footer>
   </section>
 </template>
