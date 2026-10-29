@@ -101,8 +101,7 @@ const participacao = computed(() => {
         </div>
       </dl>
 
-      <p class="nota">
-        O BU informa a biometria por seção, nunca por candidato.
+      <p v-if="votosCandidato !== null || biometria.secoes_sem_campo > 0" class="nota">
         <template v-if="votosCandidato !== null">
           <b>{{ nomeCandidato }}</b> tem {{ formatarNumero(votosCandidato) }} votos neste
           recorte — {{ formatarPercentual(participacao) }} do comparecimento.

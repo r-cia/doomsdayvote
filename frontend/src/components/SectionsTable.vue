@@ -120,7 +120,6 @@ function navegarLinhas(evento) {
         <p>
           {{ formatarNumero(total) }} seções no filtro.
           <template v-if="contexto">Escopo: {{ contexto }}.</template>
-          A busca textual filtra os itens da página atual.
         </p>
       </div>
     </div>
@@ -132,11 +131,7 @@ function navegarLinhas(evento) {
           v-model="busca"
           type="search"
           placeholder="Município, zona, seção ou local"
-          aria-describedby="busca-secoes-ajuda"
         />
-        <small id="busca-secoes-ajuda">
-          A busca é aplicada pela API (município, zona ou seção).
-        </small>
       </label>
 
       <label class="campo campo--curto">

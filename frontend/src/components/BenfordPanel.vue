@@ -126,11 +126,6 @@ function tom(classificacao) {
 
       <div class="benford__rodape">
         <p class="nota">
-          <b>1º dígito</b> dos votos por seção com {{ minimo }} votos ou mais ·
-          <b>MAD</b> de Nigrini
-        </p>
-        <p class="nota">
-          aderência descritiva, não prova de fraude ·
           <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> seções abaixo do mínimo
         </p>
       </div>
