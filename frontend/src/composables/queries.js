@@ -106,7 +106,7 @@ export function useAnalise() {
   })
 }
 
-export function useAnomalias() {
+export function useAnomalias(habilitado = null) {
   const store = useFiltersStore()
   return useQuery({
     queryKey: computed(() => [
@@ -128,7 +128,11 @@ export function useAnomalias() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(
+      () =>
+        Boolean(store.electionId && store.cargo) &&
+        (habilitado ? habilitado.value : true),
+    ),
     placeholderData: keepPreviousData,
   })
 }

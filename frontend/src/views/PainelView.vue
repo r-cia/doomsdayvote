@@ -1,8 +1,8 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AnaliseSection from '../components/AnaliseSection.vue'
 import AvisoBanner from '../components/AvisoBanner.vue'
-import BenfordPanel from '../components/BenfordPanel.vue'
 import BiometriaPanel from '../components/BiometriaPanel.vue'
 import FilterBar from '../components/FilterBar.vue'
 import KpiCards from '../components/KpiCards.vue'
@@ -14,6 +14,7 @@ import StateBlock from '../components/StateBlock.vue'
 import UfPanel from '../components/UfPanel.vue'
 import {
   useAnalise,
+  useAnomalias,
   useMapa,
   useResumo,
   useSecoes,
@@ -50,6 +51,30 @@ const mapaUfQuery = useMapa('uf', {
   ignorarUf: true,
 })
 const secoesQuery = useSecoes()
+
+const anomaliasRef = ref(null)
+const anomaliasVisiveis = ref(false)
+const anomaliasQuery = useAnomalias(anomaliasVisiveis)
+
+onMounted(() => {
+  if (!anomaliasRef.value || typeof IntersectionObserver === 'undefined') {
+    anomaliasVisiveis.value = true
+    return
+  }
+
+  const observador = new IntersectionObserver(
+    (entradas) => {
+      if (entradas.some((entrada) => entrada.isIntersecting)) {
+        anomaliasVisiveis.value = true
+        observador.disconnect()
+      }
+    },
+    { rootMargin: '240px' },
+  )
+
+  observador.observe(anomaliasRef.value)
+  onBeforeUnmount(() => observador.disconnect())
+})
 
 const candidatos = computed(() =>
   candidatosNominais(resumoQuery.data.value?.votos ?? []),
@@ -211,17 +236,11 @@ function atualizarSecoes() {
         />
       </section>
 
-      <section class="leituras" aria-label="Biometria e Benford">
+      <section class="leituras" aria-label="Composição do recorte">
         <BiometriaPanel
           :dados="analiseQuery.data.value?.biometria ?? null"
           :votos-candidato="votosDoCandidato"
           :nome-candidato="candidatoSelecionado?.nm_votavel ?? ''"
-        />
-
-        <BenfordPanel
-          :dados="analiseQuery.data.value?.benford ?? null"
-          :selecionado="store.candidato"
-          @select="aoCandidato"
         />
       </section>
 
@@ -276,6 +295,18 @@ function atualizarSecoes() {
         @select="abrirSecao"
         @retry="atualizarSecoes"
       />
+
+      <div ref="anomaliasRef">
+        <AnaliseSection
+          :benford="analiseQuery.data.value?.benford ?? null"
+          :anomalias="anomaliasQuery.data.value ?? null"
+          :selecionado="store.candidato"
+          :loading="anomaliasQuery.isLoading.value"
+          :error="anomaliasQuery.error.value?.message ?? ''"
+          @retry="anomaliasQuery.refetch()"
+          @select="aoCandidato"
+        />
+      </div>
     </template>
   </div>
 </template>

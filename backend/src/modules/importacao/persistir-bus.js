@@ -215,7 +215,13 @@ export async function persistirArquivo(trx, { loteId, registros, metadadosDeriva
       qt_votos: registro.valores.QT_VOTOS ?? null,
       lote_id: loteId,
       nr_linha_origem: registro.nrLinha,
-      bruto: JSON.stringify(registro.bruto),
+      ano_eleicao: registro.valores.ANO_ELEICAO,
+      nr_turno: registro.valores.NR_TURNO,
+      sg_uf: registro.valores.SG_UF,
+      cd_municipio_tse: registro.valores.CD_MUNICIPIO,
+      nr_zona: registro.valores.NR_ZONA,
+      nr_secao: registro.valores.NR_SECAO,
+      cd_cargo_pergunta: registro.valores.CD_CARGO_PERGUNTA,
     }));
 
     for (let i = 0; i < linhas.length; i += 500) {

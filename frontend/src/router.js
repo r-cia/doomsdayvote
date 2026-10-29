@@ -15,8 +15,7 @@ const router = createRouter({
     },
     {
       path: '/auditoria',
-      name: 'auditoria',
-      component: () => import('./views/AuditoriaView.vue'),
+      redirect: '/painel',
     },
     {
       path: '/secoes/:id',

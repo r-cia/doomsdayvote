@@ -1,5 +1,7 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
+
+const rota = useRoute()
 </script>
 
 <template>
@@ -24,9 +26,35 @@ import { RouterLink, RouterView } from 'vue-router'
     </RouterLink>
 
     <nav class="nav" aria-label="Seções do sistema">
-      <RouterLink to="/painel">Painel</RouterLink>
-      <RouterLink :to="{ path: '/painel', hash: '#mapa' }">Mapa</RouterLink>
-      <RouterLink to="/auditoria">Auditoria</RouterLink>
+      <RouterLink to="/painel" custom v-slot="{ href, navigate }">
+        <a
+          :href="href"
+          :class="{ 'router-link-active': rota.path === '/painel' && !rota.hash }"
+          @click="navigate"
+        >Painel</a>
+      </RouterLink>
+      <RouterLink
+        :to="{ path: '/painel', hash: '#mapa' }"
+        custom
+        v-slot="{ href, navigate }"
+      >
+        <a
+          :href="href"
+          :class="{ 'router-link-active': rota.hash === '#mapa' }"
+          @click="navigate"
+        >Mapa</a>
+      </RouterLink>
+      <RouterLink
+        :to="{ path: '/painel', hash: '#analise' }"
+        custom
+        v-slot="{ href, navigate }"
+      >
+        <a
+          :href="href"
+          :class="{ 'router-link-active': rota.hash === '#analise' }"
+          @click="navigate"
+        >Análise</a>
+      </RouterLink>
     </nav>
 
     <p class="classificacao">
