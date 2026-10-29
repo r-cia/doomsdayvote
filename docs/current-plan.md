@@ -1,25 +1,26 @@
-# Plano atual — carga de arquivos grandes sem estourar memória
+# Plano atual — carga de arquivos grandes
 
-## Causa
+## Causa do OOM
 
-O arquivo do SP não está ordenado por seção: as linhas de um mesmo BU aparecem espalhadas. O importador mantém os BUs abertos em memória até a última linha de cada grupo, então o buffer cresce até o tamanho do arquivo (8 GB → heap de 20 GB estourado).
+O arquivo do SP não está ordenado por seção: as linhas de um mesmo BU aparecem espalhadas. O importador antigo mantinha todos os BUs abertos em memória até a última linha de cada grupo, então o buffer crescia até o tamanho do arquivo (8 GB → heap de 20 GB estourado).
 
-## Opção A — spill em disco por BU (recomendada agora)
+## Solução aplicada — staging UNLOGGED + COPY
 
-1. **Primeira passada:** lê o arquivo em streaming e grava cada linha bruta em um de N arquivos temporários (N = 128), escolhido pelo hash da chave do BU. A chave sai dos campos crus, sem parsear o registro. Memória constante; disco ~8 GB.
-2. **Segunda passada:** processa um arquivo por vez; como todas as linhas de um BU caem no mesmo arquivo, o agrupamento é feito em memória só com o tamanho de um bucket (~64 MB de texto, ~150 MB de heap), valida e persiste com a lógica atual.
-3. `nr_linha_origem` viaja junto da linha no arquivo temporário.
-4. Limpeza do diretório temporário no fim e em caso de erro.
-5. O leitor ganha o texto bruto da linha e o parser expõe `parsear(campos, nrLinha)` para a segunda passada.
+1. O arquivo é lido em streaming e cada linha normalizada é enviada por `COPY bweb_staging (...) FROM STDIN` (pg-copy-streams) com `lote_id`, `chave` do BU, `nr_linha` e `valores` jsonb. Sem transação aberta durante o COPY; a staging é apagada em caso de falha.
+2. As chaves distintas do lote são lidas e as BUs são processadas em blocos de 200, buscando as linhas por `(lote_id, chave)`.
+3. Cada bloco passa pela validação e pela persistência atuais — versionamento, hash, alertas e idempotência intactos.
+4. A staging é apagada ao fim da transação de persistência.
 
-Custo: reparsear o arquivo (duas passadas) e ~8 GB de disco temporário. Nenhuma dependência nova, nenhuma mudança de schema, validação e versionamento intactos.
+Memória fica limitada à linha em trânsito, ao bloco de 200 BUs e à lista de chaves do arquivo (~200 mil chaves de ~40 bytes no SP). Não depende do tamanho nem da ordem do arquivo.
 
-## Opção B — staging no Postgres + COPY (para 300 milhões)
+Custo: a staging ocupa disco temporário no Postgres (jsonb normalizado, estimado em 12–20 GB para o SP de 8 GB) e é descartada ao fim. Sem dependência de disco local, sem segunda passada no arquivo.
 
-`COPY` do CSV para uma tabela UNLOGGED, agrupamento por SQL e persistência por lote de BUs. Mais rápido e sem disco local, mas exige `pg-copy-streams`, tabela de staging e mover o agrupamento para SQL. Fica para a etapa de 300M.
+## Validação
 
-## Testes
+- `tests/integration/importacao-fora-de-ordem.test.js`: o fixture com as linhas intercaladas produz os mesmos totais de boletins e resultados da importação normal.
+- `lote`, `schema`, `resultado-colunas` e `api` continuam passando.
 
-- Unitário: bucketização determinística (mesmo BU sempre no mesmo bucket) e parser por linha.
-- Integração: importar o fixture normal e uma cópia com as linhas embaralhadas; os dois devem produzir os mesmos BUs e votos.
-- Regressão: lote, idempotência, versão e `/api/summary` continuam passando.
+## Pendências
+
+- Rodar a carga real do SP e medir tempo e pico de memória.
+- Se a carga de 300 milhões exigir mais velocidade, o próximo passo é enviar o CSV direto para a staging sem normalizar em Node (COPY do arquivo cru para colunas de texto) e normalizar em SQL.
