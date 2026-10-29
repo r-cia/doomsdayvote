@@ -6,7 +6,7 @@ Não é totalização oficial, não é tempo real e não afirma cobertura: mostr
 
 ## Stack
 
-- **Backend:** Node 22, Fastify 5, Kysely, PostgreSQL, Pino, Zod, pg-copy-streams. ESM, sem TypeScript.
+- **Backend:** Node 22, Fastify 5, Kysely, PostgreSQL, Redis, Pino, Zod, pg-copy-streams. ESM, sem TypeScript.
 - **Frontend:** Vue 3, Vite 8, Pinia, Vue Query, MapLibre (malha local).
 - **Portas:** API em `7000`, frontend em `7010` (escuta em `0.0.0.0`).
 

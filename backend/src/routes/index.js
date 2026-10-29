@@ -65,8 +65,18 @@ function itemSecao(linha, corte) {
 
 export async function registrarRotas(app) {
   const db = app.deps.db;
+  const cache = app.deps.cache ?? {
+    obter: async (_rota, _params, _ttl, fn) => ({ valor: await fn(), cache: 'off' }),
+  };
 
-  app.get('/api/elections', async () => {
+  const cacheado = (rota, ttl, schema, fn) => async (req, reply) => {
+    const query = validar(schema, { ...req.params, ...req.query });
+    const { valor, cache: estado } = await cache.obter(rota, query, ttl, () => fn(query, req));
+    reply.header('x-cache', estado);
+    return valor;
+  };
+
+  app.get('/api/elections', cacheado('elections', 300, z.object({}), async () => {
     const eleicoes = await db
       .selectFrom('eleicao')
       .selectAll()
@@ -92,10 +102,9 @@ export async function registrarRotas(app) {
           })),
       })),
     };
-  });
+  }));
 
-  app.get('/api/summary', async (req) => {
-    const query = validar(baseSchema, req.query);
+  app.get('/api/summary', cacheado('summary', 60, baseSchema, async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
@@ -116,16 +125,12 @@ export async function registrarRotas(app) {
       votos,
       metricas,
     };
-  });
+  }));
 
-  app.get('/api/timeline', async (req) => {
-    const query = validar(
-      baseSchema.extend({
-        granularity: z.enum(['1m', '5m']).default('5m'),
-        por_candidato: z.enum(['true', 'false']).optional(),
-      }),
-      req.query,
-    );
+  app.get('/api/timeline', cacheado('timeline', 120, baseSchema.extend({
+    granularity: z.enum(['1m', '5m']).default('5m'),
+    por_candidato: z.enum(['true', 'false']).optional(),
+  }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const intervalo = query.granularity === '1m' ? '1 minute' : '5 minutes';
@@ -225,10 +230,9 @@ export async function registrarRotas(app) {
       pontos,
       series,
     };
-  });
+  }));
 
-  app.get('/api/analysis', async (req) => {
-    const query = validar(baseSchema, req.query);
+  app.get('/api/analysis', cacheado('analysis', 300, baseSchema, async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const escopo = {
@@ -258,10 +262,9 @@ export async function registrarRotas(app) {
         })),
       },
     };
-  });
+  }));
 
-  app.get('/api/anomalies', async (req) => {
-    const query = validar(baseSchema, req.query);
+  app.get('/api/anomalies', cacheado('anomalies', 600, baseSchema, async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const escopo = {
@@ -325,16 +328,12 @@ export async function registrarRotas(app) {
         secoes: ranking,
       },
     };
-  });
+  }));
 
-  app.get('/api/map', async (req) => {
-    const query = validar(
-      baseSchema.extend({
-        level: z.enum(['uf', 'municipio']).default('uf'),
-        candidatos: z.string().optional(),
-      }),
-      req.query,
-    );
+  app.get('/api/map', cacheado('map', 300, baseSchema.extend({
+    level: z.enum(['uf', 'municipio']).default('uf'),
+    candidatos: z.string().optional(),
+  }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const candidatos = (query.candidatos ?? '')
@@ -363,21 +362,17 @@ export async function registrarRotas(app) {
       avisos,
       areas,
     };
-  });
+  }));
 
-  app.get('/api/sections', async (req) => {
-    const query = validar(
-      baseSchema.extend({
-        zona: z.coerce.number().int().optional(),
-        secao: z.coerce.number().int().optional(),
-        municipio_nome: z.string().optional(),
-        busca: z.string().optional(),
-        status: z.string().optional(),
-        page: z.coerce.number().int().min(1).default(1),
-        page_size: z.coerce.number().int().min(1).optional(),
-      }),
-      req.query,
-    );
+  app.get('/api/sections', cacheado('sections', 60, baseSchema.extend({
+    zona: z.coerce.number().int().optional(),
+    secao: z.coerce.number().int().optional(),
+    municipio_nome: z.string().optional(),
+    busca: z.string().optional(),
+    status: z.string().optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+  }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
@@ -460,18 +455,14 @@ export async function registrarRotas(app) {
       total: itens.length,
       items: itens.slice(inicio, inicio + pageSize),
     };
-  });
+  }));
 
-  app.get('/api/sections/:id', async (req) => {
-    const query = validar(
-      z.object({
-        id: z.string().uuid(),
-        election_id: z.string().uuid(),
-        cargo: z.coerce.number().int(),
-        ...corteSchema,
-      }),
-      { ...req.params, ...req.query },
-    );
+  app.get('/api/sections/:id', cacheado('section', 300, z.object({
+    id: z.string().uuid(),
+    election_id: z.string().uuid(),
+    cargo: z.coerce.number().int(),
+    ...corteSchema,
+  }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
 
@@ -541,5 +532,5 @@ export async function registrarRotas(app) {
       lote,
       versoes_anteriores: Number(anteriores.total),
     };
-  });
+  }));
 }
