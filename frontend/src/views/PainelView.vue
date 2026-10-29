@@ -14,19 +14,33 @@ import StateBlock from '../components/StateBlock.vue'
 import UfPanel from '../components/UfPanel.vue'
 import {
   useAnalise,
-  useEleicoes,
   useMapa,
   useResumo,
   useSecoes,
   useTimeline,
 } from '../composables/queries'
+import { useSelecaoEleicao } from '../composables/selecao'
 import { candidatosNominais } from '../lib/agregacoes'
-import { useFiltersStore } from '../stores/filters'
 
-const store = useFiltersStore()
 const router = useRouter()
+const {
+  store,
+  eleicoesQuery,
+  eleicoesDisponiveis,
+  cargos,
+  anos,
+  turnos,
+  filtros,
+  aoCargo,
+  aoAno,
+  aoTurno,
+  aoCandidato,
+  aoCorte,
+  aoUf,
+  limparMunicipio,
+  limpar,
+} = useSelecaoEleicao()
 
-const eleicoesQuery = useEleicoes()
 const resumoQuery = useResumo()
 const timelineQuery = useTimeline()
 const analiseQuery = useAnalise()
@@ -37,60 +51,6 @@ const mapaUfQuery = useMapa('uf', {
 })
 const secoesQuery = useSecoes()
 
-const eleicoes = computed(() => eleicoesQuery.data.value?.eleicoes ?? [])
-const eleicoesDisponiveis = computed(() =>
-  eleicoes.value.filter((eleicao) =>
-    eleicao.cargos?.some((cargo) =>
-      ['Presidente', 'Governador'].includes(cargo.ds_cargo_pergunta),
-    ),
-  ),
-)
-const eleicaoAtual = computed(() =>
-  eleicoesDisponiveis.value.find((eleicao) => eleicao.id === store.electionId),
-)
-
-const ORDEM_CARGOS = { Presidente: 0, Governador: 1 }
-
-const cargos = computed(() => {
-  const mapa = new Map()
-  for (const eleicao of eleicoesDisponiveis.value) {
-    for (const cargo of eleicao.cargos ?? []) {
-      if (!(cargo.ds_cargo_pergunta in ORDEM_CARGOS)) continue
-      mapa.set(cargo.cd_cargo_pergunta, cargo.ds_cargo_pergunta)
-    }
-  }
-  return [...mapa.entries()]
-    .map(([cd, ds]) => ({ cd_cargo_pergunta: cd, ds_cargo_pergunta: ds }))
-    .sort(
-      (a, b) =>
-        (ORDEM_CARGOS[a.ds_cargo_pergunta] ?? 9) -
-        (ORDEM_CARGOS[b.ds_cargo_pergunta] ?? 9),
-    )
-})
-
-const eleicoesDoCargo = computed(() =>
-  eleicoesDisponiveis.value.filter((eleicao) =>
-    (eleicao.cargos ?? []).some(
-      (cargo) => cargo.cd_cargo_pergunta === store.cargo,
-    ),
-  ),
-)
-
-const anos = computed(() =>
-  [...new Set(eleicoesDoCargo.value.map((eleicao) => eleicao.ano_eleicao))].sort(
-    (a, b) => b - a,
-  ),
-)
-
-const turnos = computed(() =>
-  [
-    ...new Set(
-      eleicoesDoCargo.value
-        .filter((eleicao) => eleicao.ano_eleicao === eleicaoAtual.value?.ano_eleicao)
-        .map((eleicao) => eleicao.nr_turno),
-    ),
-  ].sort((a, b) => a - b),
-)
 const candidatos = computed(() =>
   candidatosNominais(resumoQuery.data.value?.votos ?? []),
 )
@@ -100,16 +60,6 @@ const candidatoSelecionado = computed(
       (candidato) => candidato.nr_votavel === store.candidato,
     ) ?? null,
 )
-const filtros = computed(() => ({
-  electionId: store.electionId,
-  ano: eleicaoAtual.value?.ano_eleicao ?? null,
-  cargo: store.cargo,
-  turno: store.turno,
-  candidato: store.candidato,
-  asOfInput: store.asOfInput,
-  uf: store.uf,
-  municipio: store.municipio,
-}))
 
 const votosDoCandidato = computed(() => {
   if (!candidatoSelecionado.value) return null
@@ -137,70 +87,6 @@ const avisos = computed(() => {
 })
 
 const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
-
-function eleicaoPara(cargo, ano, turno) {
-  const opcoes = eleicoesDisponiveis.value.filter((eleicao) =>
-    (eleicao.cargos ?? []).some(
-      (item) => item.cd_cargo_pergunta === cargo,
-    ),
-  )
-  return (
-    opcoes.find(
-      (eleicao) => eleicao.ano_eleicao === ano && eleicao.nr_turno === turno,
-    ) ??
-    opcoes.find((eleicao) => eleicao.ano_eleicao === ano) ??
-    opcoes[0] ??
-    null
-  )
-}
-
-function aplicarEleicao(eleicao, cargo) {
-  if (!eleicao) return
-  store.definirEleicao(eleicao)
-  store.definirCargo(cargo)
-}
-
-function aoCargo(cargo) {
-  aplicarEleicao(
-    eleicaoPara(cargo, eleicaoAtual.value?.ano_eleicao, eleicaoAtual.value?.nr_turno),
-    cargo,
-  )
-}
-
-function aoAno(ano) {
-  aplicarEleicao(
-    eleicaoPara(store.cargo, ano, eleicaoAtual.value?.nr_turno),
-    store.cargo,
-  )
-}
-
-function aoTurno(turno) {
-  aplicarEleicao(
-    eleicaoPara(store.cargo, eleicaoAtual.value?.ano_eleicao, turno),
-    store.cargo,
-  )
-}
-
-function aoCandidato(candidato) {
-  const numero = candidato === null || candidato === undefined ? null : Number(candidato)
-  store.definirCandidato(store.candidato === numero ? null : numero)
-}
-
-function aoCorte(valor) {
-  store.definirCorte(valor)
-}
-
-function aoUf(uf) {
-  store.definirUf(uf)
-}
-
-function limparMunicipio() {
-  store.definirMunicipio(null)
-}
-
-function limpar() {
-  store.limpar()
-}
 
 function selecionarNoMapa(selecao) {
   if (!selecao) return
@@ -375,14 +261,18 @@ function atualizarSecoes() {
         :loading="secoesQuery.isLoading.value"
         :error="secoesQuery.error.value?.message ?? ''"
         :status="store.sectionStatus"
-        :busca="store.sectionBusca"
+        :zona="store.sectionZona"
+        :secao="store.sectionSecao"
+        :municipio-nome="store.sectionMunicipioNome"
         :page-size="store.sectionPageSize"
         :uf="store.uf"
         :municipio="store.municipio"
         @update:page="store.definirPagina"
         @update:page-size="store.definirTamanhoPagina"
         @update:status="store.definirStatusSecao"
-        @update:busca="store.definirBuscaSecao"
+        @update:zona="store.definirZonaSecao"
+        @update:secao="store.definirNumeroSecao"
+        @update:municipio-nome="store.definirMunicipioSecao"
         @select="abrirSecao"
         @retry="atualizarSecoes"
       />

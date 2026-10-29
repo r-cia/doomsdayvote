@@ -113,6 +113,21 @@ describe('API de leitura', () => {
       expect(detalhe.statusCode).toBe(200);
       expect(detalhe.json().secao.id).toBe(corpo.items[0].id);
       expect(detalhe.json().boletim).toBeTruthy();
+
+      const primeiro = corpo.items[0];
+      const porSecao = await app.inject({
+        method: 'GET',
+        url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&uf=AC&zona=${primeiro.nr_zona}&secao=${primeiro.nr_secao}`,
+      });
+      expect(porSecao.statusCode).toBe(200);
+      expect(porSecao.json().items).toHaveLength(1);
+
+      const porMunicipio = await app.inject({
+        method: 'GET',
+        url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&uf=AC&municipio_nome=${encodeURIComponent(primeiro.nm_municipio)}`,
+      });
+      expect(porMunicipio.statusCode).toBe(200);
+      expect(porMunicipio.json().total).toBeGreaterThan(0);
     },
     { timeout: 120000 },
   );
@@ -163,6 +178,34 @@ describe('API de leitura', () => {
       expect(corpoSeries.series.length).toBeGreaterThan(0);
       expect(corpoSeries.series[0].pontos.length).toBeGreaterThan(0);
       expect(corpoSeries.series[0].pontos[0].votos_acumulados).toBeGreaterThan(0);
+    },
+    { timeout: 120000 },
+  );
+
+  it(
+    'anomalias: Benford por nível, duplicação e outliers',
+    async () => {
+      const resposta = await app.inject({
+        method: 'GET',
+        url: `/api/anomalies?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}`,
+      });
+      expect(resposta.statusCode).toBe(200);
+      const corpo = resposta.json();
+
+      expect(corpo.benford_niveis.minimo_votos).toBe(10);
+      const candidato = corpo.benford_niveis.candidatos[0];
+      expect(candidato.niveis.secao.digitos).toHaveLength(9);
+      expect(candidato.niveis.zona.digitos).toHaveLength(9);
+      expect(candidato.niveis.municipio.digitos).toHaveLength(9);
+
+      expect(corpo.duplicacao.total_grupos).toBeGreaterThanOrEqual(0);
+      expect(Array.isArray(corpo.duplicacao.grupos)).toBe(true);
+
+      expect(corpo.outliers.features).toHaveLength(7);
+      expect(corpo.outliers.total_secoes).toBeGreaterThan(0);
+      expect(corpo.outliers.secoes.length).toBeGreaterThan(0);
+      expect(corpo.outliers.secoes[0].score_if).toBeGreaterThanOrEqual(0);
+      expect(corpo.outliers.secoes[0].score_if).toBeLessThanOrEqual(1);
     },
     { timeout: 120000 },
   );

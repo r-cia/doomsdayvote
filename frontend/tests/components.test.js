@@ -501,15 +501,18 @@ describe('SectionsTable', () => {
     ],
   }
 
-  it('busca na página, pagina e abre detalhe', async () => {
+  it('só carrega com UF, pagina e abre detalhe', async () => {
+    const semUf = mount(SectionsTable, {
+      props: { data, status: '', pageSize: 25, uf: null },
+    })
+    expect(semUf.text()).toContain('Selecione um estado')
+    expect(semUf.findAll('[data-secao-btn]')).toHaveLength(0)
+
     const wrapper = mount(SectionsTable, {
-      props: { data, status: '', pageSize: 25 },
+      props: { data, status: '', pageSize: 25, uf: 'PE' },
     })
 
     expect(wrapper.findAll('[data-secao-btn]')).toHaveLength(2)
-    await wrapper.find('input[type="search"]').setValue('Recife')
-    expect(wrapper.findAll('[data-secao-btn]')).toHaveLength(1)
-    expect(wrapper.text()).toContain('Recife')
 
     await wrapper.findAll('button').find((botao) => botao.text() === 'Próxima').trigger('click')
     expect(wrapper.emitted('update:page')[0]).toEqual([2])
@@ -521,12 +524,31 @@ describe('SectionsTable', () => {
     expect(wrapper.emitted('select')[0][0].id).toBe('s1')
   })
 
+  it('emite município, zona e seção em campos separados', async () => {
+    const wrapper = mount(SectionsTable, {
+      props: { data, status: '', pageSize: 25, uf: 'PE' },
+    })
+
+    const campos = wrapper.findAll('input')
+    expect(campos).toHaveLength(3)
+
+    await campos[0].setValue('Recife')
+    expect(wrapper.emitted('update:municipio-nome')[0]).toEqual(['Recife'])
+
+    await campos[1].setValue('9')
+    expect(wrapper.emitted('update:zona')[0]).toEqual(['9'])
+
+    await campos[2].setValue('12')
+    expect(wrapper.emitted('update:secao')[0]).toEqual(['12'])
+  })
+
   it('mostra estado vazio quando não há itens', () => {
     const wrapper = mount(SectionsTable, {
       props: {
         data: { page: 1, page_size: 25, total: 0, items: [] },
         status: '',
         pageSize: 25,
+        uf: 'PE',
       },
     })
     expect(wrapper.text()).toContain('Nenhuma seção encontrada')

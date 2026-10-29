@@ -106,6 +106,33 @@ export function useAnalise() {
   })
 }
 
+export function useAnomalias() {
+  const store = useFiltersStore()
+  return useQuery({
+    queryKey: computed(() => [
+      'anomalias',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+    ]),
+    queryFn: ({ signal }) =>
+      api.anomalias(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    placeholderData: keepPreviousData,
+  })
+}
+
 export function useMapa(nivel = null, opcoes = {}) {
   const store = useFiltersStore()
   const nivelEfetivo = computed(() => nivel ?? store.mapLevel)
@@ -157,7 +184,9 @@ export function useSecoes() {
       store.uf,
       store.municipio,
       store.sectionStatus,
-      store.sectionBusca,
+      store.sectionZona,
+      store.sectionSecao,
+      store.sectionMunicipioNome,
       store.sectionPage,
       store.sectionPageSize,
     ]),
@@ -170,13 +199,17 @@ export function useSecoes() {
           uf: store.uf,
           municipio: store.municipio,
           status: store.sectionStatus,
-          busca: store.sectionBusca,
+          zona: store.sectionZona,
+          secao: store.sectionSecao,
+          municipio_nome: store.sectionMunicipioNome,
           page: store.sectionPage,
           page_size: store.sectionPageSize,
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() =>
+      Boolean(store.electionId && store.cargo && store.uf),
+    ),
     placeholderData: keepPreviousData,
   })
 }

@@ -1,11 +1,7 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
-import {
-  formatarData,
-  formatarDataHora,
-  formatarNumero,
-} from '../lib/format'
+import { formatarData, formatarDataHora, formatarNumero } from '../lib/format'
 import { motivoSecao, opcoesStatus, statusSecao } from '../lib/status'
 
 const props = defineProps({
@@ -13,7 +9,9 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   status: { type: String, default: '' },
-  busca: { type: String, default: '' },
+  zona: { type: Number, default: null },
+  secao: { type: Number, default: null },
+  municipioNome: { type: String, default: '' },
   pageSize: { type: Number, default: 25 },
   uf: { type: String, default: null },
   municipio: { type: Number, default: null },
@@ -23,25 +21,13 @@ const emit = defineEmits([
   'update:page',
   'update:page-size',
   'update:status',
-  'update:busca',
+  'update:zona',
+  'update:secao',
+  'update:municipio-nome',
   'select',
   'retry',
 ])
 
-const busca = ref(props.busca)
-let debounceBusca = null
-
-watch(
-  () => props.busca,
-  (valor) => {
-    busca.value = valor
-  },
-)
-
-watch(busca, (valor) => {
-  clearTimeout(debounceBusca)
-  debounceBusca = setTimeout(() => emit('update:busca', valor), 300)
-})
 const tabela = ref(null)
 const itens = computed(() => props.data?.items ?? [])
 const total = computed(() => Number(props.data?.total ?? 0))
@@ -50,24 +36,6 @@ const totalPaginas = computed(() =>
   Math.max(1, Math.ceil(total.value / Math.max(1, props.pageSize))),
 )
 const statusDisponiveis = opcoesStatus()
-
-const itensFiltrados = computed(() => {
-  const termo = busca.value.trim().toLowerCase()
-  if (!termo) return itens.value
-  return itens.value.filter((item) =>
-    [
-      item.nm_municipio,
-      item.sg_uf,
-      item.nr_zona,
-      item.nr_secao,
-      item.nr_local_votacao,
-      item.status,
-      statusSecao(item.status).rotulo,
-    ]
-      .filter((valor) => valor !== null && valor !== undefined)
-      .some((valor) => String(valor).toLowerCase().includes(termo)),
-  )
-})
 
 const contexto = computed(() => {
   const partes = []
@@ -92,11 +60,6 @@ function irParaUltima() {
   irPara(totalPaginas.value)
 }
 
-watch(
-  () => props.data?.page,
-  () => {},
-)
-
 function navegarLinhas(evento) {
   const botoes = [...(tabela.value?.querySelectorAll('[data-secao-btn]') ?? [])]
   if (botoes.length === 0) return
@@ -117,171 +80,186 @@ function navegarLinhas(evento) {
     <div class="card__cabecalho">
       <div>
         <h2 id="secoes-titulo">Seções eleitorais</h2>
-        <p>
+        <p v-if="uf">
           {{ formatarNumero(total) }} seções no filtro.
           <template v-if="contexto">Escopo: {{ contexto }}.</template>
         </p>
       </div>
     </div>
 
-    <div class="secoes__barra">
-      <label class="campo campo--busca">
-        <span>Buscar nesta página</span>
-        <input
-          v-model="busca"
-          type="search"
-          placeholder="Município, zona, seção ou local"
-        />
-      </label>
-
-      <label class="campo campo--curto">
-        <span>Status</span>
-        <select
-          :value="status"
-          @change="$emit('update:status', $event.target.value)"
-        >
-          <option value="">Todos</option>
-          <option
-            v-for="opcao in statusDisponiveis"
-            :key="opcao.valor"
-            :value="opcao.valor"
-          >
-            {{ opcao.rotulo }}
-          </option>
-        </select>
-      </label>
-
-      <label class="campo campo--curto">
-        <span>Por página</span>
-        <select
-          :value="pageSize"
-          @change="$emit('update:page-size', Number($event.target.value))"
-        >
-          <option :value="25">25</option>
-          <option :value="50">50</option>
-          <option :value="100">100</option>
-          <option :value="200">200</option>
-        </select>
-      </label>
-    </div>
-
-    <StateBlock
-      v-if="error"
-      estado="erro"
-      titulo="Não foi possível carregar as seções"
-      :descricao="error"
-      acao="Tentar novamente"
-      @acao="$emit('retry')"
-    />
-    <StateBlock
-      v-else-if="loading && itens.length === 0"
-      estado="carregando"
-      titulo="Carregando seções"
-    />
-    <p v-else-if="itens.length === 0" class="vazio">
-      Nenhuma seção encontrada com os filtros atuais.
-    </p>
-    <p v-else-if="itensFiltrados.length === 0" class="vazio">
-      Nenhum item desta página corresponde à busca.
-    </p>
+    <p v-if="!uf" class="vazio">Selecione um estado.</p>
 
     <template v-else>
-      <p v-if="loading" class="secoes__atualizando" role="status">
-        Atualizando seções…
-      </p>
+      <div class="secoes__barra">
+        <label class="campo campo--busca">
+          <span>Município</span>
+          <input
+            type="text"
+            placeholder="Nome"
+            :value="municipioNome"
+            @change="emit('update:municipio-nome', $event.target.value)"
+          />
+        </label>
 
-      <div class="tabela-scroll">
-        <table ref="tabela">
-          <caption class="sr-only">
-            Seções eleitorais, status do BU e acesso ao detalhe
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col">UF</th>
-              <th scope="col">Município</th>
-              <th scope="col" class="num">Zona</th>
-              <th scope="col" class="num">Seção</th>
-              <th scope="col" class="num">Local</th>
-              <th scope="col">Status</th>
-              <th scope="col">BU recebido</th>
-              <th scope="col"><span class="sr-only">Ação</span></th>
-            </tr>
-          </thead>
-          <tbody @keydown="navegarLinhas">
-            <tr v-for="item in itensFiltrados" :key="item.id">
-              <td>{{ item.sg_uf }}</td>
-              <th scope="row">{{ item.nm_municipio }}</th>
-              <td class="num">{{ item.nr_zona }}</td>
-              <td class="num">{{ item.nr_secao }}</td>
-              <td class="num">{{ item.nr_local_votacao }}</td>
-              <td>
-                <span
-                  class="status"
-                  :class="`status--${statusSecao(item.status).tom}`"
-                  :title="statusSecao(item.status).descricao"
-                >
-                  {{ statusSecao(item.status).rotulo }}
-                </span>
-                <small v-if="item.motivo" class="status__motivo">
-                  {{ motivoSecao(item.motivo) }}
-                </small>
-              </td>
-              <td>{{ recebimento(item) }}</td>
-              <td>
-                <button
-                  type="button"
-                  class="button button--ghost button--compacto"
-                  :data-secao-btn="item.id"
-                  :aria-label="`Ver detalhe da seção ${item.nr_secao} da zona ${item.nr_zona} de ${item.nm_municipio}`"
-                  @click="$emit('select', item)"
-                >
-                  Detalhe
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <label class="campo campo--curto">
+          <span>Zona</span>
+          <input
+            type="number"
+            min="1"
+            :value="zona ?? ''"
+            @change="emit('update:zona', $event.target.value)"
+          />
+        </label>
+
+        <label class="campo campo--curto">
+          <span>Seção</span>
+          <input
+            type="number"
+            min="1"
+            :value="secao ?? ''"
+            @change="emit('update:secao', $event.target.value)"
+          />
+        </label>
+
+        <label class="campo campo--curto">
+          <span>Status</span>
+          <select
+            :value="status"
+            @change="emit('update:status', $event.target.value)"
+          >
+            <option value="">Todos</option>
+            <option
+              v-for="opcao in statusDisponiveis"
+              :key="opcao.valor"
+              :value="opcao.valor"
+            >
+              {{ opcao.rotulo }}
+            </option>
+          </select>
+        </label>
+
+        <label class="campo campo--curto">
+          <span>Por página</span>
+          <select
+            :value="pageSize"
+            @change="emit('update:page-size', Number($event.target.value))"
+          >
+            <option :value="25">25</option>
+            <option :value="50">50</option>
+            <option :value="100">100</option>
+          </select>
+        </label>
       </div>
 
-      <nav class="paginacao" aria-label="Paginação das seções">
-        <span aria-live="polite">
-          Página {{ pagina }} de {{ totalPaginas }}
-        </span>
-        <div class="paginacao__botoes">
-          <button
-            type="button"
-            class="button button--ghost button--compacto"
-            :disabled="pagina <= 1"
-            @click="irPara(1)"
-          >
-            Primeira
-          </button>
-          <button
-            type="button"
-            class="button button--ghost button--compacto"
-            :disabled="pagina <= 1"
-            @click="irPara(pagina - 1)"
-          >
-            Anterior
-          </button>
-          <button
-            type="button"
-            class="button button--ghost button--compacto"
-            :disabled="pagina >= totalPaginas"
-            @click="irPara(pagina + 1)"
-          >
-            Próxima
-          </button>
-          <button
-            type="button"
-            class="button button--ghost button--compacto"
-            :disabled="pagina >= totalPaginas"
-            @click="irParaUltima"
-          >
-            Última
-          </button>
+      <StateBlock
+        v-if="error"
+        estado="erro"
+        titulo="Não foi possível carregar as seções"
+        :descricao="error"
+        acao="Tentar novamente"
+        @acao="emit('retry')"
+      />
+      <StateBlock
+        v-else-if="loading && !data"
+        estado="carregando"
+        titulo="Carregando seções"
+      />
+      <p v-else-if="itens.length === 0" class="vazio">Nenhuma seção encontrada.</p>
+
+      <template v-else>
+        <p v-if="loading" class="secoes__atualizando" role="status">
+          Atualizando…
+        </p>
+        <div class="tabela-scroll">
+          <table ref="tabela" @keydown="navegarLinhas">
+            <caption class="sr-only">
+              Seções eleitorais com status e horário de recebimento do BU
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">UF</th>
+                <th scope="col">Município</th>
+                <th scope="col" class="num">Zona</th>
+                <th scope="col" class="num">Seção</th>
+                <th scope="col" class="num">Local</th>
+                <th scope="col">Status</th>
+                <th scope="col">BU recebido</th>
+                <th scope="col"><span class="sr-only">Ação</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in itens" :key="item.id">
+                <td>{{ item.sg_uf }}</td>
+                <td>{{ item.nm_municipio }}</td>
+                <td class="num">{{ item.nr_zona }}</td>
+                <td class="num">{{ item.nr_secao }}</td>
+                <td class="num">{{ item.nr_local_votacao }}</td>
+                <td>
+                  <span
+                    class="status"
+                    :class="`status--${statusSecao(item.status).tom}`"
+                    :title="statusSecao(item.status).descricao"
+                  >
+                    {{ statusSecao(item.status).rotulo }}
+                  </span>
+                  <small v-if="item.motivo" class="status__motivo">
+                    {{ motivoSecao(item.motivo) }}
+                  </small>
+                </td>
+                <td>{{ recebimento(item) }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="button button--ghost button--compacto"
+                    data-secao-btn
+                    @click="emit('select', item)"
+                  >
+                    Detalhe
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </nav>
+
+        <nav class="paginacao" aria-label="Paginação das seções">
+          <span>Página {{ pagina }} de {{ totalPaginas }}</span>
+          <div class="paginacao__botoes">
+            <button
+              type="button"
+              class="button button--ghost button--compacto"
+              :disabled="pagina <= 1"
+              @click="irPara(1)"
+            >
+              Primeira
+            </button>
+            <button
+              type="button"
+              class="button button--ghost button--compacto"
+              :disabled="pagina <= 1"
+              @click="irPara(pagina - 1)"
+            >
+              Anterior
+            </button>
+            <button
+              type="button"
+              class="button button--ghost button--compacto"
+              :disabled="pagina >= totalPaginas"
+              @click="irPara(pagina + 1)"
+            >
+              Próxima
+            </button>
+            <button
+              type="button"
+              class="button button--ghost button--compacto"
+              :disabled="pagina >= totalPaginas"
+              @click="irParaUltima"
+            >
+              Última
+            </button>
+          </div>
+        </nav>
+      </template>
     </template>
   </section>
 </template>
