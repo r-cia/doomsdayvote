@@ -1563,6 +1563,16 @@ tr.linha--ativa th {
   background: var(--amber-soft);
 }
 
+.uf-grupo {
+  text-align: left;
+  padding: 6px 10px 4px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--bg);
+}
+
 /* ── seções ───────────────────────────────────────────────────────── */
 
 .secoes__barra {
