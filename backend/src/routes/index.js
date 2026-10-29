@@ -7,6 +7,7 @@ import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
 import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
+import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
 import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
 
@@ -327,6 +328,28 @@ export async function registrarRotas(app) {
         total_secoes: secoes.length,
         secoes: ranking,
       },
+    };
+  }));
+
+  app.get('/api/estatisticas', cacheado('estatisticas', 300, baseSchema.extend({
+    escopo: z.enum(['turno', 'ano']).default('turno'),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const irmaos = await eleicoesDoAno(db, { eleicao, cargo: query.cargo });
+    const alvos = query.escopo === 'ano' && irmaos.length > 0 ? irmaos : [eleicao];
+    const recorte = { cargo: query.cargo, corte, escopo: escopoDe(query) };
+
+    const blocos = [];
+    for (const alvo of alvos) {
+      blocos.push(await estatisticasDaEleicao(db, { eleicao: alvo, ...recorte }));
+    }
+
+    return {
+      corte: corteResposta(corte),
+      escopo: query.escopo,
+      turnos_disponiveis: irmaos.map((irmao) => irmao.nr_turno),
+      blocos,
     };
   }));
 
