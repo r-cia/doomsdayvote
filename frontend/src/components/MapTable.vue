@@ -39,7 +39,7 @@ const linhas = computed(() =>
     return {
       chave,
       area,
-      rotulo: props.nivel === 'uf' ? area.sg_uf : `Município ${chave}`,
+      rotulo: props.nivel === 'uf' ? area.sg_uf : (area.nm_municipio || `Município ${chave}`),
       total: Number(area.total_votos ?? 0),
       validos: Number(area.votos_validos ?? 0),
       liderNome: lider ? nomeCandidato(lider.nr_votavel) : '—',
