@@ -1104,6 +1104,7 @@ select {
   display: grid;
   grid-template-columns: minmax(0, 0.86fr) minmax(300px, 1fr);
   gap: 12px;
+  align-items: stretch;
 }
 
 .card {
@@ -1488,8 +1489,15 @@ tbody tr[data-ativo='true'] {
 /* ── uf ───────────────────────────────────────────────────────────── */
 
 .uf-painel__scroll {
-  max-height: 560px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
+}
+
+.uf-painel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .uf-painel__acoes {
