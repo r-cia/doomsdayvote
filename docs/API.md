@@ -86,3 +86,13 @@ Duas leituras no recorte e no corte atuais.
 `qt_habilitados_por_biometria` é `qt_comparecimento − qt_biometria_nao_habilitada`. O campo `QT_ELEI_BIOM_SEM_HABILITACAO` do BU conta eleitores **com** biometria que não foram habilitados por ela; não há biometria por candidato e a API não rateia.
 
 Benford usa o primeiro dígito dos votos por seção com 10 votos ou mais, a distribuição esperada `log10(1 + 1/d)` e o MAD de Nigrini (0,006 / 0,012 / 0,015). É leitura descritiva, não prova de fraude.
+
+## `GET /api/anomalies`
+
+Benford por nível, duplicação de vetor de votos e outliers por seção, no corte e no recorte.
+
+- `benford_niveis`: por candidato, `niveis.secao`, `niveis.zona` e `niveis.municipio`, cada um com `n`, `mad`, `classificacao` e `digitos`; mínimo de 10 votos por unidade.
+- `duplicacao`: `grupos` com a mesma assinatura do vetor de votos, `mesma_zona`, `secoes_consecutivas` e `mesmo_municipio`.
+- `outliers`: `features` (7), `isolamento` (100 árvores, amostra 256, limiar 0,6), `lof` (k 10, amostra até 2.000, limiar 2) e as 20 seções com maior score.
+
+`GET /api/sections` aceita `municipio_nome` (nome parcial), `zona` e `secao` como filtros separados, além de `uf` e `municipio`.
