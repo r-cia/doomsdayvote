@@ -52,6 +52,9 @@ export async function baseSecaoCandidato(
 ) {
   return base(db, { eleicaoId, cargo, corte, escopo })
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
+    .leftJoin('localidade as l', (join) =>
+      join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+    )
     .select([
       'rv.nr_votavel',
       sql`max(rv.nm_votavel)`.as('nm_votavel'),
@@ -59,6 +62,7 @@ export async function baseSecaoCandidato(
       'bv.secao_id',
       's.sg_uf',
       's.cd_municipio_tse',
+      sql`max(l.nm_municipio)`.as('nm_municipio'),
       's.nr_zona',
       's.nr_secao',
       sql`max(bv.qt_aptos)`.as('qt_aptos'),
@@ -153,6 +157,7 @@ export function featuresDasSecoes(linhas) {
         id: linha.secao_id,
         sg_uf: linha.sg_uf,
         cd_municipio_tse: linha.cd_municipio_tse,
+        nm_municipio: linha.nm_municipio ?? null,
         nr_zona: linha.nr_zona,
         nr_secao: linha.nr_secao,
         aptos: Number(linha.qt_aptos ?? 0),
@@ -194,6 +199,7 @@ export function featuresDasSecoes(linhas) {
       id: secao.id,
       sg_uf: secao.sg_uf,
       cd_municipio_tse: secao.cd_municipio_tse,
+      nm_municipio: secao.nm_municipio ?? null,
       nr_zona: secao.nr_zona,
       nr_secao: secao.nr_secao,
       participacao: secao.comparecimento / secao.aptos,

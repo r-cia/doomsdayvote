@@ -50,7 +50,7 @@ function tomLof(valor) {
         <thead>
           <tr>
             <th scope="col">UF</th>
-            <th scope="col" class="num">Município</th>
+            <th scope="col">Município</th>
             <th scope="col" class="num">Zona</th>
             <th scope="col" class="num">Seção</th>
             <th scope="col" class="num">IF</th>
@@ -60,7 +60,7 @@ function tomLof(valor) {
         <tbody>
           <tr v-for="secao in secoes" :key="secao.id">
             <td>{{ secao.sg_uf }}</td>
-            <td class="num">{{ secao.cd_municipio_tse }}</td>
+            <td>{{ secao.nm_municipio || secao.cd_municipio_tse }}</td>
             <td class="num">{{ secao.nr_zona }}</td>
             <td class="num">{{ secao.nr_secao }}</td>
             <td class="num">
