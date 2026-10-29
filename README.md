@@ -12,6 +12,8 @@ Não é totalização oficial, não é tempo real e não afirma cobertura: mostr
 
 ## Rodar
 
+A carga aceita `.csv`, `.txt` e as versões comprimidas `.csv.gz` / `.txt.gz` (gzip). O arquivo comprimido é guardado como original e lido em streaming.
+
 ```bash
 # banco e migrações
 cd backend && npm run migrate

@@ -3,7 +3,7 @@ import { categorizar } from '../apuracao/categoria-votavel.js';
 import { hashConteudoBu, montarConteudoBu } from './conteudo-bu.js';
 import { dataOrigem, instanteOrigemSql, localOrigem } from '../../lib/datas.js';
 
-function chaveGrupo(valores) {
+export function chaveGrupo(valores) {
   return [
     valores.ANO_ELEICAO,
     valores.CD_PLEITO,
