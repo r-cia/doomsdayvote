@@ -33,6 +33,7 @@ async function primeiroCargo(eid) {
     .selectFrom('boletim_versao')
     .select('cd_cargo_pergunta')
     .where('eleicao_id', '=', eid)
+    .where('ds_cargo_pergunta', 'in', ['Presidente', 'Governador'])
     .executeTakeFirstOrThrow();
   return cargo.cd_cargo_pergunta;
 }

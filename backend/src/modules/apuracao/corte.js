@@ -67,7 +67,10 @@ export function aplicarEscopo(qb, escopo = {}) {
 }
 
 export function aplicarFiltroCorte(qb, corte) {
-  let consulta = qb.where('bv.ativo', '=', true).where('bv.cd_tipo_urna', '=', 1);
+  let consulta = qb
+    .where('bv.ativo', '=', true)
+    .where('bv.cd_tipo_urna', '=', 1)
+    .where(sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`);
 
   if (corte.tipo === 'recebimento_intradiario') {
     consulta = consulta
@@ -91,6 +94,7 @@ function baseEscopo(db, { eleicaoId, cargo, escopo = {} }) {
     .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
     .where('bv.ativo', '=', true)
     .where('bv.cd_tipo_urna', '=', 1)
+    .where(sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`)
     .where('bv.eleicao_id', '=', eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', cargo);
   return aplicarEscopo(qb, escopo);
