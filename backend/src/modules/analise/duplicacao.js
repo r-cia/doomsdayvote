@@ -35,12 +35,27 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
       }
     }
 
+    const vencedores = lista
+      .map((secao) => secao.vencedor_nr)
+      .filter((v) => v !== null && v !== undefined)
+    const mesmoVencedor =
+      vencedores.length > 0 && vencedores.every((v) => Number(v) === Number(vencedores[0]))
+    const vencedor = mesmoVencedor && lista[0].vencedor_nr
+      ? {
+          nr_votavel: Number(lista[0].vencedor_nr),
+          nm_votavel: lista[0].vencedor_nm,
+          sg_partido: lista[0].vencedor_sg,
+        }
+      : null
+
     grupos.push({
       assinatura,
       votaveis: Number(lista[0].votaveis ?? 0),
       mesma_zona: zonas.size === 1,
       mesmo_municipio: municipios.size === 1,
       secoes_consecutivas: consecutivas,
+      mesmo_vencedor: mesmoVencedor,
+      vencedor,
       secoes: lista.map((secao) => ({
         id: secao.id,
         sg_uf: secao.sg_uf,
@@ -80,6 +95,24 @@ export async function duplicacaoPorAssinatura(
 
   const linhas = await consulta
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
+    .leftJoinLateral(
+      (eb) =>
+        eb
+          .selectFrom('resultado_votavel as rv2')
+          .select([
+            'rv2.nr_votavel',
+            'rv2.nm_votavel',
+            'rv2.sg_partido',
+          ])
+          .whereRef('rv2.boletim_versao_id', '=', 'bv.id')
+          .where('rv2.categoria', '=', 'nominal')
+          .where('rv2.qt_votos', 'is not', null)
+          .orderBy('rv2.qt_votos', 'desc')
+          .orderBy('rv2.nr_votavel', 'asc')
+          .limit(1)
+          .as('venc'),
+      (join) => join.onTrue(),
+    )
     .select([
       'bv.secao_id as id',
       's.sg_uf',
@@ -87,6 +120,9 @@ export async function duplicacaoPorAssinatura(
       's.nr_zona',
       's.nr_secao',
       sql`max(l.nm_municipio)`.as('nm_municipio'),
+      'venc.nr_votavel as vencedor_nr',
+      'venc.nm_votavel as vencedor_nm',
+      'venc.sg_partido as vencedor_sg',
       sql`md5(string_agg(rv.cd_tipo_votavel::text || ':' || rv.nr_votavel::text || ':' || coalesce(rv.qt_votos, 0)::text, '|' order by rv.cd_tipo_votavel, rv.nr_votavel))`.as(
         'assinatura',
       ),
@@ -99,6 +135,9 @@ export async function duplicacaoPorAssinatura(
       's.cd_municipio_tse',
       's.nr_zona',
       's.nr_secao',
+      'venc.nr_votavel',
+      'venc.nm_votavel',
+      'venc.sg_partido',
     ])
     .execute()
 
