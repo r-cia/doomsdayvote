@@ -52,6 +52,7 @@ function numeros(grupo) {
             <th scope="col">Zonas</th>
             <th scope="col">Números</th>
             <th scope="col">Sinalizadores</th>
+            <th scope="col">Candidato</th>
           </tr>
         </thead>
         <tbody>
@@ -81,6 +82,12 @@ function numeros(grupo) {
                 </span>
                 <span v-else>—</span>
               </template>
+            </td>
+            <td>
+              <span v-if="grupo.mesmo_vencedor && grupo.vencedor">
+                {{ grupo.vencedor.nm_votavel }} ({{ grupo.vencedor.sg_partido }} {{ grupo.vencedor.nr_votavel }})
+              </span>
+              <span v-else>—</span>
             </td>
           </tr>
         </tbody>
