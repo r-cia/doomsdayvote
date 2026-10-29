@@ -348,10 +348,6 @@ function coletarCoordenadas(geometria, destino) {
 
 function ajustarVisao() {
   if (!mapa.value || !malha.value) return
-  if (props.nivel === 'uf') {
-    mapa.value.jumpTo?.({ center: [-52, -15], zoom: 3.1 })
-    return
-  }
   const coordenadas = []
   for (const feature of featuresVisiveis()) {
     coletarCoordenadas(feature.geometry, coordenadas)
@@ -362,7 +358,7 @@ function ajustarVisao() {
     limites.extend([longitude, latitude])
   }
   mapa.value.fitBounds(limites, {
-    padding: 24,
+    padding: props.nivel === 'uf' ? 24 : 16,
     duration: 0,
     maxZoom: props.nivel === 'uf' ? 4.2 : 7,
   })
