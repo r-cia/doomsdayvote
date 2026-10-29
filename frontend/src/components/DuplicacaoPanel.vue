@@ -66,7 +66,7 @@ function numeros(grupo) {
               <span v-if="grupo.secoes_consecutivas" class="chip chip--alert">
                 consecutivas
               </span>
-              <span v-if="grupo.mesmo_municipio" class="chip">mesmo município</span>
+              <span v-if="grupo.mesmo_municipio" class="chip chip--warn">mesmo município</span>
             </td>
           </tr>
         </tbody>
