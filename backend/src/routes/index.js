@@ -6,6 +6,7 @@ import { avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../mo
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
+import { benfordPorCandidato, composicaoBiometria } from '../modules/analise/estatisticas.js';
 
 const corteSchema = {
   as_of: z.string().optional(),
@@ -117,7 +118,10 @@ export async function registrarRotas(app) {
 
   app.get('/api/timeline', async (req) => {
     const query = validar(
-      baseSchema.extend({ granularity: z.enum(['1m', '5m']).default('5m') }),
+      baseSchema.extend({
+        granularity: z.enum(['1m', '5m']).default('5m'),
+        por_candidato: z.enum(['true', 'false']).optional(),
+      }),
       req.query,
     );
     const corte = resolverCorte(query);
@@ -158,6 +162,52 @@ export async function registrarRotas(app) {
       };
     });
 
+    let series = null;
+    if (query.por_candidato === 'true') {
+      const { rows: linhas } = await sql`
+        select
+          date_bin(${intervalo}::interval, bv.dt_bu_recebido_ts, timestamptz '2000-01-01') as t,
+          rv.nr_votavel,
+          max(rv.nm_votavel) as nm_votavel,
+          sum(rv.qt_votos) as votos
+        from boletim_versao bv
+        join resultado_votavel rv on rv.boletim_versao_id = bv.id
+        join secao_eleitoral s on s.id = bv.secao_id
+        where bv.ativo = true
+          and bv.cd_tipo_urna = 1
+          and bv.precisao_dt_bu_recebido = 'DATA_HORA'
+          and bv.eleicao_id = ${eleicao.id}
+          and bv.cd_cargo_pergunta = ${query.cargo}
+          and lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')
+          and rv.categoria = 'nominal'
+          and rv.qt_votos is not null
+          ${filtroUf}
+          ${filtroMunicipio}
+        group by 1, 2
+        order by 1, 2
+      `.execute(db);
+
+      const acumulado = new Map();
+      for (const linha of linhas) {
+        if (!acumulado.has(linha.nr_votavel)) {
+          acumulado.set(linha.nr_votavel, {
+            nr_votavel: linha.nr_votavel,
+            nm_votavel: linha.nm_votavel,
+            total: 0,
+            pontos: [],
+          });
+        }
+        const serie = acumulado.get(linha.nr_votavel);
+        serie.total += Number(linha.votos);
+        serie.pontos.push({
+          t: new Date(linha.t).toISOString(),
+          votos_acumulados: serie.total,
+        });
+      }
+
+      series = [...acumulado.values()].map(({ total, ...serie }) => serie);
+    }
+
     return {
       granularity: query.granularity,
       corte: corteResposta(corte),
@@ -171,6 +221,34 @@ export async function registrarRotas(app) {
               },
             ],
       pontos,
+      series,
+    };
+  });
+
+  app.get('/api/analysis', async (req) => {
+    const query = validar(baseSchema, req.query);
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const escopo = {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    };
+
+    const [biometria, benford, metadados, avisos] = await Promise.all([
+      composicaoBiometria(db, escopo),
+      benfordPorCandidato(db, escopo),
+      metadadosCorte(db, escopo, corte),
+      avisosCorte(db, escopo, corte),
+    ]);
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      biometria,
+      benford,
     };
   });
 

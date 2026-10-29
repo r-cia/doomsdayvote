@@ -116,4 +116,54 @@ describe('API de leitura', () => {
     },
     { timeout: 120000 },
   );
+
+  it(
+    'análise: biometria do recorte e Benford por candidato',
+    async () => {
+      const analise = await app.inject({
+        method: 'GET',
+        url: `/api/analysis?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}`,
+      });
+      expect(analise.statusCode).toBe(200);
+      const corpo = analise.json();
+
+      expect(corpo.biometria.secoes).toBeGreaterThan(0);
+      expect(corpo.biometria.qt_comparecimento).toBeGreaterThanOrEqual(0);
+      expect(
+        corpo.biometria.qt_habilitados_por_biometria +
+          corpo.biometria.qt_biometria_nao_habilitada,
+      ).toBe(corpo.biometria.qt_comparecimento);
+
+      expect(corpo.benford.minimo_votos).toBe(10);
+      expect(corpo.benford.candidatos.length).toBeGreaterThan(0);
+      const candidato = corpo.benford.candidatos[0];
+      expect(candidato.digitos).toHaveLength(9);
+      expect(candidato.n).toBeGreaterThanOrEqual(0);
+      if (candidato.n > 0) {
+        const total = candidato.digitos.reduce(
+          (soma, digito) => soma + digito.observado,
+          0,
+        );
+        expect(total).toBe(candidato.n);
+      }
+
+      const semCorte = await app.inject({
+        method: 'GET',
+        url: `/api/analysis?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&as_of=2026-10-04T17:08:43-03:00`,
+      });
+      expect(semCorte.statusCode).toBe(200);
+      expect(semCorte.json().biometria.secoes).toBe(0);
+
+      const series = await app.inject({
+        method: 'GET',
+        url: `/api/timeline?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&por_candidato=true`,
+      });
+      expect(series.statusCode).toBe(200);
+      const corpoSeries = series.json();
+      expect(corpoSeries.series.length).toBeGreaterThan(0);
+      expect(corpoSeries.series[0].pontos.length).toBeGreaterThan(0);
+      expect(corpoSeries.series[0].pontos[0].votos_acumulados).toBeGreaterThan(0);
+    },
+    { timeout: 120000 },
+  );
 });
