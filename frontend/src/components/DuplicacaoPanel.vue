@@ -84,7 +84,7 @@ function numeros(grupo) {
               </template>
             </td>
             <td>
-              <span v-if="grupo.vencedor">
+              <span v-if="grupo.mesmo_vencedor && grupo.vencedor">
                 {{ grupo.vencedor.nm_votavel }} ({{ grupo.vencedor.sg_partido }} {{ grupo.vencedor.nr_votavel }})
               </span>
               <span v-else>—</span>
