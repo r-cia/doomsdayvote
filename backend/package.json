@@ -15,7 +15,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run --config vitest.integration.config.js",
-    "carga": "node --env-file-if-exists=.env src/scripts/carregar-pasta.js"
+    "carga": "node --env-file-if-exists=.env src/scripts/carregar-pasta.js",
+    "seed:cores": "node --env-file-if-exists=.env src/scripts/seed-cores.js",
+    "cores:pendentes": "node --env-file-if-exists=.env src/scripts/cores-pendentes.js"
   },
   "dependencies": {
     "fastify": "^5.2.1",

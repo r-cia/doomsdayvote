@@ -15,6 +15,7 @@ function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
 export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {} }) {
   const linhas = await base(db, { eleicaoId, cargo, corte, escopo })
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
+    .leftJoin('partido_cor as pc', (join) => join.on(sql`pc.sg_partido = coalesce(rv.sg_partido, rv.nm_partido)`))
     .select([
       'rv.cd_tipo_votavel',
       'rv.nr_votavel',
@@ -23,6 +24,7 @@ export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {} }) {
       sql`max(rv.nr_partido)`.as('nr_partido'),
       sql`max(rv.sg_partido)`.as('sg_partido'),
       sql`max(rv.nm_partido)`.as('nm_partido'),
+      sql`max(pc.cor_hex)`.as('cor_hex'),
       sql`sum(rv.qt_votos)`.as('qt_votos'),
     ])
     .where('rv.qt_votos', 'is not', null)
@@ -42,6 +44,7 @@ export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {} }) {
       nr_partido: linha.nr_partido,
       sg_partido: linha.sg_partido,
       nm_partido: linha.nm_partido,
+      cor_hex: linha.cor_hex,
       qt_votos: Number(linha.qt_votos),
       percentual: baseValidos > 0 ? (Number(linha.qt_votos) / baseValidos) * 100 : null,
     }))
@@ -76,7 +79,8 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
   const coluna = nivel === 'uf' ? 's.sg_uf' : 's.cd_municipio_tse';
   const linhas = await base(db, { eleicaoId, cargo, corte, escopo: sgUf ? { sgUf } : {} })
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .select([coluna, 'rv.nr_votavel', 'rv.categoria', sql`sum(rv.qt_votos)`.as('qt_votos')])
+    .leftJoin('partido_cor as pc', (join) => join.on(sql`pc.sg_partido = coalesce(rv.sg_partido, rv.nm_partido)`))
+    .select([coluna, 'rv.nr_votavel', 'rv.categoria', sql`max(pc.cor_hex)`.as('cor_hex'), sql`sum(rv.qt_votos)`.as('qt_votos')])
     .where('rv.qt_votos', 'is not', null)
     .groupBy([coluna, 'rv.nr_votavel', 'rv.categoria'])
     .execute();
@@ -102,10 +106,10 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
       area.votos_validos += votos;
     }
     if (linha.categoria === 'nominal' && (!area.lider || votos > area.lider.qt_votos)) {
-      area.lider = { nr_votavel: linha.nr_votavel, qt_votos: votos };
+      area.lider = { nr_votavel: linha.nr_votavel, qt_votos: votos, cor_hex: linha.cor_hex };
     }
     if (candidatos.includes(linha.nr_votavel)) {
-      area.candidatos.push({ nr_votavel: linha.nr_votavel, qt_votos: votos });
+      area.candidatos.push({ nr_votavel: linha.nr_votavel, qt_votos: votos, cor_hex: linha.cor_hex });
     }
   }
 

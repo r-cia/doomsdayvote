@@ -212,6 +212,15 @@ export async function up(db) {
     .execute();
 
   await db.schema
+    .createTable('partido_cor')
+    .addColumn('sg_partido', 'text', (coluna) => coluna.primaryKey())
+    .addColumn('cor_hex', 'char(7)', (coluna) => coluna.notNull())
+    .addColumn('fonte', 'text', (coluna) => coluna.notNull())
+    .addColumn('atualizado_em', 'timestamptz', (coluna) => coluna.notNull().defaultTo(sql`now()`))
+    .addCheckConstraint('partido_cor_cor_hex_check', sql`cor_hex ~ '^#[0-9A-Fa-f]{6}$'`)
+    .execute();
+
+  await db.schema
     .createTable('malha_geografica')
     .addColumn('id', 'uuid', (coluna) => coluna.primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn('nivel', 'text', (coluna) => coluna.notNull())
@@ -271,5 +280,6 @@ export async function down(db) {
   await db.schema.dropTable('secao_eleitoral').execute();
   await db.schema.dropTable('localidade').execute();
   await db.schema.dropTable('eleicao').execute();
+  await db.schema.dropTable('partido_cor').execute();
   await db.schema.dropTable('malha_geografica').execute();
 }

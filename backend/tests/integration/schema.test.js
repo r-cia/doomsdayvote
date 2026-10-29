@@ -39,6 +39,7 @@ const TABELAS = [
   'resultado_votavel',
   'alerta_importacao',
   'malha_geografica',
+  'partido_cor',
 ];
 
 let sequencia = 0;
@@ -128,7 +129,7 @@ describe('schema inicial', () => {
     await db.destroy();
   });
 
-  it('cria as oito tabelas de domínio', async () => {
+  it('cria as nove tabelas de domínio', async () => {
     const { rows } = await sql`
       SELECT table_name
       FROM information_schema.tables
