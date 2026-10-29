@@ -1573,6 +1573,23 @@ tr.linha--ativa th {
   background: var(--bg);
 }
 
+.tabela-votos-estado th,
+.tabela-votos-estado td {
+  white-space: nowrap;
+}
+
+.votos-estado-candidato {
+  display: grid;
+  line-height: 1.05;
+}
+
+.votos-estado-candidato small {
+  font-size: 9px;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 /* ── seções ───────────────────────────────────────────────────────── */
 
 .secoes__barra {

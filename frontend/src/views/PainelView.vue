@@ -6,7 +6,8 @@ import KpiCards from '../components/KpiCards.vue'
 import PlacarRanking from '../components/PlacarRanking.vue'
 import PlotDia from '../components/PlotDia.vue'
 import StateBlock from '../components/StateBlock.vue'
-import { useAnalise, useResumo, useTimeline } from '../composables/queries'
+import VotosPorEstadoPanel from '../components/VotosPorEstadoPanel.vue'
+import { useAnalise, useMapa, useResumo, useTimeline } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { candidatosNominais } from '../lib/agregacoes'
 
@@ -19,6 +20,10 @@ const {
 const resumoQuery = useResumo()
 const timelineQuery = useTimeline()
 const analiseQuery = useAnalise()
+const mapaUfQuery = useMapa('uf', {
+  ignorarMunicipio: true,
+  ignorarUf: true,
+})
 
 const candidatos = computed(() =>
   candidatosNominais(resumoQuery.data.value?.votos ?? []),
@@ -103,4 +108,9 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
       :nome-candidato="candidatoSelecionado?.nm_votavel ?? ''"
     />
   </section>
+
+  <VotosPorEstadoPanel
+    :areas="mapaUfQuery.data.value?.areas ?? []"
+    :candidatos="resumoQuery.data.value?.votos ?? []"
+  />
 </template>
