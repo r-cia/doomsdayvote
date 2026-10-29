@@ -39,7 +39,7 @@ cd ../frontend && npm run dev
 ## Estrutura
 
 ```
-backend/src/modules/importacao   parsers 2014/2018/2022/2026, validações, persistência
+backend/src/modules/importacao   parsers 2014/2018/2022/2026, validações, staging por COPY, persistência
 backend/src/modules/apuracao     corte, somas, progresso, status da seção
 backend/src/modules/analise      biometria do recorte e Benford por candidato
 backend/src/routes               API de leitura
