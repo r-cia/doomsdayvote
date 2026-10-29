@@ -95,8 +95,8 @@ describe('formatação', () => {
 
 describe('cores', () => {
   it('usa paleta fixa e cor neutra para partido sem cor', () => {
-    expect(corPartido('pt')).toBe('#C1121F')
-    expect(corPartido('PL')).toBe('#1D4ED8')
+    expect(corPartido('pt')).toBe('#d15059')
+    expect(corPartido('PL')).toBe('#587ce2')
     expect(corPartido('PARTIDO NOVO XYZ')).toBe(COR_NEUTRA)
     expect(siglaTemCor('PT')).toBe(true)
     expect(siglaTemCor('XYZ')).toBe(false)
@@ -113,12 +113,12 @@ describe('cores', () => {
   })
 
   it('escolhe texto com contraste e cor por área', () => {
-    expect(corTextoContraste('#FFFFFF')).toBe('#0F172A')
+    expect(corTextoContraste('#FFFFFF')).toBe('#10150f')
     expect(corTextoContraste('#1E3A8A')).toBe('#FFFFFF')
     const partidos = new Map([[13, { sg_partido: 'PT' }]])
     expect(
       corDaArea({ lider: { nr_votavel: 13 } }, 'lider', null, partidos),
-    ).toBe('#C1121F')
+    ).toBe('#d15059')
     expect(
       corDaArea(
         { lider: { percentual: 55 }, candidatos: [] },
@@ -126,7 +126,7 @@ describe('cores', () => {
         null,
         partidos,
       ),
-    ).toBe('#3B82F6')
+    ).toBe('#b58f23')
   })
 })
 

@@ -57,6 +57,7 @@ const mapaPronto = ref(false)
 const malha = ref(null)
 const malhaEstado = ref('carregando')
 const malhaMensagem = ref('')
+const feicoesNaMalha = ref(0)
 const cacheMalhas = new Map()
 let tokenMalha = 0
 const tooltip = reactive({
@@ -277,32 +278,42 @@ function dadosGeoJSON() {
 }
 
 function atualizarFonte() {
-  if (!mapaPronto.value || !mapa.value || !malha.value) return
-  const dados = dadosGeoJSON()
-  const fonte = mapa.value.getSource('areas')
-  if (fonte) {
-    fonte.setData(dados)
-    return
+  if (!mapa.value || !malha.value) return
+  if (!mapaPronto.value) {
+    if (!mapa.value.isStyleLoaded?.()) return
+    mapaPronto.value = true
   }
-  mapa.value.addSource('areas', { type: 'geojson', data: dados })
-  mapa.value.addLayer({
-    id: 'areas-fill',
-    type: 'fill',
-    source: 'areas',
-    paint: {
-      'fill-color': ['get', '_cor'],
-      'fill-opacity': 0.88,
-    },
-  })
-  mapa.value.addLayer({
-    id: 'areas-line',
-    type: 'line',
-    source: 'areas',
-    paint: {
-      'line-color': '#FFFFFF',
-      'line-width': 1,
-    },
-  })
+  try {
+    const dados = dadosGeoJSON()
+    feicoesNaMalha.value = dados.features.length
+    const fonte = mapa.value.getSource('areas')
+    if (fonte) {
+      fonte.setData(dados)
+      return
+    }
+    mapa.value.addSource('areas', { type: 'geojson', data: dados })
+    mapa.value.addLayer({
+      id: 'areas-fill',
+      type: 'fill',
+      source: 'areas',
+      paint: {
+        'fill-color': ['get', '_cor'],
+        'fill-opacity': 0.88,
+      },
+    })
+    mapa.value.addLayer({
+      id: 'areas-line',
+      type: 'line',
+      source: 'areas',
+      paint: {
+        'line-color': '#3a4a34',
+        'line-width': 1,
+      },
+    })
+  } catch (erro) {
+    malhaMensagem.value =
+      erro instanceof Error ? erro.message : 'Falha ao preparar a malha.'
+  }
 }
 
 function coletarCoordenadas(geometria, destino) {
@@ -337,6 +348,10 @@ function coletarCoordenadas(geometria, destino) {
 
 function ajustarVisao() {
   if (!mapa.value || !malha.value) return
+  if (props.nivel === 'uf') {
+    mapa.value.jumpTo?.({ center: [-52, -15], zoom: 3.1 })
+    return
+  }
   const coordenadas = []
   for (const feature of featuresVisiveis()) {
     coletarCoordenadas(feature.geometry, coordenadas)
@@ -364,7 +379,7 @@ function criarMapa() {
         {
           id: 'fundo',
           type: 'background',
-          paint: { 'background-color': '#F8FAFC' },
+          paint: { 'background-color': '#162014' },
         },
       ],
     },
@@ -387,9 +402,16 @@ function criarMapa() {
     atualizarFonte()
     ajustarVisao()
   })
+  mapa.value.on('idle', () => {
+    if (mapa.value && !mapa.value.getSource('areas')) atualizarFonte()
+  })
   mapa.value.on('mousemove', aoMover)
   mapa.value.on('mouseleave', esconderTooltip)
   mapa.value.on('click', aoClicar)
+  mapa.value.on('error', (evento) => {
+    malhaMensagem.value =
+      evento?.error?.message ?? 'Falha ao desenhar o mapa.'
+  })
 }
 
 function areaDaFeicao(feature) {
@@ -543,7 +565,13 @@ watch(
 )
 
 watch(
-  [() => props.areas, () => props.modo, () => props.candidato, () => props.uf],
+  [
+    () => props.areas,
+    () => props.candidatos,
+    () => props.modo,
+    () => props.candidato,
+    () => props.uf,
+  ],
   () => {
     atualizarFonte()
     if (props.nivel === 'municipio') ajustarVisao()
@@ -554,12 +582,17 @@ watch(
 watch(malhaEstado, async (estado) => {
   if (estado !== 'ok') return
   await nextTick()
+  criarMapa()
   mapa.value?.resize()
+  atualizarFonte()
+  ajustarVisao()
 })
 
 onMounted(async () => {
-  criarMapa()
   await carregarMalha(props.nivel)
+  await nextTick()
+  criarMapa()
+  mapa.value?.resize()
   atualizarFonte()
   ajustarVisao()
 })
@@ -684,8 +717,13 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
+    <p v-if="malhaMensagem && malhaEstado === 'ok'" class="mapa-erro" role="alert">
+      {{ malhaMensagem }}
+    </p>
+
     <div class="legenda" role="group" aria-label="Legenda do mapa">
       <strong>{{ legenda.titulo }}</strong>
+      <span class="legenda__meta">{{ feicoesNaMalha }} feições</span>
       <ul>
         <li v-for="item in legenda.itens" :key="item.rotulo">
           <span

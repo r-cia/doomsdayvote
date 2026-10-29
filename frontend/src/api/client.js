@@ -43,6 +43,7 @@ export const api = {
   timeline: (params, signal) => obter('/timeline', params, signal),
   mapa: (params, signal) => obter('/map', params, signal),
   secoes: (params, signal) => obter('/sections', params, signal),
+  analise: (params, signal) => obter('/analysis', params, signal),
   secao: (id, params, signal) =>
     obter(`/sections/${encodeURIComponent(id)}`, params, signal),
 }
