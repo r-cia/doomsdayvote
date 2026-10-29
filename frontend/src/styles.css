@@ -825,14 +825,16 @@ select {
 
 .leituras__valores {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px 14px;
   margin: 0;
 }
 
 .leituras__valores div {
   display: grid;
-  gap: 1px;
+  grid-template-rows: auto 1fr;
+  align-content: start;
+  gap: 4px;
   padding-top: 6px;
   border-top: 1px solid var(--line-soft);
 }
@@ -842,18 +844,23 @@ select {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-faint);
+  line-height: 1.3;
+  min-height: 2.6em;
 }
 
 .leituras__valores dd {
   margin: 0;
   font-size: 15px;
   color: var(--amber);
+  display: grid;
+  gap: 2px;
+  align-content: start;
 }
 
 .leituras__valores dd small {
   font-size: 10px;
   color: var(--ink-dim);
-  margin-left: 6px;
+  margin-left: 0;
 }
 
 .nota {
@@ -1967,7 +1974,7 @@ tr.linha--ativa th {
   }
 
   .leituras__valores {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .detalhe-grade,
