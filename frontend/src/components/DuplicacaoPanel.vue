@@ -44,7 +44,7 @@ function numeros(grupo) {
           <tr>
             <th scope="col" class="num">Seções</th>
             <th scope="col">UF</th>
-            <th scope="col" class="num">Município</th>
+            <th scope="col">Município</th>
             <th scope="col" class="num">Zona</th>
             <th scope="col">Números</th>
             <th scope="col">Sinalizadores</th>
@@ -54,7 +54,7 @@ function numeros(grupo) {
           <tr v-for="grupo in grupos" :key="grupo.assinatura">
             <td class="num">{{ grupo.secoes.length }}</td>
             <td>{{ grupo.secoes[0].sg_uf }}</td>
-            <td class="num">{{ grupo.secoes[0].cd_municipio_tse }}</td>
+            <td>{{ grupo.secoes[0].nm_municipio || grupo.secoes[0].cd_municipio_tse }}</td>
             <td class="num">{{ zonaTexto(grupo) }}</td>
             <td>{{ numeros(grupo) }}</td>
             <td>

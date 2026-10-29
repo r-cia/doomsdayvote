@@ -45,6 +45,7 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
         id: secao.id,
         sg_uf: secao.sg_uf,
         cd_municipio_tse: secao.cd_municipio_tse,
+        nm_municipio: secao.nm_municipio ?? null,
         nr_zona: secao.nr_zona,
         nr_secao: secao.nr_secao,
       })),
@@ -68,6 +69,9 @@ export async function duplicacaoPorAssinatura(
   let consulta = db
     .selectFrom('boletim_versao as bv')
     .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+    .leftJoin('localidade as l', (join) =>
+      join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+    )
     .where('bv.eleicao_id', '=', eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', cargo)
 
@@ -82,6 +86,7 @@ export async function duplicacaoPorAssinatura(
       's.cd_municipio_tse',
       's.nr_zona',
       's.nr_secao',
+      sql`max(l.nm_municipio)`.as('nm_municipio'),
       sql`md5(string_agg(rv.cd_tipo_votavel::text || ':' || rv.nr_votavel::text || ':' || coalesce(rv.qt_votos, 0)::text, '|' order by rv.cd_tipo_votavel, rv.nr_votavel))`.as(
         'assinatura',
       ),
