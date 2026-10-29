@@ -75,8 +75,9 @@ function numeros(grupo) {
                     grupo.secoes[1].nm_municipio &&
                     grupo.secoes[0].nm_municipio !== grupo.secoes[1].nm_municipio
                   "
+                  class="chip chip--warn"
                 >
-                  idêntico a {{ grupo.secoes[1].nm_municipio }}
+                  {{ grupo.secoes[1].nm_municipio }}-{{ grupo.secoes[1].sg_uf }}
                 </span>
                 <span v-else>—</span>
               </template>
