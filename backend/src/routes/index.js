@@ -297,27 +297,42 @@ export async function registrarRotas(app) {
       indices.map((indice, posicao) => [indice, lof.scores[posicao]]),
     );
 
-    const linhaPorSecao = new Map(
-      linhas.map((linha) => [linha.secao_id, linha]),
-    )
+    const vencedorPorMunicipio = new Map()
+    for (const linha of linhas) {
+      const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}`
+      if (!vencedorPorMunicipio.has(chave)) {
+        vencedorPorMunicipio.set(chave, new Map())
+      }
+      const candidatos = vencedorPorMunicipio.get(chave)
+      const atual = candidatos.get(linha.nr_votavel) ?? {
+        nr_votavel: linha.nr_votavel,
+        nm_votavel: linha.nm_votavel,
+        sg_partido: linha.sg_partido,
+        votos: 0,
+      }
+      atual.votos += Number(linha.votos ?? 0)
+      candidatos.set(linha.nr_votavel, atual)
+    }
+    const vencedorCidade = new Map()
+    for (const [chave, candidatos] of vencedorPorMunicipio) {
+      let vencedor = null
+      for (const candidato of candidatos.values()) {
+        if (!vencedor || candidato.votos > vencedor.votos) {
+          vencedor = candidato
+        }
+      }
+      if (vencedor) {
+        vencedorCidade.set(chave, {
+          nr_votavel: vencedor.nr_votavel,
+          nm_votavel: vencedor.nm_votavel,
+          sg_partido: vencedor.sg_partido,
+        })
+      }
+    }
     const ranking = secoes
       .map((secao, indice) => {
-        const origem = linhaPorSecao.get(secao.id)
-        let vencedor = null
-        if (origem) {
-          const votos = origem.votos || []
-          if (votos.length > 0) {
-            let maxIdx = 0
-            for (let i = 1; i < votos.length; i += 1) {
-              if (Number(votos[i]) > Number(votos[maxIdx])) maxIdx = i
-            }
-            vencedor = {
-              nr_votavel: origem.nr_votavel,
-              nm_votavel: origem.nm_votavel,
-              sg_partido: origem.sg_partido,
-            }
-          }
-        }
+        const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`
+        const vencedor = vencedorCidade.get(chave) ?? null
         return {
           ...secao,
           score_if: isolamento.scores[indice],
@@ -381,10 +396,12 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
-    const candidatos = (query.candidatos ?? '')
-      .split(',')
-      .map((valor) => Number(valor))
-      .filter((valor) => Number.isInteger(valor));
+    const candidatos = typeof query.candidatos === 'string' && query.candidatos.trim() !== ''
+      ? query.candidatos
+          .split(',')
+          .map((valor) => Number(valor))
+          .filter((valor) => Number.isInteger(valor) && valor !== 0 && !Number.isNaN(valor))
+      : [];
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
 
     const [areas, metadados, avisos] = await Promise.all([
