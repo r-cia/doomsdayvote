@@ -60,7 +60,7 @@ export function totaisCategoria(votos = []) {
 }
 
 export function chaveArea(area, nivel) {
-  return nivel === 'uf' ? area.sg_uf : area.cd_municipio_tse
+  return nivel === 'uf' ? area.sg_uf : (area.geom_id ?? area.cd_municipio_tse)
 }
 
 export function normalizarCodigo(valor) {

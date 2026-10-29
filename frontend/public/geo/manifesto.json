@@ -1,0 +1,26 @@
+{
+  "uf": {
+    "nivel": "uf",
+    "arquivo": "br-uf.geojson",
+    "fonte": "IBGE",
+    "versao": "2022",
+    "url": "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_UF_2022.zip",
+    "sha256": "2451bb6da22909dd03905e212f0f439b06cf27650b56c8dc16d4d310ec85dbb4",
+    "qt_features": 27
+  },
+  "municipio": {
+    "nivel": "municipio",
+    "arquivo": "br-municipios.geojson",
+    "fonte": "IBGE",
+    "versao": "2022",
+    "url": "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_Municipios_2022.zip",
+    "sha256": "9a4cfaf201f1a68039c00d953ee2d51ed13de9fbd1e80ae4677af7d97315d1b9",
+    "qt_features": 5572
+  },
+  "correspondencia": {
+    "fonte": "TSE",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/municipio_tse_ibge/municipio_tse_ibge.zip",
+    "arquivo": "backend/data/geo/municipios-tse-ibge.csv",
+    "linhas": 5571
+  }
+}
