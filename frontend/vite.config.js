@@ -4,6 +4,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [vue()],
   server: {
+    host: '0.0.0.0',
     port: 7010,
     strictPort: true,
     proxy: {
@@ -14,6 +15,7 @@ export default defineConfig({
     },
   },
   preview: {
+    host: '0.0.0.0',
     port: 7010,
     strictPort: true,
     proxy: {
