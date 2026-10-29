@@ -63,7 +63,6 @@ const votosUf = computed(() => candidatosNominais(props.votos))
           Municípios
         </button>
         <button
-          v-if="ufSelecionada"
           type="button"
           class="button button--ghost button--compacto"
           @click="$emit('limpar')"
