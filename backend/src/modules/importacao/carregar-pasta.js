@@ -3,7 +3,7 @@ import path from 'node:path';
 import { importarArquivo } from './importar-arquivo.js';
 import { gerarRelatorioLote } from './relatorio.js';
 
-const EXTENSOES = /\.(csv|txt)$/i;
+const EXTENSOES = /\.(csv|txt)(\.gz)?$/i;
 
 export async function carregarPasta({ db, inputDir, storageDir, now = new Date() }) {
   const entradas = await readdir(inputDir, { withFileTypes: true });

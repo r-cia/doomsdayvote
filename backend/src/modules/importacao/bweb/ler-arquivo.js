@@ -53,7 +53,7 @@ export async function lerArquivoBweb(caminho, { nomeArquivo } = {}) {
   }
 
   if (leiaute === 'BWEB_2014_31') {
-    const nome = nomeArquivo ?? path.basename(caminho);
+    const nome = (nomeArquivo ?? path.basename(caminho)).replace(/\.gz$/i, '');
     const derivados = interpretarNomeArquivo2014(nome);
 
     async function* registros() {

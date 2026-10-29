@@ -107,9 +107,8 @@ export function validarLinha(registro, { vistos = new Set() } = {}) {
   return { importar, alertas };
 }
 
-function validarMetadadosArquivo(registros) {
+function validarMetadadosIncremental(registros, estado) {
   const alertas = [];
-  const porEleicao = new Map();
 
   for (const registro of registros) {
     const v = registro.valores;
@@ -120,14 +119,15 @@ function validarMetadadosArquivo(registros) {
       DT_PLEITO: v.DT_PLEITO?.data ?? null,
       SG_UF: v.SG_UF,
     };
-    const anterior = porEleicao.get(chave);
+    const anterior = estado.porEleicao.get(chave);
     if (!anterior) {
-      porEleicao.set(chave, atual);
+      estado.porEleicao.set(chave, atual);
       continue;
     }
+    if (estado.divergentes.has(chave)) continue;
     if (JSON.stringify(anterior) !== JSON.stringify(atual)) {
       alertas.push(alerta('alerta', 'METADADO_INCONSISTENTE', `Metadados divergentes para CD_ELEICAO ${chave}`, { nrLinha: registro.nrLinha }));
-      break;
+      estado.divergentes.add(chave);
     }
   }
 
@@ -194,23 +194,36 @@ function validarBu(registros, leiaute) {
   return alertas;
 }
 
-export function validarRegistros(registros, { leiaute, buffer } = {}) {
-  const alertas = [];
-  const vistos = new Set();
-  const validos = [];
+export function criarValidador({ leiaute } = {}) {
+  const estado = { porEleicao: new Map(), divergentes: new Set() };
 
-  for (const registro of registros) {
-    const resultado = validarLinha(registro, { vistos });
-    alertas.push(...resultado.alertas);
-    if (resultado.importar) validos.push(registro);
-  }
+  return {
+    validarGrupo(registros) {
+      const alertas = [];
+      const vistos = new Set();
+      const validos = [];
+
+      for (const registro of registros) {
+        const resultado = validarLinha(registro, { vistos });
+        alertas.push(...resultado.alertas);
+        if (resultado.importar) validos.push(registro);
+      }
+
+      alertas.push(...validarMetadadosIncremental(validos, estado));
+      alertas.push(...validarBu(validos, leiaute));
+
+      return { registros: validos, alertas };
+    },
+  };
+}
+
+export function validarRegistros(registros, { leiaute, buffer } = {}) {
+  const validador = criarValidador({ leiaute });
+  const { registros: validos, alertas } = validador.validarGrupo(registros);
 
   if (buffer && encodingSuspeito(buffer)) {
     alertas.push(alerta('alerta', 'ENCODING_SUSPEITO', 'Arquivo parece UTF-8 ou tem BOM; esperado Latin-1'));
   }
-
-  alertas.push(...validarMetadadosArquivo(validos));
-  alertas.push(...validarBu(validos, leiaute));
 
   return { registros: validos, alertas };
 }
