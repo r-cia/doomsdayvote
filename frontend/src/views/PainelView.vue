@@ -359,12 +359,14 @@ function atualizarSecoes() {
         <UfPanel
           :areas="mapaUfQuery.data.value?.areas ?? []"
           :candidatos="candidatos"
+          :votos="resumoQuery.data.value?.votos ?? []"
           :loading="mapaUfQuery.isLoading.value"
           :error="mapaUfQuery.error.value?.message ?? ''"
           :uf-selecionada="store.uf"
           @select="selecionarUf"
           @municipios="verMunicipios"
           @retry="atualizarMapa"
+          @limpar="store.definirUf(null)"
         />
       </section>
 
