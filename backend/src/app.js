@@ -19,7 +19,7 @@ function detalhesFastify(validacao) {
 
 export function buildApp({ deps = {}, config = {}, rotas }) {
   const app = Fastify({
-    logger: deps.logger ?? false,
+    ...(deps.logger ? { loggerInstance: deps.logger } : { logger: false }),
   });
 
   app.decorate('deps', deps);
