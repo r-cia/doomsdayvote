@@ -1,0 +1,31 @@
+{
+  "name": "doomsdayvote-backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "migrate": "node src/scripts/migrate.js",
+    "migrate:reset": "node src/scripts/migrate.js --reset",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.js"
+  },
+  "dependencies": {
+    "@fastify/rate-limit": "^10.2.2",
+    "fastify": "^5.2.1",
+    "kysely": "^0.28.2",
+    "pg": "^8.13.1",
+    "pino": "^9.6.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.0.5",
+    "vitest": "^3.0.5"
+  }
+}
