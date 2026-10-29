@@ -38,9 +38,11 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
     const vencedores = lista
       .map((secao) => secao.vencedor_nr)
       .filter((v) => v !== null && v !== undefined)
-    const mesmoVencedor =
-      vencedores.length > 0 && vencedores.every((v) => Number(v) === Number(vencedores[0]))
-    const vencedor = mesmoVencedor && lista[0].vencedor_nr
+    const mesmoVencedorEmTodas =
+      vencedores.length === lista.length &&
+      vencedores.length > 0 &&
+      vencedores.every((v) => Number(v) === Number(vencedores[0]))
+    const vencedorComum = mesmoVencedorEmTodas && lista[0].vencedor_nr
       ? {
           nr_votavel: Number(lista[0].vencedor_nr),
           nm_votavel: lista[0].vencedor_nm,
@@ -54,8 +56,7 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
       mesma_zona: zonas.size === 1,
       mesmo_municipio: municipios.size === 1,
       secoes_consecutivas: consecutivas,
-      mesmo_vencedor: mesmoVencedor,
-      vencedor,
+      vencedor_comum: vencedorComum,
       secoes: lista.map((secao) => ({
         id: secao.id,
         sg_uf: secao.sg_uf,
