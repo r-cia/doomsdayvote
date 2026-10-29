@@ -137,6 +137,36 @@ export function useAnomalias(habilitado = null) {
   })
 }
 
+export function useEstatisticas(escopo) {
+  const store = useFiltersStore()
+  const escopoValor = computed(() => escopo?.value ?? escopo ?? 'turno')
+  return useQuery({
+    queryKey: computed(() => [
+      'estatisticas',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+      escopoValor.value,
+    ]),
+    queryFn: ({ signal }) =>
+      api.estatisticas(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
+          escopo: escopoValor.value,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    placeholderData: keepPreviousData,
+  })
+}
+
 export function useMapa(nivel = null, opcoes = {}) {
   const store = useFiltersStore()
   const nivelEfetivo = computed(() => nivel ?? store.mapLevel)

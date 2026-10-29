@@ -1032,6 +1032,65 @@ select {
   letter-spacing: 0.06em;
 }
 
+.estatistica-controle {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.estatistica-lista {
+  display: grid;
+  gap: 12px;
+}
+
+.estatistica-bloco {
+  border: 1px solid var(--line);
+  border-radius: var(--raio);
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.estatistica-bloco__cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.estatistica-bloco__cabecalho h3 {
+  font-family: var(--cond);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.estatistica-bloco__cabecalho p {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.estatistica-tabela-wrap {
+  overflow-x: auto;
+}
+
+.estatistica-tabela-wrap + .estatistica-tabela-wrap {
+  border-top: 1px solid var(--line);
+}
+
+.estatistica-candidato {
+  display: grid;
+  line-height: 1.05;
+}
+
+.estatistica-candidato small {
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+
 /* ── malha, cards e tabelas ───────────────────────────────────────── */
 
 .malha {
