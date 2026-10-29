@@ -2,7 +2,7 @@ node_modules/
 .env
 coverage/
 frontend/dist/
-/impeccable/review/
+.impeccable/review/
 /files/
 /data/
 /ibge/
