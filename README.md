@@ -44,7 +44,7 @@ backend/src/modules/apuracao     corte, somas, progresso, status da seção
 backend/src/modules/analise      biometria do recorte e Benford por candidato
 backend/src/routes               API de leitura
 frontend/src/components          mesa de plotagem, placar, biometria, análise, mapa, tabela
-frontend/src/views               painel (com a seção de análise) e extrato da seção
+frontend/src/views               painel, mapa, análise e extrato da seção
 frontend/public/geo              malha IBGE convertida
 docs/                            formatos de BU, API, plano
 ```

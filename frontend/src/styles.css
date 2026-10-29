@@ -173,10 +173,14 @@ select {
 
 /* ── faixa de comando ─────────────────────────────────────────────── */
 
-.faixa {
+.topo {
   position: sticky;
   top: 0;
   z-index: 30;
+  background: var(--bg);
+}
+
+.faixa {
   display: flex;
   align-items: center;
   gap: 24px;
@@ -281,6 +285,13 @@ select {
 }
 
 /* ── sala ─────────────────────────────────────────────────────────── */
+
+.comando-barra {
+  padding: 8px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 16px 22px -20px rgba(0, 0, 0, 0.85);
+}
 
 .sala {
   position: relative;
@@ -1014,8 +1025,6 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
 }
 
 .analise__cabecalho h2 {
@@ -1828,23 +1837,28 @@ tr.linha--ativa th {
     padding: 10px 10px 32px;
   }
 
-  .comando {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .comando-barra {
+    padding: 8px 10px;
   }
 
-  .campo--eleicao,
+  .comando {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .campo {
+    flex: 0 0 auto;
+  }
+
   .campo--candidato,
   .campo--corte {
-    grid-column: 1 / -1;
+    flex: 0 0 180px;
   }
 
-  .campo--curto {
-    grid-column: span 2;
-  }
-
-  .campo--uf {
-    grid-column: 1 / -1;
+  .comando__acoes {
+    flex: 0 0 auto;
+    margin-left: 0;
   }
 
   .painel__cabecalho {
@@ -1853,11 +1867,6 @@ tr.linha--ativa th {
 
   .painel__meta {
     text-align: left;
-  }
-
-  .comando__acoes {
-    grid-column: 1 / -1;
-    margin-left: 0;
   }
 
   .placar__linha {

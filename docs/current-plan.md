@@ -1,51 +1,38 @@
-# Plano atual — cache Redis para as leituras
+# Plano atual — abas, barra de comando fixa e menos densidade
 
 ## Problema
 
-Consultas repetidas (mesma eleição, mesmo cargo, mesma UF) voltam ao banco a cada abertura de tela e a cada navegação entre painel, mapa e análise. `/api/anomalies` chega a ~2 s e `/api/map` e `/api/summary` repetem as mesmas agregações para todos os clientes.
+Painel, Mapa e Análise são âncoras de uma única página: tudo carrega junto e a leitura fica densa. A barra de comando (cargo, ano, turno, candidato, corte, UF) rola para fora da tela, então o recorte some de vista.
 
 ## Desenho
 
-Cache-aside em Redis na frente dos endpoints GET de leitura, com chave canônica e invalidação por namespace.
-
-- Chave: `dv:v{ns}:{rota}:{hash}` — `hash` é sha1 do JSON canônico dos parâmetros já validados; `ns` é um contador em `dv:ns`.
-- Conclusão de lote de importação incrementa `dv:ns`: todas as chaves antigas viram lixo e expiram sozinhas. Nenhuma varredura de `KEYS`.
-- Só resposta 200 entra no cache; erro nunca é cacheado.
-- Falha do Redis (fora do ar, timeout, `REDIS_URL` ausente) não derruba a API: a requisição segue para o banco e o cache é ignorado.
-- Single-flight por processo: requisições idênticas simultâneas compartilham a mesma execução e uma única consulta ao banco.
-- Cabeçalho `x-cache: hit|miss` para conferir o comportamento.
-
-## TTL por endpoint
-
-| Endpoint | TTL |
-| :--- | :--- |
-| `/api/elections` | 300 s |
-| `/api/summary` | 60 s |
-| `/api/timeline` | 120 s |
-| `/api/analysis` | 300 s |
-| `/api/anomalies` | 600 s |
-| `/api/map` | 300 s |
-| `/api/sections` | 60 s |
-| `/api/sections/:id` | 300 s |
+1. **Abas de verdade.** Três rotas: `/painel`, `/mapa` e `/analise`. A navegação passa a usar `RouterLink` com `router-link-active`, sem hash. `/auditoria` continua redirecionando para `/painel`.
+2. **Barra de comando fixa.** `FilterBar` sai do `PainelView` e vai para o shell (`App.vue`), logo abaixo da faixa. Fica `position: sticky; top: 46px` (altura da faixa), com fundo opaco, fio inferior e sombra suave — visível em qualquer rolagem, em todas as abas e no extrato da seção.
+3. **Conteúdo por aba.**
+   - **Painel:** KPIs, plot do dia, placar do ranking e biometria do recorte.
+   - **Mapa:** mapa, painel da UF e tabela de seções.
+   - **Análise:** Benford, Benford por nível, duplicação e proximidade, isolamento e LOF.
+4. **Carga sob demanda.** Cada aba cria só as consultas que usa: o Mapa não busca Benford nem outliers; a Análise não busca timeline; o Painel não busca mapa nem seções. O estado do recorte continua no store, então trocar de aba preserva filtros e não refaz o que já está em cache.
+5. **Anomalias sem IntersectionObserver.** Na aba Análise a seção já é o conteúdo: a consulta dispara na abertura da aba.
 
 ## Arquivos
 
-- `src/lib/cache.js` — cliente `ioredis`, `comCache(chave, ttl, fn)`, `invalidar()`, single-flight, fail-open.
-- `src/composition-root.js` — cria o cache a partir de `REDIS_URL`.
-- `src/routes/index.js` — envolve os oito handlers.
-- `src/modules/importacao/lote.js` — `invalidar()` em `concluirLote`.
-- `src/env.js` e `.env.example` — `REDIS_URL` opcional; ausente = cache desligado.
-- `tests/cache.test.js` — hit, miss, erro do Redis, single-flight e invalidação, com cliente falso.
-- `README.md` e `docs/API.md` — Redis na stack e `x-cache` no contrato.
+- `src/App.vue` — faixa com abas + `FilterBar` no shell; estados de carregamento/erro das eleições saem do `PainelView` para o shell.
+- `src/views/PainelView.vue` — só KPIs, plot, placar e biometria.
+- `src/views/MapaView.vue` — novo, mapa + UF + seções.
+- `src/views/AnaliseView.vue` — novo, as quatro leituras de análise.
+- `src/router.js` — rotas `/mapa` e `/analise`; `scrollBehavior` para o topo.
+- `src/styles.css` — `.comando` fixo com sombra, ajuste de `scroll-margin` e do padding da sala.
+- `tests/components.test.js` — segue cobrindo `FilterBar` e `MapPanel`; sem teste novo de view.
 
 ## Fora de escopo
 
-- Cache no frontend ou em CDN.
-- Pré-aquecimento de chaves.
-- Cache das rotas de importação (escrita).
+- Reordenar os campos da barra de comando.
+- Mudar o conteúdo dos painéis.
+- Alterar a API.
 
 ## Estado
 
-Implementado com `ioredis`, TTLs acima e `REDIS_URL=redis://127.0.0.1:6379` no `.env.example`. Sem `REDIS_URL` o cache fica desligado e a API segue no banco.
+Implementado: três rotas (`/painel`, `/mapa`, `/analise`), `FilterBar` no shell dentro de `.topo` fixo, conteúdo separado por aba e cada aba criando só as consultas que usa. Em 760px a barra de comando rola na horizontal e continua fixa.
 
-Validação: `tests/unit/cache.test.js` (7), `tests/integration/cache.test.js` (2, Redis real), `api.test.js` (4, com `x-cache: off`), unidade 85/85.
+Validação: build ok e 33 testes de componente passando. Sem servidor no ar, a conferência visual fica com você.
