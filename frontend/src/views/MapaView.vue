@@ -112,7 +112,7 @@ function atualizarSecoes() {
       :loading="mapaQuery.isLoading.value"
       :error="mapaQuery.error.value?.message ?? ''"
       altura="630px"
-      @update:level="store.definirNivel"
+      @update:level="(nivel) => { if (nivel === 'uf') { store.definirUf(null); store.definirMunicipio(null); store.definirNivel('uf'); } else { store.definirNivel(nivel); } }"
       @update:mode="store.definirModo"
       @select="selecionarNoMapa"
       @retry="atualizarMapa"
