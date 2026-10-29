@@ -117,7 +117,7 @@ export const useFiltersStore = defineStore('filters', {
       this.uf = uf || null
       this.municipio = null
       this.sectionPage = 1
-      if (!this.uf && this.mapLevel === 'municipio') this.mapLevel = 'uf'
+      if (!this.uf) this.mapLevel = 'uf'
     },
 
     definirMunicipio(municipio) {
