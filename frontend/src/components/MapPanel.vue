@@ -739,7 +739,6 @@ onBeforeUnmount(() => {
     </div>
 
     <MapTable
-      v-if="false"
       :areas="areas"
       :nivel="nivel"
       :modo="modo"
