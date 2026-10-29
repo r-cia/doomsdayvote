@@ -3,45 +3,40 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { FileMigrationProvider, Kysely, Migrator, NO_MIGRATION, PostgresDialect, sql } from 'kysely';
+import { FileMigrationProvider, Kysely, Migrator, NO_MIGRATIONS, PostgresDialect, sql } from 'kysely';
 import { migracoesPendentes } from '../../src/db/migracoes.js';
 
 const urlMigracao = process.env.TEST_DATABASE_MIGRATION_URL;
 const diretorio = fileURLToPath(new URL('../fixtures/migrations', import.meta.url));
+const schema = 'migracao_teste';
 
 if (!urlMigracao) {
   throw new Error('TEST_DATABASE_MIGRATION_URL não definida');
 }
 
-function criarConexao() {
-  return new Kysely({
-    dialect: new PostgresDialect({
-      pool: new pg.Pool({ connectionString: urlMigracao, options: '-c timezone=UTC' }),
+const db = new Kysely({
+  dialect: new PostgresDialect({
+    pool: new pg.Pool({
+      connectionString: urlMigracao,
+      options: `-c timezone=UTC -c search_path=${schema}`,
     }),
-  });
-}
+  }),
+});
 
-function criarMigrador(db) {
-  return new Migrator({
-    db,
-    provider: new FileMigrationProvider({ fs, path, migrationFolder: diretorio }),
-  });
-}
+const migrator = new Migrator({
+  db,
+  provider: new FileMigrationProvider({ fs, path, migrationFolder: diretorio }),
+  migrationTableSchema: schema,
+});
 
 describe('checagem de migrações pendentes', () => {
-  const db = criarConexao();
-  const migrator = criarMigrador(db);
-
   beforeAll(async () => {
-    const tabela = await sql`SELECT to_regclass('public.kysely_migration') AS tabela`.execute(db);
-    if (tabela.rows[0]?.tabela) {
-      await sql`DELETE FROM kysely_migration WHERE name = '0001_teste'`.execute(db);
-    }
-    await sql`DROP TABLE IF EXISTS tabela_teste_migracao`.execute(db);
+    await sql`DROP SCHEMA IF EXISTS ${sql.id(schema)} CASCADE`.execute(db);
+    await sql`CREATE SCHEMA ${sql.id(schema)}`.execute(db);
   });
 
   afterAll(async () => {
-    await migrator.migrateTo(NO_MIGRATION);
+    await sql`DROP SCHEMA IF EXISTS ${sql.id(schema)} CASCADE`.execute(db);
     await db.destroy();
   });
 

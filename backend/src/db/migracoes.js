@@ -18,7 +18,7 @@ export async function migracoesPendentes(db, diretorio = DIRETORIO_MIGRACOES) {
     .map((arquivo) => arquivo.replace(/\.js$/, ''))
     .sort();
 
-  const { rows } = await sql`SELECT to_regclass('public.kysely_migration') AS tabela`.execute(db);
+  const { rows } = await sql`SELECT to_regclass('kysely_migration') AS tabela`.execute(db);
   if (!rows[0]?.tabela) return nomesArquivos;
 
   const { rows: aplicadas } = await sql`SELECT name FROM kysely_migration`.execute(db);

@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import pg from 'pg';
-import { FileMigrationProvider, Kysely, Migrator, NO_MIGRATION, PostgresDialect } from 'kysely';
+import { FileMigrationProvider, Kysely, Migrator, NO_MIGRATIONS, PostgresDialect } from 'kysely';
 import { loadMigrateEnv } from '../env.js';
 import { DIRETORIO_MIGRACOES } from '../db/migracoes.js';
 
@@ -40,7 +40,7 @@ async function main() {
 
   try {
     if (reset) {
-      const descida = await migrator.migrateTo(NO_MIGRATION);
+      const descida = await migrator.migrateTo(NO_MIGRATIONS);
       if (descida.error) throw descida.error;
     }
 
