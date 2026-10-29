@@ -297,12 +297,34 @@ export async function registrarRotas(app) {
       indices.map((indice, posicao) => [indice, lof.scores[posicao]]),
     );
 
+    const linhaPorSecao = new Map(
+      linhas.map((linha) => [linha.secao_id, linha]),
+    )
     const ranking = secoes
-      .map((secao, indice) => ({
-        ...secao,
-        score_if: isolamento.scores[indice],
-        score_lof: scoreLof.get(indice) ?? null,
-      }))
+      .map((secao, indice) => {
+        const origem = linhaPorSecao.get(secao.id)
+        let vencedor = null
+        if (origem) {
+          const votos = origem.votos || []
+          if (votos.length > 0) {
+            let maxIdx = 0
+            for (let i = 1; i < votos.length; i += 1) {
+              if (Number(votos[i]) > Number(votos[maxIdx])) maxIdx = i
+            }
+            vencedor = {
+              nr_votavel: origem.nr_votavel,
+              nm_votavel: origem.nm_votavel,
+              sg_partido: origem.sg_partido,
+            }
+          }
+        }
+        return {
+          ...secao,
+          score_if: isolamento.scores[indice],
+          score_lof: scoreLof.get(indice) ?? null,
+          vencedor,
+        }
+      })
       .sort((a, b) => b.score_if - a.score_if)
       .slice(0, 20);
 
