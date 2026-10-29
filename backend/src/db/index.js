@@ -11,7 +11,11 @@ export function criarDb({ connectionString, readOnly = false }) {
 
   const pool = new pg.Pool({ connectionString, options });
 
-  return new Kysely({
+  const db = new Kysely({
     dialect: new PostgresDialect({ pool }),
   });
+
+  Object.defineProperty(db, 'pool', { value: pool });
+
+  return db;
 }
