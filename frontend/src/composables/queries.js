@@ -242,7 +242,7 @@ export function useSecoes() {
         signal,
       ),
     enabled: computed(() =>
-      Boolean(store.electionId && store.cargo && store.uf),
+      Boolean(store.electionId && store.cargo && store.municipio),
     ),
     placeholderData: keepPreviousData,
   })
