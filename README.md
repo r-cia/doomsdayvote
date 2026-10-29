@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/doomsday.png" alt="Doomsday Vote" width="120" />
+</p>
+
 # Doomsday Vote
 
 Conferência **offline** de Boletins de Urna (BUs) do TSE para os cargos **Presidente** e **Governador**. 
