@@ -1,7 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import MapTable from './MapTable.vue'
 import StateBlock from './StateBlock.vue'
-import { candidatosNominais, linhasMapa } from '../lib/agregacoes'
+import { candidatosNominais } from '../lib/agregacoes'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
@@ -12,37 +13,26 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ufSelecionada: { type: String, default: null },
+  nivel: { type: String, default: 'uf' },
+  modo: { type: String, default: 'lider' },
+  candidato: { type: Number, default: null },
+  uf: { type: String, default: null },
 })
 
-defineEmits(['select', 'municipios', 'retry', 'limpar'])
-
-const partidoPorNumero = computed(() => {
-  const mapa = new Map()
-  for (const candidato of props.candidatos) {
-    mapa.set(candidato.nr_votavel, candidato)
-  }
-  return mapa
-})
-
-const linhas = computed(() => {
-  const base = linhasMapa(props.areas, 'uf').map(({ area }) => {
-    const candidato = partidoPorNumero.value.get(area.lider?.nr_votavel)
-    return {
-      uf: area.sg_uf,
-      total: Number(area.total_votos ?? 0),
-      lider: area.lider,
-      liderNome: candidato?.nm_votavel ?? null,
-      liderSigla: candidato?.sg_partido ?? null,
-      liderPercentual: area.lider?.percentual ?? null,
-    }
-  })
-  return base.map((linha) => ({
-    ...linha,
-    largura: Math.max(0, Math.min(100, Number(linha.liderPercentual ?? 0))),
-  }))
-})
+const emit = defineEmits(['select', 'municipios', 'retry', 'limpar'])
 
 const votosUf = computed(() => candidatosNominais(props.votos))
+
+function aoSelecionarArea(selecao) {
+  if (!selecao) return
+  if (selecao.tipo === 'uf') {
+    emit('select', selecao.valor)
+    return
+  }
+  if (selecao.tipo === 'municipio') {
+    emit('municipios', selecao.uf ?? props.ufSelecionada ?? selecao.valor)
+  }
+}
 </script>
 
 <template>
@@ -121,72 +111,15 @@ const votosUf = computed(() => candidatosNominais(props.votos))
       <p v-if="votosUf.length === 0" class="vazio">Sem votos nesta UF no corte.</p>
     </div>
 
-    <p v-else-if="linhas.length === 0" class="vazio">
-      Nenhuma UF com dados para os filtros atuais.
-    </p>
-
-    <div v-else class="tabela-scroll uf-painel__scroll">
-      <table>
-        <caption class="sr-only">Resumo de votos e líder por UF</caption>
-        <thead>
-          <tr>
-            <th scope="col">UF</th>
-            <th scope="col" class="num">Votos</th>
-            <th scope="col">Líder</th>
-            <th scope="col" class="num">% líder</th>
-            <th scope="col"><span class="sr-only">Ações</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="linha in linhas"
-            :key="linha.uf"
-            :class="{ 'linha--ativa': ufSelecionada === linha.uf }"
-          >
-            <th scope="row">
-              <button
-                type="button"
-                class="uf-botao"
-                :aria-pressed="ufSelecionada === linha.uf"
-                @click="$emit('select', linha.uf)"
-              >
-                {{ linha.uf }}
-              </button>
-            </th>
-            <td class="num">
-              <span class="uf-votos">{{ formatarNumero(linha.total) }}</span>
-              <span class="uf-barra" aria-hidden="true">
-                <span :style="{ width: `${linha.largura}%` }"></span>
-              </span>
-            </td>
-            <td>
-              <span v-if="linha.lider" class="lider">
-                <span
-                  v-if="linha.liderSigla"
-                  class="party-dot party-dot--mini"
-                  :style="{
-                    backgroundColor: corPartido(linha.liderSigla),
-                    color: corTextoContraste(corPartido(linha.liderSigla)),
-                  }"
-                >{{ linha.liderSigla }}</span>
-                {{ linha.liderNome ?? `Candidato ${linha.lider.nr_votavel}` }}
-              </span>
-              <span v-else>—</span>
-            </td>
-            <td class="num">{{ formatarPercentual(linha.liderPercentual) }}</td>
-            <td>
-              <button
-                type="button"
-                class="button button--ghost button--compacto"
-                :aria-label="`Ver municípios de ${linha.uf}`"
-                @click="$emit('municipios', linha.uf)"
-              >
-                Municípios
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <MapTable
+      v-else
+      :areas="areas"
+      :nivel="nivel"
+      :modo="modo"
+      :candidato="candidato"
+      :candidatos="candidatos"
+      :uf="ufSelecionada ?? uf"
+      @select="aoSelecionarArea"
+    />
   </section>
 </template>
