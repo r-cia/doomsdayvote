@@ -8,6 +8,7 @@ import { sql } from 'kysely';
 import { criarDb } from '../../src/db/index.js';
 import { dividirLinhaBweb } from '../../src/modules/importacao/bweb/leitor.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
+import { gerarRelatorioLote } from '../../src/modules/importacao/relatorio.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -78,6 +79,10 @@ describe('importação idempotente e versionada', () => {
     const resultados = await contar('resultado_votavel');
     expect(versoes).toBeGreaterThan(0);
     expect(resultados).toBe(1529);
+
+    const relatorio = await gerarRelatorioLote(db, primeiro.lote.id);
+    expect(relatorio.lote.id).toBe(primeiro.lote.id);
+    expect(Array.isArray(relatorio.porCodigo)).toBe(true);
 
     const segundo = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), storageDir });
     expect(segundo.ignorado).toBe(true);
@@ -169,5 +174,26 @@ describe('importação idempotente e versionada', () => {
       importarArquivo({ db, caminho: path.join(storageDir, 'nao-existe.csv'), nomeArquivo: 'nao-existe.csv', storageDir }),
     ).rejects.toBeTruthy();
     expect(await contar('lote_importacao')).toBe(0);
+  });
+
+  it('marca falha de leiaute sem importar dados', async () => {
+    const conteudo = await readFile(fixture, 'latin1');
+    const linhas = conteudo.split(/\r?\n/);
+    linhas[0] = linhas[0].replace('"NR_TURMA_APURADORA"', '"NR_TURMA"');
+    const destino = path.join(storageDir, 'bweb-1t_ac_2026-cabecalho.csv');
+    await writeFile(destino, linhas.join('\n'), 'latin1');
+
+    await expect(
+      importarArquivo({ db, caminho: destino, nomeArquivo: path.basename(destino), storageDir }),
+    ).rejects.toMatchObject({ codigo: 'MUDANCA_LEIAUTE' });
+
+    const lote = await db
+      .selectFrom('lote_importacao')
+      .selectAll()
+      .where('nome_arquivo', '=', path.basename(destino))
+      .executeTakeFirstOrThrow();
+    expect(lote.status).toBe('falhou');
+    expect(lote.erro_codigo).toBe('MUDANCA_LEIAUTE');
+    expect(await contar('boletim_versao')).toBe(0);
   });
 });

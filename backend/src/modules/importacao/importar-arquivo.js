@@ -1,7 +1,8 @@
-import { stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { lerArquivoBweb } from './bweb/ler-arquivo.js';
 import { armazenarOriginal, calcularSha256, concluirLote, falharLote, iniciarLote } from './lote.js';
 import { persistirArquivo } from './persistir-bus.js';
+import { validarRegistros } from './validacoes.js';
 
 export async function importarArquivo({
   db,
@@ -10,11 +11,12 @@ export async function importarArquivo({
   storageDir,
   now = new Date(),
   lerArquivo = lerArquivoBweb,
-  validar = () => ({ importar: true, alertas: [] }),
+  validar = validarRegistros,
   persistir = persistirArquivo,
 }) {
   const sha256 = await calcularSha256(caminho);
   const { size } = await stat(caminho);
+  const buffer = await readFile(caminho);
   const caminhoArmazenado = await armazenarOriginal(caminho, sha256, storageDir);
 
   const { ignorado, lote } = await iniciarLote(db, {
@@ -32,25 +34,16 @@ export async function importarArquivo({
   try {
     const resultado = await db.transaction().execute(async (trx) => {
       const arquivo = await lerArquivo(caminho, { nomeArquivo });
-      const registros = [];
-      const alertas = [];
-      let qtLinhas = 0;
-      let dtGeracao = null;
+      const lidos = [];
+      for await (const registro of arquivo.registros) lidos.push(registro);
 
-      for await (const registro of arquivo.registros) {
-        qtLinhas += 1;
-        if (!dtGeracao) dtGeracao = registro.valores.DT_GERACAO?.local ?? null;
-
-        const validado = validar(registro);
-        if (validado.alertas?.length) alertas.push(...validado.alertas);
-        if (validado.importar === false) continue;
-
-        registros.push(registro);
-      }
+      const validado = validar(lidos, { leiaute: arquivo.leiaute, buffer });
+      const alertas = validado.alertas ?? [];
+      const dtGeracao = lidos[0]?.valores.DT_GERACAO?.local ?? null;
 
       const { importados } = await persistir(trx, {
         loteId: lote.id,
-        registros,
+        registros: validado.registros,
         metadadosDerivados: arquivo.metadadosDerivados?.campos ?? [],
       });
 
@@ -58,14 +51,14 @@ export async function importarArquivo({
         await trx
           .insertInto('alerta_importacao')
           .values(
-            alertas.map((alerta) => ({
+            alertas.map((item) => ({
               lote_id: lote.id,
-              severidade: alerta.severidade,
-              codigo: alerta.codigo,
-              mensagem: alerta.mensagem,
-              nr_linha: alerta.nrLinha ?? null,
-              campo: alerta.campo ?? null,
-              contexto: alerta.contexto ?? {},
+              severidade: item.severidade,
+              codigo: item.codigo,
+              mensagem: item.mensagem,
+              nr_linha: item.nrLinha ?? null,
+              campo: item.campo ?? null,
+              contexto: item.contexto ?? {},
             })),
           )
           .execute();
@@ -73,10 +66,10 @@ export async function importarArquivo({
 
       return {
         leiaute: arquivo.leiaute,
-        qtLinhas,
+        qtLinhas: lidos.length,
         importados,
-        qtErros: alertas.filter((alerta) => alerta.severidade === 'erro').length,
-        qtAlertas: alertas.filter((alerta) => alerta.severidade === 'alerta').length,
+        qtErros: alertas.filter((item) => item.severidade === 'erro').length,
+        qtAlertas: alertas.filter((item) => item.severidade === 'alerta').length,
         dtGeracao: arquivo.metadadosDerivados?.geracaoNoNome ?? dtGeracao,
         metadados: {
           cabecalhoOriginal: arquivo.cabecalhoOriginal,
