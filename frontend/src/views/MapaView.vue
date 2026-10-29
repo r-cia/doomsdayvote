@@ -61,6 +61,12 @@ function selecionarUf(uf) {
   store.definirNivel('municipio')
 }
 
+function limparParaBrasil() {
+  store.definirUf(null)
+  store.definirMunicipio(null)
+  store.definirNivel('uf')
+}
+
 function verMunicipios(uf) {
   store.definirUf(uf)
   store.definirNivel('municipio')
@@ -121,7 +127,7 @@ function atualizarSecoes() {
       @select="selecionarUf"
       @municipios="verMunicipios"
       @retry="atualizarMapa"
-      @limpar="store.definirUf(null)"
+      @limpar="limparParaBrasil"
     />
   </section>
 
