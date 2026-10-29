@@ -1,15 +1,23 @@
-import { sql } from 'kysely';
 import { stat } from 'node:fs/promises';
+import { from as copyFrom } from 'pg-copy-streams';
+import { sql } from 'kysely';
 import { lerArquivoBweb } from './bweb/ler-arquivo.js';
 import { lerAmostra } from './bweb/leitor.js';
 import { armazenarOriginal, calcularSha256, concluirLote, falharLote, iniciarLote } from './lote.js';
 import { chaveGrupo, persistirArquivo } from './persistir-bus.js';
 import { criarValidador, encodingSuspeito } from './validacoes.js';
 
-const LINHAS_POR_INSERT = 1000;
 const BUS_POR_LOTE = 200;
 const LIMITE_ALERTAS = 10000;
 const ALERTAS_POR_INSERT = 500;
+
+function escaparCopy(valor) {
+  return String(valor)
+    .replace(/\\/g, '\\\\')
+    .replace(/\t/g, '\\t')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+}
 
 export async function importarArquivo({
   db,
@@ -35,19 +43,60 @@ export async function importarArquivo({
 
   if (ignorado) return { ignorado: true, lote };
 
+  if (!db.pool) {
+    throw new Error('importarArquivo precisa de um db com pool para o COPY');
+  }
+
   const inicio = Date.now();
 
   try {
+    const arquivo = await lerArquivo(caminho, { nomeArquivo });
+    let qtLinhas = 0;
+    let primeiro = null;
+
+    const cliente = await db.pool.connect();
+    let falhaCopy = null;
+
+    try {
+      await cliente.query('DELETE FROM bweb_staging WHERE lote_id = $1', [lote.id]);
+
+      const fluxo = cliente.query(
+        copyFrom(
+          'COPY bweb_staging (lote_id, chave, nr_linha, valores) FROM STDIN WITH (FORMAT text)',
+        ),
+      );
+
+      const copiaConcluida = new Promise((resolver, rejeitar) => {
+        fluxo.on('finish', resolver);
+        fluxo.on('error', rejeitar);
+      });
+
+      for await (const registro of arquivo.registros) {
+        if (!primeiro) primeiro = registro;
+        qtLinhas += 1;
+
+        const linha = `${lote.id}\t${escaparCopy(chaveGrupo(registro.valores))}\t${registro.nrLinha}\t${escaparCopy(JSON.stringify(registro.valores))}\n`;
+
+        if (!fluxo.write(linha)) {
+          await new Promise((resolver) => fluxo.once('drain', resolver));
+        }
+      }
+
+      fluxo.end();
+      await copiaConcluida;
+    } catch (erro) {
+      falhaCopy = erro;
+      throw erro;
+    } finally {
+      cliente.release(falhaCopy ?? undefined);
+    }
+
     const resultado = await db.transaction().execute(async (trx) => {
-      const arquivo = await lerArquivo(caminho, { nomeArquivo });
       const validador = criarValidador({ leiaute: arquivo.leiaute });
       const alertas = [];
       let qtAlertas = 0;
       let qtErros = 0;
-      let qtLinhas = 0;
       let importados = 0;
-      let primeiro = null;
-      let staging = [];
 
       const contabilizar = (lista) => {
         for (const item of lista) {
@@ -56,25 +105,6 @@ export async function importarArquivo({
           if (alertas.length < LIMITE_ALERTAS) alertas.push(item);
         }
       };
-
-      const descarregarStaging = async () => {
-        if (staging.length === 0) return;
-        await trx.insertInto('bweb_staging').values(staging).execute();
-        staging = [];
-      };
-
-      for await (const registro of arquivo.registros) {
-        if (!primeiro) primeiro = registro;
-        qtLinhas += 1;
-        staging.push({
-          lote_id: lote.id,
-          chave: chaveGrupo(registro.valores),
-          nr_linha: registro.nrLinha,
-          valores: registro.valores,
-        });
-        if (staging.length >= LINHAS_POR_INSERT) await descarregarStaging();
-      }
-      await descarregarStaging();
 
       const { rows: chaves } = await sql`
         select distinct chave from bweb_staging
@@ -179,6 +209,12 @@ export async function importarArquivo({
 
     return { ignorado: false, lote: atualizado };
   } catch (erro) {
+    await db
+      .deleteFrom('bweb_staging')
+      .where('lote_id', '=', lote.id)
+      .execute()
+      .catch(() => {});
+
     await falharLote(db, lote.id, {
       codigo: erro.codigo ?? 'ERRO_INTERNO',
       mensagem: erro.message,
