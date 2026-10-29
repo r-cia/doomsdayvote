@@ -98,7 +98,15 @@ async function criarBase() {
     .returning('id')
     .executeTakeFirstOrThrow();
 
-  return { eleicaoId: eleicao.id, secaoId: secao.id, loteId: lote.id, sha256 };
+  return {
+    eleicaoId: eleicao.id,
+    secaoId: secao.id,
+    loteId: lote.id,
+    sha256,
+    cdMunicipio: 1000 + numero,
+    nrZona: numero,
+    nrSecao: numero,
+  };
 }
 
 function versao(base, overrides = {}) {
@@ -151,6 +159,8 @@ describe('schema inicial', () => {
           ('boletim_versao', 'dt_bu_recebido_ts'),
           ('boletim_versao', 'dt_bu_recebido_data'),
           ('eleicao', 'dt_eleicao'),
+          ('resultado_votavel', 'ano_eleicao'),
+          ('resultado_votavel', 'nr_turno'),
           ('resultado_votavel', 'bruto')
         )
     `.execute(db);
@@ -159,7 +169,27 @@ describe('schema inicial', () => {
     expect(tipos['boletim_versao.dt_bu_recebido_ts']).toBe('timestamp with time zone');
     expect(tipos['boletim_versao.dt_bu_recebido_data']).toBe('date');
     expect(tipos['eleicao.dt_eleicao']).toBe('date');
-    expect(tipos['resultado_votavel.bruto']).toBe('jsonb');
+    expect(tipos['resultado_votavel.ano_eleicao']).toBe('smallint');
+    expect(tipos['resultado_votavel.nr_turno']).toBe('smallint');
+    expect(tipos['resultado_votavel.bruto']).toBeUndefined();
+  });
+
+  it('indexa ano e turno em resultado_votavel', async () => {
+    const { rows } = await sql`
+      SELECT indexname
+      FROM pg_indexes
+      WHERE schemaname = 'public'
+        AND tablename = 'resultado_votavel'
+        AND indexname IN (
+          'resultado_votavel_eleicao_idx',
+          'resultado_votavel_uf_cargo_idx'
+        )
+    `.execute(db);
+
+    expect(rows.map((linha) => linha.indexname).sort()).toEqual([
+      'resultado_votavel_eleicao_idx',
+      'resultado_votavel_uf_cargo_idx',
+    ]);
   });
 
   it('garante uma única versão ativa por BU', async () => {
@@ -234,7 +264,13 @@ describe('schema inicial', () => {
       nr_votavel: 13,
       lote_id: base.loteId,
       nr_linha_origem: 1,
-      bruto: {},
+      ano_eleicao: 2026,
+      nr_turno: 1,
+      sg_uf: 'AC',
+      cd_municipio_tse: base.cdMunicipio,
+      nr_zona: base.nrZona,
+      nr_secao: base.nrSecao,
+      cd_cargo_pergunta: 1,
     };
 
     await db.insertInto('resultado_votavel').values(resultado).execute();
@@ -287,9 +323,10 @@ describe('schema inicial', () => {
 
     await cliente.query(
       `INSERT INTO resultado_votavel
-        (boletim_versao_id, cd_tipo_votavel, categoria, nr_votavel, lote_id, nr_linha_origem, bruto)
-       VALUES ($1, 1, 'nominal', 13, $2, 1, '{}')`,
-      [boletim.id, base.loteId],
+        (boletim_versao_id, cd_tipo_votavel, categoria, nr_votavel, lote_id, nr_linha_origem,
+         ano_eleicao, nr_turno, sg_uf, cd_municipio_tse, nr_zona, nr_secao, cd_cargo_pergunta)
+       VALUES ($1, 1, 'nominal', 13, $2, 1, 2026, 1, 'AC', $3, $4, $5, 1)`,
+      [boletim.id, base.loteId, base.cdMunicipio, base.nrZona, base.nrSecao],
     );
     const selecionado = await cliente.query(
       'SELECT count(*)::int AS total FROM resultado_votavel WHERE boletim_versao_id = $1',

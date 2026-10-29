@@ -756,7 +756,7 @@ select {
 
 .leituras {
   display: grid;
-  grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
@@ -1002,6 +1002,25 @@ select {
 
 .auditoria-grade .painel {
   min-width: 0;
+}
+
+.analise {
+  display: grid;
+  gap: 12px;
+}
+
+.analise__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.analise__cabecalho h2 {
+  font-size: 18px;
+  letter-spacing: 0.06em;
 }
 
 /* ── malha, cards e tabelas ───────────────────────────────────────── */
