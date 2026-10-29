@@ -50,7 +50,6 @@ const participacao = computed(() => {
     <div>
       <span class="kpis__rotulo">Última carga</span>
       <strong class="kpis__valor kpis__valor--hora">{{ formatarDataHora(resumo.captured_at) }}</strong>
-      <span class="kpis__nota">arquivo mais recente</span>
     </div>
     <div>
       <span class="kpis__rotulo">{{ candidato ? candidato.nm_votavel : 'Candidato' }}</span>
@@ -58,7 +57,7 @@ const participacao = computed(() => {
         {{ candidato ? formatarPercentual(percentualDoCandidato) : '—' }}
       </strong>
       <span class="kpis__nota">
-        {{ candidato ? `${formatarNumero(votosDoCandidato)} votos` : 'selecione no placar' }}
+        {{ candidato ? `${formatarNumero(votosDoCandidato)} votos` : '' }}
       </span>
     </div>
   </section>

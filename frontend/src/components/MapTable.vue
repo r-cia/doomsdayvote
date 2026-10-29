@@ -95,10 +95,6 @@ function aoClicarLinha(linha) {
     <div class="card__cabecalho">
       <div>
         <h2 id="tabela-mapa-titulo">Tabela alternativa ao mapa</h2>
-        <p>
-          Os mesmos dados do mapa em formato textual. Use as setas para navegar
-          entre as áreas e Enter para selecionar.
-        </p>
       </div>
       <span class="contador">{{ linhas.length }} áreas</span>
     </div>

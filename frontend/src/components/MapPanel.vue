@@ -609,10 +609,7 @@ onBeforeUnmount(() => {
     <div class="card__cabecalho mapa-card__cabecalho">
       <div>
         <h2 id="mapa-titulo">Mapa</h2>
-        <p>
-          Malha estática local. O mapa é visual; a tabela abaixo é a alternativa
-          acessível com os mesmos dados.
-        </p>
+        <p>Malha IBGE local.</p>
       </div>
       <div class="mapa-controles">
         <div class="segmented" role="group" aria-label="Nível do mapa">

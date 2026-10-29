@@ -93,9 +93,5 @@ function escolher(candidato) {
         </span>
       </button>
     </TransitionGroup>
-
-    <p class="placar__rodape">
-      {{ selecionado ? 'Candidato selecionado alimenta biometria, Benford e mapa' : 'Selecione um candidato para abrir a conferência' }}
-    </p>
   </section>
 </template>

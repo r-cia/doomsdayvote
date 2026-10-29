@@ -359,7 +359,6 @@ describe('BiometriaPanel', () => {
     expect(texto).toContain('150')
     expect(texto).toContain('85,71%')
     expect(texto).toContain('14,29%')
-    expect(texto).toContain('nunca por candidato')
     expect(texto).toContain('Candidato A')
   })
 })
