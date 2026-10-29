@@ -98,3 +98,11 @@ Benford por nível, duplicação de vetor de votos e outliers por seção, no co
 - `outliers`: `features` (7), `isolamento` (100 árvores, amostra 256, limiar 0,6), `lof` (k 10, amostra até 2.000, limiar 2) e as 20 seções com maior score.
 
 `GET /api/sections` aceita `municipio_nome` (nome parcial), `zona` e `secao` como filtros separados, além de `uf` e `municipio`.
+
+## GET /api/estatisticas
+
+Parâmetros: `election_id`, `cargo`, `as_of` opcional, `uf` opcional, `municipio` opcional, `escopo` (`turno` por padrão ou `ano`).
+
+Quando `escopo=ano` e o ano tem dois turnos, devolve dois blocos lado a lado, sem somá-los.
+
+Cada bloco traz `comparecimento` (média, mediana e desvio padrão populacional dos `qt_comparecimento` por seção) e `candidatos` (para cada candidato nominal, média, mediana e desvio padrão populacional dos votos por seção). `secoes` é o número de seções do recorte. Cache Redis TTL 300 s, cabeçalho `x-cache: hit|miss|off`.
