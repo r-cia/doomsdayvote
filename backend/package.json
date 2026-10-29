@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:integration": "vitest run --config vitest.integration.config.js"
+    "test:integration": "vitest run --config vitest.integration.config.js",
+    "carga": "node --env-file-if-exists=.env src/scripts/carregar-pasta.js"
   },
   "dependencies": {
     "fastify": "^5.2.1",
