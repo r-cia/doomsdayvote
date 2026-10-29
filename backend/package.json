@@ -17,7 +17,8 @@
     "test:integration": "vitest run --config vitest.integration.config.js",
     "carga": "node --env-file-if-exists=.env src/scripts/carregar-pasta.js",
     "seed:cores": "node --env-file-if-exists=.env src/scripts/seed-cores.js",
-    "cores:pendentes": "node --env-file-if-exists=.env src/scripts/cores-pendentes.js"
+    "cores:pendentes": "node --env-file-if-exists=.env src/scripts/cores-pendentes.js",
+    "geo:carregar": "node --env-file-if-exists=.env src/scripts/geo-carregar.js"
   },
   "dependencies": {
     "fastify": "^5.2.1",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^3.0.5",
+    "mapshaper": "^0.7.101",
     "vitest": "^3.0.5"
   }
 }

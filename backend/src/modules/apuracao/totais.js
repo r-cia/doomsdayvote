@@ -79,8 +79,13 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
   const coluna = nivel === 'uf' ? 's.sg_uf' : 's.cd_municipio_tse';
   const linhas = await base(db, { eleicaoId, cargo, corte, escopo: sgUf ? { sgUf } : {} })
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
+    .leftJoin('localidade as l', (join) =>
+      join
+        .onRef('l.sg_uf', '=', 's.sg_uf')
+        .onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+    )
     .leftJoin('partido_cor as pc', (join) => join.on(sql`pc.sg_partido = coalesce(rv.sg_partido, rv.nm_partido)`))
-    .select([coluna, 'rv.nr_votavel', 'rv.categoria', sql`max(pc.cor_hex)`.as('cor_hex'), sql`sum(rv.qt_votos)`.as('qt_votos')])
+    .select([coluna, 'rv.nr_votavel', 'rv.categoria', sql`max(pc.cor_hex)`.as('cor_hex'), sql`max(l.geom_id)`.as('geom_id'), sql`sum(rv.qt_votos)`.as('qt_votos')])
     .where('rv.qt_votos', 'is not', null)
     .groupBy([coluna, 'rv.nr_votavel', 'rv.categoria'])
     .execute();
@@ -92,6 +97,7 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
     if (!areas.has(chave)) {
       areas.set(chave, {
         [nivel === 'uf' ? 'sg_uf' : 'cd_municipio_tse']: chave,
+        geom_id: linha.geom_id ?? null,
         total_votos: 0,
         votos_validos: 0,
         lider: null,
