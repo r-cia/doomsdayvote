@@ -996,7 +996,7 @@ select {
 
 .malha {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 0.86fr) minmax(300px, 1fr);
   gap: 12px;
 }
 
