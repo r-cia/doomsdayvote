@@ -189,8 +189,11 @@ function ufDaFeicao(propriedades) {
 
 function nomeDaFeicao(propriedades, codigo) {
   const area = areaPorCodigo(indiceAreas.value, codigo, props.nivel)
-  if (props.nivel === 'municipio' && area?.nm_municipio) {
-    return area.nm_municipio
+  if (props.nivel === 'municipio') {
+    if (area?.nm_municipio) return area.nm_municipio
+    const doGeo = primeiroValor(propriedades, CAMPOS_NOME)
+    if (doGeo) return doGeo
+    return codigo
   }
   return primeiroValor(propriedades, CAMPOS_NOME) ?? codigo
 }
@@ -470,10 +473,11 @@ function aoMover(evento) {
   const feature = encontrados[0]
   const area = areaDaFeicao(feature)
   const codigo = feature.properties?._key || ''
+  const rotulo = area?.nm_municipio || feature.properties?._rotulo
   const titulo =
-    feature.properties?._rotulo && feature.properties._rotulo !== codigo
-      ? `${feature.properties._rotulo} · ${codigo}`
-      : `${rotuloNivel.value} ${codigo}`
+    rotulo && rotulo !== codigo
+      ? `${rotulo} · ${codigo}`
+      : area?.nm_municipio || `${rotuloNivel.value} ${codigo}`
   tooltip.visivel = true
   tooltip.x = evento.point.x
   tooltip.y = evento.point.y
