@@ -1,3 +1,4 @@
+import { sql } from 'kysely';
 import { stat } from 'node:fs/promises';
 import { lerArquivoBweb } from './bweb/ler-arquivo.js';
 import { lerAmostra } from './bweb/leitor.js';
@@ -5,8 +6,8 @@ import { armazenarOriginal, calcularSha256, concluirLote, falharLote, iniciarLot
 import { chaveGrupo, persistirArquivo } from './persistir-bus.js';
 import { criarValidador, encodingSuspeito } from './validacoes.js';
 
-const REGISTROS_POR_BLOCO = 5000;
-const GRUPOS_POR_BLOCO = 200;
+const LINHAS_POR_INSERT = 1000;
+const BUS_POR_LOTE = 200;
 const LIMITE_ALERTAS = 10000;
 const ALERTAS_POR_INSERT = 500;
 
@@ -46,16 +47,7 @@ export async function importarArquivo({
       let qtLinhas = 0;
       let importados = 0;
       let primeiro = null;
-      const ultimaLinha = new Map();
-      let bloco = [];
-      let registrosNoBloco = 0;
-      const abertos = new Map();
-
-      for await (const registro of arquivo.registros) {
-        if (!primeiro) primeiro = registro;
-        qtLinhas += 1;
-        ultimaLinha.set(chaveGrupo(registro.valores), registro.nrLinha);
-      }
+      let staging = [];
 
       const contabilizar = (lista) => {
         for (const item of lista) {
@@ -65,12 +57,47 @@ export async function importarArquivo({
         }
       };
 
-      const descarregar = async () => {
-        if (bloco.length === 0) return;
+      const descarregarStaging = async () => {
+        if (staging.length === 0) return;
+        await trx.insertInto('bweb_staging').values(staging).execute();
+        staging = [];
+      };
 
-        const registros = bloco.flat();
-        bloco = [];
-        registrosNoBloco = 0;
+      for await (const registro of arquivo.registros) {
+        if (!primeiro) primeiro = registro;
+        qtLinhas += 1;
+        staging.push({
+          lote_id: lote.id,
+          chave: chaveGrupo(registro.valores),
+          nr_linha: registro.nrLinha,
+          valores: registro.valores,
+        });
+        if (staging.length >= LINHAS_POR_INSERT) await descarregarStaging();
+      }
+      await descarregarStaging();
+
+      const { rows: chaves } = await sql`
+        select distinct chave from bweb_staging
+        where lote_id = ${lote.id}
+        order by chave
+      `.execute(trx);
+
+      for (let i = 0; i < chaves.length; i += BUS_POR_LOTE) {
+        const bloco = chaves.slice(i, i + BUS_POR_LOTE).map((linha) => linha.chave);
+
+        const linhas = await trx
+          .selectFrom('bweb_staging')
+          .select(['chave', 'nr_linha', 'valores'])
+          .where('lote_id', '=', lote.id)
+          .where('chave', 'in', bloco)
+          .orderBy('chave')
+          .orderBy('nr_linha')
+          .execute();
+
+        const registros = linhas.map((linha) => ({
+          nrLinha: linha.nr_linha,
+          valores: linha.valores,
+        }));
 
         const validado = validar
           ? validar(registros, { leiaute: arquivo.leiaute })
@@ -78,46 +105,17 @@ export async function importarArquivo({
 
         contabilizar(validado.alertas ?? []);
 
-        if (validado.registros.length === 0) return;
-
-        const { importados: novos } = await persistir(trx, {
-          loteId: lote.id,
-          registros: validado.registros,
-          metadadosDerivados: arquivo.metadadosDerivados?.campos ?? [],
-        });
-        importados += novos;
-      };
-
-      const leitura = await lerArquivo(caminho, { nomeArquivo });
-      for await (const registro of leitura.registros) {
-        const chave = chaveGrupo(registro.valores);
-        let grupo = abertos.get(chave);
-        if (!grupo) {
-          grupo = [];
-          abertos.set(chave, grupo);
-        }
-        grupo.push(registro);
-
-        if (registro.nrLinha === ultimaLinha.get(chave)) {
-          bloco.push(grupo);
-          registrosNoBloco += grupo.length;
-          abertos.delete(chave);
-
-          if (
-            registrosNoBloco >= REGISTROS_POR_BLOCO ||
-            bloco.length >= GRUPOS_POR_BLOCO
-          ) {
-            await descarregar();
-          }
+        if (validado.registros.length > 0) {
+          const { importados: novos } = await persistir(trx, {
+            loteId: lote.id,
+            registros: validado.registros,
+            metadadosDerivados: arquivo.metadadosDerivados?.campos ?? [],
+          });
+          importados += novos;
         }
       }
 
-      for (const grupo of abertos.values()) {
-        bloco.push(grupo);
-        registrosNoBloco += grupo.length;
-      }
-      abertos.clear();
-      await descarregar();
+      await sql`delete from bweb_staging where lote_id = ${lote.id}`.execute(trx);
 
       const amostra = await lerAmostra(caminho);
       if (encodingSuspeito(amostra)) {
