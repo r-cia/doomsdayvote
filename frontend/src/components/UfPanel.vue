@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
 import { candidatosNominais, linhasMapa } from '../lib/agregacoes'
 import { corPartido, corTextoContraste } from '../lib/colors'
@@ -16,6 +16,7 @@ const props = defineProps({
 
 defineEmits(['select', 'municipios', 'retry', 'limpar'])
 
+const ordenacao = ref('votos')
 const partidoPorNumero = computed(() => {
   const mapa = new Map()
   for (const candidato of props.candidatos) {
@@ -36,10 +37,16 @@ const linhas = computed(() => {
       liderPercentual: area.lider?.percentual ?? null,
     }
   })
-  return base.map((linha) => ({
+  const comLargura = base.map((linha) => ({
     ...linha,
     largura: Math.max(0, Math.min(100, Number(linha.liderPercentual ?? 0))),
   }))
+  if (ordenacao.value === 'percentual') {
+    return [...comLargura].sort(
+      (a, b) => (b.liderPercentual ?? -1) - (a.liderPercentual ?? -1),
+    )
+  }
+  return [...comLargura].sort((a, b) => b.total - a.total)
 })
 
 const votosUf = computed(() => candidatosNominais(props.votos))
@@ -54,6 +61,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
         </h2>
       </div>
       <div class="uf-painel__acoes">
+        <select v-if="!ufSelecionada" v-model="ordenacao" class="uf-ordenacao">
+          <option value="votos">Votos</option>
+          <option value="percentual">% Líder</option>
+        </select>
         <button
           v-if="ufSelecionada"
           type="button"

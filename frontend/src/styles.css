@@ -1506,6 +1506,18 @@ tbody tr[data-ativo='true'] {
   gap: 8px;
 }
 
+.uf-ordenacao {
+  height: 24px;
+  padding: 0 6px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--raio);
+  color: var(--ink-dim);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .uf-botao {
   padding: 1px 6px;
   background: transparent;
