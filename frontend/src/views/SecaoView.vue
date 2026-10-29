@@ -86,11 +86,12 @@ function voltar() {
 </script>
 
 <template>
-  <div class="page">
-    <div class="detalhe-topo">
+  <div class="page page--extrato">
+    <div class="extrato-topo">
       <button type="button" class="button button--ghost" @click="voltar">
         ← Voltar ao painel
       </button>
+      <p>Extrato de teletipo · boletim de urna</p>
     </div>
 
     <StateBlock
@@ -118,7 +119,6 @@ function voltar() {
     <template v-else-if="dados">
       <header class="page__cabecalho detalhe-cabecalho">
         <div>
-          <p class="eyebrow">Detalhe da seção</p>
           <h1>
             Seção {{ secao?.nr_secao }} · Zona {{ secao?.nr_zona }}
           </h1>
@@ -173,6 +173,9 @@ function voltar() {
             <div><dt>Encerramento</dt><dd>{{ formatarDataHora(boletim.dt_encerramento) }}</dd></div>
             <div><dt>Emissão do BU</dt><dd>{{ formatarDataHora(boletim.dt_emissao_bu) }}</dd></div>
             <div><dt>Recebimento</dt><dd>{{ recebimento() }}</dd></div>
+            <div><dt>Aptos</dt><dd>{{ formatarNumero(boletim.qt_aptos) }}</dd></div>
+            <div><dt>Comparecimento</dt><dd>{{ formatarNumero(boletim.qt_comparecimento) }}</dd></div>
+            <div><dt>Biometria não habilitada</dt><dd>{{ formatarNumero(boletim.qt_elei_biom_sem_habilitacao) }}</dd></div>
             <div><dt>Versões anteriores</dt><dd>{{ formatarNumero(dados.versoes_anteriores) }}</dd></div>
           </dl>
         </section>

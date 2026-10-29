@@ -5,7 +5,10 @@ import KpiCards from '../src/components/KpiCards.vue'
 import MapPanel from '../src/components/MapPanel.vue'
 import MapTable from '../src/components/MapTable.vue'
 import SectionsTable from '../src/components/SectionsTable.vue'
-import TimelinePanel from '../src/components/TimelinePanel.vue'
+import PlotDia from '../src/components/PlotDia.vue'
+import PlacarRanking from '../src/components/PlacarRanking.vue'
+import BiometriaPanel from '../src/components/BiometriaPanel.vue'
+import BenfordPanel from '../src/components/BenfordPanel.vue'
 
 vi.mock('vue-chartjs', () => ({
   Line: {
@@ -88,6 +91,7 @@ const candidatos = [
 
 const filtros = {
   electionId: 'e1',
+  ano: 2022,
   cargo: 1,
   turno: 1,
   candidato: null,
@@ -97,11 +101,11 @@ const filtros = {
 }
 
 describe('FilterBar', () => {
-  it('emite eleição, turno, cargo e candidato', async () => {
+  it('pede cargo, ano, turno e candidato nessa ordem', async () => {
     const wrapper = mount(FilterBar, {
       props: {
-        eleicoes,
         cargos: eleicoes[0].cargos,
+        anos: [2022, 2018],
         turnos: [1, 2],
         candidatos,
         filtros,
@@ -109,22 +113,22 @@ describe('FilterBar', () => {
     })
 
     const selects = wrapper.findAll('select')
-    await selects[0].setValue('e1')
-    await selects[1].setValue('2')
-    await selects[2].setValue('3')
+    await selects[0].setValue('3')
+    await selects[1].setValue('2022')
+    await selects[2].setValue('2')
     await selects[3].setValue('22')
 
-    expect(wrapper.emitted('update:election')[0]).toEqual(['e1'])
-    expect(wrapper.emitted('update:turno')[0]).toEqual([2])
     expect(wrapper.emitted('update:cargo')[0]).toEqual([3])
+    expect(wrapper.emitted('update:ano')[0]).toEqual([2022])
+    expect(wrapper.emitted('update:turno')[0]).toEqual([2])
     expect(wrapper.emitted('update:candidato')[0]).toEqual([22])
   })
 
   it('emite corte e UF', async () => {
     const wrapper = mount(FilterBar, {
       props: {
-        eleicoes,
         cargos: eleicoes[0].cargos,
+        anos: [2022],
         turnos: [1],
         candidatos,
         filtros,
@@ -244,60 +248,171 @@ describe('MapTable', () => {
   })
 })
 
-describe('TimelinePanel', () => {
-  it('esconde o gráfico e mostra o aviso quando não há pontos', () => {
-    const wrapper = mount(TimelinePanel, {
+describe('PlotDia', () => {
+  const pontos = [
+    { t: '2022-10-02T21:00:00.000Z', votos_acumulados: 1000, secoes_com_bu_acumuladas: 5 },
+    { t: '2022-10-02T21:05:00.000Z', votos_acumulados: 1500, secoes_com_bu_acumuladas: 8 },
+  ]
+
+  it('mostra o corte, o slider e a leitura do dia', async () => {
+    const wrapper = mount(PlotDia, {
       props: {
-        data: {
-          pontos: [],
-          avisos: [
-            {
-              codigo: 'CORTE_INDISPONIVEL',
-              mensagem: 'A fonte deste ano não permite linha do tempo por horário',
-            },
-          ],
-        },
-        granularity: '5m',
+        pontos,
+        series: [
+          {
+            nr_votavel: 13,
+            nm_votavel: 'Candidato A',
+            pontos: [
+              { t: '2022-10-02T21:00:00.000Z', votos_acumulados: 600 },
+              { t: '2022-10-02T21:05:00.000Z', votos_acumulados: 900 },
+            ],
+          },
+        ],
+        candidatos,
+      },
+    })
+
+    expect(wrapper.find('input[type="range"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('1.500')
+    expect(wrapper.text()).toContain('8')
+
+    await wrapper.find('input[type="range"]').setValue('0')
+    expect(wrapper.emitted('update:corte')[0][0]).toMatch(/^2022-10-02T18:00$/)
+
+    await wrapper.setProps({ corte: '2022-10-02T18:00:00.000Z' })
+    expect(wrapper.text()).toContain('1.000')
+  })
+
+  it('avisa quando a fonte não permite linha do tempo', () => {
+    const wrapper = mount(PlotDia, {
+      props: {
+        pontos: [],
+        series: [],
+        avisos: [
+          {
+            codigo: 'CORTE_INDISPONIVEL',
+            mensagem: 'A fonte deste ano não permite linha do tempo por horário',
+          },
+        ],
       },
     })
 
     expect(wrapper.text()).toContain('Linha do tempo indisponível')
     expect(wrapper.text()).toContain('não permite linha do tempo')
-    expect(wrapper.find('[data-test="chart"]').exists()).toBe(false)
+    expect(wrapper.find('input[type="range"]').exists()).toBe(false)
   })
+})
 
-  it('mostra gráfico, slider e métricas do ponto selecionado', async () => {
-    const wrapper = mount(TimelinePanel, {
+describe('PlacarRanking', () => {
+  const votos = [
+    { categoria: 'nominal', nr_votavel: 13, nm_votavel: 'Candidato A', sg_partido: 'PT', qt_votos: 600, percentual: 60 },
+    { categoria: 'nominal', nr_votavel: 22, nm_votavel: 'Candidato B', sg_partido: 'PL', qt_votos: 400, percentual: 40 },
+  ]
+  const series = [
+    {
+      nr_votavel: 13,
+      nm_votavel: 'Candidato A',
+      pontos: [
+        { t: '2022-10-02T21:00:00.000Z', votos_acumulados: 400 },
+        { t: '2022-10-02T21:05:00.000Z', votos_acumulados: 600 },
+      ],
+    },
+  ]
+
+  it('ordena por votos, mostra o delta do corte e seleciona', async () => {
+    const wrapper = mount(PlacarRanking, { props: { votos, series } })
+
+    const linhas = wrapper.findAll('.placar__linha')
+    expect(linhas).toHaveLength(2)
+    expect(linhas[0].text()).toContain('Candidato A')
+    expect(linhas[0].text()).toContain('60,00%')
+    expect(linhas[0].text()).toContain('+200')
+
+    await linhas[1].trigger('click')
+    expect(wrapper.emitted('select')[0]).toEqual([22])
+  })
+})
+
+describe('BiometriaPanel', () => {
+  it('mostra a composição do recorte sem ratear votos', () => {
+    const wrapper = mount(BiometriaPanel, {
       props: {
-        data: {
-          pontos: [
-            {
-              t: '2022-10-02T21:00:00.000Z',
-              votos_acumulados: 1000,
-              secoes_com_bu_acumuladas: 5,
-            },
-            {
-              t: '2022-10-02T21:05:00.000Z',
-              votos_acumulados: 1500,
-              secoes_com_bu_acumuladas: 8,
-            },
-          ],
-          avisos: [],
+        dados: {
+          secoes: 12,
+          secoes_sem_campo: 0,
+          qt_aptos: 2000,
+          qt_comparecimento: 1050,
+          qt_habilitados_por_biometria: 900,
+          qt_biometria_nao_habilitada: 150,
+          percentual_comparecimento: 52.5,
+          percentual_habilitada: 85.71,
+          percentual_nao_habilitada: 14.29,
         },
-        granularity: '5m',
+        votosCandidato: 600,
+        nomeCandidato: 'Candidato A',
       },
     })
 
-    expect(wrapper.find('[data-test="chart"]').exists()).toBe(true)
-    expect(wrapper.find('input[type="range"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('1.500')
+    const texto = wrapper.text()
+    expect(texto).toContain('1.050')
+    expect(texto).toContain('900')
+    expect(texto).toContain('150')
+    expect(texto).toContain('85,71%')
+    expect(texto).toContain('14,29%')
+    expect(texto).toContain('nunca por candidato')
+    expect(texto).toContain('Candidato A')
+  })
+})
 
-    await wrapper.find('input[type="range"]').setValue('0')
-    expect(wrapper.text()).toContain('1.000')
-    expect(wrapper.text()).toContain('5')
+describe('BenfordPanel', () => {
+  const digitos = Array.from({ length: 9 }, (_, indice) => ({
+    digito: indice + 1,
+    observado: 10,
+    observado_percentual: 12,
+    esperado_percentual: 30.1 - indice * 2,
+  }))
 
-    await wrapper.findAll('button').find((botao) => botao.text() === '1 min').trigger('click')
-    expect(wrapper.emitted('update:granularity')[0]).toEqual(['1m'])
+  it('lista todos os candidatos e seleciona um', async () => {
+    const wrapper = mount(BenfordPanel, {
+      props: {
+        dados: {
+          minimo_votos: 10,
+          candidatos: [
+            {
+              nr_votavel: 13,
+              nm_votavel: 'Candidato A',
+              total_votos: 900,
+              n: 120,
+              secoes_abaixo_minimo: 3,
+              mad: 0.0042,
+              classificacao: 'conformidade próxima',
+              digitos,
+            },
+            {
+              nr_votavel: 22,
+              nm_votavel: 'Candidato B',
+              total_votos: 400,
+              n: 40,
+              secoes_abaixo_minimo: 9,
+              mad: 0.021,
+              classificacao: 'não conformidade',
+              digitos,
+            },
+          ],
+        },
+      },
+    })
+
+    const texto = wrapper.text()
+    expect(texto).toContain('Candidato A')
+    expect(texto).toContain('Candidato B')
+    expect(texto).toContain('0,0042')
+    expect(texto).toContain('conformidade próxima')
+    expect(texto).toContain('120')
+
+    const botoes = wrapper.findAll('tbody button')
+    await botoes[1].trigger('click')
+    expect(wrapper.emitted('select')[0]).toEqual([22])
   })
 })
 

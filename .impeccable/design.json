@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T15:50:00.000Z",
+  "title": "Design System: Doomsday Vote",
+  "extensions": {
+    "colorMeta": {
+      "ground": { "role": "neutral", "displayName": "Fundo da Sala", "canonical": "#0a0d0a", "tonalRamp": ["#050705", "#0a0d0a", "#10150f", "#161d14", "#1f2a1c", "#2b3a28", "#3d5138", "#5a7152"] },
+      "panel": { "role": "neutral", "displayName": "Painel", "canonical": "#10150f", "tonalRamp": ["#080b08", "#10150f", "#161d14", "#1f2a1c", "#2b3a28", "#3d5138", "#5a7152", "#8fa382"] },
+      "seam": { "role": "neutral", "displayName": "Fio", "canonical": "#273522", "tonalRamp": ["#0d120c", "#141b12", "#1b2518", "#273522", "#35462f", "#4a5f42", "#6a8060", "#94a88a"] },
+      "ink": { "role": "neutral", "displayName": "Tinta", "canonical": "#d9e3cf", "tonalRamp": ["#2a3326", "#414d3a", "#5f7055", "#7e9275", "#9aac8c", "#b6c6a8", "#cbd8c0", "#d9e3cf"] },
+      "phosphor-amber": { "role": "primary", "displayName": "Fósforo Âmbar", "canonical": "#ffb52e", "tonalRamp": ["#2b1d05", "#4d3407", "#734e0b", "#9a6a10", "#b57f1c", "#d29a24", "#f0b32b", "#ffb52e"] },
+      "amber-deep": { "role": "primary", "displayName": "Âmbar Fundo", "canonical": "#b57f1c", "tonalRamp": ["#2b1d05", "#4d3407", "#734e0b", "#9a6a10", "#b57f1c", "#c99220", "#e0a826", "#ffb52e"] },
+      "lamp-green": { "role": "secondary", "displayName": "Lâmpada Verde", "canonical": "#74e08c", "tonalRamp": ["#0d2a14", "#154a24", "#1e6b33", "#2b8c44", "#43aa59", "#5ac471", "#74e08c", "#a3f0b3"] },
+      "lamp-amber": { "role": "secondary", "displayName": "Lâmpada Âmbar", "canonical": "#ffc857", "tonalRamp": ["#33250a", "#553f10", "#7a5b17", "#a0781e", "#c49525", "#e0ad33", "#ffc857", "#ffe0a0"] },
+      "lamp-red": { "role": "secondary", "displayName": "Lâmpada Vermelha", "canonical": "#ff6b57", "tonalRamp": ["#33120e", "#571f18", "#7a2c22", "#9c3a2d", "#c04a3a", "#e05646", "#ff6b57", "#ffa79c"] },
+      "teletype-paper": { "role": "neutral", "displayName": "Papel de Teletipo", "canonical": "#dfe4d6", "tonalRamp": ["#3a4035", "#58604f", "#7a8370", "#9aa48f", "#b8c2ad", "#cfd6c5", "#dfe4d6", "#f2f5ec"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Condensada de Quadro", "purpose": "Títulos de página e cabeçalhos de painel, em caixa alta." },
+      "data": { "displayName": "Mono de Dados", "purpose": "Nomes, tabelas, textos de apoio e todo número." },
+      "figure": { "displayName": "Número de Leitura", "purpose": "Votos, comparecimento e percentual em destaque." },
+      "label": { "displayName": "Rótulo de Instrumento", "purpose": "Rótulos de campo, colunas e legendas em 9px." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-plot", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Reordenação do placar e entrada do traçado." },
+      { "name": "draw", "value": "520ms", "purpose": "Desenho do traçado do dia; desligado em prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "1180px" },
+      { "name": "sm", "value": "760px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal de um painel, como limpar filtros ou voltar.",
+      "html": "<button class=\"ds-btn-primary\">LIMPAR FILTROS</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; height:32px; padding:0 12px; background:#ffb52e; border:1px solid #ffb52e; border-radius:2px; color:#14100a; font-family:'Fragment Mono',ui-monospace,monospace; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; } .ds-btn-primary:hover { background:#ffc65a; } .ds-btn-primary:focus-visible { outline:1px solid #ffb52e; outline-offset:2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Ação secundária, sempre ao lado de uma primária.",
+      "html": "<button class=\"ds-btn-ghost\">TENTAR NOVAMENTE</button>",
+      "css": ".ds-btn-ghost { display:inline-flex; align-items:center; justify-content:center; height:32px; padding:0 12px; background:transparent; border:1px solid #273522; border-radius:2px; color:#9aac8c; font-family:'Fragment Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; } .ds-btn-ghost:hover { background:#161d14; border-color:#7e9275; color:#d9e3cf; }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Select ou entrada de data; o rótulo fica acima em 9px.",
+      "html": "<label class=\"ds-field\"><span>CARGO</span><select><option>Presidente</option></select></label>",
+      "css": ".ds-field { display:grid; gap:4px; } .ds-field > span { font-family:'Fragment Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#7e9275; } .ds-field select { height:30px; padding:0 8px; background:#0a0d0a; border:1px solid #273522; border-radius:2px; color:#d9e3cf; font-family:'Fragment Mono',ui-monospace,monospace; font-size:12px; } .ds-field select:focus { border-color:#ffb52e; outline:none; box-shadow:0 0 0 1px #b57f1c; }"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Superfície de trabalho separada por fio, nunca por sombra.",
+      "html": "<section class=\"ds-panel\"><header><h2>TRAÇADO DO DIA</h2><p>22:50 · corte</p></header><div class=\"ds-panel-body\">9.371 seções · 2.426.758 votos</div></section>",
+      "css": ".ds-panel { display:flex; flex-direction:column; background:#10150f; border:1px solid #273522; border-radius:2px; } .ds-panel header { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:8px 14px 7px; border-bottom:1px solid #1b2518; } .ds-panel h2 { margin:0; font-family:'Archivo Narrow','Arial Narrow',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#d9e3cf; } .ds-panel header p { margin:0; font-family:'Fragment Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:#7e9275; text-align:right; } .ds-panel-body { padding:10px 14px; font-family:'Fragment Mono',ui-monospace,monospace; font-size:12px; color:#ffb52e; }"
+    },
+    {
+      "name": "State Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Leitura de Benford e estados de texto curto.",
+      "html": "<span class=\"ds-chip ds-chip-ok\">CONFORMIDADE PRÓXIMA</span>",
+      "css": ".ds-chip { display:inline-block; padding:1px 6px; border:1px solid #273522; border-radius:1px; font-family:'Fragment Mono',ui-monospace,monospace; font-size:8px; letter-spacing:0.08em; text-transform:uppercase; color:#9aac8c; } .ds-chip-ok { border-color:rgba(116,224,140,0.5); color:#74e08c; } .ds-chip-warn { border-color:rgba(255,200,87,0.5); color:#ffc857; } .ds-chip-alert { border-color:rgba(255,107,87,0.55); color:#ff6b57; }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "Dois destinos dentro da faixa de classificação.",
+      "html": "<nav class=\"ds-nav\"><a class=\"active\" href=\"#\">PAINEL</a><a href=\"#\">MAPA</a></nav>",
+      "css": ".ds-nav { display:flex; gap:4px; } .ds-nav a { padding:6px 10px; border:1px solid transparent; border-radius:2px; color:#9aac8c; font-family:'Fragment Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; text-decoration:none; } .ds-nav a:hover { color:#d9e3cf; border-color:#273522; } .ds-nav a.active { color:#ffb52e; border-color:#b57f1c; background:rgba(255,181,46,0.12); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Sala de Plotagem",
+    "overview": "A interface é uma sala de operações da Guerra Fria: um quadro de plotagem onde o dia dos boletins de urna é traçado, lido sob fósforo âmbar. O visitante não navega por um painel de cartões; ele acompanha um traçado, um placar que se reordena e um extrato de teletipo. A densidade é a de um quadro de status — rótulos miúdos em caixa alta, algarismos tabulares, fios de um pixel no lugar de sombras. O mundo empresta só quatro coisas: tipo, paleta, densidade e um movimento-assinatura (o traçado do dia). Navegação, filtros e controles continuam os da web: selects nativos, um slider de corte, botões e tabelas.",
+    "keyCharacteristics": [
+      "Fundo quase preto esverdeado e painéis separados por fios de 1px.",
+      "Âmbar de fósforo como tinta estrutural; verde de lâmpada para recebido; vermelho para alerta.",
+      "Cores de partido são os únicos saturados dos dados.",
+      "Monoespaçada para dados, condensada de quadro para títulos.",
+      "Um único gesto autoral: arrastar o corte e ver o placar reordenar enquanto as traças crescem."
+    ],
+    "rules": [
+      { "name": "The Three Inks Rule", "body": "A página tem no máximo três tintas de estado em uso simultâneo; cor de partido nunca vira estado.", "section": "colors" },
+      { "name": "The Teletype Exception Rule", "body": "O papel claro existe apenas no extrato da seção. Fora dele, a sala é escura.", "section": "colors" },
+      { "name": "The Tabular Rule", "body": "Todo número é tabular. Nenhum valor alinha à esquerda.", "section": "typography" },
+      { "name": "The Seam Rule", "body": "Nenhum painel projeta sombra; se dois planos precisam se separar, entra um fio.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar o fio de 1px para separar planos.",
+      "Do alinhar todo número à direita, em algarismos tabulares.",
+      "Do reservar o âmbar para estrutura e leitura; estado usa verde, âmbar ou vermelho.",
+      "Do manter o primeiro viewport com ranking, traçado, biometria e Benford.",
+      "Do nomear a fonte do dado (corte, seção, lote) perto do número."
+    ],
+    "donts": [
+      "Don't usar sombra, cartão arredondado ou gradiente.",
+      "Don't transformar cor de partido em estado.",
+      "Don't pôr rótulo de apoio acima de título.",
+      "Don't inventar percentual de apuração, snapshot ou cobertura.",
+      "Don't apresentar Benford como prova de fraude."
+    ]
+  }
+}

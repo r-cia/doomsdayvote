@@ -3,6 +3,9 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [vue()],
+  optimizeDeps: {
+    exclude: ['maplibre-gl'],
+  },
   server: {
     host: '0.0.0.0',
     port: 7010,

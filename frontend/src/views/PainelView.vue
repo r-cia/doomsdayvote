@@ -2,14 +2,18 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AvisoBanner from '../components/AvisoBanner.vue'
+import BenfordPanel from '../components/BenfordPanel.vue'
+import BiometriaPanel from '../components/BiometriaPanel.vue'
 import FilterBar from '../components/FilterBar.vue'
 import KpiCards from '../components/KpiCards.vue'
 import MapPanel from '../components/MapPanel.vue'
+import PlacarRanking from '../components/PlacarRanking.vue'
+import PlotDia from '../components/PlotDia.vue'
 import SectionsTable from '../components/SectionsTable.vue'
 import StateBlock from '../components/StateBlock.vue'
-import TimelinePanel from '../components/TimelinePanel.vue'
 import UfPanel from '../components/UfPanel.vue'
 import {
+  useAnalise,
   useEleicoes,
   useMapa,
   useResumo,
@@ -17,7 +21,6 @@ import {
   useTimeline,
 } from '../composables/queries'
 import { candidatosNominais } from '../lib/agregacoes'
-import { formatarCorte } from '../lib/format'
 import { useFiltersStore } from '../stores/filters'
 
 const store = useFiltersStore()
@@ -25,12 +28,13 @@ const router = useRouter()
 
 const eleicoesQuery = useEleicoes()
 const resumoQuery = useResumo()
+const timelineQuery = useTimeline()
+const analiseQuery = useAnalise()
 const mapaQuery = useMapa()
 const mapaUfQuery = useMapa('uf', {
   ignorarMunicipio: true,
   ignorarUf: true,
 })
-const timelineQuery = useTimeline()
 const secoesQuery = useSecoes()
 
 const eleicoes = computed(() => eleicoesQuery.data.value?.eleicoes ?? [])
@@ -44,16 +48,48 @@ const eleicoesDisponiveis = computed(() =>
 const eleicaoAtual = computed(() =>
   eleicoesDisponiveis.value.find((eleicao) => eleicao.id === store.electionId),
 )
-const cargos = computed(
-  () =>
-    eleicaoAtual.value?.cargos?.filter((cargo) =>
-      ['Presidente', 'Governador'].includes(cargo.ds_cargo_pergunta),
-    ) ?? [],
-)
-const turnos = computed(() =>
-  [...new Set(eleicoesDisponiveis.value.map((eleicao) => eleicao.nr_turno))].sort(
-    (a, b) => a - b,
+
+const ORDEM_CARGOS = { Presidente: 0, Governador: 1 }
+
+const cargos = computed(() => {
+  const mapa = new Map()
+  for (const eleicao of eleicoesDisponiveis.value) {
+    for (const cargo of eleicao.cargos ?? []) {
+      if (!(cargo.ds_cargo_pergunta in ORDEM_CARGOS)) continue
+      mapa.set(cargo.cd_cargo_pergunta, cargo.ds_cargo_pergunta)
+    }
+  }
+  return [...mapa.entries()]
+    .map(([cd, ds]) => ({ cd_cargo_pergunta: cd, ds_cargo_pergunta: ds }))
+    .sort(
+      (a, b) =>
+        (ORDEM_CARGOS[a.ds_cargo_pergunta] ?? 9) -
+        (ORDEM_CARGOS[b.ds_cargo_pergunta] ?? 9),
+    )
+})
+
+const eleicoesDoCargo = computed(() =>
+  eleicoesDisponiveis.value.filter((eleicao) =>
+    (eleicao.cargos ?? []).some(
+      (cargo) => cargo.cd_cargo_pergunta === store.cargo,
+    ),
   ),
+)
+
+const anos = computed(() =>
+  [...new Set(eleicoesDoCargo.value.map((eleicao) => eleicao.ano_eleicao))].sort(
+    (a, b) => b - a,
+  ),
+)
+
+const turnos = computed(() =>
+  [
+    ...new Set(
+      eleicoesDoCargo.value
+        .filter((eleicao) => eleicao.ano_eleicao === eleicaoAtual.value?.ano_eleicao)
+        .map((eleicao) => eleicao.nr_turno),
+    ),
+  ].sort((a, b) => a - b),
 )
 const candidatos = computed(() =>
   candidatosNominais(resumoQuery.data.value?.votos ?? []),
@@ -66,6 +102,7 @@ const candidatoSelecionado = computed(
 )
 const filtros = computed(() => ({
   electionId: store.electionId,
+  ano: eleicaoAtual.value?.ano_eleicao ?? null,
   cargo: store.cargo,
   turno: store.turno,
   candidato: store.candidato,
@@ -73,26 +110,80 @@ const filtros = computed(() => ({
   uf: store.uf,
   municipio: store.municipio,
 }))
-const avisos = computed(() => [
-  ...(resumoQuery.data.value?.avisos ?? []),
-  ...(mapaQuery.data.value?.avisos ?? []),
-])
 
-function aoEleicao(id) {
-  const eleicao = eleicoesDisponiveis.value.find((item) => item.id === id)
-  if (eleicao) store.definirEleicao(eleicao)
+const votosDoCandidato = computed(() => {
+  if (!candidatoSelecionado.value) return null
+  const linha = (resumoQuery.data.value?.votos ?? []).find(
+    (voto) =>
+      voto.categoria === 'nominal' &&
+      voto.nr_votavel === candidatoSelecionado.value.nr_votavel,
+  )
+  return linha ? Number(linha.qt_votos) : 0
+})
+
+const avisos = computed(() => {
+  const vistos = new Set()
+  const lista = []
+  for (const aviso of [
+    ...(resumoQuery.data.value?.avisos ?? []),
+    ...(analiseQuery.data.value?.avisos ?? []),
+    ...(mapaQuery.data.value?.avisos ?? []),
+  ]) {
+    if (vistos.has(aviso.codigo)) continue
+    vistos.add(aviso.codigo)
+    lista.push(aviso)
+  }
+  return lista
+})
+
+const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
+
+function eleicaoPara(cargo, ano, turno) {
+  const opcoes = eleicoesDisponiveis.value.filter((eleicao) =>
+    (eleicao.cargos ?? []).some(
+      (item) => item.cd_cargo_pergunta === cargo,
+    ),
+  )
+  return (
+    opcoes.find(
+      (eleicao) => eleicao.ano_eleicao === ano && eleicao.nr_turno === turno,
+    ) ??
+    opcoes.find((eleicao) => eleicao.ano_eleicao === ano) ??
+    opcoes[0] ??
+    null
+  )
 }
 
-function aoTurno(turno) {
-  store.definirTurno(turno, eleicoesDisponiveis.value)
-}
-
-function aoCargo(cargo) {
+function aplicarEleicao(eleicao, cargo) {
+  if (!eleicao) return
+  store.definirEleicao(eleicao)
   store.definirCargo(cargo)
 }
 
+function aoCargo(cargo) {
+  aplicarEleicao(
+    eleicaoPara(cargo, eleicaoAtual.value?.ano_eleicao, eleicaoAtual.value?.nr_turno),
+    cargo,
+  )
+}
+
+function aoAno(ano) {
+  aplicarEleicao(
+    eleicaoPara(store.cargo, ano, eleicaoAtual.value?.nr_turno),
+    store.cargo,
+  )
+}
+
+function aoTurno(turno) {
+  aplicarEleicao(
+    eleicaoPara(store.cargo, eleicaoAtual.value?.ano_eleicao, turno),
+    store.cargo,
+  )
+}
+
 function aoCandidato(candidato) {
-  store.definirCandidato(candidato)
+  const numero = candidato === null || candidato === undefined ? null : Number(candidato)
+  store.definirCandidato(store.candidato === numero ? null : numero)
 }
 
 function aoCorte(valor) {
@@ -156,26 +247,13 @@ function atualizarSecoes() {
 </script>
 
 <template>
-  <div class="page">
-    <header class="page__cabecalho">
-      <div>
-        <p class="eyebrow">Auditoria pós-eleição</p>
-        <h1>Painel de auditoria</h1>
-        <p class="page__descricao">
-          Consulte votos, seções com BU, mapa por UF e detalhe de seções a partir
-          dos BUs carregados manualmente.
-        </p>
-      </div>
-      <div class="page__corte">
-        <span class="rotulo-menor">Corte atual</span>
-        <strong>{{ formatarCorte(resumoQuery.data.value?.corte) }}</strong>
-      </div>
-    </header>
+  <div class="sala">
+    <h1 class="sr-only">Conferência de boletins de urna</h1>
 
     <StateBlock
       v-if="eleicoesQuery.isLoading.value"
       estado="carregando"
-      titulo="Carregando eleições"
+      titulo="Abrindo a sala"
       descricao="Consultando a API local."
     />
     <StateBlock
@@ -195,14 +273,14 @@ function atualizarSecoes() {
 
     <template v-else>
       <FilterBar
-        :eleicoes="eleicoesDisponiveis"
         :cargos="cargos"
+        :anos="anos"
         :turnos="turnos"
         :candidatos="candidatos"
         :filtros="filtros"
-        @update:election="aoEleicao"
-        @update:turno="aoTurno"
         @update:cargo="aoCargo"
+        @update:ano="aoAno"
+        @update:turno="aoTurno"
         @update:candidato="aoCandidato"
         @update:asof="aoCorte"
         @update:uf="aoUf"
@@ -210,7 +288,13 @@ function atualizarSecoes() {
         @clear="limpar"
       />
 
-      <AvisoBanner :avisos="avisos" />
+      <KpiCards
+        v-if="resumoQuery.data.value"
+        :resumo="resumoQuery.data.value"
+        :candidato="candidatoSelecionado"
+      />
+
+      <AvisoBanner v-if="avisos.length > 0" :avisos="avisos" />
 
       <StateBlock
         v-if="resumoQuery.error.value"
@@ -220,18 +304,42 @@ function atualizarSecoes() {
         acao="Tentar novamente"
         @acao="resumoQuery.refetch()"
       />
-      <StateBlock
-        v-else-if="resumoQuery.isLoading.value && !resumoQuery.data.value"
-        estado="carregando"
-        titulo="Carregando indicadores"
-      />
-      <KpiCards
-        v-else-if="resumoQuery.data.value"
-        :resumo="resumoQuery.data.value"
-        :candidato="candidatoSelecionado"
-      />
 
-      <div class="painel-grade">
+      <section class="mesa" aria-label="Mesa de plotagem e placar">
+        <PlotDia
+          :series="timelineQuery.data.value?.series ?? []"
+          :pontos="timelineQuery.data.value?.pontos ?? []"
+          :corte="store.asOf"
+          :candidato="store.candidato"
+          :candidatos="candidatos"
+          :avisos="timelineAvisos"
+          @update:corte="aoCorte"
+        />
+
+        <PlacarRanking
+          :votos="resumoQuery.data.value?.votos ?? []"
+          :series="timelineQuery.data.value?.series ?? []"
+          :corte="store.asOf"
+          :selecionado="store.candidato"
+          @select="aoCandidato"
+        />
+      </section>
+
+      <section class="leituras" aria-label="Biometria e Benford">
+        <BiometriaPanel
+          :dados="analiseQuery.data.value?.biometria ?? null"
+          :votos-candidato="votosDoCandidato"
+          :nome-candidato="candidatoSelecionado?.nm_votavel ?? ''"
+        />
+
+        <BenfordPanel
+          :dados="analiseQuery.data.value?.benford ?? null"
+          :selecionado="store.candidato"
+          @select="aoCandidato"
+        />
+      </section>
+
+      <section id="mapa" class="malha" aria-label="Mapa e leitura por UF">
         <MapPanel
           :areas="mapaQuery.data.value?.areas ?? []"
           :nivel="store.mapLevel"
@@ -241,7 +349,7 @@ function atualizarSecoes() {
           :uf="store.uf"
           :loading="mapaQuery.isLoading.value"
           :error="mapaQuery.error.value?.message ?? ''"
-          altura="420px"
+          altura="360px"
           @update:level="store.definirNivel"
           @update:mode="store.definirModo"
           @select="selecionarNoMapa"
@@ -258,16 +366,7 @@ function atualizarSecoes() {
           @municipios="verMunicipios"
           @retry="atualizarMapa"
         />
-      </div>
-
-      <TimelinePanel
-        :data="timelineQuery.data.value"
-        :loading="timelineQuery.isLoading.value"
-        :error="timelineQuery.error.value?.message ?? ''"
-        :granularity="store.timelineGranularity"
-        @update:granularity="store.definirGranularidade"
-        @retry="timelineQuery.refetch()"
-      />
+      </section>
 
       <SectionsTable
         :data="secoesQuery.data.value"

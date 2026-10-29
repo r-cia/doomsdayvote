@@ -1,5 +1,5 @@
-export const COR_NEUTRA = '#94A3B8'
-export const COR_SEM_DADOS = '#E2E8F0'
+export const COR_NEUTRA = '#7e9275'
+export const COR_SEM_DADOS = '#243020'
 
 const PALETA_PARTIDOS = Object.freeze({
   PT: '#C1121F',
@@ -45,8 +45,18 @@ function normalizarSigla(sigla) {
     .replace(/[^A-Z0-9]/g, '')
 }
 
+function clarear(hex, fator = 0.26) {
+  const valor = hex.replace('#', '')
+  const canais = [0, 2, 4].map((inicio) => {
+    const canal = parseInt(valor.slice(inicio, inicio + 2), 16)
+    return Math.round(canal + (255 - canal) * fator)
+  })
+  return `#${canais.map((canal) => canal.toString(16).padStart(2, '0')).join('')}`
+}
+
 export function corPartido(sigla) {
-  return PALETA_PARTIDOS[normalizarSigla(sigla)] ?? COR_NEUTRA
+  const cor = PALETA_PARTIDOS[normalizarSigla(sigla)]
+  return cor ? clarear(cor) : COR_NEUTRA
 }
 
 export function siglaTemCor(sigla) {
@@ -54,16 +64,16 @@ export function siglaTemCor(sigla) {
 }
 
 export const FAIXAS_PERCENTUAL = Object.freeze([
-  { min: 0, max: 10, rotulo: '0–10%', cor: '#EFF6FF' },
-  { min: 10, max: 20, rotulo: '10–20%', cor: '#DBEAFE' },
-  { min: 20, max: 30, rotulo: '20–30%', cor: '#BFDBFE' },
-  { min: 30, max: 40, rotulo: '30–40%', cor: '#93C5FD' },
-  { min: 40, max: 50, rotulo: '40–50%', cor: '#60A5FA' },
-  { min: 50, max: 60, rotulo: '50–60%', cor: '#3B82F6' },
-  { min: 60, max: 70, rotulo: '60–70%', cor: '#2563EB' },
-  { min: 70, max: 80, rotulo: '70–80%', cor: '#1D4ED8' },
-  { min: 80, max: 90, rotulo: '80–90%', cor: '#1E40AF' },
-  { min: 90, max: 100, rotulo: '90–100%', cor: '#1E3A8A' },
+  { min: 0, max: 10, rotulo: '0–10%', cor: '#4a3a16' },
+  { min: 10, max: 20, rotulo: '10–20%', cor: '#5d4a17' },
+  { min: 20, max: 30, rotulo: '20–30%', cor: '#725a19' },
+  { min: 30, max: 40, rotulo: '30–40%', cor: '#886b1c' },
+  { min: 40, max: 50, rotulo: '40–50%', cor: '#9e7d1f' },
+  { min: 50, max: 60, rotulo: '50–60%', cor: '#b58f23' },
+  { min: 60, max: 70, rotulo: '60–70%', cor: '#cca228' },
+  { min: 70, max: 80, rotulo: '70–80%', cor: '#e0b52e' },
+  { min: 80, max: 90, rotulo: '80–90%', cor: '#f2c637' },
+  { min: 90, max: 100, rotulo: '90–100%', cor: '#ffd45e' },
 ])
 
 export function faixaPercentual(valor) {
@@ -89,8 +99,8 @@ function luminanciaRelativa(hex) {
 }
 
 export function corTextoContraste(hex) {
-  if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return '#0F172A'
-  return luminanciaRelativa(hex) > 0.42 ? '#0F172A' : '#FFFFFF'
+  if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return '#10150f'
+  return luminanciaRelativa(hex) > 0.42 ? '#10150f' : '#FFFFFF'
 }
 
 export function corDoLider(area, partidoPorNumero) {

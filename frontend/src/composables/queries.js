@@ -70,6 +70,34 @@ export function useTimeline() {
           uf: store.uf,
           municipio: store.municipio,
           granularity: store.timelineGranularity,
+          por_candidato: true,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useAnalise() {
+  const store = useFiltersStore()
+  return useQuery({
+    queryKey: computed(() => [
+      'analise',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+    ]),
+    queryFn: ({ signal }) =>
+      api.analise(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
         },
         signal,
       ),

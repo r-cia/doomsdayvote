@@ -49,7 +49,12 @@ export const useFiltersStore = defineStore('filters', {
 
       const atual = disponiveis.find((eleicao) => eleicao.id === this.electionId)
       if (!atual) {
-        this.definirEleicao(disponiveis[0])
+        const comPresidente = disponiveis.find((eleicao) =>
+          cargosPermitidos(eleicao).some(
+            (cargo) => cargo.ds_cargo_pergunta === 'Presidente',
+          ),
+        )
+        this.definirEleicao(comPresidente ?? disponiveis[0])
         return
       }
 
