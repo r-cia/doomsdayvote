@@ -349,7 +349,7 @@ function atualizarSecoes() {
           :uf="store.uf"
           :loading="mapaQuery.isLoading.value"
           :error="mapaQuery.error.value?.message ?? ''"
-          altura="360px"
+          altura="630px"
           @update:level="store.definirNivel"
           @update:mode="store.definirModo"
           @select="selecionarNoMapa"

@@ -579,10 +579,12 @@ select {
 
 .placar__lista {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
+  min-height: 0;
+  max-height: 278px;
   padding: 4px 0;
   overflow-y: auto;
-  max-height: 250px;
 }
 
 .placar__linha {
@@ -1380,7 +1382,7 @@ tbody tr[data-ativo='true'] {
 /* ── uf ───────────────────────────────────────────────────────────── */
 
 .uf-painel__scroll {
-  max-height: 380px;
+  max-height: 560px;
   overflow: auto;
 }
 
@@ -1754,6 +1756,7 @@ tr.linha--ativa th {
   }
 
   .placar__lista {
+    flex: 0 0 auto;
     max-height: 300px;
   }
 
