@@ -96,3 +96,15 @@ export function validarCabecalho45(camposBrutos) {
 export function parsearRegistro45(campos, headerMap, nrLinha) {
   return parsearRegistro(campos, headerMap, nrLinha);
 }
+
+const CARGOS_LEGISLATIVOS = new Set(['senador', 'deputado federal', 'deputado estadual']);
+
+export function ehCargoLegislativoIgnorado(valor) {
+  return CARGOS_LEGISLATIVOS.has(
+    String(valor ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim(),
+  );
+}

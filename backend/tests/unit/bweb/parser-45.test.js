@@ -46,6 +46,20 @@ describe('parser BWEB_45 — 2026', () => {
     expect(municipioAcentuado).toBe(true);
     expect(registros.some((r) => (r.valores.NM_MUNICIPIO ?? '').includes('\uFFFD'))).toBe(false);
   });
+
+  it('pula senador e deputados antes de normalizar os registros quando habilitado', async () => {
+    const metricas = { registrosIgnorados: 0 };
+    const arquivo = await lerArquivoBweb(fixture('bweb-1t_ac_2026.csv'), {
+      skipCargosLegislativos: true,
+      metricas,
+    });
+    const registros = await coletar(arquivo.registros);
+
+    expect(new Set(registros.map((registro) => registro.valores.DS_CARGO_PERGUNTA))).toEqual(
+      new Set(['Presidente', 'Governador']),
+    );
+    expect(metricas.registrosIgnorados).toBeGreaterThan(0);
+  });
 });
 
 describe('parser BWEB_45 — 2022', () => {

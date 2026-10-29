@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadApiEnv } from '../../src/env.js';
+import { loadApiEnv, loadWorkerEnv } from '../../src/env.js';
 
 const ambienteValido = {
   NODE_ENV: 'test',
@@ -45,5 +45,32 @@ describe('loadApiEnv', () => {
 
   it('rejeita PORT fora da faixa', () => {
     expect(() => loadApiEnv({ ...ambienteValido, PORT: '70000' })).toThrowError(/PORT/);
+  });
+});
+
+describe('loadWorkerEnv', () => {
+  const ambienteValido = {
+    NODE_ENV: 'test',
+    DATABASE_URL: 'postgres://usuario:senha@localhost:5432/banco',
+    BWEB_INPUT_DIR: '/dados/entrada',
+    BWEB_STORAGE_DIR: '/dados/storage',
+  };
+
+  it('desativa o filtro por padrão e converte a flag para booleano', () => {
+    expect(loadWorkerEnv(ambienteValido).BWEB_SKIP_CARGOS_LEGISLATIVOS).toBe(false);
+    expect(
+      loadWorkerEnv({ ...ambienteValido, BWEB_SKIP_CARGOS_LEGISLATIVOS: 'true' })
+        .BWEB_SKIP_CARGOS_LEGISLATIVOS,
+    ).toBe(true);
+    expect(
+      loadWorkerEnv({ ...ambienteValido, BWEB_SKIP_CARGOS_LEGISLATIVOS: 'false' })
+        .BWEB_SKIP_CARGOS_LEGISLATIVOS,
+    ).toBe(false);
+  });
+
+  it('rejeita valores inválidos para a flag', () => {
+    expect(() =>
+      loadWorkerEnv({ ...ambienteValido, BWEB_SKIP_CARGOS_LEGISLATIVOS: 'yes' }),
+    ).toThrowError(/BWEB_SKIP_CARGOS_LEGISLATIVOS/);
   });
 });

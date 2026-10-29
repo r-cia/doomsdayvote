@@ -25,6 +25,7 @@ export async function importarArquivo({
   nomeArquivo,
   storageDir,
   now = new Date(),
+  skipCargosLegislativos = false,
   lerArquivo = lerArquivoBweb,
   validar,
   persistir = persistirArquivo,
@@ -50,7 +51,8 @@ export async function importarArquivo({
   const inicio = Date.now();
 
   try {
-    const arquivo = await lerArquivo(caminho, { nomeArquivo });
+    const metricas = { registrosIgnorados: 0 };
+    const arquivo = await lerArquivo(caminho, { nomeArquivo, skipCargosLegislativos, metricas });
     let qtLinhas = 0;
     let primeiro = null;
 
@@ -180,10 +182,11 @@ export async function importarArquivo({
 
       return {
         leiaute: arquivo.leiaute,
-        qtLinhas,
+        qtLinhas: qtLinhas + metricas.registrosIgnorados,
         importados,
         qtErros,
         qtAlertas,
+        qtLinhasIgnoradas: metricas.registrosIgnorados,
         dtGeracao:
           arquivo.metadadosDerivados?.geracaoNoNome ??
           primeiro?.valores.DT_GERACAO?.local ??
@@ -207,7 +210,11 @@ export async function importarArquivo({
       duracaoMs: Date.now() - inicio,
     });
 
-    return { ignorado: false, lote: atualizado };
+    return {
+      ignorado: false,
+      lote: atualizado,
+      qtLinhasIgnoradas: resultado.qtLinhasIgnoradas,
+    };
   } catch (erro) {
     await db
       .deleteFrom('bweb_staging')
