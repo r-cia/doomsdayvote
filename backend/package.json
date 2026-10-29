@@ -17,7 +17,6 @@
     "test:integration": "vitest run --config vitest.integration.config.js"
   },
   "dependencies": {
-    "@fastify/rate-limit": "^10.2.2",
     "fastify": "^5.2.1",
     "kysely": "^0.28.2",
     "pg": "^8.13.1",

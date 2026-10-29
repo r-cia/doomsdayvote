@@ -212,48 +212,6 @@ export async function up(db) {
     .execute();
 
   await db.schema
-    .createTable('snapshot_apuracao')
-    .addColumn('id', 'uuid', (coluna) => coluna.primaryKey().defaultTo(sql`gen_random_uuid()`))
-    .addColumn('captured_at', 'timestamptz', (coluna) => coluna.notNull())
-    .addColumn('lote_ids', sql`uuid[]`, (coluna) => coluna.notNull())
-    .addColumn('eleicao_id', 'uuid', (coluna) => coluna.notNull())
-    .addColumn('cd_cargo_pergunta', 'integer', (coluna) => coluna.notNull())
-    .addColumn('sg_uf', 'varchar(2)')
-    .addColumn('secoes_com_bu', 'integer', (coluna) => coluna.notNull())
-    .addColumn('secoes_esperadas', 'integer', (coluna) => coluna.notNull())
-    .addColumn('qt_votos_total', 'bigint', (coluna) => coluna.notNull())
-    .addColumn('votos', 'jsonb', (coluna) => coluna.notNull())
-    .addColumn('qt_aptos', 'bigint')
-    .addColumn('qt_comparecimento', 'bigint')
-    .addColumn('qt_abstencoes', 'bigint')
-    .addForeignKeyConstraint('snapshot_apuracao_eleicao_fk', ['eleicao_id'], 'eleicao', ['id'])
-    .execute();
-
-  await db.schema
-    .createTable('status_secoes_esperadas')
-    .addColumn('id', 'uuid', (coluna) => coluna.primaryKey().defaultTo(sql`gen_random_uuid()`))
-    .addColumn('eleicao_id', 'uuid', (coluna) => coluna.notNull())
-    .addColumn('cd_cargo_pergunta', 'integer', (coluna) => coluna.notNull())
-    .addColumn('sg_uf', 'varchar(2)', (coluna) => coluna.notNull())
-    .addColumn('cd_municipio_tse', 'integer', (coluna) => coluna.notNull())
-    .addColumn('qt_secoes_esperadas', 'integer', (coluna) => coluna.notNull())
-    .addColumn('fonte', 'text', (coluna) => coluna.notNull())
-    .addColumn('calculado_em', 'timestamptz', (coluna) => coluna.notNull())
-    .addForeignKeyConstraint(
-      'status_secoes_esperadas_eleicao_fk',
-      ['eleicao_id'],
-      'eleicao',
-      ['id'],
-    )
-    .addUniqueConstraint('status_secoes_esperadas_chave_unica', [
-      'eleicao_id',
-      'cd_cargo_pergunta',
-      'sg_uf',
-      'cd_municipio_tse',
-    ])
-    .execute();
-
-  await db.schema
     .createTable('malha_geografica')
     .addColumn('id', 'uuid', (coluna) => coluna.primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn('nivel', 'text', (coluna) => coluna.notNull())
@@ -299,11 +257,6 @@ export async function up(db) {
     .on('alerta_importacao')
     .columns(['lote_id', 'codigo'])
     .execute();
-  await db.schema
-    .createIndex('snapshot_apuracao_consulta_idx')
-    .on('snapshot_apuracao')
-    .columns(['eleicao_id', 'cd_cargo_pergunta', 'sg_uf', 'captured_at'])
-    .execute();
 
   await sql`GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO doomsday_app`.execute(db);
   await sql`GRANT SELECT ON TABLE kysely_migration TO doomsday_app`.execute(db);
@@ -313,8 +266,6 @@ export async function up(db) {
 export async function down(db) {
   await db.schema.dropTable('resultado_votavel').execute();
   await db.schema.dropTable('alerta_importacao').execute();
-  await db.schema.dropTable('snapshot_apuracao').execute();
-  await db.schema.dropTable('status_secoes_esperadas').execute();
   await db.schema.dropTable('boletim_versao').execute();
   await db.schema.dropTable('lote_importacao').execute();
   await db.schema.dropTable('secao_eleitoral').execute();

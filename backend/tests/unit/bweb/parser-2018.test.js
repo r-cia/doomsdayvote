@@ -71,4 +71,16 @@ describe('parser BWEB_2018_42', () => {
       expect(erro.detalhes.sobrando).toContain('DSELEICAO');
     }
   });
+
+  it('lê o subset de AC 1º turno', async () => {
+    const arquivo = await lerArquivoBweb(fixture('bweb_1t_AC_101020181938.csv'));
+    const registros = await coletar(arquivo.registros);
+
+    expect(registros).toHaveLength(300);
+    for (const registro of registros) {
+      expect(registro.valores.ANO_ELEICAO).toBe(2018);
+      expect(registro.valores.NR_TURNO).toBe(1);
+      expect(registro.valores.SG_UF).toBe('AC');
+    }
+  });
 });
