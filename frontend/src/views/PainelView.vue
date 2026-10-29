@@ -110,6 +110,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   </section>
 
   <VotosPorEstadoPanel
+    :key="`${store.asOf ?? 'final'}-${store.cargo}-${store.electionId}`"
     :areas="mapaUfQuery.data.value?.areas ?? []"
     :candidatos="resumoQuery.data.value?.votos ?? []"
   />
