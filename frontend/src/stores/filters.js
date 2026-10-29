@@ -33,7 +33,9 @@ export const useFiltersStore = defineStore('filters', {
     sectionPage: 1,
     sectionPageSize: 25,
     sectionStatus: '',
-    sectionBusca: '',
+    sectionZona: null,
+    sectionSecao: null,
+    sectionMunicipioNome: '',
   }),
 
   getters: {
@@ -156,8 +158,20 @@ export const useFiltersStore = defineStore('filters', {
       this.sectionPage = 1
     },
 
-    definirBuscaSecao(busca) {
-      this.sectionBusca = busca || ''
+    definirZonaSecao(valor) {
+      const numero = Number(valor)
+      this.sectionZona = Number.isFinite(numero) && numero > 0 ? numero : null
+      this.sectionPage = 1
+    },
+
+    definirNumeroSecao(valor) {
+      const numero = Number(valor)
+      this.sectionSecao = Number.isFinite(numero) && numero > 0 ? numero : null
+      this.sectionPage = 1
+    },
+
+    definirMunicipioSecao(valor) {
+      this.sectionMunicipioNome = valor || ''
       this.sectionPage = 1
     },
 
@@ -167,7 +181,9 @@ export const useFiltersStore = defineStore('filters', {
       this.uf = null
       this.municipio = null
       this.sectionStatus = ''
-      this.sectionBusca = ''
+      this.sectionZona = null
+      this.sectionSecao = null
+      this.sectionMunicipioNome = ''
       this.sectionPage = 1
       this.mapLevel = 'uf'
     },

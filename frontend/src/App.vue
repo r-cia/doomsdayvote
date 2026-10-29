@@ -26,6 +26,7 @@ import { RouterLink, RouterView } from 'vue-router'
     <nav class="nav" aria-label="Seções do sistema">
       <RouterLink to="/painel">Painel</RouterLink>
       <RouterLink :to="{ path: '/painel', hash: '#mapa' }">Mapa</RouterLink>
+      <RouterLink to="/auditoria">Auditoria</RouterLink>
     </nav>
 
     <p class="classificacao">

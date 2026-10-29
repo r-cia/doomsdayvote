@@ -6,7 +6,9 @@ import { avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../mo
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
-import { benfordPorCandidato, composicaoBiometria } from '../modules/analise/estatisticas.js';
+import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
+import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
+import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
 
 const corteSchema = {
   as_of: z.string().optional(),
@@ -248,7 +250,80 @@ export async function registrarRotas(app) {
       ...metadados,
       avisos,
       biometria,
-      benford,
+      benford: {
+        minimo_votos: benford.minimo_votos,
+        candidatos: benford.candidatos.map(({ niveis, ...candidato }) => ({
+          ...candidato,
+          ...niveis.secao,
+        })),
+      },
+    };
+  });
+
+  app.get('/api/anomalies', async (req) => {
+    const query = validar(baseSchema, req.query);
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const escopo = {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    };
+
+    const [linhas, duplicacao, metadados, avisos] = await Promise.all([
+      baseSecaoCandidato(db, escopo),
+      duplicacaoPorAssinatura(db, escopo),
+      metadadosCorte(db, escopo, corte),
+      avisosCorte(db, escopo, corte),
+    ]);
+
+    const benford = benfordDosNiveis(linhas);
+    const secoes = featuresDasSecoes(linhas);
+    const matriz = secoes.map((secao) =>
+      FEATURES.map((feature) => secao[feature]),
+    );
+    const isolamento = isolationForest(matriz, { semente: 42 });
+    const indices = amostraLof(secoes.length, isolamento.scores);
+    const lof = localOutlierFactor(
+      indices.map((indice) => matriz[indice]),
+      { k: 10 },
+    );
+    const scoreLof = new Map(
+      indices.map((indice, posicao) => [indice, lof.scores[posicao]]),
+    );
+
+    const ranking = secoes
+      .map((secao, indice) => ({
+        ...secao,
+        score_if: isolamento.scores[indice],
+        score_lof: scoreLof.get(indice) ?? null,
+      }))
+      .sort((a, b) => b.score_if - a.score_if)
+      .slice(0, 20);
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      benford_niveis: benford,
+      duplicacao,
+      outliers: {
+        features: FEATURES,
+        isolamento: {
+          arvores: isolamento.arvores,
+          amostra: isolamento.amostra,
+          limiar: isolamento.limiar,
+        },
+        lof: {
+          k: lof.k,
+          amostra: indices.length,
+          limitado: secoes.length > indices.length,
+          limiar: lof.limiar,
+        },
+        total_secoes: secoes.length,
+        secoes: ranking,
+      },
     };
   });
 
@@ -294,6 +369,8 @@ export async function registrarRotas(app) {
     const query = validar(
       baseSchema.extend({
         zona: z.coerce.number().int().optional(),
+        secao: z.coerce.number().int().optional(),
+        municipio_nome: z.string().optional(),
         busca: z.string().optional(),
         status: z.string().optional(),
         page: z.coerce.number().int().min(1).default(1),
@@ -350,6 +427,10 @@ export async function registrarRotas(app) {
     if (query.uf) consulta = consulta.where('s.sg_uf', '=', query.uf);
     if (query.municipio) consulta = consulta.where('s.cd_municipio_tse', '=', query.municipio);
     if (query.zona) consulta = consulta.where('s.nr_zona', '=', query.zona);
+    if (query.secao) consulta = consulta.where('s.nr_secao', '=', query.secao);
+    if (query.municipio_nome) {
+      consulta = consulta.where(sql`l.nm_municipio ilike ${`%${query.municipio_nome.trim()}%`}`);
+    }
     if (query.busca) {
       const termo = query.busca.trim();
       consulta = consulta.where(sql`(

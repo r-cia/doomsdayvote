@@ -992,6 +992,18 @@ select {
   color: var(--alert);
 }
 
+/* ── auditoria ────────────────────────────────────────────────────── */
+
+.auditoria-grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.auditoria-grade .painel {
+  min-width: 0;
+}
+
 /* ── malha, cards e tabelas ───────────────────────────────────────── */
 
 .malha {
@@ -1757,7 +1769,8 @@ tr.linha--ativa th {
 @media (max-width: 1180px) {
   .mesa,
   .leituras,
-  .malha {
+  .malha,
+  .auditoria-grade {
     grid-template-columns: minmax(0, 1fr);
   }
 

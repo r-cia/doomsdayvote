@@ -44,6 +44,7 @@ export const api = {
   mapa: (params, signal) => obter('/map', params, signal),
   secoes: (params, signal) => obter('/sections', params, signal),
   analise: (params, signal) => obter('/analysis', params, signal),
+  anomalias: (params, signal) => obter('/anomalies', params, signal),
   secao: (id, params, signal) =>
     obter(`/sections/${encodeURIComponent(id)}`, params, signal),
 }

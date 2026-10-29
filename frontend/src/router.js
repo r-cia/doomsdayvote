@@ -14,6 +14,11 @@ const router = createRouter({
       redirect: '/painel',
     },
     {
+      path: '/auditoria',
+      name: 'auditoria',
+      component: () => import('./views/AuditoriaView.vue'),
+    },
+    {
       path: '/secoes/:id',
       name: 'secao',
       component: () => import('./views/SecaoView.vue'),

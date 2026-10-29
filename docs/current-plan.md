@@ -1,30 +1,34 @@
-# Plano atual — redesenho do frontend e análise estatística
+# Plano atual — análises de anomalia
 
-## 1. Direção visual (pinada pelo usuário)
+## 1. Benford multi-nível
 
-Sala de operações da Guerra Fria / monitor de fósforo âmbar. Em modo operar o mundo empresta só quatro coisas: tipo, paleta, densidade e um movimento-assinatura. Navegação e controles continuam os da web.
+- Por candidato nominal, primeiro dígito, em três níveis: **seção** (≥10 votos), **zona** (soma da zona ≥10) e **município** (soma do município ≥10).
+- Cada nível devolve n, MAD e classificação de Nigrini; a UF fica de fora (27 números não sustentam Benford).
+- Reusa `calcularBenford` (cálculo puro já testado).
 
-- **Tipo:** monoespaçada de terminal (Fragment Mono, auto-hospedada) para dados, rótulos e hashes; condensada de quadro de status (Archivo Narrow) só para títulos de painel e marca.
-- **Paleta:** fundo quase preto esverdeado, tinta âmbar de fósforo na estrutura, verde de lâmpada para recebido, vermelho para alerta; cores de partido continuam sendo os únicos saturados dos dados.
-- **Densidade:** linhas de 1px, nenhuma sombra, rótulos em caixa alta com tracking, algarismos tabulares.
-- **Movimento-assinatura:** a mesa de plotagem — o dia desenhado em canvas (tempo × votos acumulados), uma traça por candidato, o corte como linha vertical arrastável; ao arrastar, o placar reordena no lugar e a linha que mudou segura uma marca âmbar.
+## 2. Duplicação e proximidade
 
-## 2. Backend
+- Assinatura por seção: vetor canônico de todos os votáveis do BU (tipo, número, votos), com SHA-256.
+- Grupos com a mesma assinatura em ≥2 seções.
+- Cada grupo marca `mesma_zona`, `secoes_consecutivas` (mesma zona, |Δseção| ≤ 1) e `mesmo_municipio`.
+- Seções sem BU ficam fora.
 
-1. `GET /api/timeline?por_candidato=true` — séries acumuladas por candidato nominal, no mesmo corte e escopo do endpoint atual.
-2. `GET /api/analysis` — duas leituras no recorte e no corte atuais:
-   - `biometria`: `qt_aptos`, `qt_comparecimento`, `qt_elei_biom_sem_habilitacao` e `habilitados_por_biometria = comparecimento − nh`, com contagem de BUs sem o campo. Sem rateio por candidato.
-   - `benford`: por candidato nominal, primeiro dígito dos votos em cada seção com 10 votos ou mais, distribuição observada, esperada, `n`, `MAD` e classificação de Nigrini.
-3. Testes de unidade para o cálculo de Benford (distribuição, MAD, classificação, corte de 10 votos) e de integração para os dois endpoints.
+## 3. Isolation Forest e Local Outlier Factor
 
-## 3. Frontend
+- Unidade: seção. Sete features: comparecimento/aptos, abstenção/aptos, biometria não habilitada/comparecimento, hora de recebimento (minutos desde o primeiro BU), tamanho da seção (aptos, log), share do líder e concentração (HHI dos votos por candidato).
+- Isolation Forest: 100 árvores, subamostra 256, semente fixa; score 0–1; limiar 0,6.
+- LOF: k = 10, distância euclidiana em features padronizadas por mediana/IQR; cálculo em amostra determinística de até 2.000 seções (acima disso, `lof_limitado: true`).
+- Implementação em JS puro, sem dependência nova. Scores são descritivos: a interface fala em **anomalia**, nunca em fraude.
 
-- Shell: faixa de classificação com logo, filtros (eleição, turno, cargo, UF) e corte; nada de herói.
-- Primeiro viewport: mesa de plotagem + placar do ranking + composição de biometria do recorte + Benford de todos os candidatos.
-- Abaixo: mapa por UF, tabela de seções com lâmpadas de status, detalhe da seção como extrato de teletipo.
-- Acessibilidade: tabela alternativa do mapa, legenda textual, teclado, foco visível, `role=status`/`alert`.
-- Testes existentes atualizados; build; detector mecânico; revisão de acabamento; DESIGN.md e `.impeccable/design.json`.
+## 4. API e interface
 
-## 4. Documentação e board
+- `GET /api/anomalies` no corte e no recorte atuais, devolvendo `benford_niveis`, `duplicacao` e `outliers`.
+- Nova rota **Auditoria** no frontend (nav), com os três painéis: matriz candidato × nível de Benford, lista de grupos duplicados com as seções e os sinalizadores de proximidade, e ranking das seções mais anômalas com os dois scores.
+- O painel continua sendo o primeiro viewport; a auditoria fica a um clique.
 
-PRODUCT.md (novas estatísticas), docs/API.md, docs/blueprint.md, docs/architecture.md, README.md e cards no board para a análise estatística e o redesenho.
+## 5. Testes e documentação
+
+- Unidade: Benford por nível, assinatura de duplicação, Isolation Forest e LOF (determinismo, score no intervalo, outlier sintético detectado).
+- Integração: `/api/anomalies` com o fixture, incluindo um par de seções com vetor idêntico.
+- Frontend: os três painéis e a navegação.
+- Docs: `docs/API.md`, `blueprint.md` e `architecture.md`; cards no board.
