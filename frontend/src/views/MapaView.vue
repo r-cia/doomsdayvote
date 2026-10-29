@@ -42,6 +42,7 @@ function selecionarNoMapa(selecao) {
   if (!selecao) return
   if (selecao.tipo === 'uf') {
     store.definirUf(selecao.valor)
+    store.definirNivel('municipio')
     return
   }
   store.definirUf(selecao.uf)
@@ -49,7 +50,15 @@ function selecionarNoMapa(selecao) {
 }
 
 function selecionarUf(uf) {
+  if (!uf) {
+    store.definirUf(null)
+    store.definirMunicipio(null)
+    store.definirNivel('uf')
+    return
+  }
   store.definirUf(uf)
+  store.definirMunicipio(null)
+  store.definirNivel('municipio')
 }
 
 function verMunicipios(uf) {
