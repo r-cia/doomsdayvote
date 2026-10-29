@@ -7,8 +7,12 @@ const props = defineProps({
 
 const grupos = computed(() => props.dados?.grupos ?? [])
 
-function zonaTexto(grupo) {
-  return grupo.mesma_zona ? grupo.secoes[0].nr_zona : '—'
+function zonas(grupo) {
+  const valores = [...new Set(grupo.secoes.map((secao) => secao.nr_zona))].sort(
+    (a, b) => a - b,
+  )
+  if (valores.length === 0) return '—'
+  return valores.join(', ')
 }
 
 function numeros(grupo) {
@@ -45,7 +49,7 @@ function numeros(grupo) {
             <th scope="col" class="num">Seções</th>
             <th scope="col">UF</th>
             <th scope="col">Município</th>
-            <th scope="col" class="num">Zona</th>
+            <th scope="col">Zonas</th>
             <th scope="col">Números</th>
             <th scope="col">Sinalizadores</th>
           </tr>
@@ -55,7 +59,7 @@ function numeros(grupo) {
             <td class="num">{{ grupo.secoes.length }}</td>
             <td>{{ grupo.secoes[0].sg_uf }}</td>
             <td>{{ grupo.secoes[0].nm_municipio || grupo.secoes[0].cd_municipio_tse }}</td>
-            <td class="num">{{ zonaTexto(grupo) }}</td>
+            <td>{{ zonas(grupo) }}</td>
             <td>{{ numeros(grupo) }}</td>
             <td>
               <span v-if="grupo.mesma_zona" class="chip chip--warn">mesma zona</span>
