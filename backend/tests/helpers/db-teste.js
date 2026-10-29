@@ -10,6 +10,7 @@ export async function limparBanco(db) {
   await sql`DELETE FROM localidade`.execute(db);
   await sql`DELETE FROM eleicao`.execute(db);
   await sql`DELETE FROM malha_geografica`.execute(db);
+  await sql`DELETE FROM partido_cor`.execute(db);
 }
 
 export async function contar(db, tabela) {
