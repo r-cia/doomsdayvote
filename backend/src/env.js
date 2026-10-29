@@ -10,6 +10,7 @@ const apiSchema = z
     PORT: z.coerce.number().int().min(1).max(65535),
     LOG_LEVEL: logLevel,
     DATABASE_URL: z.string().min(1),
+    REDIS_URL: z.string().min(1).optional(),
     SECTIONS_PAGE_SIZE_DEFAULT: z.coerce.number().int().positive(),
     SECTIONS_PAGE_SIZE_MAX: z.coerce.number().int().positive(),
   })
@@ -27,6 +28,7 @@ const workerSchema = z.object({
   NODE_ENV: nodeEnv,
   LOG_LEVEL: logLevel,
   DATABASE_URL: z.string().min(1),
+  REDIS_URL: z.string().min(1).optional(),
   BWEB_INPUT_DIR: z.string().min(1),
   BWEB_STORAGE_DIR: z.string().min(1),
 });

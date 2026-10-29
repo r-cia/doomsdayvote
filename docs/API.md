@@ -4,6 +4,8 @@ Todas as rotas são `GET` sob `/api`, sem autenticação, e respondem JSON. O co
 
 Parâmetros comuns: `election_id` (uuid, obrigatório), `cargo` (inteiro, obrigatório), `uf` (2 letras), `municipio` (código TSE).
 
+As leituras passam por cache Redis com chave pelo recorte exato. O cabeçalho `x-cache` indica `hit` (veio do Redis), `miss` (foi ao banco e gravou) ou `off` (Redis ausente ou indisponível). A conclusão de uma carga invalida o cache inteiro.
+
 ## `GET /api/elections`
 
 Lista as eleições e os cargos com BU importado. Só devolve cargos `Presidente` e `Governador`.

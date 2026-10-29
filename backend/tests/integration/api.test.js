@@ -54,6 +54,7 @@ describe('API de leitura', () => {
       const eleicoes = await app.inject({ method: 'GET', url: '/api/elections' });
       expect(eleicoes.statusCode).toBe(200);
       expect(eleicoes.json().eleicoes.length).toBeGreaterThan(0);
+      expect(eleicoes.headers['x-cache']).toBe('off');
 
       const resumo = await app.inject({
         method: 'GET',

@@ -1,26 +1,51 @@
-# Plano atual — carga de arquivos grandes
+# Plano atual — cache Redis para as leituras
 
-## Causa do OOM
+## Problema
 
-O arquivo do SP não está ordenado por seção: as linhas de um mesmo BU aparecem espalhadas. O importador antigo mantinha todos os BUs abertos em memória até a última linha de cada grupo, então o buffer crescia até o tamanho do arquivo (8 GB → heap de 20 GB estourado).
+Consultas repetidas (mesma eleição, mesmo cargo, mesma UF) voltam ao banco a cada abertura de tela e a cada navegação entre painel, mapa e análise. `/api/anomalies` chega a ~2 s e `/api/map` e `/api/summary` repetem as mesmas agregações para todos os clientes.
 
-## Solução aplicada — staging UNLOGGED + COPY
+## Desenho
 
-1. O arquivo é lido em streaming e cada linha normalizada é enviada por `COPY bweb_staging (...) FROM STDIN` (pg-copy-streams) com `lote_id`, `chave` do BU, `nr_linha` e `valores` jsonb. Sem transação aberta durante o COPY; a staging é apagada em caso de falha.
-2. As chaves distintas do lote são lidas e as BUs são processadas em blocos de 200, buscando as linhas por `(lote_id, chave)`.
-3. Cada bloco passa pela validação e pela persistência atuais — versionamento, hash, alertas e idempotência intactos.
-4. A staging é apagada ao fim da transação de persistência.
+Cache-aside em Redis na frente dos endpoints GET de leitura, com chave canônica e invalidação por namespace.
 
-Memória fica limitada à linha em trânsito, ao bloco de 200 BUs e à lista de chaves do arquivo (~200 mil chaves de ~40 bytes no SP). Não depende do tamanho nem da ordem do arquivo.
+- Chave: `dv:v{ns}:{rota}:{hash}` — `hash` é sha1 do JSON canônico dos parâmetros já validados; `ns` é um contador em `dv:ns`.
+- Conclusão de lote de importação incrementa `dv:ns`: todas as chaves antigas viram lixo e expiram sozinhas. Nenhuma varredura de `KEYS`.
+- Só resposta 200 entra no cache; erro nunca é cacheado.
+- Falha do Redis (fora do ar, timeout, `REDIS_URL` ausente) não derruba a API: a requisição segue para o banco e o cache é ignorado.
+- Single-flight por processo: requisições idênticas simultâneas compartilham a mesma execução e uma única consulta ao banco.
+- Cabeçalho `x-cache: hit|miss` para conferir o comportamento.
 
-Custo: a staging ocupa disco temporário no Postgres (jsonb normalizado, estimado em 12–20 GB para o SP de 8 GB) e é descartada ao fim. Sem dependência de disco local, sem segunda passada no arquivo.
+## TTL por endpoint
 
-## Validação
+| Endpoint | TTL |
+| :--- | :--- |
+| `/api/elections` | 300 s |
+| `/api/summary` | 60 s |
+| `/api/timeline` | 120 s |
+| `/api/analysis` | 300 s |
+| `/api/anomalies` | 600 s |
+| `/api/map` | 300 s |
+| `/api/sections` | 60 s |
+| `/api/sections/:id` | 300 s |
 
-- `tests/integration/importacao-fora-de-ordem.test.js`: o fixture com as linhas intercaladas produz os mesmos totais de boletins e resultados da importação normal.
-- `lote`, `schema`, `resultado-colunas` e `api` continuam passando.
+## Arquivos
 
-## Pendências
+- `src/lib/cache.js` — cliente `ioredis`, `comCache(chave, ttl, fn)`, `invalidar()`, single-flight, fail-open.
+- `src/composition-root.js` — cria o cache a partir de `REDIS_URL`.
+- `src/routes/index.js` — envolve os oito handlers.
+- `src/modules/importacao/lote.js` — `invalidar()` em `concluirLote`.
+- `src/env.js` e `.env.example` — `REDIS_URL` opcional; ausente = cache desligado.
+- `tests/cache.test.js` — hit, miss, erro do Redis, single-flight e invalidação, com cliente falso.
+- `README.md` e `docs/API.md` — Redis na stack e `x-cache` no contrato.
 
-- Rodar a carga real do SP e medir tempo e pico de memória.
-- Se a carga de 300 milhões exigir mais velocidade, o próximo passo é enviar o CSV direto para a staging sem normalizar em Node (COPY do arquivo cru para colunas de texto) e normalizar em SQL.
+## Fora de escopo
+
+- Cache no frontend ou em CDN.
+- Pré-aquecimento de chaves.
+- Cache das rotas de importação (escrita).
+
+## Estado
+
+Implementado com `ioredis`, TTLs acima e `REDIS_URL=redis://127.0.0.1:6379` no `.env.example`. Sem `REDIS_URL` o cache fica desligado e a API segue no banco.
+
+Validação: `tests/unit/cache.test.js` (7), `tests/integration/cache.test.js` (2, Redis real), `api.test.js` (4, com `x-cache: off`), unidade 85/85.

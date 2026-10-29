@@ -1,6 +1,7 @@
 import pg from 'pg';
 import { loadWorkerEnv } from '../env.js';
 import { criarDb } from '../db/index.js';
+import { criarCache } from '../lib/cache.js';
 import { carregarPasta } from '../modules/importacao/carregar-pasta.js';
 
 const LOCK = 727274;
@@ -24,6 +25,7 @@ async function main() {
   }
 
   const db = criarDb({ connectionString: env.DATABASE_URL });
+  const cache = criarCache({ url: env.REDIS_URL });
 
   try {
     const resumo = await carregarPasta({
@@ -32,12 +34,15 @@ async function main() {
       storageDir: env.BWEB_STORAGE_DIR,
     });
     console.log(JSON.stringify(resumo, null, 2));
+    await cache.invalidar();
+    await cache.fechar();
     await db.destroy();
     await cliente.query('select pg_advisory_unlock($1)', [LOCK]);
     await cliente.end();
     process.exit(resumo.falhas > 0 ? 1 : 0);
   } catch (erro) {
     console.error(erro.message);
+    await cache.fechar();
     await db.destroy();
     await cliente.end();
     process.exit(1);
