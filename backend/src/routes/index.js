@@ -216,6 +216,7 @@ export async function registrarRotas(app) {
     const query = validar(
       baseSchema.extend({
         zona: z.coerce.number().int().optional(),
+        busca: z.string().optional(),
         status: z.string().optional(),
         page: z.coerce.number().int().min(1).default(1),
         page_size: z.coerce.number().int().min(1).optional(),
@@ -271,6 +272,14 @@ export async function registrarRotas(app) {
     if (query.uf) consulta = consulta.where('s.sg_uf', '=', query.uf);
     if (query.municipio) consulta = consulta.where('s.cd_municipio_tse', '=', query.municipio);
     if (query.zona) consulta = consulta.where('s.nr_zona', '=', query.zona);
+    if (query.busca) {
+      const termo = query.busca.trim();
+      consulta = consulta.where(sql`(
+        l.nm_municipio ilike ${`%${termo}%`}
+        or cast(s.nr_zona as text) = ${termo}
+        or cast(s.nr_secao as text) = ${termo}
+      )`);
+    }
 
     const linhas = await consulta.execute();
     const itens = linhas

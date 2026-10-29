@@ -100,6 +100,12 @@ describe('API de leitura', () => {
       expect(corpo.total).toBeGreaterThan(0);
       expect(corpo.items).toHaveLength(10);
 
+      const busca = await app.inject({
+        method: 'GET',
+        url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&busca=rio`,
+      });
+      expect(busca.json().total).toBeGreaterThan(0);
+
       const detalhe = await app.inject({
         method: 'GET',
         url: `/api/sections/${corpo.items[0].id}?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}`,

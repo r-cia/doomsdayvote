@@ -33,6 +33,7 @@ export const useFiltersStore = defineStore('filters', {
     sectionPage: 1,
     sectionPageSize: 25,
     sectionStatus: '',
+    sectionBusca: '',
   }),
 
   getters: {
@@ -150,12 +151,18 @@ export const useFiltersStore = defineStore('filters', {
       this.sectionPage = 1
     },
 
+    definirBuscaSecao(busca) {
+      this.sectionBusca = busca || ''
+      this.sectionPage = 1
+    },
+
     limpar() {
       this.candidato = null
       this.asOfInput = ''
       this.uf = null
       this.municipio = null
       this.sectionStatus = ''
+      this.sectionBusca = ''
       this.sectionPage = 1
       this.mapLevel = 'uf'
     },

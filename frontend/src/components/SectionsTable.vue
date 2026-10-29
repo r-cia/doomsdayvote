@@ -13,6 +13,7 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   status: { type: String, default: '' },
+  busca: { type: String, default: '' },
   pageSize: { type: Number, default: 25 },
   uf: { type: String, default: null },
   municipio: { type: Number, default: null },
@@ -22,11 +23,25 @@ const emit = defineEmits([
   'update:page',
   'update:page-size',
   'update:status',
+  'update:busca',
   'select',
   'retry',
 ])
 
-const busca = ref('')
+const busca = ref(props.busca)
+let debounceBusca = null
+
+watch(
+  () => props.busca,
+  (valor) => {
+    busca.value = valor
+  },
+)
+
+watch(busca, (valor) => {
+  clearTimeout(debounceBusca)
+  debounceBusca = setTimeout(() => emit('update:busca', valor), 300)
+})
 const tabela = ref(null)
 const itens = computed(() => props.data?.items ?? [])
 const total = computed(() => Number(props.data?.total ?? 0))
@@ -79,9 +94,7 @@ function irParaUltima() {
 
 watch(
   () => props.data?.page,
-  () => {
-    busca.value = ''
-  },
+  () => {},
 )
 
 function navegarLinhas(evento) {
@@ -122,7 +135,7 @@ function navegarLinhas(evento) {
           aria-describedby="busca-secoes-ajuda"
         />
         <small id="busca-secoes-ajuda">
-          A API não oferece busca textual entre páginas.
+          A busca é aplicada pela API (município, zona ou seção).
         </small>
       </label>
 
