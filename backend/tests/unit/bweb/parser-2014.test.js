@@ -110,4 +110,16 @@ describe('parser BWEB_2014_31', () => {
     );
     expect(inconsistentes.map((r) => r.nrLinha)).toEqual([]);
   });
+
+  it('lê o subset de AC 2º turno', async () => {
+    const arquivo = await lerArquivoBweb(fixture('bweb_2t_AC_28102014114450.txt'));
+    const registros = await coletar(arquivo.registros);
+
+    expect(registros).toHaveLength(300);
+    for (const registro of registros) {
+      expect(registro.valores.ANO_ELEICAO).toBe(2014);
+      expect(registro.valores.NR_TURNO).toBe(2);
+      expect(registro.valores.SG_UF).toBe('AC');
+    }
+  });
 });
