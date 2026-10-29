@@ -85,7 +85,7 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
         .onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
     )
     .leftJoin('partido_cor as pc', (join) => join.on(sql`pc.sg_partido = coalesce(rv.sg_partido, rv.nm_partido)`))
-    .select([coluna, 'rv.nr_votavel', 'rv.categoria', sql`max(pc.cor_hex)`.as('cor_hex'), sql`max(l.geom_id)`.as('geom_id'), sql`sum(rv.qt_votos)`.as('qt_votos')])
+    .select([coluna, 'rv.nr_votavel', 'rv.categoria', sql`max(pc.cor_hex)`.as('cor_hex'), sql`max(l.geom_id)`.as('geom_id'), sql`max(l.nm_municipio)`.as('nm_municipio'), sql`sum(rv.qt_votos)`.as('qt_votos')])
     .where('rv.qt_votos', 'is not', null)
     .groupBy([coluna, 'rv.nr_votavel', 'rv.categoria'])
     .execute();
@@ -98,6 +98,7 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
       areas.set(chave, {
         [nivel === 'uf' ? 'sg_uf' : 'cd_municipio_tse']: chave,
         geom_id: linha.geom_id ?? null,
+        nm_municipio: linha.nm_municipio ?? null,
         total_votos: 0,
         votos_validos: 0,
         lider: null,

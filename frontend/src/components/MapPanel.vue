@@ -188,6 +188,10 @@ function ufDaFeicao(propriedades) {
 }
 
 function nomeDaFeicao(propriedades, codigo) {
+  const area = areaPorCodigo(indiceAreas.value, codigo, props.nivel)
+  if (props.nivel === 'municipio' && area?.nm_municipio) {
+    return area.nm_municipio
+  }
   return primeiroValor(propriedades, CAMPOS_NOME) ?? codigo
 }
 
