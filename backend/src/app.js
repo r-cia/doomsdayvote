@@ -17,12 +17,13 @@ function detalhesFastify(validacao) {
   }));
 }
 
-export function buildApp({ deps = {}, rotas }) {
+export function buildApp({ deps = {}, config = {}, rotas }) {
   const app = Fastify({
     logger: deps.logger ?? false,
   });
 
   app.decorate('deps', deps);
+  app.decorate('config', config);
 
   app.register(async (escopo) => {
     if (rotas) await rotas(escopo);
