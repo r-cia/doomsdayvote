@@ -42,6 +42,7 @@ function selecionarNoMapa(selecao) {
   if (!selecao) return
   if (selecao.tipo === 'uf') {
     store.definirUf(selecao.valor)
+    store.definirMunicipio(null)
     store.definirNivel('municipio')
     return
   }
