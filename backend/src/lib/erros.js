@@ -11,6 +11,5 @@ export class AppError extends Error {
 export const CODIGOS = {
   VALIDATION: 400,
   NOT_FOUND: 404,
-  RATE_LIMITED: 429,
   INTERNAL: 500,
 };

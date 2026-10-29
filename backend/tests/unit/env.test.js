@@ -6,10 +6,7 @@ const ambienteValido = {
   HOST: '127.0.0.1',
   PORT: '3000',
   LOG_LEVEL: 'info',
-  TRUST_PROXY: 'true',
   DATABASE_URL: 'postgres://usuario:senha@localhost:5432/banco',
-  RATE_LIMIT_MAX: '10',
-  RATE_LIMIT_TIME_WINDOW: '1 minute',
   SECTIONS_PAGE_SIZE_DEFAULT: '50',
   SECTIONS_PAGE_SIZE_MAX: '100',
 };
@@ -26,8 +23,6 @@ describe('loadApiEnv', () => {
     for (const nome of [
       'DATABASE_URL',
       'PORT',
-      'RATE_LIMIT_MAX',
-      'RATE_LIMIT_TIME_WINDOW',
       'SECTIONS_PAGE_SIZE_DEFAULT',
       'SECTIONS_PAGE_SIZE_MAX',
     ]) {
@@ -39,8 +34,6 @@ describe('loadApiEnv', () => {
     const env = loadApiEnv(ambienteValido);
 
     expect(env.PORT).toBe(3000);
-    expect(env.TRUST_PROXY).toBe(true);
-    expect(env.RATE_LIMIT_MAX).toBe(10);
     expect(env.SECTIONS_PAGE_SIZE_MAX).toBe(100);
   });
 

@@ -38,8 +38,6 @@ const TABELAS = [
   'boletim_versao',
   'resultado_votavel',
   'alerta_importacao',
-  'snapshot_apuracao',
-  'status_secoes_esperadas',
   'malha_geografica',
 ];
 
@@ -130,7 +128,7 @@ describe('schema inicial', () => {
     await db.destroy();
   });
 
-  it('cria as dez tabelas de domínio', async () => {
+  it('cria as oito tabelas de domínio', async () => {
     const { rows } = await sql`
       SELECT table_name
       FROM information_schema.tables

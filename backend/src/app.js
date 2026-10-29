@@ -1,5 +1,4 @@
 import Fastify from 'fastify';
-import rateLimit from '@fastify/rate-limit';
 import { ZodError } from 'zod';
 import { AppError } from './lib/erros.js';
 import { isProduction } from './lib/ambiente.js';
@@ -18,19 +17,12 @@ function detalhesFastify(validacao) {
   }));
 }
 
-export function buildApp({ deps = {}, config, rotas }) {
+export function buildApp({ deps = {}, rotas }) {
   const app = Fastify({
     logger: deps.logger ?? false,
-    trustProxy: config.TRUST_PROXY,
   });
 
   app.decorate('deps', deps);
-
-  app.register(rateLimit, {
-    max: config.RATE_LIMIT_MAX,
-    timeWindow: config.RATE_LIMIT_TIME_WINDOW,
-    errorResponseBuilder: () => new AppError('RATE_LIMITED', 429, 'Muitas requisições'),
-  });
 
   app.register(async (escopo) => {
     if (rotas) await rotas(escopo);

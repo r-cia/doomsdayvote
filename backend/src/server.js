@@ -22,7 +22,7 @@ async function main() {
       process.exit(1);
     }
 
-    const app = buildApp({ deps, config: env });
+    const app = buildApp({ deps });
     await app.listen({ host: env.HOST, port: env.PORT });
   } catch (erro) {
     deps.logger.error({ err: erro }, 'falha_ao_iniciar');

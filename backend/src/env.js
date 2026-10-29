@@ -1,13 +1,5 @@
 import { z } from 'zod';
 
-const booleano = z.preprocess((valor) => {
-  if (valor === undefined) return false;
-  if (typeof valor === 'boolean') return valor;
-  if (valor === 'true' || valor === '1') return true;
-  if (valor === 'false' || valor === '0') return false;
-  return valor;
-}, z.boolean());
-
 const nodeEnv = z.enum(['development', 'test', 'production']).default('development');
 const logLevel = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info');
 
@@ -17,10 +9,7 @@ const apiSchema = z
     HOST: z.string().min(1).default('0.0.0.0'),
     PORT: z.coerce.number().int().min(1).max(65535),
     LOG_LEVEL: logLevel,
-    TRUST_PROXY: booleano,
     DATABASE_URL: z.string().min(1),
-    RATE_LIMIT_MAX: z.coerce.number().int().positive(),
-    RATE_LIMIT_TIME_WINDOW: z.string().min(1),
     SECTIONS_PAGE_SIZE_DEFAULT: z.coerce.number().int().positive(),
     SECTIONS_PAGE_SIZE_MAX: z.coerce.number().int().positive(),
   })
