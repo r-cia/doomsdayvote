@@ -1,19 +1,20 @@
 <script setup>
 import { computed } from 'vue'
 import StateBlock from './StateBlock.vue'
-import { linhasMapa } from '../lib/agregacoes'
+import { candidatosNominais, linhasMapa } from '../lib/agregacoes'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
   areas: { type: Array, default: () => [] },
   candidatos: { type: Array, default: () => [] },
+  votos: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ufSelecionada: { type: String, default: null },
 })
 
-defineEmits(['select', 'municipios', 'retry'])
+defineEmits(['select', 'municipios', 'retry', 'limpar'])
 
 const partidoPorNumero = computed(() => {
   const mapa = new Map()
@@ -35,22 +36,44 @@ const linhas = computed(() => {
       liderPercentual: area.lider?.percentual ?? null,
     }
   })
-  const maximo = Math.max(1, ...base.map((linha) => linha.total))
   return base.map((linha) => ({
     ...linha,
-    largura: Math.round((linha.total / maximo) * 100),
+    largura: Math.max(0, Math.min(100, Number(linha.liderPercentual ?? 0))),
   }))
 })
+
+const votosUf = computed(() => candidatosNominais(props.votos))
 </script>
 
 <template>
   <section class="card uf-painel" aria-labelledby="uf-painel-titulo">
     <div class="card__cabecalho">
       <div>
-        <h2 id="uf-painel-titulo">Painel por UF</h2>
-        <p>Votos e líder no corte atual. Clique para filtrar a UF.</p>
+        <h2 id="uf-painel-titulo">
+          {{ ufSelecionada ? `Votos em ${ufSelecionada}` : 'Painel por UF' }}
+        </h2>
       </div>
-      <span class="contador">{{ linhas.length }} UFs</span>
+      <div class="uf-painel__acoes">
+        <button
+          v-if="ufSelecionada"
+          type="button"
+          class="button button--ghost button--compacto"
+          @click="$emit('municipios', ufSelecionada)"
+        >
+          Municípios
+        </button>
+        <button
+          v-if="ufSelecionada"
+          type="button"
+          class="button button--ghost button--compacto"
+          @click="$emit('limpar')"
+        >
+          Brasil
+        </button>
+        <span class="contador">
+          {{ ufSelecionada ? `${votosUf.length} candidatos` : `${linhas.length} UFs` }}
+        </span>
+      </div>
     </div>
 
     <StateBlock
@@ -66,6 +89,38 @@ const linhas = computed(() => {
       estado="carregando"
       titulo="Carregando painel por UF"
     />
+
+    <div v-else-if="ufSelecionada" class="tabela-scroll uf-painel__scroll">
+      <table>
+        <caption class="sr-only">Votos por candidato em {{ ufSelecionada }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Candidato</th>
+            <th scope="col">Partido</th>
+            <th scope="col" class="num">Votos</th>
+            <th scope="col" class="num">% válidos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="candidato in votosUf" :key="candidato.nr_votavel">
+            <td>{{ candidato.nm_votavel }}</td>
+            <td>
+              <span
+                class="party-dot party-dot--mini"
+                :style="{
+                  backgroundColor: corPartido(candidato.sg_partido),
+                  color: corTextoContraste(corPartido(candidato.sg_partido)),
+                }"
+              >{{ candidato.sg_partido ?? '—' }}</span>
+            </td>
+            <td class="num">{{ formatarNumero(candidato.qt_votos) }}</td>
+            <td class="num">{{ formatarPercentual(candidato.percentual) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p v-if="votosUf.length === 0" class="vazio">Sem votos nesta UF no corte.</p>
+    </div>
+
     <p v-else-if="linhas.length === 0" class="vazio">
       Nenhuma UF com dados para os filtros atuais.
     </p>

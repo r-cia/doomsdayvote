@@ -5,6 +5,7 @@ import KpiCards from '../src/components/KpiCards.vue'
 import MapPanel from '../src/components/MapPanel.vue'
 import MapTable from '../src/components/MapTable.vue'
 import SectionsTable from '../src/components/SectionsTable.vue'
+import UfPanel from '../src/components/UfPanel.vue'
 import PlotDia from '../src/components/PlotDia.vue'
 import PlacarRanking from '../src/components/PlacarRanking.vue'
 import BiometriaPanel from '../src/components/BiometriaPanel.vue'
@@ -412,6 +413,58 @@ describe('BenfordPanel', () => {
     const botoes = wrapper.findAll('tbody button')
     await botoes[1].trigger('click')
     expect(wrapper.emitted('select')[0]).toEqual([22])
+  })
+})
+
+describe('UfPanel', () => {
+  const votos = [
+    { categoria: 'nominal', nr_votavel: 13, nm_votavel: 'Lula', sg_partido: 'PT', qt_votos: 1000, percentual: 50 },
+    { categoria: 'nominal', nr_votavel: 22, nm_votavel: 'Bolsonaro', sg_partido: 'PL', qt_votos: 800, percentual: 40 },
+    { categoria: 'legenda', nr_votavel: 90, nm_votavel: 'Legenda', sg_partido: 'XX', qt_votos: 100, percentual: 5 },
+    { categoria: 'branco', nr_votavel: null, nm_votavel: 'Branco', qt_votos: 50, percentual: null },
+  ]
+
+  it('lista todos os candidatos da UF selecionada', async () => {
+    const wrapper = mount(UfPanel, {
+      props: { areas: [], candidatos, votos, ufSelecionada: 'AC' },
+    })
+
+    const texto = wrapper.text()
+    expect(texto).toContain('Votos em AC')
+    expect(texto).toContain('Lula')
+    expect(texto).toContain('Bolsonaro')
+    expect(texto).toContain('1.000')
+    expect(texto).toContain('50,00%')
+    expect(texto).not.toContain('Legenda')
+
+    await wrapper.findAll('button').find((botao) => botao.text() === 'Brasil').trigger('click')
+    expect(wrapper.emitted('limpar')).toHaveLength(1)
+  })
+
+  it('mostra o líder por UF quando nada está selecionado', async () => {
+    const wrapper = mount(UfPanel, {
+      props: {
+        areas: [
+          {
+            sg_uf: 'AC',
+            total_votos: 1800,
+            votos_validos: 1800,
+            lider: { nr_votavel: 13, qt_votos: 1000, percentual: 55.56 },
+            candidatos: [],
+          },
+        ],
+        candidatos,
+        votos: [],
+        ufSelecionada: null,
+      },
+    })
+
+    expect(wrapper.text()).toContain('Painel por UF')
+    expect(wrapper.text()).toContain('AC')
+    expect(wrapper.text()).toContain('Candidato A')
+
+    await wrapper.find('[aria-pressed]').trigger('click')
+    expect(wrapper.emitted('select')[0]).toEqual(['AC'])
   })
 })
 
