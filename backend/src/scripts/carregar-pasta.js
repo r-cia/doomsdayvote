@@ -32,6 +32,7 @@ async function main() {
       db,
       inputDir: env.BWEB_INPUT_DIR,
       storageDir: env.BWEB_STORAGE_DIR,
+      skipCargosLegislativos: env.BWEB_SKIP_CARGOS_LEGISLATIVOS,
     });
     console.log(JSON.stringify(resumo, null, 2));
     await cache.invalidar();

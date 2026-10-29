@@ -5,18 +5,26 @@ import { lerLinhas, lerPrimeiraLinha } from './leitor.js';
 import { interpretarNomeArquivo2014 } from './nome-arquivo-2014.js';
 import { parsearRegistro2014 } from './parser-2014.js';
 import { parsearRegistro2018, validarCabecalho2018 } from './parser-2018.js';
-import { parsearRegistro45, validarCabecalho45 } from './parser-45.js';
+import { ehCargoLegislativoIgnorado, parsearRegistro45, validarCabecalho45 } from './parser-45.js';
 
-export async function lerArquivoBweb(caminho, { nomeArquivo } = {}) {
+export async function lerArquivoBweb(
+  caminho,
+  { nomeArquivo, skipCargosLegislativos = false, metricas = { registrosIgnorados: 0 } } = {},
+) {
   const leiaute = await detectarLeiaute(caminho);
 
   if (leiaute === 'BWEB_45') {
     const primeira = await lerPrimeiraLinha(caminho);
     const { headerMap, aliasesAplicados, camposAusentesNoLeiaute } = validarCabecalho45(primeira.campos);
+    const indiceCargo = headerMap.indexOf('DS_CARGO_PERGUNTA');
 
     async function* registros() {
       for await (const { nrLinha, campos } of lerLinhas(caminho)) {
         if (nrLinha === 1) continue;
+        if (skipCargosLegislativos && ehCargoLegislativoIgnorado(campos[indiceCargo])) {
+          metricas.registrosIgnorados += 1;
+          continue;
+        }
         yield parsearRegistro45(campos, headerMap, nrLinha);
       }
     }
@@ -34,10 +42,15 @@ export async function lerArquivoBweb(caminho, { nomeArquivo } = {}) {
   if (leiaute === 'BWEB_2018_42') {
     const primeira = await lerPrimeiraLinha(caminho);
     const { headerMap, aliasesAplicados, camposAusentesNoLeiaute } = validarCabecalho2018(primeira.campos);
+    const indiceCargo = headerMap.indexOf('DS_CARGO_PERGUNTA');
 
     async function* registros() {
       for await (const { nrLinha, campos } of lerLinhas(caminho)) {
         if (nrLinha === 1) continue;
+        if (skipCargosLegislativos && ehCargoLegislativoIgnorado(campos[indiceCargo])) {
+          metricas.registrosIgnorados += 1;
+          continue;
+        }
         yield parsearRegistro2018(campos, headerMap, nrLinha);
       }
     }
@@ -55,9 +68,14 @@ export async function lerArquivoBweb(caminho, { nomeArquivo } = {}) {
   if (leiaute === 'BWEB_2014_31') {
     const nome = (nomeArquivo ?? path.basename(caminho)).replace(/\.gz$/i, '');
     const derivados = interpretarNomeArquivo2014(nome);
+    const indiceCargo = CAMPOS_2014_31.indexOf('DS_CARGO_PERGUNTA');
 
     async function* registros() {
       for await (const { nrLinha, campos } of lerLinhas(caminho)) {
+        if (skipCargosLegislativos && ehCargoLegislativoIgnorado(campos[indiceCargo])) {
+          metricas.registrosIgnorados += 1;
+          continue;
+        }
         yield parsearRegistro2014(campos, nrLinha, derivados);
       }
     }

@@ -10,7 +10,13 @@ function carimbo(data = new Date()) {
   return `${p(data.getDate())}-${p(data.getMonth() + 1)}-${data.getFullYear()} ${p(data.getHours())}:${p(data.getMinutes())}:${p(data.getSeconds())}`;
 }
 
-export async function carregarPasta({ db, inputDir, storageDir, now = new Date() }) {
+export async function carregarPasta({
+  db,
+  inputDir,
+  storageDir,
+  now = new Date(),
+  skipCargosLegislativos = false,
+}) {
   const entradas = await readdir(inputDir, { withFileTypes: true });
   const arquivos = entradas
     .filter((entrada) => entrada.isFile() && EXTENSOES.test(entrada.name))
@@ -26,6 +32,7 @@ export async function carregarPasta({ db, inputDir, storageDir, now = new Date()
     importados: 0,
     ignorados: 0,
     falhas: 0,
+    linhas_ignoradas_cargos_legislativos: 0,
     ignorados_extensao: ignoradosExtensao,
     lotes: [],
   };
@@ -44,6 +51,7 @@ export async function carregarPasta({ db, inputDir, storageDir, now = new Date()
         nomeArquivo: nome,
         storageDir,
         now,
+        skipCargosLegislativos,
       });
 
       if (resultado.ignorado) {
@@ -60,6 +68,7 @@ export async function carregarPasta({ db, inputDir, storageDir, now = new Date()
       );
 
       resumo.importados += 1;
+      resumo.linhas_ignoradas_cargos_legislativos += resultado.qtLinhasIgnoradas;
       resumo.lotes.push({
         arquivo: nome,
         lote_id: resultado.lote.id,
@@ -69,9 +78,10 @@ export async function carregarPasta({ db, inputDir, storageDir, now = new Date()
         importadas: resultado.lote.qt_linhas_importadas,
         erros: resultado.lote.qt_erros,
         alertas: resultado.lote.qt_alertas,
+        linhas_ignoradas_cargos_legislativos: resultado.qtLinhasIgnoradas,
       });
       console.error(
-        `${prefixo()} concluido em ${decorrido()}s | leiaute=${resultado.lote.leiaute} linhas=${resultado.lote.qt_linhas} importadas=${resultado.lote.qt_linhas_importadas} erros=${resultado.lote.qt_erros} alertas=${resultado.lote.qt_alertas}`,
+        `${prefixo()} concluido em ${decorrido()}s | leiaute=${resultado.lote.leiaute} linhas=${resultado.lote.qt_linhas} importadas=${resultado.lote.qt_linhas_importadas} ignoradas_cargos_legislativos=${resultado.qtLinhasIgnoradas} erros=${resultado.lote.qt_erros} alertas=${resultado.lote.qt_alertas}`,
       );
     } catch (erro) {
       resumo.falhas += 1;

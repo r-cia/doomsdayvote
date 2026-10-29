@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const nodeEnv = z.enum(['development', 'test', 'production']).default('development');
 const logLevel = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info');
+const booleanEnv = z.enum(['true', 'false']).default('false').transform((valor) => valor === 'true');
 
 const apiSchema = z
   .object({
@@ -31,6 +32,7 @@ const workerSchema = z.object({
   REDIS_URL: z.string().min(1).optional(),
   BWEB_INPUT_DIR: z.string().min(1),
   BWEB_STORAGE_DIR: z.string().min(1),
+  BWEB_SKIP_CARGOS_LEGISLATIVOS: booleanEnv,
 });
 
 const migrateSchema = z.object({
