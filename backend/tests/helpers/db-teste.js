@@ -1,6 +1,7 @@
 import { sql } from 'kysely';
 
 export async function limparBanco(db) {
+  await sql`DELETE FROM bweb_staging`.execute(db);
   await sql`UPDATE boletim_versao SET substitui_versao_id = NULL`.execute(db);
   await sql`DELETE FROM resultado_votavel`.execute(db);
   await sql`DELETE FROM alerta_importacao`.execute(db);

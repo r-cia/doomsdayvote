@@ -174,8 +174,7 @@ describe('schema inicial', () => {
     expect(tipos['resultado_votavel.bruto']).toBeUndefined();
   });
 
-  it('indexa ano e turno em resultado_votavel', async () => {
-    const { rows } = await sql`
+  it('indexa ano e turno em resultado_votavel', async () => {    const { rows } = await sql`
       SELECT indexname
       FROM pg_indexes
       WHERE schemaname = 'public'
@@ -190,6 +189,14 @@ describe('schema inicial', () => {
       'resultado_votavel_eleicao_idx',
       'resultado_votavel_uf_cargo_idx',
     ]);
+  });
+
+  it('mantém a staging como tabela não logada', async () => {
+    const { rows } = await sql`
+      select relpersistence from pg_class where relname = 'bweb_staging'
+    `.execute(db);
+
+    expect(rows[0]?.relpersistence).toBe('u');
   });
 
   it('garante uma única versão ativa por BU', async () => {
