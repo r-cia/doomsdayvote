@@ -145,13 +145,13 @@ A paleta é uma sala escura com três tintas de estado e um papel claro reservad
 
 ## Layout
 
-Grade de 12 colunas implícita com painéis que se tocam: a mesa de plotagem ocupa 1.5fr e o placar 1fr; as leituras dividem 0.8fr e 1.2fr; mapa 1.6fr e painel por UF 1fr. O espaçamento entre painéis é 1px — o fio — e o respiro interno é 8–14px. A faixa de classificação tem 46px e fica fixa. Em 1180px os pares viram coluna única; em 760px os filtros viram duas colunas e o turno ocupa a linha inteira. A primeira dobra cabe em 1440×900: faixa, filtros, série, mesa e leituras.
+Grade de 12 colunas implícita com painéis que se tocam: a mesa de plotagem ocupa 1.5fr e o placar 1fr; as leituras dividem 0.8fr e 1.2fr; mapa 1.6fr e painel por UF 1fr. O espaçamento entre painéis é 1px — o fio — e o respiro interno é 8–14px. A faixa de classificação tem 46px; a barra de comando fica logo abaixo dela e as duas ficam fixas no topo. Painel, Mapa e Análise são abas, cada uma com o seu conteúdo. Em 1180px os pares viram coluna única; em 760px os filtros rolam na horizontal, em uma linha. A primeira dobra cabe em 1440×900: faixa, filtros, série, mesa e leituras.
 
 ## Elevation & Depth
 
-Sem sombras. A profundidade vem do fio de 1px e de um degrau de valor entre fundo, painel e painel elevado. O único brilho é o halo curto da lâmpada na faixa de classificação.
+Sem sombras, com uma exceção: a barra de comando fixa projeta uma sombra curta para descolar do conteúdo que passa por baixo. A profundidade do resto vem do fio de 1px e de um degrau de valor entre fundo, painel e painel elevado. O único brilho é o halo curto da lâmpada na faixa de classificação.
 
-**The Seam Rule.** Nenhum painel projeta sombra; se dois planos precisam se separar, entra um fio.
+**The Seam Rule.** Nenhum painel projeta sombra; se dois planos precisam se separar, entra um fio. A barra fixa é a única que se separa por sombra.
 
 ## Shapes
 

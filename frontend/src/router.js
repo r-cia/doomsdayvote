@@ -11,7 +11,13 @@ const router = createRouter({
     },
     {
       path: '/mapa',
-      redirect: '/painel',
+      name: 'mapa',
+      component: () => import('./views/MapaView.vue'),
+    },
+    {
+      path: '/analise',
+      name: 'analise',
+      component: () => import('./views/AnaliseView.vue'),
     },
     {
       path: '/auditoria',
@@ -24,7 +30,7 @@ const router = createRouter({
     },
     { path: '/:pathMatch(.*)*', redirect: '/painel' },
   ],
-  scrollBehavior: (to) => (to.hash ? { el: to.hash, top: 60 } : { top: 0 }),
+  scrollBehavior: () => ({ top: 0 }),
 })
 
 export default router
