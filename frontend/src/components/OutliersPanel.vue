@@ -55,6 +55,7 @@ function tomLof(valor) {
             <th scope="col" class="num">Seção</th>
             <th scope="col" class="num">IF</th>
             <th scope="col" class="num">LOF</th>
+            <th scope="col">Candidato</th>
           </tr>
         </thead>
         <tbody>
@@ -72,6 +73,12 @@ function tomLof(valor) {
               <span class="chip" :class="tomLof(secao.score_lof)">
                 {{ score(secao.score_lof) }}
               </span>
+            </td>
+            <td>
+              <span v-if="secao.vencedor">
+                {{ secao.vencedor.nm_votavel }} ({{ secao.vencedor.sg_partido }} {{ secao.vencedor.nr_votavel }})
+              </span>
+              <span v-else>—</span>
             </td>
           </tr>
         </tbody>
