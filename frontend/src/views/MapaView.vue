@@ -133,6 +133,7 @@ function atualizarSecoes() {
   </section>
 
   <SectionsTable
+    v-if="store.municipio"
     :data="secoesQuery.data.value"
     :loading="secoesQuery.isLoading.value"
     :error="secoesQuery.error.value?.message ?? ''"
