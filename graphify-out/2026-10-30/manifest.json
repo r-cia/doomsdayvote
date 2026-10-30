@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatisticas.js": {
-    "mtime": 1793364051.2698004,
-    "seen": 1793364259.127869,
-    "ast_hash": "e930b0e40c6407368eb6f395f13f9c98",
+    "mtime": 1793373181.8614955,
+    "seen": 1793373217.6447375,
+    "ast_hash": "18c2840f866d88eb14ce9e05d6626faa",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/outliers.js": {
@@ -1014,15 +1014,15 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/comparacao-local.js": {
-    "mtime": 1793360267.2739341,
-    "seen": 1793364259.1278546,
-    "ast_hash": "cb414360a7a944ea207ba988308144db",
+    "mtime": 1793373144.1371093,
+    "seen": 1793373217.6447268,
+    "ast_hash": "800e20ec947f12300e751cde0d297167",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/concentracao.js": {
-    "mtime": 1793360702.0343597,
-    "seen": 1793364259.127857,
-    "ast_hash": "2e15087725307051177e6dd839072860",
+    "mtime": 1793373149.2641618,
+    "seen": 1793373217.6447296,
+    "ast_hash": "95dd1927ab8b460ac597d9412ce4a7b8",
     "semantic_hash": ""
   },
   "backend/tests/integration/comparacao-local.test.js": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793372574.7762778,
-    "seen": 1793372607.491794,
-    "ast_hash": "3932e862a31f771dc677aee2c0076a0b",
+    "mtime": 1793373167.0843441,
+    "seen": 1793373217.6450317,
+    "ast_hash": "1bbcc87133b9e13f85b6d4312d99e8dc",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
@@ -1089,6 +1089,12 @@
     "mtime": 1793372283.5612957,
     "seen": 1793372354.2518163,
     "ast_hash": "853ab73cbf4bbcbc5073debb597f48bd",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/estatisticas.test.js": {
+    "mtime": 1793373161.0312822,
+    "seen": 1793373217.6448612,
+    "ast_hash": "19b7e4b0f779d4dd48c38998a979a934",
     "semantic_hash": ""
   }
 }

@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import StateBlock from './StateBlock.vue'
-import CoberturaBlock from './CoberturaBlock.vue'
+import { formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -15,14 +15,25 @@ const topShare = computed(() => props.dados?.top_share ?? props.dados?.top_por_s
 const topMargem = computed(() => props.dados?.top_margem ?? props.dados?.top_por_margem ?? [])
 const cobertura = computed(() => props.dados?.cobertura ?? null)
 
-function formatPercentual(valor) {
+function percentualRazao(valor) {
   if (valor === null || valor === undefined) return '—'
-  return `${(valor * 100).toFixed(2)}%`
+  return formatarPercentual(Number(valor) * 100)
 }
 
-function formatNumero(valor) {
+function percentual(valor) {
   if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR')
+  return formatarPercentual(valor)
+}
+
+function pontosPercentuais(valor) {
+  if (valor === null || valor === undefined) return '—'
+  const numero = Number(valor)
+  if (!Number.isFinite(numero)) return '—'
+  return `${numero > 0 ? '+' : ''}${formatarNumero(numero)} pp`
+}
+
+function municipio(secao) {
+  return secao?.nm_municipio || (secao?.cd_municipio_tse == null ? '—' : String(secao.cd_municipio_tse))
 }
 </script>
 
@@ -31,7 +42,8 @@ function formatNumero(valor) {
     <header class="painel__cabecalho">
       <h2 id="concentracao-titulo">Concentração e margem por seção</h2>
       <p class="painel__meta">
-        {{ topShare.length }} por participação · {{ topMargem.length }} por margem
+        {{ formatarNumero(topShare.length) }} por participação ·
+        {{ formatarNumero(topMargem.length) }} por margem
       </p>
     </header>
 
@@ -40,36 +52,93 @@ function formatNumero(valor) {
     <div v-else-if="topShare.length === 0 && topMargem.length === 0" class="vazio">
       Nenhuma seção no recorte.
     </div>
-    <div v-else class="grupos">
-      <article class="grupo">
+    <div v-else class="concentracao-grade">
+      <article class="concentracao-grade__grupo">
         <header class="grupo__cabecalho">
-          <h3>Maior participação do candidato mais votado</h3>
+          <h3>Maior participação</h3>
         </header>
-        <ul class="grupo__secoes">
-          <li v-for="item in topShare" :key="item.secao?.id ?? item.id">
-            Zona {{ item.secao?.nr_zona }} · Seção {{ item.secao?.nr_secao }} —
-            participação {{ formatPercentual(item.share_lider) }},
-            margem {{ formatNumero(item.margem_absoluta) }} votos
-            <span v-if="item.contexto?.share_lider_percentil !== null">
-              (percentil {{ item.contexto.share_lider_percentil?.toFixed(0) }})
-            </span>
-          </li>
-        </ul>
+        <div class="tabela-scroll">
+          <table class="analise-tabela">
+            <caption class="sr-only">Seções classificadas por participação do líder</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="num">Pos.</th>
+                <th scope="col">UF</th>
+                <th scope="col">Município</th>
+                <th scope="col" class="num">Zona</th>
+                <th scope="col" class="num">Seção</th>
+                <th scope="col" class="num">Part. do líder</th>
+                <th scope="col" class="num">Margem 1º–2º (votos)</th>
+                <th scope="col" class="num">Percentil</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, indice) in topShare" :key="item.secao?.id ?? item.id">
+                <td class="num">{{ formatarNumero(indice + 1) }}</td>
+                <td>{{ item.secao?.sg_uf || '—' }}</td>
+                <td>{{ municipio(item.secao) }}</td>
+                <td class="num">{{ formatarNumero(item.secao?.nr_zona) }}</td>
+                <td class="num">{{ formatarNumero(item.secao?.nr_secao) }}</td>
+                <td class="num">{{ percentualRazao(item.share_lider) }}</td>
+                <td class="num">{{ formatarNumero(item.margem_absoluta) }}</td>
+                <td class="num">{{ percentual(item.contexto?.share_lider_percentil) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </article>
-      <article class="grupo">
+      <article class="concentracao-grade__grupo">
         <header class="grupo__cabecalho">
-          <h3>Maior margem para o segundo colocado</h3>
+          <h3>Maior margem</h3>
         </header>
-        <ul class="grupo__secoes">
-          <li v-for="item in topMargem" :key="`m-${item.secao?.id ?? item.id}`">
-            Zona {{ item.secao?.nr_zona }} · Seção {{ item.secao?.nr_secao }} —
-            margem {{ formatNumero(item.margem_absoluta) }} votos
-            ({{ item.margem_pp?.toFixed(2) }} pp),
-            participação {{ formatPercentual(item.share_lider) }}
-          </li>
-        </ul>
+        <div class="tabela-scroll">
+          <table class="analise-tabela">
+            <caption class="sr-only">Seções classificadas pela margem entre os dois primeiros</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="num">Pos.</th>
+                <th scope="col">UF</th>
+                <th scope="col">Município</th>
+                <th scope="col" class="num">Zona</th>
+                <th scope="col" class="num">Seção</th>
+                <th scope="col" class="num">Margem 1º–2º (votos)</th>
+                <th scope="col" class="num">Margem 1º–2º (pp)</th>
+                <th scope="col" class="num">Part. do líder</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, indice) in topMargem" :key="`m-${item.secao?.id ?? item.id}`">
+                <td class="num">{{ formatarNumero(indice + 1) }}</td>
+                <td>{{ item.secao?.sg_uf || '—' }}</td>
+                <td>{{ municipio(item.secao) }}</td>
+                <td class="num">{{ formatarNumero(item.secao?.nr_zona) }}</td>
+                <td class="num">{{ formatarNumero(item.secao?.nr_secao) }}</td>
+                <td class="num">{{ formatarNumero(item.margem_absoluta) }}</td>
+                <td class="num">{{ pontosPercentuais(item.margem_pp) }}</td>
+                <td class="num">{{ percentualRazao(item.share_lider) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </article>
     </div>
-    <CoberturaBlock :dados="dados" />
+    <dl v-if="cobertura" class="painel-resumo" aria-label="Resumo da cobertura">
+      <div class="painel-resumo__item">
+        <dt>Seções consideradas</dt>
+        <dd>{{ formatarNumero(cobertura.consideradas) }}</dd>
+      </div>
+      <div class="painel-resumo__item">
+        <dt>Com contexto</dt>
+        <dd>{{ formatarNumero(cobertura.com_contexto) }}</dd>
+      </div>
+      <div class="painel-resumo__item">
+        <dt>Sem contexto</dt>
+        <dd>{{ formatarNumero(cobertura.sem_contexto) }}</dd>
+      </div>
+      <div class="painel-resumo__item">
+        <dt>Grupos insuficientes</dt>
+        <dd>{{ formatarNumero(cobertura.grupos_insuficientes) }}</dd>
+      </div>
+    </dl>
   </section>
 </template>
