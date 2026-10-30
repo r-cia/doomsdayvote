@@ -100,8 +100,8 @@ function seta(coluna) {
   <section class="painel" aria-labelledby="biometria-uf-titulo">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Biometria</p>
-        <h2 id="biometria-uf-titulo">Biometria por estado</h2>
+        <p class="painel__etiqueta">{{ $t('biometria.titulo') }}</p>
+        <h2 id="biometria-uf-titulo">{{ $t('biometria.porEstado') }}</h2>
       </div>
       <div class="estatistica-controle">
         <select v-model="agrupar" class="uf-ordenacao">
@@ -111,7 +111,7 @@ function seta(coluna) {
       </div>
     </header>
 
-    <div v-if="linhas.length === 0" class="vazio">Sem dados de biometria.</div>
+    <div v-if="linhas.length === 0" class="vazio">{{ $t('comum.semDadosBiometria') }}</div>
 
     <div v-else class="tabela-scroll">
       <table class="tabela">

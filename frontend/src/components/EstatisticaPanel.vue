@@ -40,8 +40,8 @@ function erroMensagem(erro) {
   <section class="painel" aria-labelledby="titulo-estatisticas">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Estatística descritiva</p>
-        <h2 id="titulo-estatisticas">Média, mediana e desvio padrão por seção</h2>
+        <p class="painel__etiqueta">{{ $t('estatistica.descritiva') }}</p>
+        <h2 id="titulo-estatisticas">{{ $t('estatistica.subtitulo') }}</h2>
         <p class="painel__subtitulo">
           Votos por seção de cada candidato e comparecimento por seção. Desvio
           padrão populacional.

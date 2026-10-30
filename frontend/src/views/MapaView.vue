@@ -110,7 +110,7 @@ function atualizarSecoes() {
 <template>
   <AvisoBanner v-if="avisos.length > 0" :avisos="avisos" />
 
-  <section class="malha" aria-label="Mapa e leitura por UF">
+  <section class="malha" :aria-label="$t('mapa.malha')">
     <MapPanel
       :areas="mapaQuery.data.value?.areas ?? []"
       :nivel="store.mapLevel"

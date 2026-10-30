@@ -108,7 +108,7 @@ const votosUf = computed(() => candidatosNominais(props.votos))
     <div class="card__cabecalho">
       <div>
         <h2 id="uf-painel-titulo">
-          {{ ufSelecionada ? `Votos em ${ufSelecionada}` : 'Painel por UF' }}
+          {{ ufSelecionada ? `${$t('mapa.ufPainel')} ${ufSelecionada}` : $t('mapa.ufPainel') }}
         </h2>
       </div>
       <div class="uf-painel__acoes">
