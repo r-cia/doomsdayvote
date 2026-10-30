@@ -99,6 +99,16 @@ Benford por nível, duplicação de vetor de votos e outliers por seção, no co
 
 `GET /api/sections` aceita `municipio_nome` (nome parcial), `zona` e `secao` como filtros separados, além de `uf` e `municipio`.
 
+## `GET /api/consistencia`
+
+Consistência aritmética por seção no BU ativo: `comparecimento_vs_votos`, `aptos_vs_comparecimento_abstencao`, `comparecimento_vs_aptos`, `biometria_vs_comparecimento`. Retorna apenas as regras divergentes (uma linha por regra), com `cobertura` (consideradas, com divergência, sem campo por regra) e `limitacoes`. Aceita `regra`, `page` e `page_size`. Ausência de campo não é tratada como zero e não gera divergência.
+
+```json
+{ "corte": { "tipo": "final" }, "cobertura": { "consideradas": 100, "com_divergencia": 2, "sem_campo_por_regra": { "comparecimento_vs_votos": 0 } }, "limitacoes": [], "page": 1, "page_size": 50, "total": 2, "itens": [{ "secao": { "id": "…", "sg_uf": "AC" }, "regra": "comparecimento_vs_votos", "diferenca": 3, "campos": ["qt_comparecimento", "qt_votos"], "valores": { "qt_comparecimento": 80, "soma_qt_votos": 83 }, "bu": { "id": "…", "versao": 1, "lote": { "id": "…", "nome": "…" }, "sha256": "…", "timestamps": {} } }] }
+```
+
+`GET /api/sections/:id` inclui `consistencia`: array com todas as regras e seus status (`ok`, `divergente`, `dados_insuficientes`) para o BU ativo.
+
 ## GET /api/estatisticas
 
 Parâmetros: `election_id`, `cargo`, `as_of` opcional, `uf` opcional, `municipio` opcional, `escopo` (`turno` por padrão ou `ano`).

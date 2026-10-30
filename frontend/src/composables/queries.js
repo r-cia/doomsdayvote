@@ -274,6 +274,38 @@ export function useSecoes() {
   })
 }
 
+export function useConsistencia(regra = null) {
+  const store = useFiltersStore()
+  const regraEfetiva = computed(() =>
+    typeof regra === 'function' ? regra() : regra?.value !== undefined ? regra.value : regra,
+  )
+  return useQuery({
+    queryKey: computed(() => [
+      'consistencia',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+      regraEfetiva.value ?? null,
+    ]),
+    queryFn: ({ signal }) =>
+      api.consistencia(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
+          regra: regraEfetiva.value ?? undefined,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    placeholderData: keepPreviousData,
+  })
+}
+
 export function useSecao(id) {
   const store = useFiltersStore()
   const idEfetivo = computed(() => {
