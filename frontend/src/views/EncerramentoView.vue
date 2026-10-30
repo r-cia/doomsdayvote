@@ -125,8 +125,8 @@ watch(() => store.cargo, carregarUrnas)
   <section class="painel" aria-labelledby="urnas-titulo">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Encerramento</p>
-        <h2 id="urnas-titulo">Urnas</h2>
+        <p class="painel__etiqueta">{{ $t('encerramento.titulo') }}</p>
+        <h2 id="urnas-titulo">{{ $t('encerramento.urnas') }}</h2>
       </div>
     </header>
 
@@ -169,9 +169,9 @@ watch(() => store.cargo, carregarUrnas)
         <h2>Municípios com maior % após 17:15</h2>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
-      <div v-if="!ufSelecionada" class="vazio">Clique em um estado na tabela acima.</div>
-      <div v-else-if="carregandoMunicipios" class="vazio">Carregando…</div>
-      <div v-else-if="municipios.length === 0" class="vazio">Sem dados.</div>
+      <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') || 'Clique em um estado na tabela acima.' }}</div>
+      <div v-else-if="carregandoMunicipios" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
@@ -214,7 +214,7 @@ watch(() => store.cargo, carregarUrnas)
       </div>
       <div v-if="!municipioSelecionado" class="vazio">Clique em um município.</div>
       <div v-else-if="carregandoSecoes" class="vazio">Carregando…</div>
-      <div v-else-if="secoes.length === 0" class="vazio">Sem dados.</div>
+      <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
