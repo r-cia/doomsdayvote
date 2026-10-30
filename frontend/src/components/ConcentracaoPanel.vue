@@ -40,36 +40,36 @@ function municipio(secao) {
 <template>
   <section class="painel" aria-labelledby="concentracao-titulo">
     <header class="painel__cabecalho">
-      <h2 id="concentracao-titulo">Concentração e margem por seção</h2>
-      <p class="painel__meta">
-        {{ formatarNumero(topShare.length) }} por participação ·
-        {{ formatarNumero(topMargem.length) }} por margem
+      <h2 id="concentracao-titulo">{{ $t('analiseUI.concentracao') }}</h2>
+      <p v-if="!loading && dados" class="painel__meta">
+        {{ formatarNumero(topShare.length) }} {{ $t('analiseUI.porParticipacao') }} ·
+        {{ formatarNumero(topMargem.length) }} {{ $t('analiseUI.porMargem') }}
       </p>
     </header>
 
-    <StateBlock v-if="loading" estado="carregando" titulo="Carregando" />
-    <StateBlock v-else-if="error" estado="erro" titulo="Erro" :descricao="error" acao="Tentar novamente" @acao="emit('retry')" />
+    <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock v-else-if="error" estado="erro" :titulo="$t('comum.erro')" :descricao="error" :acao="$t('comum.tentarNovamente')" @acao="emit('retry')" />
     <div v-else-if="topShare.length === 0 && topMargem.length === 0" class="vazio">
-      Nenhuma seção no recorte.
+      {{ $t('comum.nenhumaSecaoRecorte') }}
     </div>
     <div v-else class="concentracao-grade">
       <article class="concentracao-grade__grupo">
         <header class="grupo__cabecalho">
-          <h3>Maior participação</h3>
+          <h3>{{ $t('analiseUI.maiorParticipacao') }}</h3>
         </header>
         <div class="tabela-scroll">
           <table class="analise-tabela">
-            <caption class="sr-only">Seções classificadas por participação do líder</caption>
+            <caption class="sr-only">{{ $t('analiseUI.secoesPorParticipacao') }}</caption>
             <thead>
               <tr>
-                <th scope="col" class="num">Pos.</th>
+                <th scope="col" class="num">{{ $t('analiseUI.posicao') }}</th>
                 <th scope="col">UF</th>
-                <th scope="col">Município</th>
-                <th scope="col" class="num">Zona</th>
-                <th scope="col" class="num">Seção</th>
-                <th scope="col" class="num">Part. do líder</th>
-                <th scope="col" class="num">Margem 1º–2º (votos)</th>
-                <th scope="col" class="num">Percentil</th>
+                <th scope="col">{{ $t('analiseUI.municipio') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.participacaoLider') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.margemVotos') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.percentil') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -89,21 +89,21 @@ function municipio(secao) {
       </article>
       <article class="concentracao-grade__grupo">
         <header class="grupo__cabecalho">
-          <h3>Maior margem</h3>
+          <h3>{{ $t('analiseUI.maiorMargem') }}</h3>
         </header>
         <div class="tabela-scroll">
           <table class="analise-tabela">
-            <caption class="sr-only">Seções classificadas pela margem entre os dois primeiros</caption>
+            <caption class="sr-only">{{ $t('analiseUI.secoesPorMargem') }}</caption>
             <thead>
               <tr>
-                <th scope="col" class="num">Pos.</th>
+                <th scope="col" class="num">{{ $t('analiseUI.posicao') }}</th>
                 <th scope="col">UF</th>
-                <th scope="col">Município</th>
-                <th scope="col" class="num">Zona</th>
-                <th scope="col" class="num">Seção</th>
-                <th scope="col" class="num">Margem 1º–2º (votos)</th>
-                <th scope="col" class="num">Margem 1º–2º (pp)</th>
-                <th scope="col" class="num">Part. do líder</th>
+                <th scope="col">{{ $t('analiseUI.municipio') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.margemVotos') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.margemPontos') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.participacaoLider') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -122,21 +122,21 @@ function municipio(secao) {
         </div>
       </article>
     </div>
-    <dl v-if="cobertura" class="painel-resumo" aria-label="Resumo da cobertura">
+    <dl v-if="cobertura" class="painel-resumo" :aria-label="$t('comum.resumoCobertura')">
       <div class="painel-resumo__item">
-        <dt>Seções consideradas</dt>
+        <dt>{{ $t('analiseUI.secoesConsideradas') }}</dt>
         <dd>{{ formatarNumero(cobertura.consideradas) }}</dd>
       </div>
       <div class="painel-resumo__item">
-        <dt>Com contexto</dt>
+        <dt>{{ $t('analiseUI.comContexto') }}</dt>
         <dd>{{ formatarNumero(cobertura.com_contexto) }}</dd>
       </div>
       <div class="painel-resumo__item">
-        <dt>Sem contexto</dt>
+        <dt>{{ $t('analiseUI.semContexto') }}</dt>
         <dd>{{ formatarNumero(cobertura.sem_contexto) }}</dd>
       </div>
       <div class="painel-resumo__item">
-        <dt>Grupos insuficientes</dt>
+        <dt>{{ $t('analiseUI.gruposInsuficientes') }}</dt>
         <dd>{{ formatarNumero(cobertura.grupos_insuficientes) }}</dd>
       </div>
     </dl>

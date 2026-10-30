@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
@@ -10,6 +11,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['retry'])
+const { t } = useI18n()
 
 const grupos = computed(() => props.dados?.grupos ?? [])
 const cobertura = computed(() => props.dados?.cobertura ?? null)
@@ -31,43 +33,47 @@ function municipio(secao) {
 }
 
 function nivel(rotulo) {
-  return { local: 'Local', zona: 'Zona', municipio: 'Município' }[rotulo] ?? rotulo
+  return {
+    local: t('analiseUI.local'),
+    zona: t('analiseUI.zona'),
+    municipio: t('analiseUI.municipio'),
+  }[rotulo] ?? rotulo
 }
 </script>
 
 <template>
   <section class="painel" aria-labelledby="comparacao-local-titulo">
     <header class="painel__cabecalho">
-      <h2 id="comparacao-local-titulo">Comparação local entre seções semelhantes</h2>
-      <p class="painel__meta">
-        {{ formatarNumero(grupos.length) }} grupos
+      <h2 id="comparacao-local-titulo">{{ $t('analiseUI.comparacaoLocal') }}</h2>
+      <p v-if="!loading && dados" class="painel__meta">
+        {{ formatarNumero(grupos.length) }} {{ $t('analiseUI.grupos') }}
       </p>
     </header>
 
-    <StateBlock v-if="loading" estado="carregando" titulo="Carregando" />
-    <StateBlock v-else-if="error" estado="erro" titulo="Erro" :descricao="error" acao="Tentar novamente" @acao="emit('retry')" />
+    <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock v-else-if="error" estado="erro" :titulo="$t('comum.erro')" :descricao="error" :acao="$t('comum.tentarNovamente')" @acao="emit('retry')" />
     <div v-else-if="grupos.length === 0" class="vazio">
-      Nenhum grupo comparável no recorte.
+      {{ $t('comum.semGruposComparaveis') }}
     </div>
     <div v-else class="grupos">
       <article v-for="(grupo, indice) in grupos" :key="grupo.chave ?? indice" class="grupo">
         <header class="grupo__cabecalho">
-          <h3>{{ nivel(grupo.nivel) }} · {{ formatarNumero(grupo.tamanho) }} seções</h3>
-          <span v-if="grupo.dados_insuficientes" class="status status--warning">Dados insuficientes</span>
+          <h3>{{ nivel(grupo.nivel) }} · {{ formatarNumero(grupo.tamanho) }} {{ $t('analiseUI.secoes') }}</h3>
+          <span v-if="grupo.dados_insuficientes" class="status status--warning">{{ $t('analiseUI.dadosInsuficientes') }}</span>
         </header>
         <div class="tabela-scroll">
           <table class="analise-tabela">
-            <caption class="sr-only">Seções do grupo {{ nivel(grupo.nivel) }}</caption>
+            <caption class="sr-only">{{ $t('analiseUI.secoesGrupo', { level: nivel(grupo.nivel) }) }}</caption>
             <thead>
               <tr>
                 <th scope="col">UF</th>
-                <th scope="col">Município</th>
-                <th scope="col" class="num">Zona</th>
-                <th scope="col" class="num">Seção</th>
-                <th scope="col" class="num">Participação</th>
-                <th scope="col" class="num">Abstenção</th>
-                <th scope="col" class="num">Δ mediana part. (pp)</th>
-                <th scope="col" class="num">Δ mediana abst. (pp)</th>
+                <th scope="col">{{ $t('analiseUI.municipio') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.participacao') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.abstencao') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.deltaMedianaParticipacao') }}</th>
+                <th scope="col" class="num">{{ $t('analiseUI.deltaMedianaAbstencao') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -86,21 +92,21 @@ function nivel(rotulo) {
         </div>
       </article>
     </div>
-    <dl v-if="cobertura" class="painel-resumo" aria-label="Resumo da cobertura">
+    <dl v-if="cobertura" class="painel-resumo" :aria-label="$t('comum.resumoCobertura')">
       <div class="painel-resumo__item">
-        <dt>Seções consideradas</dt>
+        <dt>{{ $t('analiseUI.secoesConsideradas') }}</dt>
         <dd>{{ formatarNumero(cobertura.consideradas) }}</dd>
       </div>
       <div class="painel-resumo__item">
-        <dt>Com grupo</dt>
+        <dt>{{ $t('analiseUI.comGrupo') }}</dt>
         <dd>{{ formatarNumero(cobertura.com_grupo) }}</dd>
       </div>
       <div class="painel-resumo__item">
-        <dt>Sem grupo</dt>
+        <dt>{{ $t('analiseUI.semGrupo') }}</dt>
         <dd>{{ formatarNumero(cobertura.sem_grupo) }}</dd>
       </div>
       <div class="painel-resumo__item">
-        <dt>Grupos insuficientes</dt>
+        <dt>{{ $t('analiseUI.gruposInsuficientes') }}</dt>
         <dd>{{ formatarNumero(cobertura.grupos_insuficientes) }}</dd>
       </div>
     </dl>

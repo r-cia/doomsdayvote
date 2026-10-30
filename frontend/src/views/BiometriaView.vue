@@ -81,6 +81,7 @@ function abrirSecao(item) {
 <template>
   <BiometriaUfPanel
     :dados="analiseQuery.data.value?.biometria_uf ?? []"
+    :loading="analiseQuery.isLoading.value"
     @select="carregarMunicipios"
   />
 

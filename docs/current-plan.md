@@ -2,18 +2,17 @@
 
 ## Objetivo
 
-Formatar as tabelas de consistência aritmética, comparação local e concentração, mantendo visíveis o estado e o município associados a cada seção.
+Corrigir os estados de carregamento dos gráficos e painéis e fazer os textos e formatos localizados acompanharem o idioma selecionado.
 
 ## Alterações
 
-1. Manter UF e município na tabela de consistência e formatar números usando os formatadores compartilhados.
-2. Converter os grupos de comparação local em tabelas com UF, município, zona, seção, participação, abstenção e diferença em pontos percentuais.
-3. Converter as listas de concentração em duas tabelas classificadas, ambas com UF, município, zona e seção, além das métricas de participação e margem.
-4. Exibir municípios pelo nome, recorrendo ao código TSE quando o nome estiver ausente.
-5. Remover os textos fixos de limitações desses painéis e apresentar contagens de cobertura com rótulos legíveis.
-6. Preservar estados de carregamento, erro, vazio, navegação e acessibilidade das tabelas; adaptar o overflow para telas estreitas.
+1. Diferenciar o carregamento inicial da ausência real de dados no gráfico temporal e nos painéis analíticos.
+2. Centralizar o estado de carregamento na área de conteúdo dos painéis, ocultar contagens sem dados enquanto carrega e evitar indicadores duplicados no mapa.
+3. Animar o spinner compartilhado, respeitando a preferência do sistema por movimento reduzido.
+4. Adicionar traduções para estados e rótulos dos painéis analíticos em português, inglês e espanhol.
+5. Fazer formatadores compartilhados e os formatadores do gráfico e da análise usarem o idioma ativo.
 
 ## Validação
 
-- Executar a suíte oficial e o build do frontend.
-- Executar o detector Impeccable nos componentes alterados.
+- Conferir consistência das chaves dos três catálogos e revisar o diff.
+- A suíte e o build não foram executados.

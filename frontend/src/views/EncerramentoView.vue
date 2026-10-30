@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../api/client'
 import { useSelecaoEleicao } from '../composables/selecao'
-import { formatarNumero, formatarPercentual } from '../lib/format'
+import { formatarHora, formatarNumero, formatarPercentual } from '../lib/format'
 import SecaoView from './SecaoView.vue'
 
 const { store } = useSelecaoEleicao()
@@ -232,7 +232,7 @@ watch(() => store.cargo, carregarUrnas)
             <tr v-for="s in secoes" :key="s.id">
               <td>{{ s.nr_zona }}</td>
               <td>{{ s.nr_secao }}</td>
-              <td class="num">{{ s.dt_encerramento ? new Date(s.dt_encerramento).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—' }}</td>
+              <td class="num">{{ formatarHora(s.dt_encerramento) }}</td>
               <td>{{ s.partido ?? '—' }}</td>
               <td class="num">{{ formatarNumero(s.votos) }}</td>
               <td class="num">{{ formatarPercentual(s.pct_votos) }}</td>

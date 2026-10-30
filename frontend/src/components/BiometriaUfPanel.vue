@@ -1,9 +1,11 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   dados: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['select'])
@@ -111,7 +113,8 @@ function seta(coluna) {
       </div>
     </header>
 
-    <div v-if="linhas.length === 0" class="vazio">{{ $t('comum.semDadosBiometria') }}</div>
+    <StateBlock v-if="loading && linhas.length === 0" estado="carregando" :titulo="$t('comum.carregando')" />
+    <div v-else-if="linhas.length === 0" class="vazio">{{ $t('comum.semDadosBiometria') }}</div>
 
     <div v-else class="tabela-scroll">
       <table class="tabela">

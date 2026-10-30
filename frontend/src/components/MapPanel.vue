@@ -669,15 +669,11 @@ onBeforeUnmount(() => {
       @acao="$emit('retry')"
     />
 
-    <div v-if="loading && !error" class="mapa-status" role="status">
-      {{ $t('comum.carregando') }}
-    </div>
-
     <StateBlock
-      v-if="malhaEstado === 'carregando'"
+      v-if="(loading || malhaEstado === 'carregando') && !error"
       estado="carregando"
-      :titulo="$t('comum.carregando')"
-      :descricao="`Lendo /geo/${arquivoMalha(nivel)}.`"
+      :titulo="$t('comum.carregandoDadosMapa')"
+      :descricao="malhaEstado === 'carregando' ? $t('comum.carregandoMalha') : ''"
     />
 
     <div v-if="malhaEstado === 'ausente'" class="mapa-ausente">
