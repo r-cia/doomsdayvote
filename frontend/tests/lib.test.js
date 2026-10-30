@@ -26,6 +26,7 @@ import {
   deInputSaoPaulo,
   formatarCorte,
   formatarData,
+  formatarCargo,
   formatarDataHora,
   formatarNumero,
   formatarPercentual,
@@ -90,6 +91,14 @@ describe('formatação', () => {
       }),
     ).toContain('Corte até')
     expect(formatarSha('abcdef0123456789', 8)).toBe('abcdef01…')
+  })
+})
+
+describe('formatarCargo', () => {
+  it('capitaliza primeira letra e minuscula o resto', () => {
+    expect(formatarCargo('PRESIDENTE')).toBe('Presidente')
+    expect(formatarCargo('Governador')).toBe('Governador')
+    expect(formatarCargo(null)).toBe('')
   })
 })
 

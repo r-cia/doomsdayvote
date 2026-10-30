@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793397895.3023314,
-    "seen": 1793398552.877376,
-    "ast_hash": "fd902cf7d0e74ec27288882d23daec0f",
+    "mtime": 1793400028.99214,
+    "seen": 1793400076.1177895,
+    "ast_hash": "061eaf1e502d0332ca2f80f0b48a1bc1",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -774,9 +774,9 @@
     "semantic_hash": ""
   },
   "frontend/src/composables/selecao.js": {
-    "mtime": 1793294364.9218693,
-    "seen": 1793360126.8219497,
-    "ast_hash": "c382838de8cbbf0bd9318740aefe2e6a",
+    "mtime": 1793400031.978176,
+    "seen": 1793400076.118085,
+    "ast_hash": "645dda09848a471bba033d52cf103a29",
     "semantic_hash": ""
   },
   "frontend/src/i18n/index.js": {
@@ -840,9 +840,9 @@
     "semantic_hash": ""
   },
   "frontend/src/stores/filters.js": {
-    "mtime": 1793335869.0757995,
-    "seen": 1793360126.821977,
-    "ast_hash": "8a5af8f25d173c5f5475a923468e6c3e",
+    "mtime": 1793400029.9331512,
+    "seen": 1793400076.1181083,
+    "ast_hash": "ef95d4f517252b135a4d9a7714a52fa6",
     "semantic_hash": ""
   },
   "frontend/src/views/AnaliseView.vue": {
@@ -900,9 +900,9 @@
     "semantic_hash": ""
   },
   "frontend/tests/store.test.js": {
-    "mtime": 1793281160.403589,
-    "seen": 1793360126.8219905,
-    "ast_hash": "e58b71527f7d773f0c7e51b27fe7c8b6",
+    "mtime": 1793400032.4101813,
+    "seen": 1793400076.1181355,
+    "ast_hash": "c5ed9cda72d8c969f3f0ad39defd7820",
     "semantic_hash": ""
   },
   "frontend/vite.config.js": {
