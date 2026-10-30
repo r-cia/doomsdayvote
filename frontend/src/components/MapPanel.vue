@@ -539,7 +539,7 @@ const legenda = computed(() => {
   for (const area of props.areas) {
     if (!area.lider) continue
     const candidato = partidoPorNumero.value.get(area.lider.nr_votavel)
-    const sigla = candidato?.sg_partido ?? (t('comum.semPartido') || 'Sem partido')
+    const sigla = candidato?.sg_partido ?? t('comum.semPartido')
     const atual = porPartido.get(sigla) ?? {
       sigla,
       cor: corPartido(candidato?.sg_partido),

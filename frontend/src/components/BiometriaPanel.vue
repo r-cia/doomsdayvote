@@ -103,12 +103,10 @@ const participacao = computed(() => {
 
       <p v-if="votosCandidato !== null || biometria.secoes_sem_campo > 0" class="nota">
         <template v-if="votosCandidato !== null">
-          <b>{{ nomeCandidato }}</b> tem {{ formatarNumero(votosCandidato) }} votos neste
-          recorte — {{ formatarPercentual(participacao) }} do comparecimento.
+          <b>{{ nomeCandidato }}</b>: {{ formatarNumero(votosCandidato) }} votos — {{ formatarPercentual(participacao) }}
         </template>
         <template v-if="biometria.secoes_sem_campo > 0">
-          {{ formatarNumero(biometria.secoes_sem_campo) }} seções não trazem o campo e
-          entram como zero.
+          {{ formatarNumero(biometria.secoes_sem_campo) }} seções sem o campo (entram como zero).
         </template>
       </p>
     </div>

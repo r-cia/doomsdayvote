@@ -25,6 +25,7 @@
     "municipios": "Municipios",
     "carregandoDados": "Cargando datos…",
     "semDados": "Sin datos.",
+    "semPartido": "Sin partido",
     "cliqueEstado": "Haga clic en un estado en la tabla de arriba.",
     "cliqueMunicipio": "Haga clic en un municipio.",
     "semDadosRecorte": "Sin datos para este filtro.",

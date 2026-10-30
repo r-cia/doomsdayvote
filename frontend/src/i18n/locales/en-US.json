@@ -25,6 +25,7 @@
     "municipios": "Municipalities",
     "carregandoDados": "Loading data…",
     "semDados": "No data.",
+    "semPartido": "No party",
     "cliqueEstado": "Click a state in the table above.",
     "cliqueMunicipio": "Click a municipality.",
     "semDadosRecorte": "No data for this filter.",
