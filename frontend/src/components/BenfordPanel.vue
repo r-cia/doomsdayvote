@@ -90,7 +90,7 @@ function tom(classificacao) {
             </caption>
             <thead>
               <tr>
-                <th scope="col">Candidato</th>
+                <th scope="col">{{ $t('estatistica.candidato') }}</th>
                 <th scope="col" class="num">n</th>
                 <th scope="col" class="num">MAD</th>
                 <th scope="col">Leitura</th>
