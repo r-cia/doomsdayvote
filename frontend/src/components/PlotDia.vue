@@ -71,7 +71,7 @@ const partidoPorNumero = computed(() => {
 })
 
 const rotulo = computed(() => {
-  if (props.pontos.length === 0) return 'Linha do tempo indisponível'
+  if (props.pontos.length === 0) return $t('comum.semDados')
   const primeiro = props.pontos[0]
   const ultimo = props.pontos.at(-1)
   return `Traçado do dia de ${formatarHora(primeiro.t)} a ${formatarHora(ultimo.t)}, com o corte em ${formatarHora(new Date(tempoCorte.value).toISOString())}. ${formatarNumero(ultimo.votos_acumulados)} votos acumulados em ${formatarNumero(ultimo.secoes_com_bu_acumuladas)} seções com BU.`
@@ -340,7 +340,7 @@ watch(
 <template>
   <section class="painel tracado" aria-labelledby="tracado-titulo">
     <header class="painel__cabecalho">
-      <h2 id="tracado-titulo">Traçado do dia</h2>
+      <h2 id="tracado-titulo">{{ $t('painel.plotDia') }}</h2>
       <p class="painel__meta">
         <b>{{ formatarHora(pontoAtual?.t) }}</b> · corte<br />
         {{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }} seções ·
