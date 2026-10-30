@@ -29,7 +29,11 @@ function escopoDe(query) {
 }
 
 async function buscarEleicao(db, id) {
-  const eleicao = await db.selectFrom('eleicao').selectAll().where('id', '=', id).executeTakeFirst();
+  const eleicao = await db
+    .selectFrom('eleicao')
+    .select(['id', 'ano_eleicao', 'cd_pleito', 'nr_turno', 'metadados_derivados'])
+    .where('id', '=', id)
+    .executeTakeFirst();
   if (!eleicao) throw new AppError('NOT_FOUND', 404, 'Eleição não encontrada');
   return eleicao;
 }
@@ -109,13 +113,54 @@ export async function registrarRotas(app) {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
+    const semEscopo = !query.uf && !query.municipio;
 
     const [votos, metricas, secoes, metadados, avisos] = await Promise.all([
-      somarVotos(db, escopo),
-      somarMetricasSecao(db, escopo),
+      corte.tipo === 'final' && semEscopo
+        ? sql`select cd_tipo_votavel, nr_votavel, categoria, nm_votavel, nr_partido, sg_partido, nm_partido, cor_hex, qt_votos from mv_votos_final where eleicao_id = ${eleicao.id} and cargo = ${query.cargo}`
+            .execute(db)
+            .then((r) => {
+              const linhas = r.rows.map((linha) => ({
+                cd_tipo_votavel: linha.cd_tipo_votavel,
+                nr_votavel: linha.nr_votavel,
+                categoria: linha.categoria,
+                nm_votavel: linha.nm_votavel,
+                nr_partido: linha.nr_partido,
+                sg_partido: linha.sg_partido,
+                nm_partido: linha.nm_partido,
+                cor_hex: linha.cor_hex,
+                qt_votos: Number(linha.qt_votos),
+              }));
+              const baseValidos = linhas
+                .filter((l) => l.categoria === 'nominal' || l.categoria === 'legenda')
+                .reduce((t, l) => t + l.qt_votos, 0);
+              return linhas
+                .map((l) => ({
+                  ...l,
+                  percentual: baseValidos > 0 ? (l.qt_votos / baseValidos) * 100 : null,
+                }))
+                .sort((a, b) => b.qt_votos - a.qt_votos);
+            })
+        : somarVotos(db, escopo),
+      corte.tipo === 'final' && semEscopo
+        ? sql`select qt_aptos, qt_comparecimento, qt_abstencoes, bus_considerados from mv_metricas_final where eleicao_id = ${eleicao.id} and cargo = ${query.cargo}`
+            .execute(db)
+            .then((r) => {
+              const linha = r.rows[0] ?? {};
+              return {
+                qt_aptos: Number(linha.qt_aptos ?? 0),
+                qt_comparecimento: Number(linha.qt_comparecimento ?? 0),
+                qt_abstencoes: Number(linha.qt_abstencoes ?? 0),
+                bus_considerados: Number(linha.bus_considerados ?? 0),
+                bus_sem_aptos: 0,
+                bus_sem_comparecimento: 0,
+                bus_sem_abstencoes: 0,
+              };
+            })
+        : somarMetricasSecao(db, escopo),
       contarSecoesComBu(db, escopo),
-      metadadosCorte(db, escopo, corte),
-      avisosCorte(db, escopo, corte),
+      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
+      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
     ]);
 
     return {
@@ -246,8 +291,8 @@ export async function registrarRotas(app) {
     const [biometria, benford, metadados, avisos] = await Promise.all([
       composicaoBiometria(db, escopo),
       benfordPorCandidato(db, escopo),
-      metadadosCorte(db, escopo, corte),
-      avisosCorte(db, escopo, corte),
+      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
+      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
     ]);
 
     return {
@@ -280,8 +325,8 @@ export async function registrarRotas(app) {
     const [linhas, duplicacao, metadados, avisos] = await Promise.all([
       baseSecaoCandidato(db, escopo),
       duplicacaoPorAssinatura(db, escopo),
-      metadadosCorte(db, escopo, corte),
-      avisosCorte(db, escopo, corte),
+      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
+      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
     ]);
 
     const benford = benfordDosNiveis(linhas);
@@ -423,8 +468,8 @@ export async function registrarRotas(app) {
         sgUf: query.uf,
         candidatos,
       }),
-      metadadosCorte(db, escopo, corte),
-      avisosCorte(db, escopo, corte),
+      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
+      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
     ]);
 
     return {
@@ -514,8 +559,16 @@ export async function registrarRotas(app) {
 
     const inicio = (query.page - 1) * pageSize;
     const [metadados, avisos] = await Promise.all([
-      metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      cache
+        .obter('metadados', query, 300, () =>
+          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+      cache
+        .obter('avisos', query, 300, () =>
+          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
     ]);
 
     return {
