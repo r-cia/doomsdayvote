@@ -1755,6 +1755,10 @@ tr.linha--ativa th {
   z-index: 1;
   min-height: calc(100vh - 46px);
   padding: 20px 16px 48px;
+  background: var(--paper);
+  color: var(--paper-ink);
+  color-scheme: light;
+}
 
 .secao-modal__overlay {
   position: fixed;
@@ -1782,10 +1786,6 @@ tr.linha--ativa th {
   font-size: 18px;
   line-height: 1;
   padding: 4px 10px;
-}
-  background: var(--paper);
-  color: var(--paper-ink);
-  color-scheme: light;
 }
 
 .page--extrato a {
