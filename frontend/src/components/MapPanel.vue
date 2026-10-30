@@ -689,7 +689,7 @@ onBeforeUnmount(() => {
         @acao="tentarMalhaNovamente"
       />
       <p>
-        Nenhuma geografia foi inventada. A tabela alternativa abaixo continua
+        {{ $t('comum.semDados') }}
         disponível com os dados da API.
       </p>
     </div>
@@ -743,7 +743,7 @@ onBeforeUnmount(() => {
             :style="{ backgroundColor: COR_SEM_DADOS }"
             aria-hidden="true"
           ></span>
-          Sem dados
+          {{ $t('comum.semDados') }}
         </li>
       </ul>
       <p v-if="legenda.itens.length === 0">{{ $t('comum.semDados') }}</p>

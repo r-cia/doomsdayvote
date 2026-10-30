@@ -212,7 +212,7 @@ watch(() => store.cargo, carregarUrnas)
           {{ (municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}).nm_municipio }}
         </p>
       </div>
-      <div v-if="!municipioSelecionado" class="vazio">Clique em um município.</div>
+      <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') }}</div>
       <div v-else-if="carregandoSecoes" class="vazio">{{ $t('comum.carregando') }}</div>
       <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <div v-else class="tabela-scroll">

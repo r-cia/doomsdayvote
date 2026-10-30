@@ -116,7 +116,7 @@ const candidatos = computed(() =>
       <StateBlock
         v-else-if="eleicoesDisponiveis.length === 0"
         estado="vazio"
-        titulo="Nenhuma eleição disponível"
+        :titulo="$t('comum.semDados')"
         descricao="Carregue os BUs pelo backend e recarregue esta página."
       />
 
