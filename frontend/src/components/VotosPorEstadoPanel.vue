@@ -8,16 +8,6 @@ const props = defineProps({
   candidatos: { type: Array, default: () => [] },
 })
 
-const areasAnteriores = ref([])
-
-watch(
-  () => props.areas,
-  (novo, antigo) => {
-    areasAnteriores.value = antigo ?? []
-  },
-  { immediate: false },
-)
-
 const ordenacao = ref({ coluna: 'nm_votavel', direcao: 'asc' })
 
 function alternar(coluna) {
@@ -66,17 +56,12 @@ function totalPorCandidato(nrVotavel) {
   return ufs.value.reduce((total, area) => total + votosPorCandidato(area, nrVotavel), 0)
 }
 
-function votosAnteriores(area, nrVotavel) {
-  const antiga = (areasAnteriores.value ?? []).find((a) => a.sg_uf === area.sg_uf)
-  if (!antiga) return 0
-  const linha = (antiga.candidatos ?? []).find(
+function delta(area, nrVotavel) {
+  const linha = (area.candidatos ?? []).find(
     (c) => Number(c.nr_votavel) === Number(nrVotavel),
   )
-  return linha ? Number(linha.qt_votos ?? 0) : 0
-}
-
-function delta(area, nrVotavel) {
-  return votosPorCandidato(area, nrVotavel) - votosAnteriores(area, nrVotavel)
+  const d = Number(linha?.qt_votos_delta ?? 0)
+  return d < 0 ? 0 : d
 }
 
 function deltaTotal(nrVotavel) {
