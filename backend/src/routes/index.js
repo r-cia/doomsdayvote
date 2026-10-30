@@ -1236,7 +1236,6 @@ export async function registrarRotas(app) {
       ...metadados,
       avisos,
       cobertura: resultado.cobertura,
-      indice_consistencia: resultado.indice_consistencia,
       page: query.page,
       page_size: pageSize,
       total: divergencias.length,

@@ -22,7 +22,7 @@
 - Views por aba: Painel, Mapa, Estatística (`/analise`), Comparações (`/comparacoes`), Biometria, Encerramento e Relatório (`/relatorio`).
 - Componentes de análise em `frontend/src/components`.
 - A aba Comparações apresenta a comparação local entre seções semelhantes.
-- A aba Relatório combina o índice de consistência da rota `/api/consistencia`, as análises existentes sob demanda e referências temporais isoladas fornecidas por `/api/relatorio`.
+- A aba Relatório combina a consistência da rota `/api/consistencia`, as análises existentes sob demanda e referências temporais isoladas fornecidas por `/api/relatorio`.
 - `CoberturaBlock.vue` exibe cobertura e limitações de forma reutilizável.
 - `AnaliseCobertura.vue` apresenta a cobertura da análise agrupando dados ausentes, base considerada e registros abaixo do mínimo de Benford.
 - `StateBlock.vue` apresenta estados compartilhados de carregamento, erro e vazio; os painéis reservam a área de conteúdo para manter o indicador associado ao painel.
@@ -33,6 +33,6 @@
 - Cada painel consome queries do TanStack Vue Query.
 - Endpoints retornam `cobertura` padronizada.
 - A consistência agrega votos por BU no Postgres antes de retornar os dados, evitando transferir todas as linhas de resultado ou montar uma lista de parâmetros por BU.
-- O índice conta cada BU avaliável uma vez; ausências ficam na cobertura, não reduzem a nota. Comparações históricas agrupam por `election_id` e usam apenas o corte final, sem entrarem na nota do alvo.
+- A cobertura conta cada BU avaliável uma vez; ausências ficam na cobertura. Comparações históricas agrupam por `election_id` e usam apenas o corte final.
 - O endpoint de relatório agrega por eleição, cargo e escopo. A latência entre encerramento e recebimento exige precisão de data/hora; contagens de precisão menor são exibidas sem inventar horário.
 - As consultas analíticas agrupam resultados por seção e candidato, mantendo os atributos geográficos como agregados; a base de seção-candidato é compartilhada entre análise e anomalias enquanto a mesma consulta está em andamento.
