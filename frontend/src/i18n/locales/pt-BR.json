@@ -26,6 +26,7 @@
     "carregandoDados": "Carregando dados…",
     "semDados": "Sem dados.",
     "cliqueEstado": "Clique em um estado na tabela acima.",
+    "cliqueMunicipio": "Clique em um município.",
     "semDadosRecorte": "Sem dados para este recorte.",
     "semDadosBiometria": "Sem dados de biometria.",
     "semSecoes": "Sem seções suficientes para o cálculo no recorte."
