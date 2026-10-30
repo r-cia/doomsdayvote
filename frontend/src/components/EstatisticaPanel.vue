@@ -120,6 +120,7 @@ function erroMensagem(erro) {
                 <th>Candidato</th>
                 <th>Partido</th>
                 <th class="tabela__numero">Seções</th>
+                <th class="tabela__numero">Seções Zero voto</th>
                 <th class="tabela__numero">Média</th>
                 <th class="tabela__numero">Mediana</th>
                 <th class="tabela__numero">Desvio padrão (pop.)</th>
@@ -135,6 +136,7 @@ function erroMensagem(erro) {
                 </td>
                 <td>{{ candidato.sg_partido }}</td>
                 <td class="tabela__numero">{{ inteiro(candidato.secoes) }}</td>
+                <td class="tabela__numero">{{ inteiro(bloco.comparecimento.secoes - (candidato.secoes_com_voto ?? 0)) }}</td>
                 <td class="tabela__numero">{{ numero(candidato.media) }}</td>
                 <td class="tabela__numero">{{ numero(candidato.mediana) }}</td>
                 <td class="tabela__numero">{{ numero(candidato.desvio) }}</td>
