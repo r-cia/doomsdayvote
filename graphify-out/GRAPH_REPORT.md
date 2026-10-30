@@ -1,16 +1,16 @@
 # Graph Report - doomsdayvote  (2026-10-30)
 
 ## Corpus Check
-- 181 files · ~167,802 words
+- 181 files · ~167,828 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1185 nodes · 2240 edges · 83 communities (64 shown, 9 thin omitted)
+- 1185 nodes · 2239 edges · 83 communities (63 shown, 10 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 32 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8ef89583`
+- Built from commit: `9ccde711`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,7 +31,7 @@
 - queries.js
 - App.vue
 - MapTable.vue
-- formatarPercentual
+- formatarNumero
 - Plano atual
 - loadWorkerEnv
 - importarArquivo
@@ -46,7 +46,7 @@
 - PainelView.vue
 - API de leitura
 - validacoes.js
-- formatarNumero
+- formatarPercentual
 - BiometriaUfPanel.vue
 - SectionsTable.vue
 - server.js
@@ -72,7 +72,7 @@
 - integration/corte.test.js
 - lote.test.js
 - RedisFalso
-- KpiCards.vue
+- motivoSecao
 - integration/comparacao-local.test.js
 - 0002_resultado_votavel_colunas.js
 - partido-cor.test.js
@@ -104,19 +104,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `main()` --indirect_call--> `registrarRotas()`  [INFERRED]
   backend/src/server.js → backend/src/routes/index.js
+- `candidatos` --calls--> `candidatosNominais()`  [EXTRACTED]
+  frontend/src/App.vue → frontend/src/lib/agregacoes.js
 - `pontosPercentuais()` --calls--> `formatarNumero()`  [EXTRACTED]
-  frontend/src/components/ConcentracaoPanel.vue → frontend/src/lib/format.js
+  frontend/src/components/ComparacaoLocalPanel.vue → frontend/src/lib/format.js
 - `diferenca()` --calls--> `formatarNumero()`  [EXTRACTED]
   frontend/src/components/ConsistenciaPanel.vue → frontend/src/lib/format.js
 - `inteiro()` --calls--> `formatarNumero()`  [EXTRACTED]
   frontend/src/components/EstatisticaPanel.vue → frontend/src/lib/format.js
-- `candidatos` --calls--> `candidatosNominais()`  [EXTRACTED]
-  frontend/src/components/PlacarRanking.vue → frontend/src/lib/agregacoes.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (83 total, 9 thin omitted)
+## Communities (83 total, 10 thin omitted)
 
 ### Community 0 - "routes/index.js"
 Cohesion: 0.05
@@ -144,7 +144,7 @@ Nodes (10): emit, municipioAtivo, props, UFS, candidatos, ControleFalso, eleicoe
 
 ### Community 6 - "SecaoView.vue"
 Cohesion: 0.09
-Nodes (23): motivoSecao(), statusSecao(), boletim, consulta, dados, emit, fechar(), habilitado (+15 more)
+Nodes (19): boletim, consulta, dados, emit, fechar(), habilitado, id, lote (+11 more)
 
 ### Community 7 - "persistir-bus.js"
 Cohesion: 0.17
@@ -171,12 +171,12 @@ Cohesion: 0.10
 Nodes (14): carregandoMunicipios, carregandoSecoes, carregandoUrnas, linhas, municipios, municipioSelecionado, ordenacao, router (+6 more)
 
 ### Community 13 - "queries.js"
-Cohesion: 0.14
-Nodes (22): useAnalise(), useAnomalias(), useComparacaoLocal(), useConcentracao(), useConsistencia(), useEleicoes(), useEstatisticas(), useSecao() (+14 more)
+Cohesion: 0.12
+Nodes (26): useAnalise(), useAnomalias(), useComparacaoLocal(), useConcentracao(), useConsistencia(), useEleicoes(), useEstatisticas(), useMapa() (+18 more)
 
 ### Community 14 - "App.vue"
 Cohesion: 0.20
-Nodes (8): {
+Nodes (8): candidatos, {
   eleicoesQuery,
   eleicoesDisponiveis,
   cargos,
@@ -191,15 +191,15 @@ Nodes (8): {
   aoUf,
   limparMunicipio,
   limpar,
-}, resumoQuery, useResumo(), definirLocale(), i18n, SUPORTADOS, queryClient, router
+}, resumoQuery, definirLocale(), i18n, SUPORTADOS, queryClient, router
 
 ### Community 15 - "MapTable.vue"
 Cohesion: 0.13
 Nodes (14): aoClicarLinha(), emit, linhas, linhasBase, linhasPagina, nomeCandidato(), ordenacao, pagina (+6 more)
 
-### Community 16 - "formatarPercentual"
-Cohesion: 0.20
-Nodes (10): percentual(), cobertura, emit, percentual(), percentualRazao(), pontosPercentuais(), props, topMargem (+2 more)
+### Community 16 - "formatarNumero"
+Cohesion: 0.14
+Nodes (13): campos, camposAusentes, camposNaoInformados, numero(), props, { t }, cobertura, emit (+5 more)
 
 ### Community 17 - "Plano atual"
 Cohesion: 0.40
@@ -219,7 +219,7 @@ Nodes (15): legenda, clarear(), COR_NEUTRA, COR_SEM_DADOS, corDaArea(), corDoLid
 
 ### Community 21 - "MapaView.vue"
 Cohesion: 0.12
-Nodes (9): useSecoes(), avisos, mapaQuery, mapaUfQuery, resumoQuery, router, secaoModalId, secoesQuery (+1 more)
+Nodes (8): avisos, mapaQuery, mapaUfQuery, resumoQuery, router, secaoModalId, secoesQuery, { store }
 
 ### Community 22 - "Plano de evolução da auditoria de votos"
 Cohesion: 0.13
@@ -246,8 +246,8 @@ Cohesion: 0.24
 Nodes (7): caminhoFixture(), app, db, importar(), db, importar(), importar()
 
 ### Community 28 - "PainelView.vue"
-Cohesion: 0.13
-Nodes (16): candidatos, votosUf, useMapa(), useTimeline(), candidatosNominais(), candidatos, analiseQuery, avisos (+8 more)
+Cohesion: 0.16
+Nodes (13): votosUf, candidatosNominais(), candidatos, analiseQuery, avisos, candidatos, candidatoSelecionado, mapaUfQuery (+5 more)
 
 ### Community 29 - "API de leitura"
 Cohesion: 0.13
@@ -257,9 +257,9 @@ Nodes (14): API de leitura, `GET /api/analysis`, `GET /api/anomalies`, `GET /api
 Cohesion: 0.18
 Nodes (16): TIPOS, alerta(), cargoEmEscopo(), CARGOS_EM_ESCOPO, CHAVE_NATURAL, chaveBu(), chaveNatural(), criarValidador() (+8 more)
 
-### Community 31 - "formatarNumero"
-Cohesion: 0.13
-Nodes (13): campos, camposAusentes, camposNaoInformados, numero(), props, { t }, cobertura, emit (+5 more)
+### Community 31 - "formatarPercentual"
+Cohesion: 0.12
+Nodes (14): cobertura, emit, grupos, percentual(), pontosPercentuais(), props, { t }, percentual() (+6 more)
 
 ### Community 32 - "BiometriaUfPanel.vue"
 Cohesion: 0.17
@@ -274,8 +274,8 @@ Cohesion: 0.26
 Nodes (8): criarDependencias(), migracoesPendentes(), loadApiEnv(), criarLogger(), main(), db, diretorio, migrator
 
 ### Community 35 - "status.js"
-Cohesion: 0.22
-Nodes (8): lista, props, avisoInfo(), AVISOS, MOTIVOS, opcoesStatus(), STATUS_KEYS, STATUS_SECAO
+Cohesion: 0.18
+Nodes (10): lista, props, avisoInfo(), AVISOS, MOTIVOS, opcoesStatus(), STATUS_KEYS, STATUS_SECAO (+2 more)
 
 ### Community 36 - "UfPanel.vue"
 Cohesion: 0.20
@@ -353,10 +353,6 @@ Nodes (9): apiSchema, booleanEnv, carregar(), loadMigrateEnv(), logLevel, migrat
 Cohesion: 0.33
 Nodes (4): copiaAlterada(), db, fixture, juntar()
 
-### Community 58 - "KpiCards.vue"
-Cohesion: 0.40
-Nodes (4): participacao, percentualDoCandidato, props, votosDoCandidato
-
 ### Community 59 - "integration/comparacao-local.test.js"
 Cohesion: 0.50
 Nodes (3): app, db, importar()
@@ -392,13 +388,13 @@ Nodes (3): app, db, importar()
 ## Knowledge Gaps
 - **452 isolated node(s):** `name`, `version`, `private`, `type`, `node` (+447 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 599 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `formatarNumero()` connect `formatarNumero` to `MapPanel.vue`, `SecaoView.vue`, `PlotDia.vue`, `BiometriaView.vue`, `EncerramentoView.vue`, `MapTable.vue`, `formatarPercentual`, `format.js`, `ConsistenciaPanel.vue`, `EstatisticaPanel.vue`, `BiometriaUfPanel.vue`, `SectionsTable.vue`, `UfPanel.vue`, `VotosPorEstadoPanel.vue`, `StateBlock.vue`, `lib.test.js`, `PlacarRanking.vue`, `KpiCards.vue`, `BiometriaPanel.vue`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **Why does `formatarNumero()` connect `formatarNumero` to `BiometriaUfPanel.vue`, `SectionsTable.vue`, `MapPanel.vue`, `UfPanel.vue`, `VotosPorEstadoPanel.vue`, `SecaoView.vue`, `PlotDia.vue`, `BiometriaView.vue`, `EncerramentoView.vue`, `MapTable.vue`, `StateBlock.vue`, `BiometriaPanel.vue`, `PlacarRanking.vue`, `lib.test.js`, `format.js`, `ConsistenciaPanel.vue`, `EstatisticaPanel.vue`, `formatarPercentual`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Why does `registrarRotas()` connect `routes/index.js` to `server.js`, `versoes-bu.js`, `integration/comparacao-local.test.js`, `status-secao.js`, `app.js`, `integration/estatisticas.test.js`, `versoes.test.js`, `caminhoFixture`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Why does `criarDb()` connect `criarDb` to `server.js`, `geo-carregar.js`, `integration/comparacao-local.test.js`, `criarCache`, `loadWorkerEnv`, `app.js`, `integration/status-secao.test.js`, `integration/estatisticas.test.js`, `integration/corte.test.js`, `lote.test.js`, `importarArquivo`, `fixtures.js`, `versoes.test.js`, `caminhoFixture`, `partido-cor.test.js`?**

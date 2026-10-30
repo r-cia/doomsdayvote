@@ -786,21 +786,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793375896.4592066,
-    "seen": 1793375943.204035,
-    "ast_hash": "2aba6dd9f155becfdef35dcebf9b920e",
+    "mtime": 1793375975.9581473,
+    "seen": 1793375990.6784985,
+    "ast_hash": "728e1d1dcdcad7d474762c9e7ebe5af2",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793375896.4592066,
-    "seen": 1793375943.2040372,
-    "ast_hash": "404101e38e79f165a0215947d1a76617",
+    "mtime": 1793375975.9591472,
+    "seen": 1793375990.6785002,
+    "ast_hash": "f5659316a411688570ee3394e0ea82ae",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793375896.4582067,
-    "seen": 1793375943.2040389,
-    "ast_hash": "f4504f69c4fad464a8494919150ff0b5",
+    "mtime": 1793375975.9571471,
+    "seen": 1793375990.6785018,
+    "ast_hash": "a380b692acb7e24676977a9cc6e0c81f",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -1110,9 +1110,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/AnaliseCobertura.vue": {
-    "mtime": 1793375896.4572065,
-    "seen": 1793375943.2039752,
-    "ast_hash": "3db92025ca0872b8368fda96c2339e47",
+    "mtime": 1793375975.9561472,
+    "seen": 1793375990.6784441,
+    "ast_hash": "be15d17183568acc939eb5784673ee75",
     "semantic_hash": ""
   }
 }

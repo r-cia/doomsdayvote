@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
-import CoberturaBlock from './CoberturaBlock.vue'
 import { useEstatisticas } from '../composables/queries'
 import { formatarNumero } from '../lib/format'
 
@@ -147,9 +146,5 @@ function erroMensagem(erro) {
         </section>
       </article>
     </div>
-    <CoberturaBlock
-      :cobertura="estatisticasQuery.data.value?.cobertura ?? null"
-      :limitacoes="estatisticasQuery.data.value?.limitacoes ?? []"
-    />
   </section>
 </template>
