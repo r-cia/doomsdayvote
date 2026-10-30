@@ -31,6 +31,8 @@ export function criarCache({ url, logger, cliente: fornecido } = {}) {
       lazyConnect: true,
       maxRetriesPerRequest: 1,
       connectTimeout: 2000,
+      keepAlive: 30000,
+      enableReadyCheck: true,
       retryStrategy: (tentativas) => Math.min(tentativas * 1000, 5000),
     });
 
