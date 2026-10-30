@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { formatarNumero } from '../lib/format'
 import { candidatosNominais } from '../lib/agregacoes'
 
@@ -7,6 +7,16 @@ const props = defineProps({
   areas: { type: Array, default: () => [] },
   candidatos: { type: Array, default: () => [] },
 })
+
+const areasAnteriores = ref([])
+
+watch(
+  () => props.areas,
+  (novo, antigo) => {
+    areasAnteriores.value = antigo ?? []
+  },
+  { immediate: false },
+)
 
 const ordenacao = ref({ coluna: 'nm_votavel', direcao: 'asc' })
 
@@ -56,6 +66,23 @@ function totalPorCandidato(nrVotavel) {
   return ufs.value.reduce((total, area) => total + votosPorCandidato(area, nrVotavel), 0)
 }
 
+function votosAnteriores(area, nrVotavel) {
+  const antiga = (areasAnteriores.value ?? []).find((a) => a.sg_uf === area.sg_uf)
+  if (!antiga) return 0
+  const linha = (antiga.candidatos ?? []).find(
+    (c) => Number(c.nr_votavel) === Number(nrVotavel),
+  )
+  return linha ? Number(linha.qt_votos ?? 0) : 0
+}
+
+function delta(area, nrVotavel) {
+  return votosPorCandidato(area, nrVotavel) - votosAnteriores(area, nrVotavel)
+}
+
+function deltaTotal(nrVotavel) {
+  return ufs.value.reduce((t, area) => t + delta(area, nrVotavel), 0)
+}
+
 function seta(coluna) {
   if (ordenacao.value.coluna !== coluna) return ''
   return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
@@ -96,9 +123,17 @@ function seta(coluna) {
               </div>
             </th>
             <td v-for="area in ufs" :key="area.sg_uf" class="num">
-              {{ formatarNumero(votosPorCandidato(area, candidato.nr_votavel)) }}
+              <div>{{ formatarNumero(votosPorCandidato(area, candidato.nr_votavel)) }}</div>
+              <small v-if="delta(area, candidato.nr_votavel) !== 0" class="delta">
+                {{ delta(area, candidato.nr_votavel) > 0 ? '+' : '' }}{{ formatarNumero(delta(area, candidato.nr_votavel)) }}
+              </small>
             </td>
-            <td class="num"><strong>{{ formatarNumero(totalPorCandidato(candidato.nr_votavel)) }}</strong></td>
+            <td class="num">
+              <strong>{{ formatarNumero(totalPorCandidato(candidato.nr_votavel)) }}</strong>
+              <small v-if="deltaTotal(candidato.nr_votavel) !== 0" class="delta">
+                {{ deltaTotal(candidato.nr_votavel) > 0 ? '+' : '' }}{{ formatarNumero(deltaTotal(candidato.nr_votavel)) }}
+              </small>
+            </td>
           </tr>
         </tbody>
       </table>
