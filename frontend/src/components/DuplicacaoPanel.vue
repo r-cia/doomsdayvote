@@ -27,7 +27,7 @@ function numeros(grupo) {
 <template>
   <section class="painel" aria-labelledby="duplicacao-titulo">
     <header class="painel__cabecalho">
-      <h2 id="duplicacao-titulo">Duplicação e proximidade</h2>
+      <h2 id="duplicacao-titulo">{{ $t('estatistica.duplicacao') }}</h2>
       <p class="painel__meta">
         vetor de votos idêntico<br />
         <b>{{ dados?.total_grupos ?? 0 }}</b> grupos ·
@@ -36,7 +36,7 @@ function numeros(grupo) {
     </header>
 
     <div v-if="grupos.length === 0" class="vazio">
-      Nenhum vetor de votos repetido no recorte.
+      {{ $t('comum.semDados') }}
     </div>
 
     <div v-else class="tabela-scroll">
