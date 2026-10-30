@@ -24,6 +24,19 @@ const mapaUfQuery = useMapa('uf', {
   ignorarMunicipio: true,
   ignorarUf: true,
   incluirTodosCandidatos: true,
+  asOfAnterior: computed(() => {
+    const pontos = timelineQuery.data.value?.pontos ?? []
+    if (pontos.length === 0) return null
+    const alvo = store.asOf ? new Date(store.asOf).getTime() : Infinity
+    let anterior = null
+    for (const p of pontos) {
+      const t = new Date(p.t).getTime()
+      if (t < alvo) anterior = p.t
+      else break
+    }
+    if (!anterior && pontos.length > 1) anterior = pontos[pontos.length - 2]?.t
+    return anterior
+  }),
   candidatos: computed(() => {
     const lista = candidatosNominais(resumoQuery.data.value?.votos ?? [])
       .map((c) => c.nr_votavel)

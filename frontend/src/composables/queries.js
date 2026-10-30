@@ -181,6 +181,16 @@ export function useMapa(nivel = null, opcoes = {}) {
   const municipioDoMapa = computed(() =>
     opcoes.ignorarMunicipio ? null : store.municipio,
   )
+  const asOfEfetivo = computed(() => {
+    const o = opcoes.asOfOverride
+    const v = o && typeof o === 'object' && 'value' in o ? o.value : o
+    return (v === null || v === undefined || v === '') ? store.asOf : v
+  })
+  const asOfAnterior = computed(() => {
+    const o = opcoes.asOfAnterior
+    const v = o && typeof o === 'object' && 'value' in o ? o.value : o
+    return (v === null || v === undefined || v === '') ? undefined : v
+  })
   const candidatosMapa = computed(() => {
     if (!opcoes.incluirTodosCandidatos) return store.candidato
     if (typeof opcoes.candidatos === 'function') return opcoes.candidatos()
@@ -193,7 +203,8 @@ export function useMapa(nivel = null, opcoes = {}) {
       'mapa',
       store.electionId,
       store.cargo,
-      store.asOf,
+      asOfEfetivo.value,
+      asOfAnterior.value,
       ufDoMapa.value,
       municipioDoMapa.value,
       nivelEfetivo.value,
@@ -204,7 +215,8 @@ export function useMapa(nivel = null, opcoes = {}) {
         {
           election_id: store.electionId,
           cargo: store.cargo,
-          as_of: store.asOf,
+          as_of: asOfEfetivo.value,
+          as_of_anterior: asOfAnterior.value,
           uf: ufDoMapa.value,
           municipio: municipioDoMapa.value,
           level: nivelEfetivo.value,

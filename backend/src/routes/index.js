@@ -425,8 +425,10 @@ export async function registrarRotas(app) {
   app.get('/api/map', cacheado('map', 300, baseSchema.extend({
     level: z.enum(['uf', 'municipio']).default('uf'),
     candidatos: z.string().optional(),
+    as_of_anterior: z.string().optional(),
   }), async (query) => {
     const corte = resolverCorte(query);
+    const corteAnterior = query.as_of_anterior ? resolverCorte({ as_of: query.as_of_anterior }) : null;
     const eleicao = await buscarEleicao(db, query.election_id);
     const candidatos = typeof query.candidatos === 'string' && query.candidatos.trim() !== ''
       ? query.candidatos
@@ -436,7 +438,7 @@ export async function registrarRotas(app) {
       : [];
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
 
-    const [areas, metadados, avisos] = await Promise.all([
+    const [areas, areasAnteriores, metadados, avisos] = await Promise.all([
       totaisPorArea(db, {
         eleicaoId: eleicao.id,
         cargo: query.cargo,
@@ -445,16 +447,49 @@ export async function registrarRotas(app) {
         sgUf: query.uf,
         candidatos,
       }),
+      corteAnterior
+        ? totaisPorArea(db, {
+            eleicaoId: eleicao.id,
+            cargo: query.cargo,
+            corte: corteAnterior,
+            nivel: query.level,
+            sgUf: query.uf,
+            candidatos,
+          })
+        : Promise.resolve(null),
       cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
       cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
     ]);
+
+    const anterioresPorChave = new Map();
+    if (areasAnteriores) {
+      for (const a of areasAnteriores) {
+        const chave = query.level === 'uf' ? a.sg_uf : a.cd_municipio_tse;
+        anterioresPorChave.set(chave, a);
+      }
+    }
+
+    const areasComDelta = areas.map((area) => {
+      const chave = query.level === 'uf' ? area.sg_uf : area.cd_municipio_tse;
+      const anterior = anterioresPorChave.get(chave);
+      const candidatosComDelta = (area.candidatos ?? []).map((c) => {
+        const ant = anterior?.candidatos?.find(
+          (x) => Number(x.nr_votavel) === Number(c.nr_votavel),
+        );
+        const delta = ant
+          ? Math.max(0, Number(c.qt_votos ?? 0) - Number(ant.qt_votos ?? 0))
+          : Number(c.qt_votos ?? 0);
+        return { ...c, qt_votos_delta: delta };
+      });
+      return { ...area, candidatos: candidatosComDelta };
+    });
 
     return {
       level: query.level,
       corte: corteResposta(corte),
       ...metadados,
       avisos,
-      areas,
+      areas: areasComDelta,
     };
   }));
 
