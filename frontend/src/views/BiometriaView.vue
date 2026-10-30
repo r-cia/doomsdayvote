@@ -165,7 +165,7 @@ function abrirSecao(item) {
                   class="button button--ghost button--compacto"
                   @click="abrirSecao(s)"
                 >
-                  Detalhe
+                  {{ $t('comum.detalhe') }}
                 </button>
               </td>
             </tr>

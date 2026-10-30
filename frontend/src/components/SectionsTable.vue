@@ -214,7 +214,7 @@ function navegarLinhas(evento) {
                     data-secao-btn
                     @click="emit('select', item)"
                   >
-                    Detalhe
+                    {{ $t('comum.detalhe') }}
                   </button>
                 </td>
               </tr>

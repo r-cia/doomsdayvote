@@ -118,7 +118,7 @@ function voltar() { fechar() }
           class="button button--ghost"
           @click="voltar"
         >
-          ← Voltar ao painel
+          ← {{ $t('comum.voltar') }}
         </button>
         <button
           v-else
