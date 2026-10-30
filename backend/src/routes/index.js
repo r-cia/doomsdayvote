@@ -265,7 +265,9 @@ export async function registrarRotas(app) {
     };
   }));
 
-  app.get('/api/anomalies', cacheado('anomalies', 600, baseSchema, async (query) => {
+  app.get('/api/anomalies', cacheado('anomalies', 600, baseSchema.extend({
+    ordenar_por: z.enum(['if', 'lof']).default('if'),
+  }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const escopo = {
@@ -340,7 +342,15 @@ export async function registrarRotas(app) {
           vencedor,
         }
       })
-      .sort((a, b) => b.score_if - a.score_if)
+      .sort((a, b) => {
+        if (query.ordenar_por === 'lof') {
+          const la = a.score_lof ?? -Infinity;
+          const lb = b.score_lof ?? -Infinity;
+          if (lb !== la) return lb - la;
+          return b.score_if - a.score_if;
+        }
+        return b.score_if - a.score_if;
+      })
       .slice(0, 20);
 
     return {

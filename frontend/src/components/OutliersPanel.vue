@@ -1,22 +1,14 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  ordenacao: { type: String, default: 'if' },
 })
 
-const ordenacao = ref('if')
+const emit = defineEmits(['update:ordenacao'])
 
-const secoesBase = computed(() => props.dados?.secoes ?? [])
-const secoes = computed(() => {
-  const lista = [...secoesBase.value]
-  if (ordenacao.value === 'lof') {
-    lista.sort((a, b) => (b.score_lof ?? -Infinity) - (a.score_lof ?? -Infinity))
-  } else {
-    lista.sort((a, b) => (b.score_if ?? -Infinity) - (a.score_if ?? -Infinity))
-  }
-  return lista
-})
+const secoes = computed(() => props.dados?.secoes ?? [])
 const limiarIf = computed(() => props.dados?.isolamento?.limiar ?? 0.6)
 const limiarLof = computed(() => props.dados?.lof?.limiar ?? 2)
 
@@ -45,7 +37,10 @@ function tomLof(valor) {
       <div class="estatistica-controle">
         <label class="campo campo--curto">
           <span class="campo__rotulo">Ordenar por</span>
-          <select v-model="ordenacao">
+          <select
+            :value="ordenacao"
+            @change="emit('update:ordenacao', $event.target.value)"
+          >
             <option value="if">Maior IF</option>
             <option value="lof">Maior LOF</option>
           </select>
