@@ -1,0 +1,143 @@
+{
+  "app": {
+    "titulo": "Doomsday Vote",
+    "subtitulo": "conferência de boletins de urna",
+    "classificacao": "Não oficial · TSE",
+    "abas": {
+      "painel": "Painel",
+      "mapa": "Mapa",
+      "estatistica": "Estatística",
+      "biometria": "Biometria",
+      "encerramento": "Encerramento"
+    },
+    "idioma": "Idioma"
+  },
+  "comum": {
+    "carregando": "Carregando…",
+    "erro": "Erro",
+    "vazio": "Sem dados",
+    "todos": "Todos",
+    "tentarNovamente": "Tentar novamente",
+    "detalhe": "Detalhe",
+    "voltar": "Voltar ao painel",
+    "fechar": "Fechar",
+    "brasil": "Brasil",
+    "municipios": "Municípios",
+    "carregandoDados": "Carregando dados…",
+    "semDados": "Sem dados.",
+    "semDadosRecorte": "Sem dados para este recorte.",
+    "semDadosBiometria": "Sem dados de biometria.",
+    "semSecoes": "Sem seções suficientes para o cálculo no recorte."
+  },
+  "filtros": {
+    "cargo": "Cargo",
+    "ano": "Ano",
+    "turno": "Turno",
+    "candidato": "Candidato",
+    "corte": "Corte do dia",
+    "uf": "UF",
+    "municipio": "Município",
+    "limparMunicipio": "Limpar município",
+    "limpar": "Limpar filtros",
+    "escopo": "Escopo",
+    "turnoAtual": "Turno atual",
+    "anoCompleto": "Ano (1º e 2º)",
+    "ordenarPor": "Ordenar por"
+  },
+  "painel": {
+    "titulo": "Painel",
+    "composicao": "Composição do recorte",
+    "mesa": "Mesa de plotagem e placar",
+    "leituras": "Leituras",
+    "plotDia": "Traçado do dia",
+    "placar": "Placar",
+    "kpi": {
+      "comparecimento": "Comparecimento",
+      "secoesComBu": "Seções com BU",
+      "votosValidos": "Votos válidos",
+      "ultimaCarga": "Última carga"
+    },
+    "biometria": {
+      "titulo": "Composição do recorte",
+      "secoes": "seções",
+      "comparecimento": "Comparecimento",
+      "habilitados": "Habilitados por biometria",
+      "naoHabilitada": "Com biometria não habilitada",
+      "aptos": "Aptos",
+      "semComposicao": "Sem composição para o recorte."
+    }
+  },
+  "mapa": {
+    "titulo": "Mapa",
+    "malha": "Mapa e leitura por UF",
+    "ufPainel": "Painel por UF",
+    "votosPorEstado": "Votos por estado",
+    "secoes": "Seções eleitorais",
+    "semDadosUf": "Nenhuma UF com dados para os filtros atuais.",
+    "semDadosEstado": "Sem dados por estado para o corte atual."
+  },
+  "estatistica": {
+    "titulo": "Estatística",
+    "descritiva": "Estatística descritiva",
+    "subtitulo": "Média, mediana e desvio padrão por seção",
+    "descricao": "Votos por seção de cada candidato e comparecimento por seção. Desvio padrão populacional.",
+    "variavel": "Variável",
+    "candidato": "Candidato",
+    "partido": "Partido",
+    "secoes": "Seções",
+    "secoesZero": "Seções Zero voto",
+    "media": "Média",
+    "mediana": "Mediana",
+    "desvio": "Desvio padrão (pop.)",
+    "comparecimento": "Comparecimento",
+    "benford": "Benford",
+    "duplicacao": "Duplicação",
+    "isolamento": "Isolamento e LOF"
+  },
+  "biometria": {
+    "titulo": "Biometria",
+    "porEstado": "Biometria por estado",
+    "uf": "UF",
+    "votosComBiometria": "Votos com biometria",
+    "pctComBiometria": "% com biometria",
+    "votosNaoHabilitada": "Votos biometria não habilitada",
+    "pctNaoHabilitada": "% não habilitada",
+    "agruparRegiao": "Agrupar por região",
+    "semAgrupamento": "Sem agrupamento",
+    "porRegiao": "Por região",
+    "regiao": "Região",
+    "municipios": "Municípios com maior biometria não habilitada",
+    "secoes": "Seções com maior % não habilitada"
+  },
+  "encerramento": {
+    "titulo": "Encerramento",
+    "urnas": "Urnas",
+    "uf": "UF",
+    "numUrnas": "Nº de urnas",
+    "ate1715": "Até 17:15",
+    "pct1715": "% até 17:15",
+    "ate1915": "Até 19:15",
+    "pct1915": "% até 19:15",
+    "apos1915": "Após 19:15",
+    "pctApos1915": "% após 19:15",
+    "municipios": "Municípios com maior % após 17:15",
+    "secoes": "Seções com maior % após 17:15",
+    "total": "Total",
+    "apos1715": "Após 17:15",
+    "percentual": "%",
+    "encerramento": "Encerramento",
+    "partido": "Partido",
+    "votos": "Votos",
+    "pctVotos": "% Votos",
+    "zona": "Zona",
+    "secao": "Seção"
+  },
+  "format": {
+    "corteFinal": "Corte final",
+    "corteAte": "Corte até"
+  },
+  "status": {
+    "recebido": "BU recebido",
+    "pendente": "Pendente"
+  }
+}

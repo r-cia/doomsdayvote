@@ -6,6 +6,7 @@ import StateBlock from './components/StateBlock.vue'
 import { useResumo } from './composables/queries'
 import { useSelecaoEleicao } from './composables/selecao'
 import { candidatosNominais } from './lib/agregacoes'
+import { definirLocale } from './i18n'
 
 const {
   eleicoesQuery,
@@ -54,16 +55,25 @@ const candidatos = computed(() =>
       </RouterLink>
 
       <nav class="nav" aria-label="Abas do sistema">
-        <RouterLink to="/painel">Painel</RouterLink>
-        <RouterLink to="/mapa">Mapa</RouterLink>
-        <RouterLink to="/analise">Estatística</RouterLink>
-        <RouterLink to="/biometria">Biometria</RouterLink>
-        <RouterLink to="/encerramento">Encerramento</RouterLink>
+        <RouterLink to="/painel">{{ $t('app.abas.painel') }}</RouterLink>
+        <RouterLink to="/mapa">{{ $t('app.abas.mapa') }}</RouterLink>
+        <RouterLink to="/analise">{{ $t('app.abas.estatistica') }}</RouterLink>
+        <RouterLink to="/biometria">{{ $t('app.abas.biometria') }}</RouterLink>
+        <RouterLink to="/encerramento">{{ $t('app.abas.encerramento') }}</RouterLink>
       </nav>
 
       <p class="classificacao">
-        <span><i aria-hidden="true"></i>Não oficial · TSE</span>
+        <span><i aria-hidden="true"></i>{{ $t('app.classificacao') }}</span>
       </p>
+      <select
+        class="uf-ordenacao"
+        :value="$i18n.locale"
+        @change="definirLocale($event.target.value)"
+      >
+        <option value="pt-BR">PT-BR</option>
+        <option value="en-US">EN-US</option>
+        <option value="es-ES">ES-ES</option>
+      </select>
     </header>
 
     <div v-if="eleicoesDisponiveis.length > 0" class="comando-barra">

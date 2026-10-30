@@ -42,7 +42,7 @@ const participacao = computed(() => {
 <template>
   <section class="painel biometria" aria-labelledby="biometria-titulo">
     <header class="painel__cabecalho">
-      <h2 id="biometria-titulo">Composição do recorte</h2>
+      <h2 id="biometria-titulo">{{ $t('painel.biometria.titulo') }}</h2>
       <p class="painel__meta">
         biometria<br />
         <b>{{ formatarNumero(biometria?.secoes) }}</b> seções

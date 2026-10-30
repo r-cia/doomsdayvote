@@ -1,0 +1,143 @@
+{
+  "app": {
+    "titulo": "Doomsday Vote",
+    "subtitulo": "auditoría de urnas",
+    "classificacao": "No oficial · TSE",
+    "abas": {
+      "painel": "Panel",
+      "mapa": "Mapa",
+      "estatistica": "Estadística",
+      "biometria": "Biometría",
+      "encerramento": "Cierre"
+    },
+    "idioma": "Idioma"
+  },
+  "comum": {
+    "carregando": "Cargando…",
+    "erro": "Error",
+    "vazio": "Sin datos",
+    "todos": "Todos",
+    "tentarNovamente": "Intentar de nuevo",
+    "detalhe": "Detalle",
+    "voltar": "Volver al panel",
+    "fechar": "Cerrar",
+    "brasil": "Brasil",
+    "municipios": "Municipios",
+    "carregandoDados": "Cargando datos…",
+    "semDados": "Sin datos.",
+    "semDadosRecorte": "Sin datos para este filtro.",
+    "semDadosBiometria": "Sin datos de biometría.",
+    "semSecoes": "Secciones insuficientes para el cálculo en este filtro."
+  },
+  "filtros": {
+    "cargo": "Cargo",
+    "ano": "Año",
+    "turno": "Turno",
+    "candidato": "Candidato",
+    "corte": "Corte del día",
+    "uf": "Estado",
+    "municipio": "Municipio",
+    "limparMunicipio": "Limpiar municipio",
+    "limpar": "Limpiar filtros",
+    "escopo": "Alcance",
+    "turnoAtual": "Turno actual",
+    "anoCompleto": "Año (1º y 2º)",
+    "ordenarPor": "Ordenar por"
+  },
+  "painel": {
+    "titulo": "Panel",
+    "composicao": "Composición del filtro",
+    "mesa": "Mesa de trazado y marcador",
+    "leituras": "Lecturas",
+    "plotDia": "Trazo del día",
+    "placar": "Marcador",
+    "kpi": {
+      "comparecimento": "Asistencia",
+      "secoesComBu": "Secciones con BU",
+      "votosValidos": "Votos válidos",
+      "ultimaCarga": "Última carga"
+    },
+    "biometria": {
+      "titulo": "Composición del filtro",
+      "secoes": "secciones",
+      "comparecimento": "Asistencia",
+      "habilitados": "Habilitados por biometría",
+      "naoHabilitada": "Biometría no habilitada",
+      "aptos": "Aptos",
+      "semComposicao": "Sin composición para este filtro."
+    }
+  },
+  "mapa": {
+    "titulo": "Mapa",
+    "malha": "Mapa y lectura por estado",
+    "ufPainel": "Panel por estado",
+    "votosPorEstado": "Votos por estado",
+    "secoes": "Secciones electorales",
+    "semDadosUf": "Ningún estado con datos para los filtros actuales.",
+    "semDadosEstado": "Sin datos por estado para el corte actual."
+  },
+  "estatistica": {
+    "titulo": "Estadística",
+    "descritiva": "Estadística descriptiva",
+    "subtitulo": "Media, mediana y desviación estándar poblacional por sección",
+    "descricao": "Votos por sección de cada candidato y asistencia por sección. Desviación estándar poblacional.",
+    "variavel": "Variable",
+    "candidato": "Candidato",
+    "partido": "Partido",
+    "secoes": "Secciones",
+    "secoesZero": "Secciones con cero votos",
+    "media": "Media",
+    "mediana": "Mediana",
+    "desvio": "Desviación estándar (pob.)",
+    "comparecimento": "Asistencia",
+    "benford": "Benford",
+    "duplicacao": "Duplicación",
+    "isolamento": "Aislamiento y LOF"
+  },
+  "biometria": {
+    "titulo": "Biometría",
+    "porEstado": "Biometría por estado",
+    "uf": "Estado",
+    "votosComBiometria": "Votos con biometría",
+    "pctComBiometria": "% con biometría",
+    "votosNaoHabilitada": "Votos biometría no habilitada",
+    "pctNaoHabilitada": "% no habilitada",
+    "agruparRegiao": "Agrupar por región",
+    "semAgrupamento": "Sin agrupación",
+    "porRegiao": "Por región",
+    "regiao": "Región",
+    "municipios": "Municipios con mayor biometría no habilitada",
+    "secoes": "Secciones con mayor % no habilitada"
+  },
+  "encerramento": {
+    "titulo": "Cierre",
+    "urnas": "Urnas",
+    "uf": "Estado",
+    "numUrnas": "Nº de urnas",
+    "ate1715": "Hasta 17:15",
+    "pct1715": "% hasta 17:15",
+    "ate1915": "Hasta 19:15",
+    "pct1915": "% hasta 19:15",
+    "apos1915": "Después 19:15",
+    "pctApos1915": "% después 19:15",
+    "municipios": "Municipios con mayor % después 17:15",
+    "secoes": "Secciones con mayor % después 17:15",
+    "total": "Total",
+    "apos1715": "Después 17:15",
+    "percentual": "%",
+    "encerramento": "Cierre",
+    "partido": "Partido",
+    "votos": "Votos",
+    "pctVotos": "% Votos",
+    "zona": "Zona",
+    "secao": "Sección"
+  },
+  "format": {
+    "corteFinal": "Corte final",
+    "corteAte": "Corte hasta"
+  },
+  "status": {
+    "recebido": "BU recibido",
+    "pendente": "Pendiente"
+  }
+}
