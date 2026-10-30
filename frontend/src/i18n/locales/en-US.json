@@ -26,6 +26,7 @@
     "carregandoDados": "Loading data…",
     "semDados": "No data.",
     "cliqueEstado": "Click a state in the table above.",
+    "cliqueMunicipio": "Click a municipality.",
     "semDadosRecorte": "No data for this filter.",
     "semDadosBiometria": "No biometrics data.",
     "semSecoes": "Not enough sections for the calculation in this filter."

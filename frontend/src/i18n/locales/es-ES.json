@@ -26,6 +26,7 @@
     "carregandoDados": "Cargando datos…",
     "semDados": "Sin datos.",
     "cliqueEstado": "Haga clic en un estado en la tabla de arriba.",
+    "cliqueMunicipio": "Haga clic en un municipio.",
     "semDadosRecorte": "Sin datos para este filtro.",
     "semDadosBiometria": "Sin datos de biometría.",
     "semSecoes": "Secciones insuficientes para el cálculo en este filtro."
