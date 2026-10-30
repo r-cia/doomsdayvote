@@ -12,8 +12,7 @@ function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
   return aplicarEscopo(qb, escopo);
 }
 
-export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {} }) {
-  const dataPleito = escopo.dataPleito;
+export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {}, dataPleito }) {
   const corte1715 = dataPleito ? `${dataPleito} 17:15:00-03` : null;
 
   const colunas = [
