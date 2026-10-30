@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "backend/src/db/index.js": {
-    "mtime": 1793377067.08423,
-    "seen": 1793377080.6922753,
-    "ast_hash": "1817e2e75f19e7568fa43abbf727f84c",
+    "mtime": 1793377622.9765542,
+    "seen": 1793377630.3238938,
+    "ast_hash": "7124744dee995f446a0160df28ffa859",
     "semantic_hash": ""
   },
   "backend/src/db/migracoes.js": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "backend/src/env.js": {
-    "mtime": 1793376945.3778555,
-    "seen": 1793377080.692279,
-    "ast_hash": "bba130c956b5b3b6c61c997ee7d7273e",
+    "mtime": 1793377622.977554,
+    "seen": 1793377630.3238988,
+    "ast_hash": "8a6e60e5afd77c8af6540a53e9f1f20e",
     "semantic_hash": ""
   },
   "backend/src/lib/ambiente.js": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793377024.4807482,
-    "seen": 1793377080.6923642,
-    "ast_hash": "7e0f03ba705d61f00751fefaf021c978",
+    "mtime": 1793377202.9937701,
+    "seen": 1793377213.9611611,
+    "ast_hash": "289862386b1faf05af869f22a6b14841",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793377099.5795977,
-    "seen": 1793377132.2287538,
-    "ast_hash": "15d92dfad8a0c6b143f0156f121364d6",
+    "mtime": 1793377622.978554,
+    "seen": 1793377630.324262,
+    "ast_hash": "6670662feb34e82815d46f58e46b2cd9",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793377067.0852299,
-    "seen": 1793377080.6925957,
-    "ast_hash": "6874f9638ad066261c6bc3b47c20c928",
+    "mtime": 1793377622.977554,
+    "seen": 1793377630.3242497,
+    "ast_hash": "ed14b5ce6499ef80a8405710afc61698",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
