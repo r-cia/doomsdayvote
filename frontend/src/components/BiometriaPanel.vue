@@ -49,7 +49,7 @@ const participacao = computed(() => {
       </p>
     </header>
 
-    <div v-if="!biometria" class="vazio">Sem composição para o recorte.</div>
+    <div v-if="!biometria" class="vazio">{{ $t('painel.biometria.semComposicao') }}</div>
 
     <div v-else class="biometria__corpo">
       <div

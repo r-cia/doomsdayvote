@@ -113,7 +113,7 @@ const votosUf = computed(() => candidatosNominais(props.votos))
       </div>
       <div class="uf-painel__acoes">
         <select v-if="!ufSelecionada" v-model="agrupar" class="uf-ordenacao">
-          <option value="nenhum">Sem agrupamento</option>
+          <option value="nenhum">{{ $t("biometria.semAgrupamento") }}</option>
           <option value="regiao">Por região</option>
         </select>
         <button
@@ -140,15 +140,15 @@ const votosUf = computed(() => candidatosNominais(props.votos))
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível carregar o painel por UF"
+      :titulo="$t('comum.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="$emit('retry')"
     />
     <StateBlock
       v-else-if="loading && linhas.length === 0"
       estado="carregando"
-      titulo="Carregando painel por UF"
+      :titulo="$t('comum.carregando')"
     />
 
     <div v-else-if="ufSelecionada" class="tabela-scroll uf-painel__scroll">
@@ -179,11 +179,11 @@ const votosUf = computed(() => candidatosNominais(props.votos))
           </tr>
         </tbody>
       </table>
-      <p v-if="votosUf.length === 0" class="vazio">Sem votos nesta UF no corte.</p>
+      <p v-if="votosUf.length === 0" class="vazio">{{ $t('comum.semDados') }}</p>
     </div>
 
     <p v-else-if="linhas.length === 0" class="vazio">
-      Nenhuma UF com dados para os filtros atuais.
+      {{ $t('mapa.semDadosUf') }}
     </p>
 
     <div v-else-if="agrupar === 'regiao' && grupos" class="tabela-scroll uf-painel__scroll">

@@ -52,7 +52,7 @@ function tom(classificacao) {
     </header>
 
     <div v-if="!dados || candidatos.length === 0" class="vazio">
-      Nenhuma seção com {{ minimo }} votos ou mais no corte atual.
+      {{ $t("comum.semDados") }}
     </div>
 
     <template v-else>

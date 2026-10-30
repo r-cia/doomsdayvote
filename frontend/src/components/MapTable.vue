@@ -133,7 +133,7 @@ function aoClicarLinha(linha) {
   <section class="card tabela-mapa" aria-labelledby="tabela-mapa-titulo">
     <div class="card__cabecalho">
       <div>
-        <h2 id="tabela-mapa-titulo">Detalhes</h2>
+        <h2 id="tabela-mapa-titulo">{{ $t("comum.detalhe") }}</h2>
       </div>
       <span class="contador">{{ linhas.length }} áreas</span>
     </div>
