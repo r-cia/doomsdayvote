@@ -200,7 +200,7 @@ function voltar() { fechar() }
           <StateBlock
             v-if="!boletim"
             estado="vazio"
-            titulo="Sem BU no corte atual"
+            :titulo="$t('comum.semDados')"
             descricao="Não há boletim de urna considerado para esta seção."
           />
           <dl v-else class="dados">
@@ -244,7 +244,7 @@ function voltar() { fechar() }
         <StateBlock
           v-if="resultados.length === 0"
           estado="vazio"
-          titulo="Sem resultados para esta seção"
+          :titulo="$t('comum.semDados')"
         />
         <div v-else class="tabela-scroll">
           <table>

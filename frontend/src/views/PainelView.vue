@@ -106,7 +106,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     estado="erro"
     :titulo="$t('comum.erro')"
     :descricao="resumoQuery.error.value.message"
-    acao="Tentar novamente"
+    :acao="$t('comum.tentarNovamente')"
     @acao="resumoQuery.refetch()"
   />
 
