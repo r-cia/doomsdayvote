@@ -2,8 +2,9 @@
 import AnaliseSection from '../components/AnaliseSection.vue'
 import StateBlock from '../components/StateBlock.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
+import ConsistenciaPanel from '../components/ConsistenciaPanel.vue'
 import { ref, watch } from 'vue'
-import { useAnalise, useAnomalias } from '../composables/queries'
+import { useAnalise, useAnomalias, useConsistencia } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 
 const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
@@ -11,12 +12,14 @@ const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
 const ordenacao = ref('if')
 const analiseQuery = useAnalise()
 const anomaliasQuery = useAnomalias(null, ordenacao)
+const consistenciaQuery = useConsistencia()
 
 watch(
   () => store.asOf,
   () => {
     analiseQuery.refetch()
     anomaliasQuery.refetch()
+    consistenciaQuery.refetch()
   },
 )
 
@@ -46,5 +49,12 @@ watch(
     @retry="anomaliasQuery.refetch()"
     @select="aoCandidato"
     @update:ordenacao="ordenacao = $event"
+  />
+
+  <ConsistenciaPanel
+    :dados="consistenciaQuery.data.value ?? null"
+    :loading="consistenciaQuery.isLoading.value"
+    :error="consistenciaQuery.error.value?.message ?? ''"
+    @retry="consistenciaQuery.refetch()"
   />
 </template>

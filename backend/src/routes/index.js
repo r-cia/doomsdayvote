@@ -9,6 +9,7 @@ import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apurac
 import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
 import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
+import { consistenciaPorSecao, validarConsistenciaBu } from '../modules/analise/consistencia.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
 
 const corteSchema = {
@@ -752,6 +753,79 @@ export async function registrarRotas(app) {
     };
   }));
 
+  app.get('/api/consistencia', cacheado('consistencia', 300, baseSchema.extend({
+    regra: z.enum([
+      'comparecimento_vs_votos',
+      'aptos_vs_comparecimento_abstencao',
+      'comparecimento_vs_aptos',
+      'biometria_vs_comparecimento',
+    ]).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
+    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
+    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+
+    const resultado = await consistenciaPorSecao(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    });
+
+    const limitacoes = [
+      'Consistência aritmética calculada a partir do BU ativo no corte selecionado.',
+      'Campos ausentes (nulos) não são tratados como zero e não geram divergência.',
+      'Biometria é agregada por seção, sem vínculo individual.',
+      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
+    ];
+
+    const divergencias = [];
+    for (const item of resultado.secoes) {
+      for (const regra of item.regras) {
+        if (regra.status !== 'divergente') continue;
+        if (query.regra && regra.regra !== query.regra) continue;
+        divergencias.push({
+          secao: item.secao,
+          regra: regra.regra,
+          diferenca: regra.diferenca,
+          campos: regra.campos,
+          valores: regra.valores,
+          bu: item.bu,
+        });
+      }
+    }
+
+    const [metadados, avisos] = await Promise.all([
+      cache
+        .obter('metadados', query, 300, () =>
+          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+      cache
+        .obter('avisos', query, 300, () =>
+          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+    ]);
+
+    const inicio = (query.page - 1) * pageSize;
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      limitacoes,
+      page: query.page,
+      page_size: pageSize,
+      total: divergencias.length,
+      itens: divergencias.slice(inicio, inicio + pageSize),
+    };
+  }));
+
   app.get('/api/sections', cacheado('sections', 60, baseSchema.extend({
     zona: z.coerce.number().int().optional(),
     secao: z.coerce.number().int().optional(),
@@ -920,6 +994,18 @@ export async function registrarRotas(app) {
           .executeTakeFirstOrThrow()
       : { total: 0 };
 
+    const consistencia = boletim
+      ? validarConsistenciaBu(
+          {
+            qt_aptos: boletim.qt_aptos,
+            qt_comparecimento: boletim.qt_comparecimento,
+            qt_abstencoes: boletim.qt_abstencoes,
+            qt_elei_biom_sem_habilitacao: boletim.qt_elei_biom_sem_habilitacao,
+          },
+          resultados,
+        )
+      : [];
+
     return {
       secao,
       status: classificarStatusSecao(boletim, corte),
@@ -927,6 +1013,7 @@ export async function registrarRotas(app) {
       resultados,
       lote,
       versoes_anteriores: Number(anteriores.total),
+      consistencia,
     };
   }));
 }
