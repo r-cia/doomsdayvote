@@ -12,6 +12,7 @@ Corrigir os estados de carregamento dos gráficos e painéis, fazer os textos e 
 4. Adicionar traduções para estados e rótulos dos painéis analíticos em português, inglês e espanhol.
 5. Fazer formatadores compartilhados e os formatadores do gráfico e da análise usarem o idioma ativo.
 6. Reagregar os totais da view materializada por UF e candidato antes de selecionar o líder e calcular percentuais.
+7. Substituir os metadados brutos sob Benford por um resumo localizado da base, ausências e amostras abaixo do mínimo.
 
 ## Validação
 

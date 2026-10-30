@@ -1090,6 +1090,57 @@ select {
   letter-spacing: 0.06em;
 }
 
+.analise-cobertura {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.analise-cobertura h3 {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.analise-cobertura__dados {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 20px;
+  margin: 0;
+}
+
+.analise-cobertura__dados > div {
+  min-width: 0;
+}
+
+.analise-cobertura__dados dt {
+  color: var(--ink-dim, #9aac8c);
+  font-size: 10px;
+}
+
+.analise-cobertura__dados dd {
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.analise-cobertura__dados ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 760px) {
+  .analise-cobertura__dados {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
 .estatistica-controle {
   display: flex;
   gap: 8px;

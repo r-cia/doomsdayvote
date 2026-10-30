@@ -16,6 +16,7 @@
 - Views por aba: Painel, Mapa, Análise.
 - Componentes de análise em `frontend/src/components`.
 - `CoberturaBlock.vue` exibe cobertura e limitações de forma reutilizável.
+- `AnaliseCobertura.vue` apresenta a cobertura da análise agrupando dados ausentes, base considerada e registros abaixo do mínimo de Benford.
 - `StateBlock.vue` apresenta estados compartilhados de carregamento, erro e vazio; os painéis reservam a área de conteúdo para manter o indicador associado ao painel.
 - Vue I18n fornece catálogos equivalentes para `pt-BR`, `en-US` e `es-ES`; os formatadores de números e datas consultam o idioma ativo no momento da formatação.
 

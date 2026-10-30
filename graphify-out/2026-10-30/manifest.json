@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/totais.js": {
-    "mtime": 1793372335.3378258,
-    "seen": 1793372354.2518444,
-    "ast_hash": "debc56905b1e87aff22ea19db1fa6fba",
+    "mtime": 1793375721.0871208,
+    "seen": 1793375745.982926,
+    "ast_hash": "523cf0b432c829b6feda884dd0c35a5f",
     "semantic_hash": ""
   },
   "backend/src/modules/importacao/bweb/campos.js": {
@@ -660,9 +660,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordPanel.vue": {
-    "mtime": 1793375095.458448,
-    "seen": 1793375176.5128527,
-    "ast_hash": "358b464aeca03b24416eedff9c297721",
+    "mtime": 1793375913.795412,
+    "seen": 1793375943.203985,
+    "ast_hash": "02154c91cd927c4be3dd4ecfa2ff2482",
     "semantic_hash": ""
   },
   "frontend/src/components/BiometriaPanel.vue": {
@@ -786,21 +786,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793375618.9338968,
-    "seen": 1793375638.729387,
-    "ast_hash": "9645cb206dbfc7f29366b5c444661a80",
+    "mtime": 1793375896.4592066,
+    "seen": 1793375943.204035,
+    "ast_hash": "2aba6dd9f155becfdef35dcebf9b920e",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793375618.934897,
-    "seen": 1793375638.7293887,
-    "ast_hash": "3172d2cd2938368aa4904367503a333e",
+    "mtime": 1793375896.4592066,
+    "seen": 1793375943.2040372,
+    "ast_hash": "404101e38e79f165a0215947d1a76617",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793375618.9328969,
-    "seen": 1793375638.7293904,
-    "ast_hash": "39a7304c0aa6e825d5308730b5cb0618",
+    "mtime": 1793375896.4582067,
+    "seen": 1793375943.2040389,
+    "ast_hash": "f4504f69c4fad464a8494919150ff0b5",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -846,9 +846,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/AnaliseView.vue": {
-    "mtime": 1793375095.459448,
-    "seen": 1793375176.5130024,
-    "ast_hash": "212981e14ff13b81a8a573826d78366d",
+    "mtime": 1793375875.63896,
+    "seen": 1793375943.2040555,
+    "ast_hash": "3bf41fb09736dfc6ec5d8a3aaf369050",
     "semantic_hash": ""
   },
   "frontend/src/views/BiometriaView.vue": {
@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793375013.7843995,
-    "seen": 1793375068.5094292,
-    "ast_hash": "65b0219403212272d85ce105c2a53ae7",
+    "mtime": 1793375731.6842473,
+    "seen": 1793375745.983217,
+    "ast_hash": "9013edcf5205a942d144e910447c4c29",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793375013.7853997,
-    "seen": 1793375068.5094,
-    "ast_hash": "1f25b9408646181896eb8cf130d4fd53",
+    "mtime": 1793375731.6832473,
+    "seen": 1793375745.983205,
+    "ast_hash": "de80f37bd948a63b742559515f8dba59",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
@@ -1107,6 +1107,12 @@
     "mtime": 1793374271.570568,
     "seen": 1793375068.508498,
     "ast_hash": "f0e171bf8dad7043fef4c4d8b7890aec",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AnaliseCobertura.vue": {
+    "mtime": 1793375896.4572065,
+    "seen": 1793375943.2039752,
+    "ast_hash": "3db92025ca0872b8368fda96c2339e47",
     "semantic_hash": ""
   }
 }
