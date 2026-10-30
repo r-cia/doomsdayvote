@@ -124,7 +124,7 @@ function voltar() { fechar() }
           v-else
           type="button"
           class="button button--ghost secao-modal__fechar"
-          aria-label="Fechar"
+          :aria-label="$t('comum.fechar')"
           @click="fechar"
         >
           ✕
