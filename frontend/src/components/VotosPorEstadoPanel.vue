@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { formatarNumero } from '../lib/format'
 import { candidatosNominais } from '../lib/agregacoes'
 
@@ -8,7 +8,37 @@ const props = defineProps({
   candidatos: { type: Array, default: () => [] },
 })
 
-const listaCandidatos = computed(() => candidatosNominais(props.candidatos))
+const ordenacao = ref({ coluna: 'nm_votavel', direcao: 'asc' })
+
+function alternar(coluna) {
+  if (ordenacao.value.coluna === coluna) {
+    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
+  } else {
+    ordenacao.value = { coluna, direcao: 'asc' }
+  }
+}
+
+function totalCandidato(c) {
+  return (props.areas ?? []).reduce((t, area) => {
+    const linha = (area.candidatos ?? []).find((x) => Number(x.nr_votavel) === Number(c.nr_votavel))
+    return t + (linha ? Number(linha.qt_votos ?? 0) : 0)
+  }, 0)
+}
+
+const listaCandidatos = computed(() => {
+  const lista = candidatosNominais(props.candidatos).map((c) => ({ ...c, _total: totalCandidato(c) }))
+  const { coluna, direcao } = ordenacao.value
+  lista.sort((a, b) => {
+    let va, vb
+    if (coluna === 'nm_votavel') { va = a.nm_votavel ?? ''; vb = b.nm_votavel ?? '' }
+    else if (coluna === 'total') { va = a._total; vb = b._total }
+    else { va = a[coluna]; vb = b[coluna] }
+    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+    return direcao === 'asc' ? va - vb : vb - va
+  })
+  return lista
+})
+
 const ufs = computed(() =>
   [...(props.areas ?? [])]
     .filter((area) => area.sg_uf)
@@ -25,6 +55,12 @@ function votosPorCandidato(area, nrVotavel) {
 function totalPorCandidato(nrVotavel) {
   return ufs.value.reduce((total, area) => total + votosPorCandidato(area, nrVotavel), 0)
 }
+
+function seta(coluna) {
+  if (ordenacao.value.coluna !== coluna) return ''
+  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
+}
+
 </script>
 
 <template>
@@ -44,11 +80,11 @@ function totalPorCandidato(nrVotavel) {
       <table class="tabela-votos-estado">
         <thead>
           <tr>
-            <th scope="col">Candidato</th>
+            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">Candidato{{ seta('nm_votavel') }}</th>
             <th v-for="area in ufs" :key="area.sg_uf" scope="col" class="num">
               {{ area.sg_uf }}
             </th>
-            <th scope="col" class="num">Total</th>
+            <th scope="col" class="num ordenavel" @click="alternar('total')">Total{{ seta('total') }}</th>
           </tr>
         </thead>
         <tbody>
