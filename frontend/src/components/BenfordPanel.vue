@@ -44,7 +44,7 @@ function tom(classificacao) {
 <template>
   <section class="painel" aria-labelledby="benford-titulo">
     <header class="painel__cabecalho">
-      <h2 id="benford-titulo">Benford · todos os candidatos</h2>
+      <h2 id="benford-titulo">{{ $t('estatistica.benford') }}</h2>
       <p class="painel__meta">
         primeiro dígito<br />
         <b>{{ formatarNumero(ativo?.n) }}</b> seções
