@@ -273,7 +273,5 @@ export async function consistenciaPorSecao(db, { eleicaoId, cargo, corte, escopo
       sem_campo_por_regra: semCampoPorRegra,
       divergencias_por_regra: divergenciasPorRegra,
     },
-    indice_consistencia:
-      avaliadas > 0 ? Number(((semDivergencia / avaliadas) * 100).toFixed(1)) : null,
   };
 }
