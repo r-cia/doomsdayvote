@@ -7,7 +7,7 @@ pg.types.setTypeParser(20, (valor) => Number(valor));
 export function criarDb({
   connectionString,
   readOnly = false,
-  statementTimeout = 60000,
+  statementTimeout = 180000,
   poolMax = 20,
   workMemMb = 64,
 }) {
