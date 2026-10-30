@@ -25,6 +25,11 @@ const router = createRouter({
       component: () => import('./views/BiometriaView.vue'),
     },
     {
+      path: '/encerramento',
+      name: 'encerramento',
+      component: () => import('./views/EncerramentoView.vue'),
+    },
+    {
       path: '/auditoria',
       redirect: '/painel',
     },
