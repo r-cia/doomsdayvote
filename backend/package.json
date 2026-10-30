@@ -12,6 +12,7 @@
     "migrate": "node --env-file-if-exists=.env src/scripts/migrate.js",
     "migrate:reset": "node --env-file-if-exists=.env src/scripts/migrate.js --reset",
     "test": "vitest run",
+    "purge:originais": "node --env-file-if-exists=.env src/scripts/purge-originais.js",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run --config vitest.integration.config.js",
