@@ -25,6 +25,20 @@ export function buildApp({ deps = {}, config = {}, rotas }) {
   app.decorate('deps', deps);
   app.decorate('config', config);
 
+  app.addHook('onResponse', async (req, reply) => {
+    req.log.info(
+      {
+        rota: req.routerPath ?? req.url,
+        metodo: req.method,
+        status: reply.statusCode,
+        duracao_ms: Number(reply.elapsedTime.toFixed(2)),
+        bytes: Number(reply.getHeader('content-length') || 0),
+        cache: reply.getHeader('x-cache') ?? null,
+      },
+      'http_resposta',
+    );
+  });
+
   app.register(async (escopo) => {
     if (rotas) await rotas(escopo);
   });
