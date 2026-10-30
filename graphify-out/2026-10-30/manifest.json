@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/totais.js": {
-    "mtime": 1793371556.4588532,
-    "seen": 1793371590.7601879,
-    "ast_hash": "61079823c5baaeb9422b6c414f2512b0",
+    "mtime": 1793372335.3378258,
+    "seen": 1793372354.2518444,
+    "ast_hash": "debc56905b1e87aff22ea19db1fa6fba",
     "semantic_hash": ""
   },
   "backend/src/modules/importacao/bweb/campos.js": {
@@ -288,9 +288,9 @@
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
-    "mtime": 1793332037.5115066,
-    "seen": 1793360126.8218431,
-    "ast_hash": "a26ec9411f0408bfaddc670d6322d320",
+    "mtime": 1793372342.5969002,
+    "seen": 1793372354.2518792,
+    "ast_hash": "d21407566a0a5407b120c737373e62b5",
     "semantic_hash": ""
   },
   "backend/src/scripts/cores-pendentes.js": {
@@ -1083,6 +1083,12 @@
     "mtime": 1793371497.3622487,
     "seen": 1793371590.760157,
     "ast_hash": "232309099439744e4faf0f6369619c8c",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0007_mv_totais_area.js": {
+    "mtime": 1793372283.5612957,
+    "seen": 1793372354.2518163,
+    "ast_hash": "853ab73cbf4bbcbc5073debb597f48bd",
     "semantic_hash": ""
   }
 }

@@ -20,9 +20,10 @@ export function validarConsistenciaBu(bu = {}, resultados = []) {
   {
     const comparecimento = b.qt_comparecimento;
     const lista = Array.isArray(resultados) ? resultados : null;
-    let soma = 0;
-    let temNulo = false;
-    let insuficiente = ausente(comparecimento) || lista === null;
+    const agregado = !lista && resultados && typeof resultados === 'object' ? resultados : null;
+    let soma = lista ? 0 : Number(agregado?.somaVotos ?? 0);
+    let temNulo = agregado?.temVotosNulos === true;
+    let insuficiente = ausente(comparecimento) || (lista === null && agregado === null);
     if (lista) {
       for (const item of lista) {
         if (ausente(item?.qt_votos)) {
@@ -31,8 +32,8 @@ export function validarConsistenciaBu(bu = {}, resultados = []) {
           soma += Number(item.qt_votos);
         }
       }
-      if (temNulo) insuficiente = true;
     }
+    if (temNulo) insuficiente = true;
     const diferenca = insuficiente ? null : soma - Number(comparecimento);
     regras.push({
       regra: 'comparecimento_vs_votos',
@@ -132,6 +133,7 @@ export async function consistenciaPorSecao(db, { eleicaoId, cargo, corte, escopo
       join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
     )
     .leftJoin('lote_importacao as lot', 'lot.id', 'bv.lote_id')
+    .leftJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
     .where('bv.eleicao_id', '=', eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', cargo);
 
@@ -164,28 +166,48 @@ export async function consistenciaPorSecao(db, { eleicaoId, cargo, corte, escopo
       'lot.sha256 as lote_sha256',
       'lot.dt_geracao_arquivo',
       'lot.captured_at',
+      sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('soma_votos'),
+      sql`coalesce(bool_or(rv.qt_votos is null) filter (where rv.id is not null), false)`.as('tem_votos_nulos'),
+    ])
+    .groupBy([
+      's.id',
+      's.sg_uf',
+      's.cd_municipio_tse',
+      's.nr_zona',
+      's.nr_secao',
+      's.nr_local_votacao',
+      'l.nm_municipio',
+      'bv.id',
+      'bv.versao',
+      'bv.qt_aptos',
+      'bv.qt_comparecimento',
+      'bv.qt_abstencoes',
+      'bv.qt_elei_biom_sem_habilitacao',
+      'bv.dt_abertura',
+      'bv.dt_encerramento',
+      'bv.dt_emissao_bu',
+      'bv.dt_bu_recebido_ts',
+      'bv.dt_bu_recebido_data',
+      'bv.imported_at',
+      'lot.id',
+      'lot.nome_arquivo',
+      'lot.sha256',
+      'lot.dt_geracao_arquivo',
+      'lot.captured_at',
     ])
     .execute();
 
-  const ids = boletins.map((b) => b.bu_id).filter(Boolean);
-  const resultados = ids.length
-    ? await db.selectFrom('resultado_votavel').selectAll().where('boletim_versao_id', 'in', ids).execute()
-    : [];
-  const porBu = new Map();
-  for (const r of resultados) {
-    if (!porBu.has(r.boletim_versao_id)) porBu.set(r.boletim_versao_id, []);
-    porBu.get(r.boletim_versao_id).push(r);
-  }
-
   const secoes = boletins.map((b) => {
-    const res = porBu.get(b.bu_id) ?? [];
     const buObj = {
       qt_aptos: b.qt_aptos,
       qt_comparecimento: b.qt_comparecimento,
       qt_abstencoes: b.qt_abstencoes,
       qt_elei_biom_sem_habilitacao: b.qt_elei_biom_sem_habilitacao,
     };
-    const regras = validarConsistenciaBu(buObj, res);
+    const regras = validarConsistenciaBu(buObj, {
+      somaVotos: b.soma_votos,
+      temVotosNulos: b.tem_votos_nulos,
+    });
     return {
       secao: {
         id: b.secao_id,

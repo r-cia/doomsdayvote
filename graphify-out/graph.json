@@ -164,7 +164,7 @@
       "file_type": "code",
       "norm_label": "consistenciaporsecao()",
       "source_file": "backend/src/modules/analise/consistencia.js",
-      "source_location": "L126"
+      "source_location": "L127"
     },
     {
       "id": "backend_src_modules_analise_consistencia_validarconsistenciabu",
@@ -13985,7 +13985,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/consistencia.js",
-      "source_location": "L138",
+      "source_location": "L140",
       "weight": 1.0
     },
     {
@@ -13997,7 +13997,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/consistencia.js",
-      "source_location": "L139",
+      "source_location": "L141",
       "weight": 1.0
     },
     {
@@ -14009,7 +14009,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/consistencia.js",
-      "source_location": "L188",
+      "source_location": "L207",
       "weight": 1.0
     },
     {
@@ -14021,7 +14021,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/consistencia.js",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -29100,7 +29100,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/modules/analise/consistencia.js",
-      "source_location": "L126",
+      "source_location": "L127",
       "weight": 1.0
     },
     {
@@ -38706,5 +38706,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6d5b400a4184a17b107cb60365ce9e3569573e12"
+  "built_at_commit": "2369b5e792ad778d39b1057437735163f90d21c9"
 }
