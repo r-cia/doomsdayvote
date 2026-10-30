@@ -786,21 +786,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793394940.9764378,
-    "seen": 1793395538.2132182,
-    "ast_hash": "88c493f57a5d9fe56cda11e105f8683e",
+    "mtime": 1793397714.712312,
+    "seen": 1793397733.7480989,
+    "ast_hash": "508fa3c3977b5041453ce3da4b21f58b",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793394943.287463,
-    "seen": 1793395538.2132201,
-    "ast_hash": "6bf496a5ea46ce71b1626ea56a4ce578",
+    "mtime": 1793397714.989315,
+    "seen": 1793397733.7481036,
+    "ast_hash": "cbbafc1ed5336dc87310e82f95ff7a37",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793394938.619412,
-    "seen": 1793395538.2132218,
-    "ast_hash": "e5aee905fcda24c236df774ff8cd735c",
+    "mtime": 1793397714.359308,
+    "seen": 1793397733.7481077,
+    "ast_hash": "eaa89cd002dca5a68c48a204fefc532a",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -1128,9 +1128,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/RelatorioView.vue": {
-    "mtime": 1793396606.9819283,
-    "seen": 1793396859.110513,
-    "ast_hash": "37a5f5d2bbd3376ada47f72e306952f7",
+    "mtime": 1793397641.106489,
+    "seen": 1793397733.7481618,
+    "ast_hash": "fbf761c22c0ab0bcd75e3f5dabe917af",
     "semantic_hash": ""
   },
   "backend/src/lib/ordenacao.js": {
