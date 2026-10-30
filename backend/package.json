@@ -7,8 +7,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "node --max-old-space-size=30720 --stack-size=32000 --env-file-if-exists=.env --watch src/server.js",
-    "start": "node --max-old-space-size=30720 --stack-size=32000 --env-file-if-exists=.env src/server.js",
+    "dev": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env --watch src/server.js",
+    "start": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/server.js",
     "migrate": "node --env-file-if-exists=.env src/scripts/migrate.js",
     "migrate:reset": "node --env-file-if-exists=.env src/scripts/migrate.js --reset",
     "test": "vitest run",
@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run --config vitest.integration.config.js",
-    "carga": "node --max-old-space-size=30720 --stack-size=32000 --env-file-if-exists=.env src/scripts/carregar-pasta.js",
+    "carga": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/scripts/carregar-pasta.js",
     "seed:cores": "node --env-file-if-exists=.env src/scripts/seed-cores.js",
     "cores:pendentes": "node --env-file-if-exists=.env src/scripts/cores-pendentes.js",
     "geo:carregar": "node --env-file-if-exists=.env src/scripts/geo-carregar.js"

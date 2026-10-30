@@ -104,7 +104,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <StateBlock
     v-if="resumoQuery.error.value"
     estado="erro"
-    titulo="Não foi possível carregar o resumo"
+    :titulo="$t('comum.erro')"
     :descricao="resumoQuery.error.value.message"
     acao="Tentar novamente"
     @acao="resumoQuery.refetch()"
