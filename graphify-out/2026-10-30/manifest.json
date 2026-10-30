@@ -642,9 +642,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/AnaliseSection.vue": {
-    "mtime": 1793364051.2708006,
-    "seen": 1793364259.1280355,
-    "ast_hash": "deaebd4e892371781316f0b64e5fc7ae",
+    "mtime": 1793375095.459448,
+    "seen": 1793375176.512839,
+    "ast_hash": "30474e0b29a3a765d286b81bea3d2f46",
     "semantic_hash": ""
   },
   "frontend/src/components/AvisoBanner.vue": {
@@ -660,21 +660,21 @@
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordPanel.vue": {
-    "mtime": 1793374843.3381524,
-    "seen": 1793375068.509135,
-    "ast_hash": "6c0e7447cf084bbc13ad9baef368fbc3",
+    "mtime": 1793375095.458448,
+    "seen": 1793375176.5128527,
+    "ast_hash": "358b464aeca03b24416eedff9c297721",
     "semantic_hash": ""
   },
   "frontend/src/components/BiometriaPanel.vue": {
-    "mtime": 1793335459.8891485,
-    "seen": 1793360126.8219266,
-    "ast_hash": "0ab2ce4fc888297cf83305c68387f563",
+    "mtime": 1793375128.271865,
+    "seen": 1793375176.5128572,
+    "ast_hash": "f6f27f6e8aa4daab05ed7e8cf2ab0d94",
     "semantic_hash": ""
   },
   "frontend/src/components/BiometriaUfPanel.vue": {
-    "mtime": 1793334310.148162,
-    "seen": 1793360126.821928,
-    "ast_hash": "9d5ae99ff4bf5683dde28dd641604fbe",
+    "mtime": 1793375128.2728648,
+    "seen": 1793375176.512861,
+    "ast_hash": "6bd77f971ad8f9fc9c6253763febc92e",
     "semantic_hash": ""
   },
   "frontend/src/components/ConsistenciaPanel.vue": {
@@ -756,15 +756,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/VersoesBuPanel.vue": {
-    "mtime": 1793374786.4033802,
-    "seen": 1793375068.5092254,
-    "ast_hash": "ba01b98733805f22c4c6ae7493394cb4",
+    "mtime": 1793375145.1100779,
+    "seen": 1793375176.5129328,
+    "ast_hash": "1089ea6a772bffa4fcf04a075ccf17b8",
     "semantic_hash": ""
   },
   "frontend/src/components/VotosPorEstadoPanel.vue": {
-    "mtime": 1793333288.575378,
-    "seen": 1793360126.821947,
-    "ast_hash": "b93c549a7cae8bd0d2fb31d29de21ccf",
+    "mtime": 1793375095.460448,
+    "seen": 1793375176.5129366,
+    "ast_hash": "9b8cb48a2356f0d1550a96245c3be407",
     "semantic_hash": ""
   },
   "frontend/src/composables/queries.js": {
@@ -846,15 +846,15 @@
     "semantic_hash": ""
   },
   "frontend/src/views/AnaliseView.vue": {
-    "mtime": 1793364051.2718005,
-    "seen": 1793364259.1280985,
-    "ast_hash": "0654ef18571f57626efa43d8bd1a8826",
+    "mtime": 1793375095.459448,
+    "seen": 1793375176.5130024,
+    "ast_hash": "212981e14ff13b81a8a573826d78366d",
     "semantic_hash": ""
   },
   "frontend/src/views/BiometriaView.vue": {
-    "mtime": 1793335106.3610744,
-    "seen": 1793360126.82198,
-    "ast_hash": "1ccb07f475a3f86398b8b1fb5919ebb7",
+    "mtime": 1793375128.273865,
+    "seen": 1793375176.513007,
+    "ast_hash": "6af9f7dda9ef7bdf11449b7e66b2bc12",
     "semantic_hash": ""
   },
   "frontend/src/views/EncerramentoView.vue": {
@@ -870,9 +870,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/PainelView.vue": {
-    "mtime": 1793374722.9585037,
-    "seen": 1793375068.5093207,
-    "ast_hash": "14d025975d905d193afc4632d44ffdc2",
+    "mtime": 1793375128.2728648,
+    "seen": 1793375176.5130203,
+    "ast_hash": "b797f4375d661299cf69414779b9d7ee",
     "semantic_hash": ""
   },
   "frontend/src/views/SecaoView.vue": {

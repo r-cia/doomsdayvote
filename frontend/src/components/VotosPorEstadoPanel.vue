@@ -81,8 +81,8 @@ function seta(coluna) {
   <section class="painel" aria-labelledby="votos-estado-titulo">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Distribuição</p>
-        <h2 id="votos-estado-titulo">Votos por estado</h2>
+        <p class="painel__etiqueta">{{ $t('mapa.votosPorEstado') }}</p>
+        <h2 id="votos-estado-titulo">{{ $t('mapa.votosPorEstado') }}</h2>
       </div>
     </header>
 
@@ -95,7 +95,7 @@ function seta(coluna) {
       <table class="tabela-votos-estado">
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">Candidato{{ seta('nm_votavel') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">{{ $t('filtros.candidato') }}{{ seta('nm_votavel') }}</th>
             <th v-for="area in ufs" :key="area.sg_uf" scope="col" class="num">
               {{ area.sg_uf }}
             </th>

@@ -30,7 +30,7 @@
   "28": "PainelView.vue",
   "29": "API de leitura",
   "30": "validacoes.js",
-  "31": "formatarNumero",
+  "31": "formatarPercentual",
   "32": "BiometriaUfPanel.vue",
   "33": "SectionsTable.vue",
   "34": "geo-carregar.js",
@@ -43,11 +43,11 @@
   "41": "versoes-bu.js",
   "42": "useSelecaoEleicao",
   "43": "concentracao.js",
-  "44": "AnaliseView.vue",
+  "44": "CoberturaBlock.vue",
   "45": "status-secao.js",
   "46": "criarCache",
   "47": "benford.js",
-  "48": "BenfordPanel.vue",
+  "48": "StateBlock.vue",
   "49": "prepararFeatures",
   "50": "integration/comparacao-local.test.js",
   "51": "app.js",
@@ -77,5 +77,9 @@
   "75": "Arquitetura",
   "76": "vite.config.js",
   "77": "Blueprint — regras de domínio",
-  "80": "0007_mv_totais_area.js"
+  "78": "formatarNumero",
+  "79": "EstatisticaPanel.vue",
+  "80": "0007_mv_totais_area.js",
+  "81": "BiometriaPanel.vue",
+  "82": "motivoSecao"
 }
