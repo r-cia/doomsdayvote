@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793371408.5213401,
-    "seen": 1793371590.7602234,
-    "ast_hash": "2af5d2a07c187415537b5375a534ff26",
+    "mtime": 1793371717.2554984,
+    "seen": 1793371758.9624856,
+    "ast_hash": "f1d2cbd9217df89ca91e81b3862c760b",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {

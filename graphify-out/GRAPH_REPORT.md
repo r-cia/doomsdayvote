@@ -1,7 +1,7 @@
 # Graph Report - doomsdayvote  (2026-10-30)
 
 ## Corpus Check
-- 176 files · ~166,012 words
+- 176 files · ~166,002 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5dbc5b22`
+- Built from commit: `ca3cd348`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
