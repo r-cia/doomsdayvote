@@ -46,7 +46,10 @@
     "carregandoMalha": "Loading geographic map…",
     "acao": "Action",
     "resumoCobertura": "Coverage summary",
-    "votos": "votes"
+    "votos": "votes",
+    "camposAusentesNaoZero": "Missing fields are not treated as zero.",
+    "semLimiarAlertaDescritivo": "The tool does not set alert thresholds; results are descriptive.",
+    "naoConcluiFraude": "The tool does not conclude fraud; it flags deviations for review."
   },
   "filtros": {
     "cargo": "Office",
@@ -119,7 +122,8 @@
     "comparecimento": "Attendance",
     "benford": "Benford",
     "duplicacao": "Duplication",
-    "isolamento": "Isolation and LOF"
+    "isolamento": "Isolation and LOF",
+    "limitacaoAgregacaoPorSecao": "Descriptive statistics aggregated by section, with no individual-level linkage."
   },
   "analiseUI": {
     "consistencia": "Arithmetic consistency",
@@ -199,7 +203,8 @@
     "porRegiao": "By region",
     "regiao": "Region",
     "municipios": "Municipalities with highest non-enabled biometrics",
-    "secoes": "Sections with highest % non-enabled"
+    "secoes": "Sections with highest % non-enabled",
+    "limitacaoAgregacaoPorSecao": "Biometrics aggregated by section, with no individual-level linkage."
   },
   "encerramento": {
     "titulo": "Closing",

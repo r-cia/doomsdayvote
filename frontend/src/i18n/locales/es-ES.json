@@ -46,7 +46,10 @@
     "carregandoMalha": "Cargando el mapa geográfico…",
     "acao": "Acción",
     "resumoCobertura": "Resumen de cobertura",
-    "votos": "votos"
+    "votos": "votos",
+    "camposAusentesNaoZero": "Los campos ausentes no se tratan como cero.",
+    "semLimiarAlertaDescritivo": "La herramienta no define umbrales de alerta; los resultados son descriptivos.",
+    "naoConcluiFraude": "La herramienta no concluye que haya fraude; señala desviaciones para su revisión."
   },
   "filtros": {
     "cargo": "Cargo",
@@ -119,7 +122,8 @@
     "comparecimento": "Asistencia",
     "benford": "Benford",
     "duplicacao": "Duplicación",
-    "isolamento": "Aislamiento y LOF"
+    "isolamento": "Aislamiento y LOF",
+    "limitacaoAgregacaoPorSecao": "Estadísticas descriptivas agregadas por sección, sin vínculo individual."
   },
   "analiseUI": {
     "consistencia": "Consistencia aritmética",
@@ -199,7 +203,8 @@
     "porRegiao": "Por región",
     "regiao": "Región",
     "municipios": "Municipios con mayor biometría no habilitada",
-    "secoes": "Secciones con mayor % no habilitada"
+    "secoes": "Secciones con mayor % no habilitada",
+    "limitacaoAgregacaoPorSecao": "Biometría agregada por sección, sin vínculo individual."
   },
   "encerramento": {
     "titulo": "Cierre",

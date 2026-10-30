@@ -1,16 +1,16 @@
 # Graph Report - doomsdayvote  (2026-10-30)
 
 ## Corpus Check
-- 180 files · ~166,875 words
+- 180 files · ~167,167 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1176 nodes · 2229 edges · 83 communities (63 shown, 10 thin omitted)
+- 1177 nodes · 2230 edges · 73 communities (55 shown, 8 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 32 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4e062d58`
+- Built from commit: `8d7a718c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -29,13 +29,12 @@
 - BiometriaView.vue
 - EncerramentoView.vue
 - queries.js
-- agregacoes.js
+- PlacarRanking.vue
 - MapTable.vue
-- env.js
+- regressao-apuracao.test.js
 - Plano atual
-- loadWorkerEnv
 - importarArquivo
-- lib.test.js
+- colors.js
 - MapaView.vue
 - Plano de evolução da auditoria de votos
 - format.js
@@ -46,37 +45,30 @@
 - PainelView.vue
 - API de leitura
 - validacoes.js
-- formatarPercentual
+- formatarNumero
 - BiometriaUfPanel.vue
 - SectionsTable.vue
-- geo-carregar.js
+- env.js
 - status.js
 - UfPanel.vue
 - VotosPorEstadoPanel.vue
 - Product
 - AGENTS.md — SYSTEM DIRECTIVES
-- schema.test.js
 - versoes-bu.js
 - useSelecaoEleicao
 - concentracao.js
 - CoberturaBlock.vue
 - status-secao.js
-- criarCache
+- criarDb
 - benford.js
 - StateBlock.vue
-- prepararFeatures
-- integration/comparacao-local.test.js
+- lib.test.js
 - app.js
-- server.js
-- partido-cor.test.js
 - integration/corte.test.js
 - lote.test.js
 - RedisFalso
-- integration/estatisticas.test.js
-- versoes.test.js
 - 0002_resultado_votavel_colunas.js
-- criarDb
-- integration/status-secao.test.js
+- db-teste.js
 - buweb-2014.md
 - buweb-2018.md
 - ~~qT~~
@@ -84,10 +76,8 @@
 - frontend.md
 - Arquitetura
 - Blueprint — regras de domínio
-- formatarNumero
 - EstatisticaPanel.vue
 - BiometriaPanel.vue
-- motivoSecao
 
 ## God Nodes (most connected - your core abstractions)
 1. `registrarRotas()` - 41 edges
@@ -102,25 +92,25 @@
 10. `formatarPercentual()` - 19 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `contarCorte()` --calls--> `aplicarFiltroCorte()`  [EXTRACTED]
+  backend/tests/integration/corte.test.js → backend/src/modules/apuracao/corte.js
 - `main()` --indirect_call--> `registrarRotas()`  [INFERRED]
   backend/src/server.js → backend/src/routes/index.js
 - `candidatos` --calls--> `candidatosNominais()`  [EXTRACTED]
   frontend/src/App.vue → frontend/src/lib/agregacoes.js
-- `pontosPercentuais()` --calls--> `formatarNumero()`  [EXTRACTED]
-  frontend/src/components/ConcentracaoPanel.vue → frontend/src/lib/format.js
-- `main()` --calls--> `buildApp()`  [EXTRACTED]
-  backend/src/server.js → backend/src/app.js
-- `criarDependencias()` --calls--> `criarDb()`  [EXTRACTED]
-  backend/src/composition-root.js → backend/src/db/index.js
+- `diferenca()` --calls--> `formatarNumero()`  [EXTRACTED]
+  frontend/src/components/ConsistenciaPanel.vue → frontend/src/lib/format.js
+- `inteiro()` --calls--> `formatarNumero()`  [EXTRACTED]
+  frontend/src/components/EstatisticaPanel.vue → frontend/src/lib/format.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (83 total, 10 thin omitted)
+## Communities (73 total, 8 thin omitted)
 
 ### Community 0 - "routes/index.js"
 Cohesion: 0.05
-Nodes (69): AppError, CODIGOS, validar(), comparacaoLocal(), concentracao(), ausente(), consistenciaPorSecao(), REGRAS (+61 more)
+Nodes (68): AppError, CODIGOS, validar(), comparacaoLocal(), concentracao(), ausente(), consistenciaPorSecao(), REGRAS (+60 more)
 
 ### Community 1 - "ler-arquivo.js"
 Cohesion: 0.08
@@ -136,7 +126,7 @@ Nodes (38): chart.js, dependencies, chart.js, maplibre-gl, pinia, @tanstack/vue-
 
 ### Community 4 - "MapPanel.vue"
 Cohesion: 0.09
-Nodes (33): ajustarVisao(), aoClicar(), aoMover(), areaDaFeicao(), arquivoMalha(), atualizarFonte(), cacheMalhas, CAMPOS_MUNICIPIO (+25 more)
+Nodes (36): ajustarVisao(), aoClicar(), aoMover(), areaDaFeicao(), arquivoMalha(), atualizarFonte(), cacheMalhas, CAMPOS_MUNICIPIO (+28 more)
 
 ### Community 5 - "components.test.js"
 Cohesion: 0.08
@@ -144,7 +134,7 @@ Nodes (10): emit, municipioAtivo, props, UFS, candidatos, ControleFalso, eleicoe
 
 ### Community 6 - "SecaoView.vue"
 Cohesion: 0.09
-Nodes (19): boletim, consulta, dados, emit, fechar(), habilitado, id, lote (+11 more)
+Nodes (23): motivoSecao(), statusSecao(), boletim, consulta, dados, emit, fechar(), habilitado (+15 more)
 
 ### Community 7 - "persistir-bus.js"
 Cohesion: 0.17
@@ -174,33 +164,25 @@ Nodes (14): carregandoMunicipios, carregandoSecoes, carregandoUrnas, linhas, mun
 Cohesion: 0.12
 Nodes (26): useAnalise(), useAnomalias(), useComparacaoLocal(), useConcentracao(), useConsistencia(), useEleicoes(), useEstatisticas(), useMapa() (+18 more)
 
-### Community 14 - "agregacoes.js"
-Cohesion: 0.12
-Nodes (19): participacao, percentualDoCandidato, props, validos, votosDoCandidato, deltas, emit, escolher() (+11 more)
+### Community 14 - "PlacarRanking.vue"
+Cohesion: 0.14
+Nodes (15): participacao, percentualDoCandidato, props, validos, votosDoCandidato, candidatos, deltas, emit (+7 more)
 
 ### Community 15 - "MapTable.vue"
 Cohesion: 0.12
 Nodes (16): linhasTooltip(), aoClicarLinha(), emit, linhas, linhasBase, linhasPagina, nomeCandidato(), ordenacao (+8 more)
 
-### Community 16 - "env.js"
-Cohesion: 0.24
-Nodes (9): apiSchema, booleanEnv, carregar(), loadMigrateEnv(), logLevel, migrateSchema, nodeEnv, workerSchema (+1 more)
-
 ### Community 17 - "Plano atual"
 Cohesion: 0.40
 Nodes (4): Alterações, Objetivo, Plano atual, Validação
 
-### Community 18 - "loadWorkerEnv"
-Cohesion: 0.18
-Nodes (8): loadWorkerEnv(), db, env, main(), cores, db, env, ambienteValido
-
 ### Community 19 - "importarArquivo"
-Cohesion: 0.32
-Nodes (9): escaparCopy(), importarArquivo(), armazenarOriginal(), calcularSha256(), concluirLote(), falharLote(), iniciarLote(), db (+1 more)
+Cohesion: 0.22
+Nodes (13): escaparCopy(), importarArquivo(), armazenarOriginal(), calcularSha256(), concluirLote(), falharLote(), iniciarLote(), criarValidador() (+5 more)
 
-### Community 20 - "lib.test.js"
+### Community 20 - "colors.js"
 Cohesion: 0.24
-Nodes (15): legenda, clarear(), COR_NEUTRA, corDaArea(), corDoLider(), corPartido(), corPercentual(), corTextoContraste() (+7 more)
+Nodes (13): legenda, clarear(), COR_SEM_DADOS, corDaArea(), corDoLider(), corPartido(), corPercentual(), corTextoContraste() (+5 more)
 
 ### Community 21 - "MapaView.vue"
 Cohesion: 0.12
@@ -215,12 +197,12 @@ Cohesion: 0.18
 Nodes (14): recebimento(), comparacao, props, versoes, deInputSaoPaulo(), formatadorOffset, formatadorPartes, formatarCorte() (+6 more)
 
 ### Community 24 - "ConsistenciaPanel.vue"
-Cohesion: 0.17
-Nodes (9): cobertura, emit, itens, props, resumo, rotuloRegra, router, store (+1 more)
+Cohesion: 0.15
+Nodes (10): cobertura, diferenca(), emit, itens, props, resumo, rotuloRegra, router (+2 more)
 
 ### Community 25 - "fixtures.js"
-Cohesion: 0.23
-Nodes (9): carimbo(), carregarPasta(), gerarRelatorioLote(), FIXTURES, LINHAS_POR_FIXTURE, backendDir, db, execFileAsync (+1 more)
+Cohesion: 0.21
+Nodes (10): carimbo(), carregarPasta(), gerarRelatorioLote(), FIXTURES, LINHAS_POR_FIXTURE, backendDir, db, execFileAsync (+2 more)
 
 ### Community 26 - "App.vue"
 Cohesion: 0.20
@@ -242,24 +224,24 @@ Nodes (8): candidatos, {
 }, resumoQuery, definirLocale(), i18n, SUPORTADOS, queryClient, router
 
 ### Community 27 - "caminhoFixture"
-Cohesion: 0.24
-Nodes (7): caminhoFixture(), app, db, importar(), db, importar(), importar()
+Cohesion: 0.14
+Nodes (11): caminhoFixture(), app, db, importar(), app, db, importar(), db (+3 more)
 
 ### Community 28 - "PainelView.vue"
-Cohesion: 0.15
-Nodes (14): candidatos, votosUf, candidatosNominais(), candidatos, analiseQuery, avisos, candidatos, candidatoSelecionado (+6 more)
+Cohesion: 0.16
+Nodes (13): votosUf, candidatosNominais(), candidatos, analiseQuery, avisos, candidatos, candidatoSelecionado, mapaUfQuery (+5 more)
 
 ### Community 29 - "API de leitura"
 Cohesion: 0.13
 Nodes (14): API de leitura, `GET /api/analysis`, `GET /api/anomalies`, `GET /api/comparacao-local`, `GET /api/concentracao`, `GET /api/consistencia`, `GET /api/elections`, GET /api/estatisticas (+6 more)
 
 ### Community 30 - "validacoes.js"
-Cohesion: 0.18
-Nodes (16): TIPOS, alerta(), cargoEmEscopo(), CARGOS_EM_ESCOPO, CHAVE_NATURAL, chaveBu(), chaveNatural(), criarValidador() (+8 more)
+Cohesion: 0.19
+Nodes (15): TIPOS, alerta(), cargoEmEscopo(), CARGOS_EM_ESCOPO, CHAVE_NATURAL, chaveBu(), chaveNatural(), encodingSuspeito() (+7 more)
 
-### Community 31 - "formatarPercentual"
-Cohesion: 0.20
-Nodes (10): percentual(), cobertura, emit, percentual(), percentualRazao(), pontosPercentuais(), props, topMargem (+2 more)
+### Community 31 - "formatarNumero"
+Cohesion: 0.12
+Nodes (17): cobertura, emit, grupos, percentual(), pontosPercentuais(), props, { t }, cobertura (+9 more)
 
 ### Community 32 - "BiometriaUfPanel.vue"
 Cohesion: 0.17
@@ -269,17 +251,17 @@ Nodes (10): agregado, agrupar, agruparRegiao, base, emit, linhas, ordenacao, pro
 Cohesion: 0.18
 Nodes (11): contexto, emit, irPara(), irParaUltima(), itens, pagina, props, statusDisponiveis (+3 more)
 
-### Community 34 - "geo-carregar.js"
-Cohesion: 0.17
-Nodes (11): correspondencia, db, env, geoDir, ibge, linhas, malhas, manifesto (+3 more)
+### Community 34 - "env.js"
+Cohesion: 0.06
+Nodes (31): DIRETORIO_MIGRACOES, migracoesPendentes(), apiSchema, booleanEnv, carregar(), loadApiEnv(), loadMigrateEnv(), logLevel (+23 more)
 
 ### Community 35 - "status.js"
-Cohesion: 0.18
-Nodes (10): lista, props, avisoInfo(), AVISOS, MOTIVOS, opcoesStatus(), STATUS_KEYS, STATUS_SECAO (+2 more)
+Cohesion: 0.22
+Nodes (8): lista, props, avisoInfo(), AVISOS, MOTIVOS, opcoesStatus(), STATUS_KEYS, STATUS_SECAO
 
 ### Community 36 - "UfPanel.vue"
-Cohesion: 0.15
-Nodes (12): indiceAreas, agrupar, grupos, linhas, ordenacao, partidoPorNumero, props, regiaoDe() (+4 more)
+Cohesion: 0.20
+Nodes (8): agrupar, grupos, linhas, ordenacao, partidoPorNumero, props, regiaoDe(), REGIOES
 
 ### Community 37 - "VotosPorEstadoPanel.vue"
 Cohesion: 0.21
@@ -292,10 +274,6 @@ Nodes (11): Accessibility & Inclusion, Brand Commitments, Capabilities and Const
 ### Community 39 - "AGENTS.md — SYSTEM DIRECTIVES"
 Cohesion: 0.18
 Nodes (10): 0. INITIALIZATION, 1. COMMUNICATION & OUTPUT FORMAT, 2. WORKFLOW & PROCESS CONTROL, 3. FILE MODIFICATION & SHELL RESTRICTIONS, 4. CODE STYLE & COMMENTING RULES, 5. SINGLE-SOURCE-OF-TRUTH DOCUMENTATION, 6. FRONTEND DEVELOPMENT, 7. DATABASE INTEGRITY & SAFETY (+2 more)
-
-### Community 40 - "schema.test.js"
-Cohesion: 0.29
-Nodes (4): DIRETORIO_MIGRACOES, db, migrator, TABELAS
 
 ### Community 41 - "versoes-bu.js"
 Cohesion: 0.36
@@ -317,9 +295,9 @@ Nodes (6): coberturaEfetiva, entradas, limitacoesEfetivas, props, grupos, props
 Cohesion: 0.31
 Nodes (6): classificarStatusSecao(), diaEmSaoPaulo(), horarios(), iso(), resultado(), STATUS_POR_TIPO_URNA
 
-### Community 46 - "criarCache"
-Cohesion: 0.25
-Nodes (3): criarCache(), main(), params
+### Community 46 - "criarDb"
+Cohesion: 0.13
+Nodes (13): criarDependencias(), criarDb(), loadWorkerEnv(), criarCache(), criarLogger(), main(), db, env (+5 more)
 
 ### Community 47 - "benford.js"
 Cohesion: 0.39
@@ -329,41 +307,25 @@ Nodes (6): calcularBenford(), classificarMad(), DIGITOS, ESPERADO_BENFORD, LIMIA
 Cohesion: 0.11
 Nodes (16): emit, candidatos, mad(), props, ativo, candidatos, emit, formatarMad() (+8 more)
 
-### Community 49 - "prepararFeatures"
-Cohesion: 0.36
-Nodes (9): codigoDaFeicao(), nomeDaFeicao(), normalizarUf(), prepararFeatures(), primeiroValor(), ufDaFeicao(), areaPorCodigo(), codigoMunicipioCurto() (+1 more)
-
-### Community 50 - "integration/comparacao-local.test.js"
-Cohesion: 0.50
-Nodes (3): app, db, importar()
+### Community 49 - "lib.test.js"
+Cohesion: 0.20
+Nodes (17): indiceAreas, nomeDaFeicao(), prepararFeatures(), areaPorCodigo(), CATEGORIAS_VALIDAS, chaveArea(), codigoMunicipioCurto(), indexarAreas() (+9 more)
 
 ### Community 51 - "app.js"
-Cohesion: 0.18
-Nodes (10): buildApp(), detalhesFastify(), detalhesZod(), isProduction(), app, db, importar(), app (+2 more)
+Cohesion: 0.14
+Nodes (13): buildApp(), detalhesFastify(), detalhesZod(), isProduction(), app, db, importar(), app (+5 more)
 
-### Community 52 - "server.js"
-Cohesion: 0.26
-Nodes (8): criarDependencias(), migracoesPendentes(), loadApiEnv(), criarLogger(), main(), db, diretorio, migrator
-
-### Community 53 - "partido-cor.test.js"
-Cohesion: 0.32
-Nodes (6): ambiente(), backendDir, cores, db, execFileAsync, semear()
+### Community 54 - "integration/corte.test.js"
+Cohesion: 0.29
+Nodes (3): contarCorte(), db, importar()
 
 ### Community 55 - "lote.test.js"
 Cohesion: 0.33
 Nodes (4): copiaAlterada(), db, fixture, juntar()
 
-### Community 58 - "integration/estatisticas.test.js"
-Cohesion: 0.50
-Nodes (3): app, db, importar()
-
-### Community 59 - "versoes.test.js"
-Cohesion: 0.50
-Nodes (3): app, db, importar()
-
-### Community 61 - "criarDb"
-Cohesion: 0.18
-Nodes (8): criarDb(), contar(), limparBanco(), db, db, fixture, db, db
+### Community 61 - "db-teste.js"
+Cohesion: 0.15
+Nodes (11): contar(), limparBanco(), db, fixture, ambiente(), backendDir, cores, db (+3 more)
 
 ### Community 75 - "Arquitetura"
 Cohesion: 0.40
@@ -373,37 +335,33 @@ Nodes (4): Arquitetura, Backend, Fluxo de análise, Frontend
 Cohesion: 0.40
 Nodes (4): Análise e cobertura, Blueprint — regras de domínio, Endpoints de análise, Limitações conhecidas
 
-### Community 78 - "formatarNumero"
-Cohesion: 0.18
-Nodes (9): cobertura, emit, grupos, pontosPercentuais(), props, { t }, diferenca(), inteiro() (+1 more)
-
 ### Community 79 - "EstatisticaPanel.vue"
-Cohesion: 0.22
-Nodes (6): blocos, escopo, estatisticasQuery, { locale }, props, temDoisTurnos
+Cohesion: 0.20
+Nodes (7): blocos, escopo, estatisticasQuery, inteiro(), { locale }, props, temDoisTurnos
 
 ### Community 81 - "BiometriaPanel.vue"
-Cohesion: 0.40
-Nodes (4): biometria, fatias, participacao, props
+Cohesion: 0.33
+Nodes (5): biometria, fatias, participacao, props, { t }
 
 ## Knowledge Gaps
-- **445 isolated node(s):** `name`, `version`, `private`, `type`, `node` (+440 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 592 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **446 isolated node(s):** `name`, `version`, `private`, `type`, `node` (+441 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 593 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `formatarNumero()` connect `formatarNumero` to `BiometriaUfPanel.vue`, `SectionsTable.vue`, `MapPanel.vue`, `UfPanel.vue`, `VotosPorEstadoPanel.vue`, `SecaoView.vue`, `PlotDia.vue`, `BiometriaView.vue`, `EncerramentoView.vue`, `agregacoes.js`, `EstatisticaPanel.vue`, `StateBlock.vue`, `BiometriaPanel.vue`, `MapTable.vue`, `lib.test.js`, `format.js`, `ConsistenciaPanel.vue`, `formatarPercentual`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `registrarRotas()` connect `routes/index.js` to `versoes-bu.js`, `versoes.test.js`, `status-secao.js`, `integration/comparacao-local.test.js`, `app.js`, `server.js`, `integration/estatisticas.test.js`, `caminhoFixture`?**
+- **Why does `formatarNumero()` connect `formatarNumero` to `BiometriaUfPanel.vue`, `SectionsTable.vue`, `MapPanel.vue`, `UfPanel.vue`, `VotosPorEstadoPanel.vue`, `SecaoView.vue`, `PlotDia.vue`, `BiometriaView.vue`, `EncerramentoView.vue`, `PlacarRanking.vue`, `EstatisticaPanel.vue`, `StateBlock.vue`, `BiometriaPanel.vue`, `MapTable.vue`, `lib.test.js`, `format.js`, `ConsistenciaPanel.vue`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
-- **Why does `criarDb()` connect `criarDb` to `geo-carregar.js`, `versoes.test.js`, `criarCache`, `loadWorkerEnv`, `integration/comparacao-local.test.js`, `server.js`, `app.js`, `integration/corte.test.js`, `lote.test.js`, `partido-cor.test.js`, `fixtures.js`, `integration/estatisticas.test.js`, `caminhoFixture`, `importarArquivo`, `integration/status-secao.test.js`?**
+- **Why does `registrarRotas()` connect `routes/index.js` to `env.js`, `versoes-bu.js`, `status-secao.js`, `app.js`, `importarArquivo`, `caminhoFixture`?**
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+- **Why does `criarDb()` connect `criarDb` to `env.js`, `regressao-apuracao.test.js`, `app.js`, `importarArquivo`, `integration/corte.test.js`, `lote.test.js`, `fixtures.js`, `caminhoFixture`, `db-teste.js`?**
   _High betweenness centrality (0.013) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `registrarRotas()` (e.g. with `main()` and `api.test.js`) actually correct?**
   _`registrarRotas()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _445 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _446 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `routes/index.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.05307017543859649 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.053975363941769314 - nodes in this community are weakly interconnected._
 - **Should `ler-arquivo.js` be split into smaller, more focused modules?**
   _Cohesion score 0.08013640238704177 - nodes in this community are weakly interconnected._
