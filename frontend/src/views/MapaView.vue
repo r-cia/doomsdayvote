@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import AvisoBanner from '../components/AvisoBanner.vue'
 import MapPanel from '../components/MapPanel.vue'
 import SectionsTable from '../components/SectionsTable.vue'
+import SecaoView from '../views/SecaoView.vue'
 import UfPanel from '../components/UfPanel.vue'
 import { useMapa, useResumo, useSecoes } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
@@ -90,18 +91,10 @@ function verMunicipios(uf) {
   document.querySelector('.mapa-card')?.scrollIntoView({ block: 'start' })
 }
 
+const secaoModalId = ref(null)
+
 function abrirSecao(item) {
-  router.push({
-    name: 'secao',
-    params: { id: item.id },
-    query: {
-      election_id: store.electionId,
-      cargo: store.cargo,
-      as_of: store.asOf ?? undefined,
-      uf: store.uf ?? undefined,
-      municipio: store.municipio ?? undefined,
-    },
-  })
+  secaoModalId.value = item.id
 }
 
 function atualizarMapa() {
@@ -168,5 +161,17 @@ function atualizarSecoes() {
     @update:municipio-nome="store.definirMunicipioSecao"
     @select="abrirSecao"
     @retry="atualizarSecoes"
+  />
+
+  <SecaoView
+    v-if="secaoModalId"
+    :modal="true"
+    :id-prop="secaoModalId"
+    :election-id-prop="store.electionId"
+    :cargo-prop="store.cargo"
+    :as-of-prop="store.asOf ?? ''"
+    :uf-prop="store.uf ?? ''"
+    :municipio-prop="store.municipio ?? ''"
+    @close="secaoModalId = null"
   />
 </template>

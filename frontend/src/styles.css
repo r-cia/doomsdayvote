@@ -1755,6 +1755,34 @@ tr.linha--ativa th {
   z-index: 1;
   min-height: calc(100vh - 46px);
   padding: 20px 16px 48px;
+
+.secao-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto;
+}
+
+.secao-modal {
+  background: var(--panel);
+  border-radius: var(--raio);
+  max-width: 960px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.secao-modal__fechar {
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px 10px;
+}
   background: var(--paper);
   color: var(--paper-ink);
   color-scheme: light;

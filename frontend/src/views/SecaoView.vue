@@ -2,6 +2,18 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StateBlock from '../components/StateBlock.vue'
+
+const props = defineProps({
+  modal: { type: Boolean, default: false },
+  idProp: { type: String, default: '' },
+  electionIdProp: { type: String, default: '' },
+  cargoProp: { type: [String, Number], default: '' },
+  asOfProp: { type: String, default: '' },
+  ufProp: { type: String, default: '' },
+  municipioProp: { type: [String, Number], default: '' },
+})
+
+const emit = defineEmits(['close'])
 import { useSecao } from '../composables/queries'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import {
@@ -19,13 +31,21 @@ const store = useFiltersStore()
 const rota = useRoute()
 const router = useRouter()
 
-if (rota.query.election_id) store.electionId = String(rota.query.election_id)
-if (rota.query.cargo) store.cargo = Number(rota.query.cargo)
-if (rota.query.as_of) store.asOfInput = paraInputSaoPaulo(String(rota.query.as_of))
-if (rota.query.uf) store.uf = String(rota.query.uf)
-if (rota.query.municipio) store.municipio = Number(rota.query.municipio)
+if (props.modal) {
+  if (props.electionIdProp) store.electionId = String(props.electionIdProp)
+  if (props.cargoProp) store.cargo = Number(props.cargoProp)
+  if (props.asOfProp) store.asOfInput = paraInputSaoPaulo(String(props.asOfProp))
+  if (props.ufProp) store.uf = String(props.ufProp)
+  if (props.municipioProp) store.municipio = Number(props.municipioProp)
+} else {
+  if (rota.query.election_id) store.electionId = String(rota.query.election_id)
+  if (rota.query.cargo) store.cargo = Number(rota.query.cargo)
+  if (rota.query.as_of) store.asOfInput = paraInputSaoPaulo(String(rota.query.as_of))
+  if (rota.query.uf) store.uf = String(rota.query.uf)
+  if (rota.query.municipio) store.municipio = Number(rota.query.municipio)
+}
 
-const id = computed(() => String(rota.params.id))
+const id = computed(() => (props.modal ? String(props.idProp) : String(rota.params.id)))
 const consulta = useSecao(id)
 const dados = computed(() => consulta.data.value ?? null)
 const secao = computed(() => dados.value?.secao ?? null)
@@ -80,19 +100,36 @@ function recebimento() {
   return formatarDataHora(boletim.value.dt_bu_recebido_ts)
 }
 
-function voltar() {
-  router.push({ name: 'painel' })
+function fechar() {
+  if (props.modal) emit('close')
+  else router.push({ name: 'painel' })
 }
+function voltar() { fechar() }
 </script>
 
 <template>
-  <div class="page page--extrato">
-    <div class="extrato-topo">
-      <button type="button" class="button button--ghost" @click="voltar">
-        ← Voltar ao painel
-      </button>
-      <p>Extrato de teletipo · boletim de urna</p>
-    </div>
+  <div :class="modal ? 'secao-modal__overlay' : 'page page--extrato'" @click.self="modal && fechar()">
+    <div :class="modal ? 'secao-modal' : ''">
+      <div class="extrato-topo">
+        <button
+          v-if="!modal"
+          type="button"
+          class="button button--ghost"
+          @click="voltar"
+        >
+          ← Voltar ao painel
+        </button>
+        <button
+          v-else
+          type="button"
+          class="button button--ghost secao-modal__fechar"
+          aria-label="Fechar"
+          @click="fechar"
+        >
+          ✕
+        </button>
+        <p>Extrato de teletipo · boletim de urna</p>
+      </div>
 
     <StateBlock
       v-if="!habilitado"
@@ -249,5 +286,6 @@ function voltar() {
         </div>
       </section>
     </template>
+    </div>
   </div>
 </template>

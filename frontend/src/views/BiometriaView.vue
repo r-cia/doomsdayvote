@@ -1,13 +1,13 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import SecaoView from './SecaoView.vue'
 import { api } from '../api/client'
 import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
 
-const router = useRouter()
+const secaoModalId = ref(null)
 
 const { store } = useSelecaoEleicao()
 const analiseQuery = useAnalise()
@@ -74,17 +74,7 @@ function nomeMunicipio(m) {
 }
 
 function abrirSecao(item) {
-  router.push({
-    name: 'secao',
-    params: { id: item.id },
-    query: {
-      election_id: store.electionId,
-      cargo: store.cargo,
-      as_of: store.asOf ?? undefined,
-      uf: ufSelecionada.value ?? undefined,
-      municipio: municipioSelecionado.value ?? undefined,
-    },
-  })
+  secaoModalId.value = item.id
 }
 </script>
 
@@ -184,4 +174,16 @@ function abrirSecao(item) {
       </div>
     </div>
   </div>
+
+  <SecaoView
+    v-if="secaoModalId"
+    :modal="true"
+    :id-prop="secaoModalId"
+    :election-id-prop="store.electionId"
+    :cargo-prop="store.cargo"
+    :as-of-prop="store.asOf ?? ''"
+    :uf-prop="ufSelecionada ?? ''"
+    :municipio-prop="municipioSelecionado ?? ''"
+    @close="secaoModalId = null"
+  />
 </template>
