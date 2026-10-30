@@ -53,6 +53,6 @@ Corrigir os estados de carregamento dos gráficos e painéis, fazer os textos e 
 - Chaves de metadados/avisos ignoram paginação e filtros irrelevantes; TTL de 24 horas é invalidado por versão após carga.
 - Falhas do Redis deduplicam consultas simultâneas localmente.
 - `mv_secao_candidato_final` atende à base seção-candidato no corte final e é atualizada após a carga.
-- Pool padrão reduzido de 40 para 12; `DB_POOL_MAX` (máximo 32) e `DB_WORK_MEM_MB` (máximo 64) são configuráveis. `maintenance_work_mem` deixa de ser elevado por conexão.
+- Pool padrão reduzido de 40 para 20; `DB_POOL_MAX` (máximo 32) e `DB_WORK_MEM_MB` (máximo 64) são configuráveis. `maintenance_work_mem` deixa de ser elevado por conexão.
 - A migração `0008_mv_secao_candidato_final.js` foi criada, mas não aplicada.
 - `graphify update .` executado. Testes/build não executados; configuração do serviço Postgres para impor o teto global de 24 GB não existe neste repositório.
