@@ -139,7 +139,7 @@ function aoClicarLinha(linha) {
     </div>
 
     <p v-if="linhas.length === 0" class="vazio">
-      Nenhuma área com dados para os filtros atuais.
+      {{ $t('comum.semDados') }}
     </p>
 
     <div v-else class="tabela-scroll">
