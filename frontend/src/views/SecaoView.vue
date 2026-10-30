@@ -135,7 +135,7 @@ function voltar() { fechar() }
     <StateBlock
       v-if="!habilitado"
       estado="vazio"
-      titulo="Filtros não informados"
+      :titulo="$t('comum.filtrosNaoInformados') || 'Filtros não informados'"
       descricao="Volte ao painel, selecione uma eleição e um cargo e abra o detalhe pela tabela de seções."
       acao="Ir ao painel"
       @acao="voltar"
@@ -143,14 +143,14 @@ function voltar() { fechar() }
     <StateBlock
       v-else-if="consulta.isLoading.value"
       estado="carregando"
-      titulo="Carregando detalhe da seção"
+      :titulo="$t('comum.carregando')"
     />
     <StateBlock
       v-else-if="consulta.error.value"
       estado="erro"
-      titulo="Não foi possível carregar a seção"
+      :titulo="$t('comum.erro')"
       :descricao="consulta.error.value.message"
-      acao="Voltar ao painel"
+      :acao="$t('comum.voltar')"
       @acao="voltar"
     />
 
