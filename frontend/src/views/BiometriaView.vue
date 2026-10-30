@@ -1,10 +1,13 @@
 <script setup>
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '../api/client'
 import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
+
+const router = useRouter()
 
 const { store } = useSelecaoEleicao()
 const analiseQuery = useAnalise()
@@ -68,6 +71,20 @@ watch(ordenarSecoes, () => {
 
 function nomeMunicipio(m) {
   return m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
+}
+
+function abrirSecao(item) {
+  router.push({
+    name: 'secao',
+    params: { id: item.id },
+    query: {
+      election_id: store.electionId,
+      cargo: store.cargo,
+      as_of: store.asOf ?? undefined,
+      uf: ufSelecionada.value ?? undefined,
+      municipio: municipioSelecionado.value ?? undefined,
+    },
+  })
 }
 </script>
 
@@ -143,6 +160,7 @@ function nomeMunicipio(m) {
               <th scope="col">Seção</th>
               <th scope="col" class="num">Não habilitada</th>
               <th scope="col" class="num">%</th>
+              <th scope="col"><span class="sr-only">Detalhe</span></th>
             </tr>
           </thead>
           <tbody>
@@ -151,6 +169,15 @@ function nomeMunicipio(m) {
               <td>{{ s.nr_secao }}</td>
               <td class="num">{{ formatarNumero(s.qt_nao_habilitada) }}</td>
               <td class="num">{{ formatarPercentual(s.percentual_nao_habilitada) }}</td>
+              <td>
+                <button
+                  type="button"
+                  class="button button--ghost button--compacto"
+                  @click="abrirSecao(s)"
+                >
+                  Detalhe
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
