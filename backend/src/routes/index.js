@@ -28,6 +28,23 @@ const baseSchema = z.object({
   ...corteSchema,
 });
 
+const TTL_CACHE_ESTATICO = 86400;
+
+function escopoCache(query) {
+  return {
+    election_id: query.election_id,
+    cargo: query.cargo,
+    uf: query.uf,
+    municipio: query.municipio,
+    as_of: query.as_of,
+    as_of_date: query.as_of_date,
+  };
+}
+
+function cacheDeCorte(cache, recurso, query, calcular) {
+  return cache.obter(recurso, escopoCache(query), TTL_CACHE_ESTATICO, calcular).then(({ valor }) => valor);
+}
+
 function escopoDe(query) {
   return { sgUf: query.uf, cdMunicipio: query.municipio };
 }
@@ -70,6 +87,40 @@ function itemSecao(linha, corte) {
     motivo: status.motivo,
     ...status.horarios,
   };
+}
+
+function statusSql(corte) {
+  let porCorte = sql`'bu_recebido'`;
+  if (corte.tipo === 'recebimento_intradiario') {
+    porCorte = sql`case
+      when coalesce(bv.precisao_dt_bu_recebido, 'AUSENTE') = 'DATA_HORA' then
+        case
+          when bv.dt_bu_recebido_ts <= ${corte.instante} then 'bu_recebido'
+          when bv.dt_encerramento <= ${corte.instante} or bv.dt_emissao_bu <= ${corte.instante} then 'encerrada_aguardando_bu'
+          else 'sem_bu'
+        end
+      else 'desconhecido'
+    end`;
+  } else if (corte.tipo === 'recebimento_diario') {
+    porCorte = sql`case
+      when (bv.precisao_dt_bu_recebido = 'DATA_HORA' and (bv.dt_bu_recebido_ts at time zone 'America/Sao_Paulo')::date <= ${corte.data})
+        or (bv.precisao_dt_bu_recebido = 'DATA' and bv.dt_bu_recebido_data <= ${corte.data}) then 'bu_recebido'
+      when (bv.dt_encerramento at time zone 'America/Sao_Paulo')::date <= ${corte.data}
+        or (bv.dt_emissao_bu at time zone 'America/Sao_Paulo')::date <= ${corte.data} then 'encerrada_aguardando_bu'
+      when coalesce(bv.precisao_dt_bu_recebido, 'AUSENTE') = 'AUSENTE' then 'desconhecido'
+      else 'sem_bu'
+    end`;
+  }
+
+  return sql`case
+    when bv.id is null then 'sem_bu'
+    when bv.cd_tipo_urna = 2 then 'nao_apurada'
+    when bv.cd_tipo_urna = 3 then 'anulada_apurada_separado'
+    when bv.cd_tipo_urna = 4 then 'anulada'
+    when bv.cd_tipo_urna = 5 then 'nao_instalada'
+    when bv.cd_tipo_urna is null or bv.cd_tipo_urna not between 1 and 5 then 'desconhecido'
+    else ${porCorte}
+  end`;
 }
 
 export async function registrarRotas(app) {
@@ -141,8 +192,8 @@ export async function registrarRotas(app) {
             })
         : somarMetricasSecao(db, escopo),
       contarSecoesComBu(db, escopo),
-      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
-      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
+      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
     ]);
 
     return {
@@ -274,8 +325,8 @@ export async function registrarRotas(app) {
       composicaoBiometria(db, escopo),
       biometriaPorUf(db, escopo),
       benfordPorCandidato(db, escopo),
-      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
-      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
+      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
     ]);
 
     const limitacoesAnalise = [
@@ -332,8 +383,8 @@ export async function registrarRotas(app) {
     const [linhas, duplicacao, metadados, avisos] = await Promise.all([
       baseSecaoCandidato(db, escopo),
       duplicacaoPorAssinatura(db, escopo),
-      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
-      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
+      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
     ]);
 
     const benford = benfordDosNiveis(linhas);
@@ -527,8 +578,8 @@ export async function registrarRotas(app) {
             candidatos,
           })
         : Promise.resolve(null),
-      cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
-      cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
+      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
     ]);
 
     const anterioresPorChave = new Map();
@@ -965,16 +1016,12 @@ export async function registrarRotas(app) {
     }
 
     const [metadados, avisos] = await Promise.all([
-      cache
-        .obter('metadados', query, 300, () =>
-          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
-      cache
-        .obter('avisos', query, 300, () =>
-          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () =>
+        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
+      cacheDeCorte(cache, 'avisos', query, () =>
+        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
     ]);
 
     const inicio = (query.page - 1) * pageSize;
@@ -1037,7 +1084,7 @@ export async function registrarRotas(app) {
         'bv.dt_emissao_bu',
         'bv.dt_bu_recebido_ts',
         'bv.dt_bu_recebido_data',
-        ...(query.status ? [] : [sql`count(*) over()`.as('total_count')]),
+        sql`count(*) over()`.as('total_count'),
       ])
       .where('s.ano_eleicao', '=', eleicao.ano_eleicao)
       .where('s.cd_pleito', '=', eleicao.cd_pleito)
@@ -1063,38 +1110,26 @@ export async function registrarRotas(app) {
       )`);
     }
 
-    if (!query.status) {
-      consulta = consulta
-        .limit(pageSize)
-        .offset((query.page - 1) * pageSize);
-    }
+    if (query.status) consulta = consulta.where(sql`${statusSql(corte)} = ${query.status}`);
+    const consultaTotal = query.status
+      ? consulta.clearSelect().clearOrderBy().select(sql`count(*)::bigint`.as('total_count'))
+      : null;
+    consulta = consulta.limit(pageSize).offset((query.page - 1) * pageSize);
 
     const linhas = await consulta.execute();
-    let itens;
-    let total;
-    if (query.status) {
-      const todos = linhas
-        .map((linha) => itemSecao(linha, corte))
-        .filter((item) => item.status === query.status);
-      total = todos.length;
-      const inicio = (query.page - 1) * pageSize;
-      itens = todos.slice(inicio, inicio + pageSize);
-    } else {
-      total = Number(linhas[0]?.total_count ?? 0);
-      itens = linhas.map((linha) => itemSecao(linha, corte));
-    }
+    const total = Number(
+      linhas[0]?.total_count ??
+        (consultaTotal ? (await consultaTotal.executeTakeFirstOrThrow()).total_count : 0),
+    );
+    const itens = linhas.map((linha) => itemSecao(linha, corte));
 
     const [metadados, avisos] = await Promise.all([
-      cache
-        .obter('metadados', query, 300, () =>
-          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
-      cache
-        .obter('avisos', query, 300, () =>
-          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () =>
+        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
+      cacheDeCorte(cache, 'avisos', query, () =>
+        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
     ]);
 
     return {
@@ -1307,16 +1342,12 @@ export async function registrarRotas(app) {
     });
 
     const [metadados, avisos] = await Promise.all([
-      cache
-        .obter('metadados', query, 300, () =>
-          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
-      cache
-        .obter('avisos', query, 300, () =>
-          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () =>
+        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
+      cacheDeCorte(cache, 'avisos', query, () =>
+        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
     ]);
 
     const grupos = resultado.grupos ?? [];
@@ -1368,16 +1399,12 @@ export async function registrarRotas(app) {
     });
 
     const [metadados, avisos] = await Promise.all([
-      cache
-        .obter('metadados', query, 300, () =>
-          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
-      cache
-        .obter('avisos', query, 300, () =>
-          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-        )
-        .then((r) => r.valor),
+      cacheDeCorte(cache, 'metadados', query, () =>
+        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
+      cacheDeCorte(cache, 'avisos', query, () =>
+        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+      ),
     ]);
 
     const topShare = resultado.top_share ?? [];

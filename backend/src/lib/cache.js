@@ -64,7 +64,25 @@ export function criarCache({ url, logger, cliente: fornecido } = {}) {
         return { valor: JSON.parse(bruto), cache: 'hit' };
       }
     } catch {
-      const valor = await fn();
+      const chaveLocal = `off:${rota}:${hash(params)}`;
+      const pendente = emVoo.get(chaveLocal);
+      if (pendente) {
+        const valor = await pendente;
+        logger?.info(
+          { rota, cache: 'off', duracao_ms: Number((performance.now() - inicio).toFixed(2)), dedup: true },
+          'cache_obter',
+        );
+        return { valor, cache: 'off' };
+      }
+
+      const execucao = Promise.resolve().then(fn);
+      emVoo.set(chaveLocal, execucao);
+      let valor;
+      try {
+        valor = await execucao;
+      } finally {
+        if (emVoo.get(chaveLocal) === execucao) emVoo.delete(chaveLocal);
+      }
       const duracao = Number((performance.now() - inicio).toFixed(2));
       logger?.info({ rota, cache: 'off', duracao_ms: duracao }, 'cache_obter');
       return { valor, cache: 'off' };
