@@ -8,6 +8,7 @@ import {
   ref,
   watch,
 } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   LngLatBounds,
   Map as MapaLibre,
@@ -50,6 +51,8 @@ const emit = defineEmits([
   'select',
   'retry',
 ])
+
+const { t } = useI18n()
 
 const container = ref(null)
 const mapa = ref(null)
@@ -428,7 +431,7 @@ function areaDaFeicao(feature) {
 function linhasTooltip(area, feature) {
   const linhas = []
   if (!area) {
-    linhas.push({ rotulo: 'Situação', valor: 'Sem dados no corte atual' })
+    linhas.push({ rotulo: 'Situação', valor: t('comum.semDados') })
     return linhas
   }
   linhas.push({
@@ -446,7 +449,7 @@ function linhasTooltip(area, feature) {
       valor: `${candidato?.nm_votavel ?? `Candidato ${area.lider.nr_votavel}`} (${candidato?.sg_partido ?? '—'}) · ${formatarPercentual(area.lider.percentual)}`,
     })
   } else {
-    linhas.push({ rotulo: 'Líder', valor: 'Sem líder identificado' })
+    linhas.push({ rotulo: 'Líder', valor: t('comum.semDados') })
   }
   const candidatoArea = candidatoDaArea(area, props.candidato)
   if (props.candidato && candidatoArea) {
@@ -536,7 +539,7 @@ const legenda = computed(() => {
   for (const area of props.areas) {
     if (!area.lider) continue
     const candidato = partidoPorNumero.value.get(area.lider.nr_votavel)
-    const sigla = candidato?.sg_partido ?? 'Sem partido'
+    const sigla = candidato?.sg_partido ?? t('comum.semPartido') || 'Sem partido'
     const atual = porPartido.get(sigla) ?? {
       sigla,
       cor: corPartido(candidato?.sg_partido),
