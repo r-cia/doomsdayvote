@@ -150,7 +150,7 @@ function abrirSecao(item) {
               <th scope="col">Seção</th>
               <th scope="col" class="num">Não habilitada</th>
               <th scope="col" class="num">%</th>
-              <th scope="col"><span class="sr-only">Detalhe</span></th>
+              <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>
           <tbody>

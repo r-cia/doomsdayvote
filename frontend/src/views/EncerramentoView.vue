@@ -225,7 +225,7 @@ watch(() => store.cargo, carregarUrnas)
               <th scope="col">Partido</th>
               <th scope="col" class="num">Votos</th>
               <th scope="col" class="num">% Votos</th>
-              <th scope="col"><span class="sr-only">Detalhe</span></th>
+              <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>
           <tbody>
