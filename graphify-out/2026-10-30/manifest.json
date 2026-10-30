@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793380433.2975678,
-    "seen": 1793380494.0115306,
-    "ast_hash": "6c9032155c3a0a53ba1093994d1c9a61",
+    "mtime": 1793386465.0811942,
+    "seen": 1793386474.3816082,
+    "ast_hash": "b11bb59015d029513a634e5cede9001f",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/MapPanel.vue": {
-    "mtime": 1793375370.7048845,
-    "seen": 1793375406.9245455,
-    "ast_hash": "47c26a0b632170dd6840e18b0c0b68e6",
+    "mtime": 1793388082.2859364,
+    "seen": 1793388100.9983728,
+    "ast_hash": "73108fc60a6954909e041527b4173b73",
     "semantic_hash": ""
   },
   "frontend/src/components/MapTable.vue": {
@@ -882,9 +882,9 @@
     "semantic_hash": ""
   },
   "frontend/tests/components.test.js": {
-    "mtime": 1793361789.877473,
-    "seen": 1793364259.1281087,
-    "ast_hash": "813f62b92f5424a73728ffc6a9a3b7bd",
+    "mtime": 1793388082.2869365,
+    "seen": 1793388100.998431,
+    "ast_hash": "a9628f6394dbce31731d6048b0c37ca3",
     "semantic_hash": ""
   },
   "frontend/tests/lib.test.js": {
@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793380385.6340332,
-    "seen": 1793380494.0118108,
-    "ast_hash": "c5862e44b5c8502b15b66eeaad6cb180",
+    "mtime": 1793387514.158629,
+    "seen": 1793388100.9984674,
+    "ast_hash": "ae12b0980ebf37c11a25f82b5e9da74e",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1128,9 +1128,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/RelatorioView.vue": {
-    "mtime": 1793380477.946069,
-    "seen": 1793380494.0117624,
-    "ast_hash": "d1196aa18db5585e042ba0c56a14cf82",
+    "mtime": 1793380508.2594094,
+    "seen": 1793386474.3818223,
+    "ast_hash": "d533c4b70392bbd6c11d8c07cdbcb026",
     "semantic_hash": ""
   }
 }
