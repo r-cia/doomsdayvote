@@ -660,7 +660,7 @@ onBeforeUnmount(() => {
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível carregar o mapa"
+      :titulo="$t('comum.erro')"
       :descricao="error"
       acao="Tentar novamente"
       @acao="$emit('retry')"
@@ -673,14 +673,14 @@ onBeforeUnmount(() => {
     <StateBlock
       v-if="malhaEstado === 'carregando'"
       estado="carregando"
-      titulo="Carregando malha"
+      :titulo="$t('comum.carregando')"
       :descricao="`Lendo /geo/${arquivoMalha(nivel)}.`"
     />
 
     <div v-if="malhaEstado === 'ausente'" class="mapa-ausente">
       <StateBlock
         estado="vazio"
-        titulo="Malha não carregada"
+        :titulo="$t('comum.semDados')"
         :descricao="`${malhaMensagem} Adicione o arquivo em frontend/public/geo/${arquivoMalha(nivel)}.`"
         acao="Tentar novamente"
         @acao="tentarMalhaNovamente"
