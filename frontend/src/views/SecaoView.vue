@@ -129,7 +129,7 @@ function voltar() { fechar() }
         >
           ✕
         </button>
-        <p>Extrato de teletipo · boletim de urna</p>
+        <p>{{ $t('secao.extrato') || 'Extrato de teletipo · boletim de urna' }}</p>
       </div>
 
     <StateBlock
