@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
-import { candidatosNominais, linhasMapa } from '../lib/agregacoes'
+import { linhasMapa, nominaisNaOrdemDoServidor } from '../lib/agregacoes'
+import { useOrdenacao } from '../composables/ordenacao'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
@@ -12,25 +13,19 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ufSelecionada: { type: String, default: null },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
+  ordenacaoVotos: { type: Object, default: () => useOrdenacao() },
 })
 
 defineEmits(['select', 'municipios', 'retry', 'limpar'])
 
-const ordenacao = ref({ coluna: 'total', direcao: 'desc' })
 const agrupar = ref('nenhum')
-
-function alternar(coluna) {
-  if (ordenacao.value.coluna === coluna) {
-    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
-  } else {
-    ordenacao.value = { coluna, direcao: 'asc' }
-  }
-}
-
-function seta(coluna) {
-  if (ordenacao.value.coluna !== coluna) return ''
-  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
-}
+const { alternar, ariaSort, seta } = props.ordenacao
+const {
+  alternar: alternarVotos,
+  ariaSort: ariaSortVotos,
+  seta: setaVotos,
+} = props.ordenacaoVotos
 
 const REGIOES = {
   Norte: ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
@@ -68,23 +63,10 @@ const linhas = computed(() => {
       liderPercentual: area.lider?.percentual ?? null,
     }
   })
-  const comLargura = base.map((linha) => ({
+  return base.map((linha) => ({
     ...linha,
     largura: Math.max(0, Math.min(100, Number(linha.liderPercentual ?? 0))),
   }))
-  const lista = [...comLargura]
-  const { coluna, direcao } = ordenacao.value
-  lista.sort((a, b) => {
-    let va, vb
-    if (coluna === 'uf') { va = a.uf ?? ''; vb = b.uf ?? '' }
-    else if (coluna === 'total') { va = a.total; vb = b.total }
-    else if (coluna === 'liderNome') { va = a.liderNome ?? ''; vb = b.liderNome ?? '' }
-    else if (coluna === 'liderPercentual') { va = a.liderPercentual ?? -1; vb = b.liderPercentual ?? -1 }
-    else { va = a[coluna]; vb = b[coluna] }
-    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-    return direcao === 'asc' ? va - vb : vb - va
-  })
-  return lista
 })
 
 const grupos = computed(() => {
@@ -100,7 +82,7 @@ const grupos = computed(() => {
     .map((r) => ({ nome: r, itens: mapa.get(r) }))
 })
 
-const votosUf = computed(() => candidatosNominais(props.votos))
+const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
 </script>
 
 <template>
@@ -156,10 +138,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
         <caption class="sr-only">Votos por candidato em {{ ufSelecionada }}</caption>
         <thead>
           <tr>
-            <th scope="col">Candidato</th>
-            <th scope="col">Partido</th>
-            <th scope="col" class="num">Votos</th>
-            <th scope="col" class="num">% válidos</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSortVotos('nm_votavel')"><button type="button" @click="alternarVotos('nm_votavel')">Candidato{{ setaVotos('nm_votavel') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSortVotos('sg_partido')"><button type="button" @click="alternarVotos('sg_partido')">Partido{{ setaVotos('sg_partido') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSortVotos('qt_votos')"><button type="button" @click="alternarVotos('qt_votos')">Votos{{ setaVotos('qt_votos') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSortVotos('percentual')"><button type="button" @click="alternarVotos('percentual')">% válidos{{ setaVotos('percentual') }}</button></th>
           </tr>
         </thead>
         <tbody>
@@ -191,10 +173,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
         <caption class="sr-only">Resumo de votos e líder por UF agrupado por região</caption>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('uf')">UF{{ seta('uf') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">Votos{{ seta('total') }}</th>
-            <th scope="col" class="ordenavel" @click="alternar('liderNome')">Líder{{ seta('liderNome') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">% líder{{ seta('liderPercentual') }}</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">Votos{{ seta('total_votos') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">Líder{{ seta('lider_nome') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">% líder{{ seta('lider_percentual') }}</button></th>
             <th scope="col"><span class="sr-only">Ações</span></th>
           </tr>
         </thead>
@@ -260,10 +242,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
         <caption class="sr-only">Resumo de votos e líder por UF</caption>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('uf')">UF{{ seta('uf') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">Votos{{ seta('total') }}</th>
-            <th scope="col" class="ordenavel" @click="alternar('liderNome')">Líder{{ seta('liderNome') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">% líder{{ seta('liderPercentual') }}</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">Votos{{ seta('total_votos') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">Líder{{ seta('lider_nome') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">% líder{{ seta('lider_percentual') }}</button></th>
             <th scope="col"><span class="sr-only">Ações</span></th>
           </tr>
         </thead>

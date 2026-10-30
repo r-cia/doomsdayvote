@@ -7,6 +7,7 @@ import StateBlock from '../components/StateBlock.vue'
 import SectionsTable from '../components/SectionsTable.vue'
 import SecaoView from '../views/SecaoView.vue'
 import UfPanel from '../components/UfPanel.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useMapa, useResumo, useSecoes } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { candidatosNominais } from '../lib/agregacoes'
@@ -14,8 +15,15 @@ import { candidatosNominais } from '../lib/agregacoes'
 const router = useRouter()
 const { store } = useSelecaoEleicao()
 
+const ordemMapa = useOrdenacao()
+const ordemUf = useOrdenacao()
+const ordemVotosUf = useOrdenacao()
+const ordemSecoes = useOrdenacao()
+
 const resumoQuery = useResumo()
+const resumoUfQuery = useResumo(ordemVotosUf.params)
 const mapaQuery = useMapa()
+const mapaTabelaQuery = useMapa(null, { ordem: ordemMapa.params })
 const candidatos = computed(() =>
   candidatosNominais(resumoQuery.data.value?.votos ?? []),
 )
@@ -29,8 +37,9 @@ const mapaUfQuery = useMapa('uf', {
       .filter((n) => n !== null && n !== undefined)
     return lista.join(',')
   }),
+  ordem: ordemUf.params,
 })
-const secoesQuery = useSecoes()
+const secoesQuery = useSecoes(ordemSecoes.params)
 
 watch(
   () => store.asOf,
@@ -100,6 +109,7 @@ function abrirSecao(item) {
 
 function atualizarMapa() {
   mapaQuery.refetch()
+  mapaTabelaQuery.refetch()
   mapaUfQuery.refetch()
 }
 
@@ -121,6 +131,8 @@ function atualizarSecoes() {
   <section class="malha" :aria-label="$t('mapa.malha')">
     <MapPanel
       :areas="mapaQuery.data.value?.areas ?? []"
+      :areas-tabela="mapaTabelaQuery.data.value?.areas"
+      :ordenacao="ordemMapa"
       :nivel="store.mapLevel"
       :modo="store.mapMode"
       :candidato="store.candidato"
@@ -138,7 +150,9 @@ function atualizarSecoes() {
     <UfPanel
       :areas="mapaUfQuery.data.value?.areas ?? []"
       :candidatos="candidatos"
-      :votos="resumoQuery.data.value?.votos ?? []"
+      :votos="resumoUfQuery.data.value?.votos ?? []"
+      :ordenacao="ordemUf"
+      :ordenacao-votos="ordemVotosUf"
       :loading="mapaUfQuery.isLoading.value"
       :error="mapaUfQuery.error.value?.message ?? ''"
       :uf-selecionada="store.uf"
@@ -161,6 +175,7 @@ function atualizarSecoes() {
     :page-size="store.sectionPageSize"
     :uf="store.uf"
     :municipio="store.municipio"
+    :ordenacao="ordemSecoes"
     @update:page="store.definirPagina"
     @update:page-size="store.definirTamanhoPagina"
     @update:status="store.definirStatusSecao"

@@ -43,6 +43,8 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   altura: { type: String, default: '440px' },
+  areasTabela: { type: Array, default: null },
+  ordenacao: Object,
 })
 
 const emit = defineEmits([
@@ -749,7 +751,8 @@ onBeforeUnmount(() => {
     </div>
 
     <MapTable
-      :areas="areas"
+      :areas="areasTabela ?? areas"
+      :ordenacao="ordenacao"
       :nivel="nivel"
       :modo="modo"
       :candidato="candidato"

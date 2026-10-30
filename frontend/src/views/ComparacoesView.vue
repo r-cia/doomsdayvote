@@ -1,11 +1,13 @@
 <script setup>
 import ComparacaoLocalPanel from '../components/ComparacaoLocalPanel.vue'
 import StateBlock from '../components/StateBlock.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useComparacaoLocal } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 
 const { store } = useSelecaoEleicao()
-const comparacaoLocalQuery = useComparacaoLocal()
+const ordenacao = useOrdenacao()
+const comparacaoLocalQuery = useComparacaoLocal(ordenacao.params)
 </script>
 
 <template>
@@ -20,6 +22,7 @@ const comparacaoLocalQuery = useComparacaoLocal()
     :dados="comparacaoLocalQuery.data.value ?? null"
     :loading="comparacaoLocalQuery.isLoading.value"
     :error="comparacaoLocalQuery.error.value?.message ?? ''"
+    :ordenacao="ordenacao"
     @retry="comparacaoLocalQuery.refetch()"
   />
 </template>

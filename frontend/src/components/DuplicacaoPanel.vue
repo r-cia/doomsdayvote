@@ -1,10 +1,14 @@
 <script setup>
 import { computed } from 'vue'
 import CoberturaBlock from './CoberturaBlock.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
+
+const { alternar, ariaSort, seta } = props.ordenacao
 
 const grupos = computed(() => props.dados?.grupos ?? [])
 
@@ -49,16 +53,16 @@ function numeros(grupo) {
         </caption>
         <thead>
           <tr>
-            <th scope="col" class="num">Seções</th>
-            <th scope="col">UF</th>
-            <th scope="col">Município</th>
-            <th scope="col">Local</th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secoes')"><button type="button" @click="alternar('secoes')">Seções{{ seta('secoes') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_municipio')"><button type="button" @click="alternar('nm_municipio')">Município{{ seta('nm_municipio') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nr_local_votacao')"><button type="button" @click="alternar('nr_local_votacao')">Local{{ seta('nr_local_votacao') }}</button></th>
             <th scope="col">Zonas</th>
             <th scope="col">Números</th>
-            <th scope="col" class="num">Votáveis</th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('votaveis')"><button type="button" @click="alternar('votaveis')">Votáveis{{ seta('votaveis') }}</button></th>
             <th scope="col" class="num">Aptos</th>
             <th scope="col">Sinalizadores</th>
-            <th scope="col">Candidato</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('candidato')"><button type="button" @click="alternar('candidato')">Candidato{{ seta('candidato') }}</button></th>
           </tr>
         </thead>
         <tbody>

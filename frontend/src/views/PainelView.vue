@@ -7,6 +7,7 @@ import PlacarRanking from '../components/PlacarRanking.vue'
 import PlotDia from '../components/PlotDia.vue'
 import StateBlock from '../components/StateBlock.vue'
 import VotosPorEstadoPanel from '../components/VotosPorEstadoPanel.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useAnalise, useMapa, useResumo, useTimeline } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { candidatosNominais } from '../lib/agregacoes'
@@ -17,7 +18,9 @@ const {
   aoCorte,
 } = useSelecaoEleicao()
 
+const ordemVotosEstado = useOrdenacao()
 const resumoQuery = useResumo()
+const resumoTabelaQuery = useResumo(ordemVotosEstado.params)
 const timelineQuery = useTimeline()
 const analiseQuery = useAnalise()
 const mapaUfQuery = useMapa('uf', {
@@ -150,7 +153,8 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <VotosPorEstadoPanel
     :key="`${store.asOf ?? 'final'}-${store.cargo}-${store.electionId}-${(candidatos || []).map(c=>c.nr_votavel).join(',')}`"
     :areas="mapaUfQuery.data.value?.areas ?? []"
-    :candidatos="resumoQuery.data.value?.votos ?? []"
-    :loading="mapaUfQuery.isLoading.value || resumoQuery.isLoading.value"
+    :candidatos="resumoTabelaQuery.data.value?.votos ?? []"
+    :ordenacao="ordemVotosEstado"
+    :loading="mapaUfQuery.isLoading.value || resumoTabelaQuery.isLoading.value"
   />
 </template>

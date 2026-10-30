@@ -1331,6 +1331,29 @@ th {
   white-space: nowrap;
 }
 
+th.ordenavel button {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  text-align: inherit;
+  white-space: inherit;
+  cursor: pointer;
+}
+
+th.ordenavel button:hover {
+  color: var(--ink);
+}
+
+th.ordenavel button:focus-visible {
+  outline: 1px solid var(--amber);
+  outline-offset: 2px;
+}
+
 td {
   padding: 6px 10px;
   border-bottom: 1px solid var(--line-soft);

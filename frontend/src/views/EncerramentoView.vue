@@ -1,7 +1,8 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../api/client'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarHora, formatarNumero, formatarPercentual } from '../lib/format'
 import SecaoView from './SecaoView.vue'
@@ -19,37 +20,9 @@ const secoes = ref([])
 const carregandoMunicipios = ref(false)
 const carregandoSecoes = ref(false)
 
-const ordenacao = ref({ coluna: 'sg_uf', direcao: 'asc' })
-
-function alternar(coluna) {
-  if (ordenacao.value.coluna === coluna) {
-    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
-  } else {
-    ordenacao.value = { coluna, direcao: 'asc' }
-  }
-}
-
-function seta(coluna) {
-  if (ordenacao.value.coluna !== coluna) return ''
-  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
-}
-
-function valor(linha, coluna) {
-  if (coluna === 'sg_uf') return linha.sg_uf ?? ''
-  return Number(linha[coluna] ?? 0)
-}
-
-const linhas = computed(() => {
-  const lista = [...urnas.value]
-  const { coluna, direcao } = ordenacao.value
-  lista.sort((a, b) => {
-    const va = valor(a, coluna)
-    const vb = valor(b, coluna)
-    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-    return direcao === 'asc' ? va - vb : vb - va
-  })
-  return lista
-})
+const ordemUrnas = useOrdenacao()
+const ordemMunicipios = useOrdenacao()
+const ordemSecoes = useOrdenacao()
 
 async function carregarUrnas() {
   carregandoUrnas.value = true
@@ -58,6 +31,7 @@ async function carregarUrnas() {
       election_id: store.electionId,
       cargo: store.cargo,
       as_of: store.asOf,
+      ...ordemUrnas.params.value,
     })
     urnas.value = r.ufs ?? []
   } catch (e) {
@@ -78,6 +52,7 @@ async function carregarMunicipios(uf) {
       cargo: store.cargo,
       as_of: store.asOf,
       uf,
+      ...ordemMunicipios.params.value,
     })
     municipios.value = r.municipios ?? []
   } catch (e) {
@@ -97,6 +72,7 @@ async function carregarSecoes(municipio) {
       as_of: store.asOf,
       uf: ufSelecionada.value,
       municipio,
+      ...ordemSecoes.params.value,
     })
     secoes.value = r.secoes ?? []
   } catch (e) {
@@ -119,6 +95,13 @@ onMounted(carregarUrnas)
 watch(() => store.asOf, carregarUrnas)
 watch(() => store.electionId, carregarUrnas)
 watch(() => store.cargo, carregarUrnas)
+watch(ordemUrnas.params, carregarUrnas)
+watch(ordemMunicipios.params, () => {
+  if (ufSelecionada.value) carregarMunicipios(ufSelecionada.value)
+})
+watch(ordemSecoes.params, () => {
+  if (municipioSelecionado.value) carregarSecoes(municipioSelecionado.value)
+})
 </script>
 
 <template>
@@ -137,18 +120,18 @@ watch(() => store.cargo, carregarUrnas)
       <table class="tabela">
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('total')">Nº de urnas{{ seta('total') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('ate_1715')">Até 17:15{{ seta('ate_1715') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('pct_1715')">% até 17:15{{ seta('pct_1715') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('ate_1915')">Até 19:15{{ seta('ate_1915') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('pct_1915')">% até 19:15{{ seta('pct_1915') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('apos_1915')">Após 19:15{{ seta('apos_1915') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('pct_apos_1915')">% após 19:15{{ seta('pct_apos_1915') }}</th>
+            <th scope="col" class="ordenavel" :aria-sort="ordemUrnas.ariaSort('sg_uf')"><button type="button" @click="ordemUrnas.alternar('sg_uf')">UF{{ ordemUrnas.seta('sg_uf') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('total')"><button type="button" @click="ordemUrnas.alternar('total')">Nº de urnas{{ ordemUrnas.seta('total') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('ate_1715')"><button type="button" @click="ordemUrnas.alternar('ate_1715')">Até 17:15{{ ordemUrnas.seta('ate_1715') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_1715')"><button type="button" @click="ordemUrnas.alternar('pct_1715')">% até 17:15{{ ordemUrnas.seta('pct_1715') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('ate_1915')"><button type="button" @click="ordemUrnas.alternar('ate_1915')">Até 19:15{{ ordemUrnas.seta('ate_1915') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_1915')"><button type="button" @click="ordemUrnas.alternar('pct_1915')">% até 19:15{{ ordemUrnas.seta('pct_1915') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('apos_1915')"><button type="button" @click="ordemUrnas.alternar('apos_1915')">Após 19:15{{ ordemUrnas.seta('apos_1915') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_apos_1915')"><button type="button" @click="ordemUrnas.alternar('pct_apos_1915')">% após 19:15{{ ordemUrnas.seta('pct_apos_1915') }}</button></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="u in linhas" :key="u.sg_uf" class="linha-clicavel" @click="carregarMunicipios(u.sg_uf)">
+          <tr v-for="u in urnas" :key="u.sg_uf" class="linha-clicavel" @click="carregarMunicipios(u.sg_uf)">
             <td>{{ u.sg_uf }}</td>
             <td class="tabela__numero">{{ formatarNumero(u.total) }}</td>
             <td class="tabela__numero">{{ formatarNumero(u.ate_1715) }}</td>
@@ -176,13 +159,13 @@ watch(() => store.cargo, carregarUrnas)
         <table>
           <thead>
             <tr>
-              <th scope="col">Município</th>
-              <th scope="col" class="num">Total</th>
-              <th scope="col" class="num">Após 17:15</th>
-              <th scope="col" class="num">%</th>
-              <th scope="col">Partido</th>
-              <th scope="col" class="num">Votos</th>
-              <th scope="col" class="num">% Votos</th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('nm_municipio')"><button type="button" @click="ordemMunicipios.alternar('nm_municipio')">Município{{ ordemMunicipios.seta('nm_municipio') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('total')"><button type="button" @click="ordemMunicipios.alternar('total')">Total{{ ordemMunicipios.seta('total') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('apos_1715')"><button type="button" @click="ordemMunicipios.alternar('apos_1715')">Após 17:15{{ ordemMunicipios.seta('apos_1715') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('pct_apos_1715')"><button type="button" @click="ordemMunicipios.alternar('pct_apos_1715')">%{{ ordemMunicipios.seta('pct_apos_1715') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('partido')"><button type="button" @click="ordemMunicipios.alternar('partido')">Partido{{ ordemMunicipios.seta('partido') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('votos')"><button type="button" @click="ordemMunicipios.alternar('votos')">Votos{{ ordemMunicipios.seta('votos') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('pct_votos')"><button type="button" @click="ordemMunicipios.alternar('pct_votos')">% Votos{{ ordemMunicipios.seta('pct_votos') }}</button></th>
             </tr>
           </thead>
           <tbody>
@@ -219,12 +202,12 @@ watch(() => store.cargo, carregarUrnas)
         <table>
           <thead>
             <tr>
-              <th scope="col">Zona</th>
-              <th scope="col">Seção</th>
-              <th scope="col" class="num">Encerramento</th>
-              <th scope="col">Partido</th>
-              <th scope="col" class="num">Votos</th>
-              <th scope="col" class="num">% Votos</th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_zona')"><button type="button" @click="ordemSecoes.alternar('nr_zona')">Zona{{ ordemSecoes.seta('nr_zona') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_secao')"><button type="button" @click="ordemSecoes.alternar('nr_secao')">Seção{{ ordemSecoes.seta('nr_secao') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('dt_encerramento')"><button type="button" @click="ordemSecoes.alternar('dt_encerramento')">Encerramento{{ ordemSecoes.seta('dt_encerramento') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('partido')"><button type="button" @click="ordemSecoes.alternar('partido')">Partido{{ ordemSecoes.seta('partido') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('votos')"><button type="button" @click="ordemSecoes.alternar('votos')">Votos{{ ordemSecoes.seta('votos') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('pct_votos')"><button type="button" @click="ordemSecoes.alternar('pct_votos')">% Votos{{ ordemSecoes.seta('pct_votos') }}</button></th>
               <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>

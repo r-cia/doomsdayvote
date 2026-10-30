@@ -1,45 +1,20 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { formatarNumero } from '../lib/format'
-import { candidatosNominais } from '../lib/agregacoes'
+import { nominaisNaOrdemDoServidor } from '../lib/agregacoes'
+import { useOrdenacao } from '../composables/ordenacao'
 import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   areas: { type: Array, default: () => [] },
   candidatos: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
-const ordenacao = ref({ coluna: 'nm_votavel', direcao: 'asc' })
+const { alternar, ariaSort, seta } = props.ordenacao
 
-function alternar(coluna) {
-  if (ordenacao.value.coluna === coluna) {
-    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
-  } else {
-    ordenacao.value = { coluna, direcao: 'asc' }
-  }
-}
-
-function totalCandidato(c) {
-  return (props.areas ?? []).reduce((t, area) => {
-    const linha = (area.candidatos ?? []).find((x) => Number(x.nr_votavel) === Number(c.nr_votavel))
-    return t + (linha ? Number(linha.qt_votos ?? 0) : 0)
-  }, 0)
-}
-
-const listaCandidatos = computed(() => {
-  const lista = candidatosNominais(props.candidatos).map((c) => ({ ...c, _total: totalCandidato(c) }))
-  const { coluna, direcao } = ordenacao.value
-  lista.sort((a, b) => {
-    let va, vb
-    if (coluna === 'nm_votavel') { va = a.nm_votavel ?? ''; vb = b.nm_votavel ?? '' }
-    else if (coluna === 'total') { va = a._total; vb = b._total }
-    else { va = a[coluna]; vb = b[coluna] }
-    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-    return direcao === 'asc' ? va - vb : vb - va
-  })
-  return lista
-})
+const listaCandidatos = computed(() => nominaisNaOrdemDoServidor(props.candidatos))
 
 const ufs = computed(() =>
   [...(props.areas ?? [])]
@@ -70,11 +45,6 @@ function deltaTotal(nrVotavel) {
   return ufs.value.reduce((t, area) => t + delta(area, nrVotavel), 0)
 }
 
-function seta(coluna) {
-  if (ordenacao.value.coluna !== coluna) return ''
-  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
-}
-
 </script>
 
 <template>
@@ -95,11 +65,11 @@ function seta(coluna) {
       <table class="tabela-votos-estado">
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">{{ $t('filtros.candidato') }}{{ seta('nm_votavel') }}</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">{{ $t('filtros.candidato') }}{{ seta('nm_votavel') }}</button></th>
             <th v-for="area in ufs" :key="area.sg_uf" scope="col" class="num">
               {{ area.sg_uf }}
             </th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">Total{{ seta('total') }}</th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('qt_votos')"><button type="button" @click="alternar('qt_votos')">Total{{ seta('qt_votos') }}</button></th>
           </tr>
         </thead>
         <tbody>

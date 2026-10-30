@@ -2,12 +2,18 @@
 import { computed } from 'vue'
 import StateBlock from './StateBlock.vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  ordenacaoShare: { type: Object, default: () => useOrdenacao('share') },
+  ordenacaoMargem: { type: Object, default: () => useOrdenacao('margem') },
 })
+
+const { alternar: alternarShare, ariaSort: ariaSortShare, seta: setaShare } = props.ordenacaoShare
+const { alternar: alternarMargem, ariaSort: ariaSortMargem, seta: setaMargem } = props.ordenacaoMargem
 
 const emit = defineEmits(['retry'])
 
@@ -63,13 +69,13 @@ function municipio(secao) {
             <thead>
               <tr>
                 <th scope="col" class="num">{{ $t('analiseUI.posicao') }}</th>
-                <th scope="col">UF</th>
-                <th scope="col">{{ $t('analiseUI.municipio') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.participacaoLider') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.margemVotos') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.percentil') }}</th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortShare('sg_uf')"><button type="button" @click="alternarShare('sg_uf')">UF{{ setaShare('sg_uf') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortShare('nm_municipio')"><button type="button" @click="alternarShare('nm_municipio')">{{ $t('analiseUI.municipio') }}{{ setaShare('nm_municipio') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('nr_zona')"><button type="button" @click="alternarShare('nr_zona')">{{ $t('analiseUI.zona') }}{{ setaShare('nr_zona') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('nr_secao')"><button type="button" @click="alternarShare('nr_secao')">{{ $t('analiseUI.secao') }}{{ setaShare('nr_secao') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('share_lider')"><button type="button" @click="alternarShare('share_lider')">{{ $t('analiseUI.participacaoLider') }}{{ setaShare('share_lider') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('margem_absoluta')"><button type="button" @click="alternarShare('margem_absoluta')">{{ $t('analiseUI.margemVotos') }}{{ setaShare('margem_absoluta') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('share_lider_percentil')"><button type="button" @click="alternarShare('share_lider_percentil')">{{ $t('analiseUI.percentil') }}{{ setaShare('share_lider_percentil') }}</button></th>
               </tr>
             </thead>
             <tbody>
@@ -97,13 +103,13 @@ function municipio(secao) {
             <thead>
               <tr>
                 <th scope="col" class="num">{{ $t('analiseUI.posicao') }}</th>
-                <th scope="col">UF</th>
-                <th scope="col">{{ $t('analiseUI.municipio') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.margemVotos') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.margemPontos') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.participacaoLider') }}</th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortMargem('sg_uf')"><button type="button" @click="alternarMargem('sg_uf')">UF{{ setaMargem('sg_uf') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortMargem('nm_municipio')"><button type="button" @click="alternarMargem('nm_municipio')">{{ $t('analiseUI.municipio') }}{{ setaMargem('nm_municipio') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('nr_zona')"><button type="button" @click="alternarMargem('nr_zona')">{{ $t('analiseUI.zona') }}{{ setaMargem('nr_zona') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('nr_secao')"><button type="button" @click="alternarMargem('nr_secao')">{{ $t('analiseUI.secao') }}{{ setaMargem('nr_secao') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('margem_absoluta')"><button type="button" @click="alternarMargem('margem_absoluta')">{{ $t('analiseUI.margemVotos') }}{{ setaMargem('margem_absoluta') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('margem_pp')"><button type="button" @click="alternarMargem('margem_pp')">{{ $t('analiseUI.margemPontos') }}{{ setaMargem('margem_pp') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('share_lider')"><button type="button" @click="alternarMargem('share_lider')">{{ $t('analiseUI.participacaoLider') }}{{ setaMargem('share_lider') }}</button></th>
               </tr>
             </thead>
             <tbody>

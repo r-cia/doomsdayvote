@@ -13,10 +13,10 @@ defineProps({
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
-  ordenacao: { type: String, default: 'if' },
+  ordenacoes: { type: Object, default: () => ({}) },
 })
 
-const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
+const emit = defineEmits(['retry', 'select'])
 </script>
 
 <template>
@@ -39,18 +39,15 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
         :dados="benford"
         :selecionado="selecionado"
         :loading="benfordLoading"
+        :ordenacao="ordenacoes.benford"
         @select="emit('select', $event)"
       />
 
       <template v-if="anomalias">
-        <BenfordNiveisPanel :dados="anomalias.benford_niveis" />
+        <BenfordNiveisPanel :dados="anomalias.benford_niveis" :ordenacao="ordenacoes.niveis" />
         <div class="auditoria-grade">
-          <DuplicacaoPanel :dados="anomalias.duplicacao" />
-          <OutliersPanel
-            :dados="anomalias.outliers"
-            :ordenacao="ordenacao"
-            @update:ordenacao="emit('update:ordenacao', $event)"
-          />
+          <DuplicacaoPanel :dados="anomalias.duplicacao" :ordenacao="ordenacoes.duplicacao" />
+          <OutliersPanel :dados="anomalias.outliers" :ordenacao="ordenacoes.outliers" />
         </div>
       </template>
 

@@ -2,12 +2,18 @@
 import { computed } from 'vue'
 import { formatarDataHora } from '../lib/format'
 import StateBlock from './StateBlock.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  ordenacaoCampos: { type: Object, default: () => useOrdenacao('campos') },
+  ordenacaoVotaveis: { type: Object, default: () => useOrdenacao('votaveis') },
 })
+
+const { alternar: alternarCampos, ariaSort: ariaSortCampos, seta: setaCampos } = props.ordenacaoCampos
+const { alternar: alternarVotaveis, ariaSort: ariaSortVotaveis, seta: setaVotaveis } = props.ordenacaoVotaveis
 
 const versoes = computed(() => props.dados?.versoes ?? [])
 const comparacao = computed(() => props.dados?.comparacao ?? null)
@@ -51,7 +57,14 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
         <div v-if="comparacao.campos_alterados?.length">
           <h4>{{ $t('versoesBU.camposAlterados') }}</h4>
           <table>
-            <thead><tr><th>{{ $t('versoesBU.campo') }}</th><th>{{ $t('versoesBU.anterior') }}</th><th>{{ $t('versoesBU.atual') }}</th><th>{{ $t('versoesBU.diferenca') }}</th></tr></thead>
+            <thead>
+              <tr>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortCampos('campo')"><button type="button" @click="alternarCampos('campo')">{{ $t('versoesBU.campo') }}{{ setaCampos('campo') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortCampos('anterior')"><button type="button" @click="alternarCampos('anterior')">{{ $t('versoesBU.anterior') }}{{ setaCampos('anterior') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortCampos('atual')"><button type="button" @click="alternarCampos('atual')">{{ $t('versoesBU.atual') }}{{ setaCampos('atual') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortCampos('diferenca')"><button type="button" @click="alternarCampos('diferenca')">{{ $t('versoesBU.diferenca') }}{{ setaCampos('diferenca') }}</button></th>
+              </tr>
+            </thead>
             <tbody>
               <tr v-for="(c, i) in comparacao.campos_alterados" :key="i">
                 <td>{{ c.campo }}</td>
@@ -65,7 +78,15 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
         <div v-if="comparacao.votaveis_alterados?.length">
           <h4>{{ $t('versoesBU.votaveisAlterados') }}</h4>
           <table>
-            <thead><tr><th>{{ $t('versoesBU.numero') }}</th><th>{{ $t('versoesBU.votavel') }}</th><th>{{ $t('versoesBU.anterior') }}</th><th>{{ $t('versoesBU.atual') }}</th><th>{{ $t('versoesBU.diferenca') }}</th></tr></thead>
+            <thead>
+              <tr>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortVotaveis('nr_votavel')"><button type="button" @click="alternarVotaveis('nr_votavel')">{{ $t('versoesBU.numero') }}{{ setaVotaveis('nr_votavel') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortVotaveis('nm_votavel')"><button type="button" @click="alternarVotaveis('nm_votavel')">{{ $t('versoesBU.votavel') }}{{ setaVotaveis('nm_votavel') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortVotaveis('anterior')"><button type="button" @click="alternarVotaveis('anterior')">{{ $t('versoesBU.anterior') }}{{ setaVotaveis('anterior') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortVotaveis('atual')"><button type="button" @click="alternarVotaveis('atual')">{{ $t('versoesBU.atual') }}{{ setaVotaveis('atual') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSortVotaveis('diferenca')"><button type="button" @click="alternarVotaveis('diferenca')">{{ $t('versoesBU.diferenca') }}{{ setaVotaveis('diferenca') }}</button></th>
+              </tr>
+            </thead>
             <tbody>
               <tr v-for="(v, i) in comparacao.votaveis_alterados" :key="i">
                 <td>{{ v.nr_votavel }}</td>

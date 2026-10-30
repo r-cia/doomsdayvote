@@ -1,7 +1,9 @@
-import { computed, isRef, watch } from 'vue'
+import { computed, isRef, toValue, watch } from 'vue'
 import { useQuery, keepPreviousData } from '@tanstack/vue-query'
 import { api } from '../api/client'
 import { useFiltersStore } from '../stores/filters'
+
+const paramsDe = (ordem) => toValue(ordem) ?? {}
 
 export function useEleicoes() {
   const store = useFiltersStore()
@@ -22,7 +24,7 @@ export function useEleicoes() {
   return query
 }
 
-export function useResumo() {
+export function useResumo(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
     queryKey: computed(() => [
@@ -32,6 +34,7 @@ export function useResumo() {
       store.asOf,
       store.uf,
       store.municipio,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.resumo(
@@ -41,6 +44,7 @@ export function useResumo() {
           as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -77,7 +81,7 @@ export function useTimeline() {
   })
 }
 
-export function useAnalise() {
+export function useAnalise(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
     queryKey: computed(() => [
@@ -87,6 +91,7 @@ export function useAnalise() {
       store.asOf,
       store.uf,
       store.municipio,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.analise(
@@ -96,6 +101,7 @@ export function useAnalise() {
           as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -104,15 +110,8 @@ export function useAnalise() {
   })
 }
 
-export function useAnomalias(habilitado = null, ordenarPor = null) {
+export function useAnomalias(habilitado = null, ordem = null) {
   const store = useFiltersStore()
-  const ordenacao = computed(() =>
-    typeof ordenarPor === 'function'
-      ? ordenarPor()
-      : ordenarPor?.value !== undefined
-        ? ordenarPor.value
-        : (ordenarPor ?? 'if'),
-  )
   return useQuery({
     queryKey: computed(() => [
       'anomalias',
@@ -121,7 +120,7 @@ export function useAnomalias(habilitado = null, ordenarPor = null) {
       store.asOf,
       store.uf,
       store.municipio,
-      ordenacao.value,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.anomalias(
@@ -131,7 +130,7 @@ export function useAnomalias(habilitado = null, ordenarPor = null) {
           as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
-          ordenar_por: ordenacao.value,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -144,7 +143,7 @@ export function useAnomalias(habilitado = null, ordenarPor = null) {
   })
 }
 
-export function useEstatisticas(escopo) {
+export function useEstatisticas(escopo, ordem = null) {
   const store = useFiltersStore()
   const escopoValor = computed(() => escopo?.value ?? escopo ?? 'turno')
   return useQuery({
@@ -156,6 +155,7 @@ export function useEstatisticas(escopo) {
       store.uf,
       store.municipio,
       escopoValor.value,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.estatisticas(
@@ -166,6 +166,7 @@ export function useEstatisticas(escopo) {
           uf: store.uf,
           municipio: store.municipio,
           escopo: escopoValor.value,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -209,6 +210,7 @@ export function useMapa(nivel = null, opcoes = {}) {
       municipioDoMapa.value,
       nivelEfetivo.value,
       opcoes.incluirTodosCandidatos ? candidatosMapa.value : store.candidato,
+      paramsDe(opcoes.ordem),
     ]),
     queryFn: ({ signal }) =>
       api.mapa(
@@ -221,6 +223,7 @@ export function useMapa(nivel = null, opcoes = {}) {
           municipio: municipioDoMapa.value,
           level: nivelEfetivo.value,
           candidatos: candidatosMapa.value,
+          ...paramsDe(opcoes.ordem),
         },
         signal,
       ),
@@ -233,7 +236,7 @@ export function useMapa(nivel = null, opcoes = {}) {
   })
 }
 
-export function useSecoes() {
+export function useSecoes(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
     queryKey: computed(() => [
@@ -249,6 +252,7 @@ export function useSecoes() {
       store.sectionMunicipioNome,
       store.sectionPage,
       store.sectionPageSize,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.secoes(
@@ -264,6 +268,7 @@ export function useSecoes() {
           municipio_nome: store.sectionMunicipioNome,
           page: store.sectionPage,
           page_size: store.sectionPageSize,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -274,7 +279,7 @@ export function useSecoes() {
   })
 }
 
-export function useConsistencia(regra = null) {
+export function useConsistencia(regra = null, ordem = null) {
   const store = useFiltersStore()
   const regraEfetiva = computed(() =>
     typeof regra === 'function' ? regra() : regra?.value !== undefined ? regra.value : regra,
@@ -288,6 +293,7 @@ export function useConsistencia(regra = null) {
       store.uf,
       store.municipio,
       regraEfetiva.value ?? null,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.consistencia(
@@ -298,6 +304,7 @@ export function useConsistencia(regra = null) {
           uf: store.uf,
           municipio: store.municipio,
           regra: regraEfetiva.value ?? undefined,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -306,7 +313,7 @@ export function useConsistencia(regra = null) {
   })
 }
 
-export function useComparacaoLocal() {
+export function useComparacaoLocal(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
     queryKey: computed(() => [
@@ -316,6 +323,7 @@ export function useComparacaoLocal() {
       store.asOf,
       store.uf,
       store.municipio,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.comparacaoLocal(
@@ -325,6 +333,7 @@ export function useComparacaoLocal() {
           as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -333,7 +342,7 @@ export function useComparacaoLocal() {
   })
 }
 
-export function useConcentracao() {
+export function useConcentracao(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
     queryKey: computed(() => [
@@ -343,6 +352,7 @@ export function useConcentracao() {
       store.asOf,
       store.uf,
       store.municipio,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.concentracao(
@@ -352,6 +362,7 @@ export function useConcentracao() {
           as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -360,7 +371,7 @@ export function useConcentracao() {
   })
 }
 
-export function useRelatorio() {
+export function useRelatorio(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
     queryKey: computed(() => [
@@ -370,6 +381,7 @@ export function useRelatorio() {
       store.asOf,
       store.uf,
       store.municipio,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.relatorio(
@@ -379,6 +391,7 @@ export function useRelatorio() {
           as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
+          ...paramsDe(ordem),
         },
         signal,
       ),
@@ -389,7 +402,7 @@ export function useRelatorio() {
   })
 }
 
-export function useSecao(id) {
+export function useSecao(id, ordem = null) {
   const store = useFiltersStore()
   const idEfetivo = computed(() => {
     const valor = isRef(id) ? id.value : id
@@ -402,6 +415,7 @@ export function useSecao(id) {
       store.electionId,
       store.cargo,
       store.asOf,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.secao(
@@ -410,17 +424,19 @@ export function useSecao(id) {
           election_id: store.electionId,
           cargo: store.cargo,
           as_of: store.asOf,
+          ...paramsDe(ordem),
         },
         signal,
       ),
     enabled: computed(() =>
       Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
     ),
+    placeholderData: (anterior, consulta) => (consulta?.queryKey[1] === idEfetivo.value ? anterior : undefined),
   })
 }
 
 
-export function useSecaoVersoes(id) {
+export function useSecaoVersoes(id, ordem = null) {
   const store = useFiltersStore()
   const idEfetivo = computed(() => {
     const valor = isRef(id) ? id.value : id
@@ -433,6 +449,7 @@ export function useSecaoVersoes(id) {
       store.electionId,
       store.cargo,
       store.asOf,
+      paramsDe(ordem),
     ]),
     queryFn: ({ signal }) =>
       api.secaoVersoes(
@@ -441,11 +458,13 @@ export function useSecaoVersoes(id) {
           election_id: store.electionId,
           cargo: store.cargo,
           as_of: store.asOf,
+          ...paramsDe(ordem),
         },
         signal,
       ),
     enabled: computed(() =>
       Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
     ),
+    placeholderData: (anterior, consulta) => (consulta?.queryKey[1] === idEfetivo.value ? anterior : undefined),
   })
 }

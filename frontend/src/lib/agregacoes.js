@@ -10,9 +10,12 @@ export function votosValidos(votos = []) {
     .reduce((total, voto) => total + Number(voto.qt_votos ?? 0), 0)
 }
 
+export function nominaisNaOrdemDoServidor(votos = []) {
+  return votos.filter((voto) => voto.categoria === 'nominal' && voto.nr_votavel !== null)
+}
+
 export function candidatosNominais(votos = []) {
-  return votos
-    .filter((voto) => voto.categoria === 'nominal' && voto.nr_votavel !== null)
+  return nominaisNaOrdemDoServidor(votos)
     .slice()
     .sort((a, b) => Number(b.qt_votos) - Number(a.qt_votos))
 }

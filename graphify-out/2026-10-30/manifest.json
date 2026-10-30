@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/duplicacao.js": {
-    "mtime": 1793364051.2698004,
-    "seen": 1793364259.127867,
-    "ast_hash": "4051578fc0c47b3cdc40d3e1c7c1baed",
+    "mtime": 1793393120.3132272,
+    "seen": 1793393915.233357,
+    "ast_hash": "f423659c8fdfcb9e3c050a0c3703fac5",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatisticas.js": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793386465.0811942,
-    "seen": 1793386474.3816082,
-    "ast_hash": "b11bb59015d029513a634e5cede9001f",
+    "mtime": 1793393509.610566,
+    "seen": 1793393915.233404,
+    "ast_hash": "35f881c1eeed20c0a841c65d1ccacf76",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -786,21 +786,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793380477.948069,
-    "seen": 1793380494.0117292,
-    "ast_hash": "12446ac4c725830c8d75fb46fc2943e7",
+    "mtime": 1793393513.9366143,
+    "seen": 1793393915.2335835,
+    "ast_hash": "7e61fe76472cc1b9d532378fb5ab5230",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793380477.949069,
-    "seen": 1793380494.011731,
-    "ast_hash": "0cc1d65c2ef005d8f6455fe45f1d2a91",
+    "mtime": 1793393514.0696156,
+    "seen": 1793393915.233585,
+    "ast_hash": "c9f273ef96fdf50a0bfff8a64249a947",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793380477.9470692,
-    "seen": 1793380494.0117328,
-    "ast_hash": "6d0055c43da519647c9943785c685b4d",
+    "mtime": 1793393513.7896125,
+    "seen": 1793393915.2335868,
+    "ast_hash": "071a5ebf65d346b23c1828de8ade93d3",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -960,9 +960,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793380477.951069,
-    "seen": 1793380494.0117958,
-    "ast_hash": "994363d1c7577bf27df63d76f2202735",
+    "mtime": 1793393509.8625686,
+    "seen": 1793393915.2336402,
+    "ast_hash": "754d48531187bf9cb9c8f41097b08512",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -1020,9 +1020,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/concentracao.js": {
-    "mtime": 1793373149.2641618,
-    "seen": 1793373217.6447296,
-    "ast_hash": "95dd1927ab8b460ac597d9412ce4a7b8",
+    "mtime": 1793393120.3122272,
+    "seen": 1793393915.2333512,
+    "ast_hash": "93aea015ec2822c762e43e9ecb4339c5",
     "semantic_hash": ""
   },
   "backend/tests/integration/comparacao-local.test.js": {
@@ -1086,8 +1086,8 @@
     "semantic_hash": ""
   },
   "backend/src/migrations/0007_mv_totais_area.js": {
-    "mtime": 1793372283.5612957,
-    "seen": 1793372354.2518163,
+    "mtime": 1793393120.3432276,
+    "seen": 1793393915.2333436,
     "ast_hash": "853ab73cbf4bbcbc5073debb597f48bd",
     "semantic_hash": ""
   },
@@ -1131,6 +1131,24 @@
     "mtime": 1793380508.2594094,
     "seen": 1793386474.3818223,
     "ast_hash": "d533c4b70392bbd6c11d8c07cdbcb026",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/ordenacao.js": {
+    "mtime": 1793393120.3422275,
+    "seen": 1793393915.2333274,
+    "ast_hash": "344af07fdd0ec112fc7008c6a85ea988",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/ordenacao.test.js": {
+    "mtime": 1793393584.1964004,
+    "seen": 1793393915.2334502,
+    "ast_hash": "b252fd1fdaaa49f5be2a1fd9b18e26d6",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/ordenacao.test.js": {
+    "mtime": 1793393120.3432276,
+    "seen": 1793393915.233514,
+    "ast_hash": "cb7d517a407ee3b138b1cfde7e07cf72",
     "semantic_hash": ""
   }
 }

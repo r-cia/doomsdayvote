@@ -5,17 +5,36 @@ import StateBlock from '../components/StateBlock.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import ConsistenciaPanel from '../components/ConsistenciaPanel.vue'
 import ConcentracaoPanel from '../components/ConcentracaoPanel.vue'
-import { ref, watch } from 'vue'
+import { computed, watch } from 'vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useAnalise, useAnomalias, useConsistencia, useConcentracao } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 
 const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
 
-const ordenacao = ref('if')
-const analiseQuery = useAnalise()
-const anomaliasQuery = useAnomalias(null, ordenacao)
-const consistenciaQuery = useConsistencia()
-const concentracaoQuery = useConcentracao()
+const ordenacoes = {
+  benford: useOrdenacao(),
+  outliers: useOrdenacao(),
+  duplicacao: useOrdenacao('duplicacao'),
+  niveis: useOrdenacao('benford'),
+}
+const ordemConsistencia = useOrdenacao()
+const ordemShare = useOrdenacao('share')
+const ordemMargem = useOrdenacao('margem')
+
+const analiseQuery = useAnalise(ordenacoes.benford.params)
+const anomaliasQuery = useAnomalias(
+  null,
+  computed(() => ({
+    ...ordenacoes.outliers.params.value,
+    ...ordenacoes.duplicacao.params.value,
+    ...ordenacoes.niveis.params.value,
+  })),
+)
+const consistenciaQuery = useConsistencia(null, ordemConsistencia.params)
+const concentracaoQuery = useConcentracao(
+  computed(() => ({ ...ordemShare.params.value, ...ordemMargem.params.value })),
+)
 
 watch(
   () => store.asOf,
@@ -50,10 +69,9 @@ watch(
     :selecionado="store.candidato"
     :loading="anomaliasQuery.isLoading.value"
     :error="anomaliasQuery.error.value?.message ?? ''"
-    :ordenacao="ordenacao"
+    :ordenacoes="ordenacoes"
     @retry="anomaliasQuery.refetch()"
     @select="aoCandidato"
-    @update:ordenacao="ordenacao = $event"
   />
 
   <AnaliseCobertura
@@ -65,6 +83,7 @@ watch(
     :dados="consistenciaQuery.data.value ?? null"
     :loading="consistenciaQuery.isLoading.value"
     :error="consistenciaQuery.error.value?.message ?? ''"
+    :ordenacao="ordemConsistencia"
     @retry="consistenciaQuery.refetch()"
   />
 
@@ -72,6 +91,8 @@ watch(
     :dados="concentracaoQuery.data.value ?? null"
     :loading="concentracaoQuery.isLoading.value"
     :error="concentracaoQuery.error.value?.message ?? ''"
+    :ordenacao-share="ordemShare"
+    :ordenacao-margem="ordemMargem"
     @retry="concentracaoQuery.refetch()"
   />
 </template>
