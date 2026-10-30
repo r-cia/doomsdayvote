@@ -79,12 +79,19 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
 
   grupos.sort((a, b) => b.secoes.length - a.secoes.length)
 
+  const totalSecoesGrupos = grupos.reduce((total, grupo) => total + grupo.secoes.length, 0)
   const limitados = grupos.slice(0, limite)
   return {
     grupos: limitados,
     total_grupos: grupos.length,
-    total_secoes: grupos.reduce((total, grupo) => total + grupo.secoes.length, 0),
+    total_secoes: totalSecoesGrupos,
     total_secoes_escopo: secoes.length,
+    cobertura: {
+      consideradas: secoes.length,
+      com_grupo: totalSecoesGrupos,
+      sem_grupo: secoes.length - totalSecoesGrupos,
+      grupos: grupos.length,
+    },
     observacao:
       'Frequência esperada de coincidências cresce com a escala do escopo; resultado descritivo, sem rótulo de alerta.',
   }

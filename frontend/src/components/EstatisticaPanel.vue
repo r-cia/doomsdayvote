@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
+import CoberturaBlock from './CoberturaBlock.vue'
 import { useEstatisticas } from '../composables/queries'
 
 const props = defineProps({
@@ -146,5 +147,9 @@ function erroMensagem(erro) {
         </section>
       </article>
     </div>
+    <CoberturaBlock
+      :cobertura="estatisticasQuery.data.value?.cobertura ?? null"
+      :limitacoes="estatisticasQuery.data.value?.limitacoes ?? []"
+    />
   </section>
 </template>

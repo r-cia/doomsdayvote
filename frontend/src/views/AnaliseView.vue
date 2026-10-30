@@ -1,5 +1,6 @@
 <script setup>
 import AnaliseSection from '../components/AnaliseSection.vue'
+import CoberturaBlock from '../components/CoberturaBlock.vue'
 import StateBlock from '../components/StateBlock.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import ConsistenciaPanel from '../components/ConsistenciaPanel.vue'
@@ -55,6 +56,11 @@ watch(
     @retry="anomaliasQuery.refetch()"
     @select="aoCandidato"
     @update:ordenacao="ordenacao = $event"
+  />
+
+  <CoberturaBlock
+    :cobertura="analiseQuery.data.value?.cobertura ?? null"
+    :limitacoes="analiseQuery.data.value?.limitacoes ?? []"
   />
 
   <ConsistenciaPanel

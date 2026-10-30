@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import CoberturaBlock from './CoberturaBlock.vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -104,5 +105,6 @@ function numeros(grupo) {
         </tbody>
       </table>
     </div>
+    <CoberturaBlock :dados="dados" />
   </section>
 </template>
