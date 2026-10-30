@@ -27,6 +27,20 @@ describe('validarConsistenciaBu', () => {
     expect(comp.diferenca).toBe(10);
   });
 
+  it('valida soma agregada de votos e ausência de votos nulos', () => {
+    const regras = validarConsistenciaBu(buOk, { somaVotos: '80', temVotosNulos: false });
+    const comp = regras.find((r) => r.regra === 'comparecimento_vs_votos');
+    expect(comp.status).toBe('ok');
+    expect(comp.diferenca).toBe(0);
+  });
+
+  it('marca dados insuficientes quando a agregação contém votos nulos', () => {
+    const regras = validarConsistenciaBu(buOk, { somaVotos: '80', temVotosNulos: true });
+    const comp = regras.find((r) => r.regra === 'comparecimento_vs_votos');
+    expect(comp.status).toBe('dados_insuficientes');
+    expect(comp.diferenca).toBeNull();
+  });
+
   it('detecta divergência quando comparecimento > aptos', () => {
     const regras = validarConsistenciaBu(
       { ...buOk, qt_comparecimento: 90, qt_aptos: 80 },

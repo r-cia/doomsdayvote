@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/consistencia.js": {
-    "mtime": 1793359669.6378984,
-    "seen": 1793360126.8218021,
-    "ast_hash": "0a0c9bd5464b11b4e0c2a5fea218ebca",
+    "mtime": 1793372588.1304147,
+    "seen": 1793372607.4915113,
+    "ast_hash": "4ee09740cef7fc48e3c842ef10f5cf51",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/descritivas.js": {
@@ -480,9 +480,9 @@
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/consistencia.test.js": {
-    "mtime": 1793359719.9234114,
-    "seen": 1793360126.8218846,
-    "ast_hash": "fe7c9fe38c470e87697c899b85dfad15",
+    "mtime": 1793372569.2782216,
+    "seen": 1793372607.491636,
+    "ast_hash": "3e4456b3bbf782e7c6774ba96d6a9c2b",
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/duplicacao.test.js": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793370347.6785378,
-    "seen": 1793371590.7604792,
-    "ast_hash": "f5e0c14eaa4a7f047201a03c6ecf7eea",
+    "mtime": 1793372574.7762778,
+    "seen": 1793372607.491794,
+    "ast_hash": "3932e862a31f771dc677aee2c0076a0b",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
