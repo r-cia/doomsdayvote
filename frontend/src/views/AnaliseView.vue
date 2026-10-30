@@ -1,14 +1,15 @@
 <script setup>
 import AnaliseSection from '../components/AnaliseSection.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
+import { ref, watch } from 'vue'
 import { useAnalise, useAnomalias } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
-import { watch } from 'vue'
 
 const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
 
+const ordenacao = ref('if')
 const analiseQuery = useAnalise()
-const anomaliasQuery = useAnomalias()
+const anomaliasQuery = useAnomalias(null, ordenacao)
 
 watch(
   () => store.asOf,
@@ -17,6 +18,8 @@ watch(
     anomaliasQuery.refetch()
   },
 )
+
+
 </script>
 
 <template>
@@ -31,7 +34,9 @@ watch(
     :selecionado="store.candidato"
     :loading="anomaliasQuery.isLoading.value"
     :error="anomaliasQuery.error.value?.message ?? ''"
+    :ordenacao="ordenacao"
     @retry="anomaliasQuery.refetch()"
     @select="aoCandidato"
+    @update:ordenacao="ordenacao = $event"
   />
 </template>

@@ -104,8 +104,15 @@ export function useAnalise() {
   })
 }
 
-export function useAnomalias(habilitado = null) {
+export function useAnomalias(habilitado = null, ordenarPor = null) {
   const store = useFiltersStore()
+  const ordenacao = computed(() =>
+    typeof ordenarPor === 'function'
+      ? ordenarPor()
+      : ordenarPor?.value !== undefined
+        ? ordenarPor.value
+        : (ordenarPor ?? 'if'),
+  )
   return useQuery({
     queryKey: computed(() => [
       'anomalias',
@@ -114,6 +121,7 @@ export function useAnomalias(habilitado = null) {
       store.asOf,
       store.uf,
       store.municipio,
+      ordenacao.value,
     ]),
     queryFn: ({ signal }) =>
       api.anomalias(
@@ -123,6 +131,7 @@ export function useAnomalias(habilitado = null) {
           as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
+          ordenar_por: ordenacao.value,
         },
         signal,
       ),

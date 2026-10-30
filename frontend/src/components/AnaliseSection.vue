@@ -11,9 +11,10 @@ defineProps({
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  ordenacao: { type: String, default: 'if' },
 })
 
-const emit = defineEmits(['retry', 'select'])
+const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
 </script>
 
 <template>
@@ -42,7 +43,11 @@ const emit = defineEmits(['retry', 'select'])
         <BenfordNiveisPanel :dados="anomalias.benford_niveis" />
         <div class="auditoria-grade">
           <DuplicacaoPanel :dados="anomalias.duplicacao" />
-          <OutliersPanel :dados="anomalias.outliers" />
+          <OutliersPanel
+            :dados="anomalias.outliers"
+            :ordenacao="ordenacao"
+            @update:ordenacao="emit('update:ordenacao', $event)"
+          />
         </div>
       </template>
 
