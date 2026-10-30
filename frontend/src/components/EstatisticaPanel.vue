@@ -67,15 +67,15 @@ function erroMensagem(erro) {
     <StateBlock
       v-else-if="estatisticasQuery.error.value"
       estado="erro"
-      titulo="Não foi possível calcular as estatísticas"
+      :titulo="$t('comum.erro')"
       :descricao="erroMensagem(estatisticasQuery.error.value)"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="estatisticasQuery.refetch()"
     />
     <StateBlock
       v-else-if="blocos.length === 0"
       estado="vazio"
-      titulo="Sem dados para este recorte"
+      :titulo="$t('comum.semDados')"
       descricao="Selecione um cargo com seções ativas."
     />
 
