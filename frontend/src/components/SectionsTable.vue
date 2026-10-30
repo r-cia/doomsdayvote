@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { formatarData, formatarDataHora, formatarNumero } from '../lib/format'
 import { motivoSecao, opcoesStatus, statusSecao } from '../lib/status'
 
@@ -15,6 +16,7 @@ const props = defineProps({
   pageSize: { type: Number, default: 25 },
   uf: { type: String, default: null },
   municipio: { type: Number, default: null },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
 const emit = defineEmits([
@@ -29,6 +31,13 @@ const emit = defineEmits([
 ])
 
 const tabela = ref(null)
+const { ariaSort, seta } = props.ordenacao
+
+function alternar(coluna) {
+  props.ordenacao.alternar(coluna)
+  emit('update:page', 1)
+}
+
 const itens = computed(() => props.data?.items ?? [])
 const total = computed(() => Number(props.data?.total ?? 0))
 const pagina = computed(() => Number(props.data?.page ?? 1))
@@ -177,13 +186,13 @@ function navegarLinhas(evento) {
             </caption>
             <thead>
               <tr>
-                <th scope="col">UF</th>
-                <th scope="col">Município</th>
-                <th scope="col" class="num">Zona</th>
-                <th scope="col" class="num">Seção</th>
-                <th scope="col" class="num">Local</th>
-                <th scope="col">Status</th>
-                <th scope="col">BU recebido</th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_municipio')"><button type="button" @click="alternar('nm_municipio')">Município{{ seta('nm_municipio') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_zona')"><button type="button" @click="alternar('nr_zona')">Zona{{ seta('nr_zona') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_secao')"><button type="button" @click="alternar('nr_secao')">Seção{{ seta('nr_secao') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_local_votacao')"><button type="button" @click="alternar('nr_local_votacao')">Local{{ seta('nr_local_votacao') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('status')"><button type="button" @click="alternar('status')">Status{{ seta('status') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('bu_recebido')"><button type="button" @click="alternar('bu_recebido')">BU recebido{{ seta('bu_recebido') }}</button></th>
                 <th scope="col"><span class="sr-only">Ação</span></th>
               </tr>
             </thead>

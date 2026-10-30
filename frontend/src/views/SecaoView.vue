@@ -15,6 +15,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
+import { useOrdenacao } from '../composables/ordenacao'
 import { useSecao, useSecaoVersoes } from '../composables/queries'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import {
@@ -47,8 +48,15 @@ if (props.modal) {
 }
 
 const id = computed(() => (props.modal ? String(props.idProp) : String(rota.params.id)))
-const consulta = useSecao(id)
-const versoesConsulta = useSecaoVersoes(id)
+const ordemResultados = useOrdenacao()
+const ordemCampos = useOrdenacao('campos')
+const ordemVotaveis = useOrdenacao('votaveis')
+const { alternar, ariaSort, seta } = ordemResultados
+const consulta = useSecao(id, ordemResultados.params)
+const versoesConsulta = useSecaoVersoes(
+  id,
+  computed(() => ({ ...ordemCampos.params.value, ...ordemVotaveis.params.value })),
+)
 const versoesDados = computed(() => versoesConsulta.data.value ?? null)
 const dados = computed(() => consulta.data.value ?? null)
 const secao = computed(() => dados.value?.secao ?? null)
@@ -254,13 +262,13 @@ function voltar() { fechar() }
             <caption class="sr-only">Resultados por votável na seção</caption>
             <thead>
               <tr>
-                <th scope="col">Tipo</th>
-                <th scope="col" class="num">Número</th>
-                <th scope="col">Votável</th>
-                <th scope="col">Partido</th>
-                <th scope="col">Categoria</th>
-                <th scope="col" class="num">Votos</th>
-                <th scope="col" class="num">% válidos</th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('cd_tipo_votavel')"><button type="button" @click="alternar('cd_tipo_votavel')">Tipo{{ seta('cd_tipo_votavel') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_votavel')"><button type="button" @click="alternar('nr_votavel')">Número{{ seta('nr_votavel') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">Votável{{ seta('nm_votavel') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_partido')"><button type="button" @click="alternar('sg_partido')">Partido{{ seta('sg_partido') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('categoria')"><button type="button" @click="alternar('categoria')">Categoria{{ seta('categoria') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('qt_votos')"><button type="button" @click="alternar('qt_votos')">Votos{{ seta('qt_votos') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('percentual')"><button type="button" @click="alternar('percentual')">% válidos{{ seta('percentual') }}</button></th>
               </tr>
             </thead>
             <tbody>
@@ -291,7 +299,13 @@ function voltar() { fechar() }
       </section>
     </template>
 
-      <VersoesBuPanel :dados="versoesDados" :loading="versoesConsulta.isLoading.value" :error="versoesConsulta.error.value?.message" />
+      <VersoesBuPanel
+        :dados="versoesDados"
+        :loading="versoesConsulta.isLoading.value"
+        :error="versoesConsulta.error.value?.message"
+        :ordenacao-campos="ordemCampos"
+        :ordenacao-votaveis="ordemVotaveis"
+      />
     </div>
   </div>
   </Teleport>

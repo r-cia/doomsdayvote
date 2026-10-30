@@ -1,13 +1,14 @@
 <script setup>
 import { computed } from 'vue'
 import { formatarDecimal } from '../lib/format'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
-  ordenacao: { type: String, default: 'if' },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
-const emit = defineEmits(['update:ordenacao'])
+const { alternar, ariaSort, seta } = props.ordenacao
 
 const secoes = computed(() => props.dados?.secoes ?? [])
 const parametros = computed(() => props.dados?.parametros ?? {})
@@ -23,18 +24,6 @@ function score(valor) {
   <section class="painel" aria-labelledby="outliers-titulo">
     <header class="painel__cabecalho">
       <h2 id="outliers-titulo">{{ $t('estatistica.isolamento') }}</h2>
-      <div class="estatistica-controle">
-        <label class="campo campo--curto">
-          <span class="campo__rotulo">Ordenar por</span>
-          <select
-            :value="ordenacao"
-            @change="emit('update:ordenacao', $event.target.value)"
-          >
-            <option value="if">Maior IF</option>
-            <option value="lof">Maior LOF</option>
-          </select>
-        </label>
-      </div>
       <p class="painel__meta">
         <b>{{ dados?.total_secoes ?? 0 }}</b> seções · amostra LOF {{ parametros.lof?.amostra ?? dados?.lof?.amostra ?? 0 }}
         <template v-if="parametros.lof?.limitado ?? dados?.lof?.limitado"> (limitada)</template>
@@ -55,13 +44,13 @@ function score(valor) {
         </caption>
         <thead>
           <tr>
-            <th scope="col">UF</th>
-            <th scope="col">Município</th>
-            <th scope="col" class="num">Zona</th>
-            <th scope="col" class="num">Seção</th>
-            <th scope="col" class="num">IF</th>
-            <th scope="col" class="num">LOF</th>
-            <th scope="col">Candidato</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_municipio')"><button type="button" @click="alternar('nm_municipio')">Município{{ seta('nm_municipio') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_zona')"><button type="button" @click="alternar('nr_zona')">Zona{{ seta('nr_zona') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_secao')"><button type="button" @click="alternar('nr_secao')">Seção{{ seta('nr_secao') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('score_if')"><button type="button" @click="alternar('score_if')">IF{{ seta('score_if') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('score_lof')"><button type="button" @click="alternar('score_lof')">LOF{{ seta('score_lof') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('candidato')"><button type="button" @click="alternar('candidato')">Candidato{{ seta('candidato') }}</button></th>
           </tr>
         </thead>
         <tbody>

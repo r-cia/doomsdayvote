@@ -3,12 +3,16 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
+
+const { alternar, ariaSort, seta } = props.ordenacao
 
 const emit = defineEmits(['retry'])
 const { t } = useI18n()
@@ -66,14 +70,14 @@ function nivel(rotulo) {
             <caption class="sr-only">{{ $t('analiseUI.secoesGrupo', { level: nivel(grupo.nivel) }) }}</caption>
             <thead>
               <tr>
-                <th scope="col">UF</th>
-                <th scope="col">{{ $t('analiseUI.municipio') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.participacao') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.abstencao') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.deltaMedianaParticipacao') }}</th>
-                <th scope="col" class="num">{{ $t('analiseUI.deltaMedianaAbstencao') }}</th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_municipio')"><button type="button" @click="alternar('nm_municipio')">{{ $t('analiseUI.municipio') }}{{ seta('nm_municipio') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_zona')"><button type="button" @click="alternar('nr_zona')">{{ $t('analiseUI.zona') }}{{ seta('nr_zona') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_secao')"><button type="button" @click="alternar('nr_secao')">{{ $t('analiseUI.secao') }}{{ seta('nr_secao') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('participacao')"><button type="button" @click="alternar('participacao')">{{ $t('analiseUI.participacao') }}{{ seta('participacao') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('abstencao')"><button type="button" @click="alternar('abstencao')">{{ $t('analiseUI.abstencao') }}{{ seta('abstencao') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('participacao_pp')"><button type="button" @click="alternar('participacao_pp')">{{ $t('analiseUI.deltaMedianaParticipacao') }}{{ seta('participacao_pp') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('abstencao_pp')"><button type="button" @click="alternar('abstencao_pp')">{{ $t('analiseUI.deltaMedianaAbstencao') }}{{ seta('abstencao_pp') }}</button></th>
               </tr>
             </thead>
             <tbody>

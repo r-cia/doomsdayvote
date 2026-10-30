@@ -6,13 +6,15 @@ import ComparacoesView from './ComparacoesView.vue'
 import BiometriaView from './BiometriaView.vue'
 import EncerramentoView from './EncerramentoView.vue'
 import StateBlock from '../components/StateBlock.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useConsistencia, useRelatorio } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarDecimal, formatarNumero, formatarPercentual } from '../lib/format'
 
 const { t } = useI18n()
 const { store, eleicaoAtual, cargos } = useSelecaoEleicao()
-const relatorio = useRelatorio()
+const { alternar, ariaSort, seta, params } = useOrdenacao()
+const relatorio = useRelatorio(params)
 const consistencia = useConsistencia()
 const mostrarAnalises = ref(false)
 
@@ -127,12 +129,12 @@ function identificador(linha) {
                 <caption class="sr-only">{{ $t('relatorio.historico') }}</caption>
                 <thead>
                   <tr>
-                    <th scope="col">{{ $t('relatorio.referencia') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.bus') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.participacao') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.diferenca') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.abstencao') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.diferenca') }}</th>
+                    <th scope="col" class="ordenavel" :aria-sort="ariaSort('referencia')"><button type="button" @click="alternar('referencia')">{{ $t('relatorio.referencia') }}{{ seta('referencia') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('bus')"><button type="button" @click="alternar('bus')">{{ $t('relatorio.bus') }}{{ seta('bus') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('participacao_pct')"><button type="button" @click="alternar('participacao_pct')">{{ $t('relatorio.participacao') }}{{ seta('participacao_pct') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('diferenca_participacao')"><button type="button" @click="alternar('diferenca_participacao')">{{ $t('relatorio.diferenca') }}{{ seta('diferenca_participacao') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('abstencao_pct')"><button type="button" @click="alternar('abstencao_pct')">{{ $t('relatorio.abstencao') }}{{ seta('abstencao_pct') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('diferenca_abstencao')"><button type="button" @click="alternar('diferenca_abstencao')">{{ $t('relatorio.diferenca') }}{{ seta('diferenca_abstencao') }}</button></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -153,16 +155,16 @@ function identificador(linha) {
                 <caption class="sr-only">{{ $t('relatorio.recebimento') }}</caption>
                 <thead>
                   <tr>
-                    <th scope="col">{{ $t('relatorio.referencia') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.dataHora') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.somenteData') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.ausente') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.outraPrecisao') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.semEncerramento') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.antesEncerramento') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.antesEmissao') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.medianaAtraso') }}</th>
-                    <th scope="col" class="tabela__numero">{{ $t('relatorio.p90Atraso') }}</th>
+                    <th scope="col" class="ordenavel" :aria-sort="ariaSort('referencia')"><button type="button" @click="alternar('referencia')">{{ $t('relatorio.referencia') }}{{ seta('referencia') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('data_hora')"><button type="button" @click="alternar('data_hora')">{{ $t('relatorio.dataHora') }}{{ seta('data_hora') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('somente_data')"><button type="button" @click="alternar('somente_data')">{{ $t('relatorio.somenteData') }}{{ seta('somente_data') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('ausente')"><button type="button" @click="alternar('ausente')">{{ $t('relatorio.ausente') }}{{ seta('ausente') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('outra_precisao')"><button type="button" @click="alternar('outra_precisao')">{{ $t('relatorio.outraPrecisao') }}{{ seta('outra_precisao') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('sem_encerramento')"><button type="button" @click="alternar('sem_encerramento')">{{ $t('relatorio.semEncerramento') }}{{ seta('sem_encerramento') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('antes_encerramento')"><button type="button" @click="alternar('antes_encerramento')">{{ $t('relatorio.antesEncerramento') }}{{ seta('antes_encerramento') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('antes_emissao')"><button type="button" @click="alternar('antes_emissao')">{{ $t('relatorio.antesEmissao') }}{{ seta('antes_emissao') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('mediana_atraso_min')"><button type="button" @click="alternar('mediana_atraso_min')">{{ $t('relatorio.medianaAtraso') }}{{ seta('mediana_atraso_min') }}</button></th>
+                    <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('p90_atraso_min')"><button type="button" @click="alternar('p90_atraso_min')">{{ $t('relatorio.p90Atraso') }}{{ seta('p90_atraso_min') }}</button></th>
                   </tr>
                 </thead>
                 <tbody>

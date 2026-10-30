@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import { useEstatisticas } from '../composables/queries'
 import { formatarNumero } from '../lib/format'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   eleicoesDisponiveis: { type: Array, default: () => [] },
@@ -12,7 +13,8 @@ const props = defineProps({
 
 const { locale } = useI18n()
 const escopo = ref('turno')
-const estatisticasQuery = useEstatisticas(escopo)
+const { alternar, ariaSort, seta, params } = useOrdenacao()
+const estatisticasQuery = useEstatisticas(escopo, params)
 
 const temDoisTurnos = computed(
   () => (estatisticasQuery.data.value?.turnos_disponiveis?.length ?? 0) >= 2,
@@ -117,13 +119,13 @@ function erroMensagem(erro) {
           <table class="tabela">
             <thead>
               <tr>
-                <th>{{ $t('estatistica.candidato') }}</th>
-                <th>{{ $t('estatistica.partido') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.secoes') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.secoesZero') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.media') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.mediana') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.desvio') }}</th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">{{ $t('estatistica.candidato') }}{{ seta('nm_votavel') }}</button></th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_partido')"><button type="button" @click="alternar('sg_partido')">{{ $t('estatistica.partido') }}{{ seta('sg_partido') }}</button></th>
+                <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('secoes')"><button type="button" @click="alternar('secoes')">{{ $t('estatistica.secoes') }}{{ seta('secoes') }}</button></th>
+                <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('secoes_zero')"><button type="button" @click="alternar('secoes_zero')">{{ $t('estatistica.secoesZero') }}{{ seta('secoes_zero') }}</button></th>
+                <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('media')"><button type="button" @click="alternar('media')">{{ $t('estatistica.media') }}{{ seta('media') }}</button></th>
+                <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('mediana')"><button type="button" @click="alternar('mediana')">{{ $t('estatistica.mediana') }}{{ seta('mediana') }}</button></th>
+                <th scope="col" class="tabela__numero ordenavel" :aria-sort="ariaSort('desvio')"><button type="button" @click="alternar('desvio')">{{ $t('estatistica.desvio') }}{{ seta('desvio') }}</button></th>
               </tr>
             </thead>
             <tbody>

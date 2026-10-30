@@ -1,10 +1,14 @@
 <script setup>
 import { computed } from 'vue'
 import { formatarDecimal } from '../lib/format'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
+
+const { alternar, ariaSort, seta } = props.ordenacao
 
 const candidatos = computed(() => props.dados?.candidatos ?? [])
 
@@ -34,13 +38,13 @@ function mad(nivel) {
         </caption>
         <thead>
           <tr>
-            <th scope="col">Candidato</th>
-            <th scope="col" class="num">Seção n</th>
-            <th scope="col" class="num">Seção MAD</th>
-            <th scope="col" class="num">Zona n</th>
-            <th scope="col" class="num">Zona MAD</th>
-            <th scope="col" class="num">Município n</th>
-            <th scope="col" class="num">Município MAD</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">Candidato{{ seta('nm_votavel') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_n')"><button type="button" @click="alternar('secao_n')">Seção n{{ seta('secao_n') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_mad')"><button type="button" @click="alternar('secao_mad')">Seção MAD{{ seta('secao_mad') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_n')"><button type="button" @click="alternar('zona_n')">Zona n{{ seta('zona_n') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_mad')"><button type="button" @click="alternar('zona_mad')">Zona MAD{{ seta('zona_mad') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_n')"><button type="button" @click="alternar('municipio_n')">Município n{{ seta('municipio_n') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_mad')"><button type="button" @click="alternar('municipio_mad')">Município MAD{{ seta('municipio_mad') }}</button></th>
           </tr>
         </thead>
         <tbody>

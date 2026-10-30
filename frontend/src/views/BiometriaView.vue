@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import SecaoView from './SecaoView.vue'
 import { api } from '../api/client'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
@@ -10,7 +11,10 @@ import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
 const secaoModalId = ref(null)
 
 const { store } = useSelecaoEleicao()
-const analiseQuery = useAnalise()
+const ordemUf = useOrdenacao('biometria_uf')
+const ordemMunicipios = useOrdenacao()
+const ordemSecoes = useOrdenacao()
+const analiseQuery = useAnalise(ordemUf.params)
 
 const ufSelecionada = ref(null)
 const municipioSelecionado = ref(null)
@@ -18,8 +22,6 @@ const municipios = ref([])
 const secoes = ref([])
 const carregandoMunicipios = ref(false)
 const carregandoSecoes = ref(false)
-const ordenarMunicipios = ref('nao_habilitada')
-const ordenarSecoes = ref('percentual')
 
 async function carregarMunicipios(uf) {
   ufSelecionada.value = uf
@@ -32,7 +34,7 @@ async function carregarMunicipios(uf) {
       cargo: store.cargo,
       as_of: store.asOf,
       uf,
-      ordenar_por: ordenarMunicipios.value,
+      ...ordemMunicipios.params.value,
     })
     municipios.value = r.municipios ?? []
   } catch (e) {
@@ -52,7 +54,7 @@ async function carregarSecoes(municipio) {
       as_of: store.asOf,
       uf: ufSelecionada.value,
       municipio,
-      ordenar_por: ordenarSecoes.value,
+      ...ordemSecoes.params.value,
     })
     secoes.value = r.secoes ?? []
   } catch (e) {
@@ -62,10 +64,10 @@ async function carregarSecoes(municipio) {
   }
 }
 
-watch(ordenarMunicipios, () => {
+watch(ordemMunicipios.params, () => {
   if (ufSelecionada.value) carregarMunicipios(ufSelecionada.value)
 })
-watch(ordenarSecoes, () => {
+watch(ordemSecoes.params, () => {
   if (municipioSelecionado.value) carregarSecoes(municipioSelecionado.value)
 })
 
@@ -82,6 +84,7 @@ function abrirSecao(item) {
   <BiometriaUfPanel
     :dados="analiseQuery.data.value?.biometria_uf ?? []"
     :loading="analiseQuery.isLoading.value"
+    :ordenacao="ordemUf"
     @select="carregarMunicipios"
   />
 
@@ -89,13 +92,6 @@ function abrirSecao(item) {
     <div class="card">
       <div class="card__cabecalho">
         <h2>Municípios com maior biometria não habilitada</h2>
-        <div class="uf-painel__acoes">
-          <select v-if="ufSelecionada" v-model="ordenarMunicipios" class="uf-ordenacao">
-            <option value="nao_habilitada">Não habilitada</option>
-            <option value="percentual">% não habilitada</option>
-            <option value="comparecimento">Comparecimento</option>
-          </select>
-        </div>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
@@ -105,9 +101,9 @@ function abrirSecao(item) {
         <table>
           <thead>
             <tr>
-              <th scope="col">Município</th>
-              <th scope="col" class="num">Não habilitada</th>
-              <th scope="col" class="num">%</th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('nm_municipio')"><button type="button" @click="ordemMunicipios.alternar('nm_municipio')">Município{{ ordemMunicipios.seta('nm_municipio') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('qt_nao_habilitada')"><button type="button" @click="ordemMunicipios.alternar('qt_nao_habilitada')">Não habilitada{{ ordemMunicipios.seta('qt_nao_habilitada') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('percentual_nao_habilitada')"><button type="button" @click="ordemMunicipios.alternar('percentual_nao_habilitada')">%{{ ordemMunicipios.seta('percentual_nao_habilitada') }}</button></th>
             </tr>
           </thead>
           <tbody>
@@ -129,13 +125,6 @@ function abrirSecao(item) {
     <div class="card">
       <div class="card__cabecalho">
         <h2>Seções com maior % não habilitada</h2>
-        <div class="uf-painel__acoes">
-          <select v-if="municipioSelecionado" v-model="ordenarSecoes" class="uf-ordenacao">
-            <option value="percentual">% não habilitada</option>
-            <option value="nao_habilitada">Não habilitada</option>
-            <option value="comparecimento">Comparecimento</option>
-          </select>
-        </div>
         <p v-if="municipioSelecionado" class="card__meta">
           {{ nomeMunicipio(municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}) }}
         </p>
@@ -147,10 +136,10 @@ function abrirSecao(item) {
         <table>
           <thead>
             <tr>
-              <th scope="col">Zona</th>
-              <th scope="col">Seção</th>
-              <th scope="col" class="num">Não habilitada</th>
-              <th scope="col" class="num">%</th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_zona')"><button type="button" @click="ordemSecoes.alternar('nr_zona')">Zona{{ ordemSecoes.seta('nr_zona') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_secao')"><button type="button" @click="ordemSecoes.alternar('nr_secao')">Seção{{ ordemSecoes.seta('nr_secao') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('qt_nao_habilitada')"><button type="button" @click="ordemSecoes.alternar('qt_nao_habilitada')">Não habilitada{{ ordemSecoes.seta('qt_nao_habilitada') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('percentual_nao_habilitada')"><button type="button" @click="ordemSecoes.alternar('percentual_nao_habilitada')">%{{ ordemSecoes.seta('percentual_nao_habilitada') }}</button></th>
               <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>

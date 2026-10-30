@@ -2,12 +2,16 @@
 import { computed } from 'vue'
 import { formatarDecimal, formatarNumero } from '../lib/format'
 import StateBlock from './StateBlock.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
+
+const { alternar, ariaSort, seta } = props.ordenacao
 
 const emit = defineEmits(['select'])
 
@@ -82,9 +86,9 @@ function formatarMad(valor) {
             </caption>
             <thead>
               <tr>
-                <th scope="col">{{ $t('estatistica.candidato') }}</th>
-                <th scope="col" class="num">n</th>
-                <th scope="col" class="num">MAD</th>
+                <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">{{ $t('estatistica.candidato') }}{{ seta('nm_votavel') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('n')"><button type="button" @click="alternar('n')">n{{ seta('n') }}</button></th>
+                <th scope="col" class="num ordenavel" :aria-sort="ariaSort('mad')"><button type="button" @click="alternar('mad')">MAD{{ seta('mad') }}</button></th>
               </tr>
             </thead>
             <tbody>

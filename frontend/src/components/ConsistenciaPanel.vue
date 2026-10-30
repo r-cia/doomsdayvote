@@ -5,12 +5,16 @@ import { useRouter } from 'vue-router'
 import StateBlock from './StateBlock.vue'
 import { useFiltersStore } from '../stores/filters'
 import { formatarNumero } from '../lib/format'
+import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  ordenacao: { type: Object, default: () => useOrdenacao() },
 })
+
+const { alternar, ariaSort, seta } = props.ordenacao
 
 const emit = defineEmits(['retry'])
 const { t } = useI18n()
@@ -75,12 +79,12 @@ function abrirSecao(item) {
         <caption class="sr-only">{{ $t('analiseUI.consistencia') }}</caption>
         <thead>
           <tr>
-            <th scope="col">UF</th>
-            <th scope="col">{{ $t('analiseUI.municipio') }}</th>
-            <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
-            <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
-            <th scope="col">{{ $t('analiseUI.regra') }}</th>
-            <th scope="col" class="num">{{ $t('analiseUI.diferenca') }}</th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_municipio')"><button type="button" @click="alternar('nm_municipio')">{{ $t('analiseUI.municipio') }}{{ seta('nm_municipio') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_zona')"><button type="button" @click="alternar('nr_zona')">{{ $t('analiseUI.zona') }}{{ seta('nr_zona') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_secao')"><button type="button" @click="alternar('nr_secao')">{{ $t('analiseUI.secao') }}{{ seta('nr_secao') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('regra')"><button type="button" @click="alternar('regra')">{{ $t('analiseUI.regra') }}{{ seta('regra') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('diferenca')"><button type="button" @click="alternar('diferenca')">{{ $t('analiseUI.diferenca') }}{{ seta('diferenca') }}</button></th>
             <th scope="col"><span class="sr-only">{{ $t('comum.acao') }}</span></th>
           </tr>
         </thead>

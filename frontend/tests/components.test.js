@@ -5,6 +5,7 @@ import KpiCards from '../src/components/KpiCards.vue'
 import MapPanel from '../src/components/MapPanel.vue'
 import MapTable from '../src/components/MapTable.vue'
 import SectionsTable from '../src/components/SectionsTable.vue'
+import { useOrdenacao } from '../src/composables/ordenacao'
 import UfPanel from '../src/components/UfPanel.vue'
 import PlotDia from '../src/components/PlotDia.vue'
 import PlacarRanking from '../src/components/PlacarRanking.vue'
@@ -525,6 +526,25 @@ describe('SectionsTable', () => {
 
     await wrapper.find('[data-secao-btn]').trigger('click')
     expect(wrapper.emitted('select')[0][0].id).toBe('s1')
+  })
+
+  it('ordena pelo cabeçalho no servidor e volta para a página 1', async () => {
+    const ordenacao = useOrdenacao()
+    const wrapper = mount(SectionsTable, {
+      props: { data, status: '', pageSize: 25, uf: 'PE', ordenacao },
+    })
+
+    const cabecalho = wrapper.findAll('th.ordenavel').find((th) => th.text() === 'Município')
+    expect(cabecalho.attributes('aria-sort')).toBe('none')
+
+    await cabecalho.find('button').trigger('click')
+    expect(ordenacao.params.value).toEqual({ ordem: 'nm_municipio', direcao: 'asc' })
+    expect(wrapper.emitted('update:page')[0]).toEqual([1])
+    expect(cabecalho.attributes('aria-sort')).toBe('ascending')
+    expect(cabecalho.text()).toBe('Município ↑')
+
+    await cabecalho.find('button').trigger('click')
+    expect(ordenacao.params.value).toEqual({ ordem: 'nm_municipio', direcao: 'desc' })
   })
 
   it('emite município, zona e seção em campos separados', async () => {
