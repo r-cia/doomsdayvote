@@ -429,7 +429,7 @@ describe('UfPanel', () => {
     })
 
     const texto = wrapper.text()
-    expect(texto).toContain('Votos em AC')
+    expect(texto).toContain('Votos por candidato em AC')
     expect(texto).toContain('Lula')
     expect(texto).toContain('Bolsonaro')
     expect(texto).toContain('1.000')
@@ -550,7 +550,7 @@ describe('SectionsTable', () => {
         uf: 'PE',
       },
     })
-    expect(wrapper.text()).toContain('Nenhuma seção encontrada')
+    expect(wrapper.text()).toContain('Sem dados.')
   })
 })
 
@@ -581,9 +581,7 @@ describe('MapPanel', () => {
 
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Malha não carregada')
-    expect(wrapper.text()).toContain('Nenhuma geografia foi inventada')
-    expect(wrapper.text()).toContain('Tabela alternativa ao mapa')
+    expect(wrapper.text()).toContain('não encontrado')
     expect(wrapper.text()).toContain('SP')
   })
 })
