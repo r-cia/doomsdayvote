@@ -743,9 +743,6 @@ export async function registrarRotas(app) {
         sql`max(l.nm_municipio)`.as('nm_municipio'),
         sql`count(*)::int`.as('total'),
         sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz)::int`.as('apos_1715'),
-        sql`(select rv.sg_partido from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null group by rv.sg_partido order by sum(rv.qt_votos) desc limit 1)`.as('partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null and rv.sg_partido = (select rv2.sg_partido from resultado_votavel rv2 join boletim_versao bv3 on bv3.id = rv2.boletim_versao_id join secao_eleitoral s3 on s3.id = bv3.secao_id where s3.cd_municipio_tse = s.cd_municipio_tse and s3.sg_uf = s.sg_uf and bv3.eleicao_id = ${eleicao.id} and bv3.cd_cargo_pergunta = ${query.cargo} and bv3.ativo = true and rv2.categoria in ('nominal','legenda') and rv2.qt_votos is not null group by rv2.sg_partido order by sum(rv2.qt_votos) desc limit 1))`.as('votos_partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null)`.as('total_validos'),
       ])
       .groupBy(['s.cd_municipio_tse', 's.sg_uf'])
       .orderBy(
@@ -756,20 +753,74 @@ export async function registrarRotas(app) {
       .limit(query.limit)
       .execute();
 
+    let qbPartidos = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
+      .where('bv.eleicao_id', '=', eleicao.id)
+      .where('bv.cd_cargo_pergunta', '=', query.cargo)
+      .where('s.sg_uf', '=', query.uf)
+      .where('rv.categoria', 'in', ['nominal', 'legenda'])
+      .where('rv.qt_votos', 'is not', null);
+    qbPartidos = aplicarFiltroCorte(qbPartidos, corte);
+
+    const linhasPartidos = await qbPartidos
+      .select([
+        's.cd_municipio_tse',
+        'rv.sg_partido',
+        sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('votos'),
+      ])
+      .groupBy(['s.cd_municipio_tse', 'rv.sg_partido'])
+      .execute();
+
+    const totaisPorMunicipio = new Map();
+    for (const linha of linhasPartidos) {
+      const cd = linha.cd_municipio_tse;
+      if (!totaisPorMunicipio.has(cd)) {
+        totaisPorMunicipio.set(cd, { total: 0, partidos: new Map() });
+      }
+      const acumulado = totaisPorMunicipio.get(cd);
+      const votos = Number(linha.votos);
+      acumulado.total += votos;
+      const atual = acumulado.partidos.get(linha.sg_partido) ?? 0;
+      acumulado.partidos.set(linha.sg_partido, atual + votos);
+    }
+    const resumoPorMunicipio = new Map();
+    for (const [cd, acumulado] of totaisPorMunicipio) {
+      let partido = null;
+      let votosPartido = 0;
+      for (const [nome, votos] of acumulado.partidos) {
+        if (votos > votosPartido) {
+          votosPartido = votos;
+          partido = nome;
+        }
+      }
+      resumoPorMunicipio.set(cd, {
+        partido,
+        votos: votosPartido,
+        total: acumulado.total,
+      });
+    }
+
     return {
       corte: corteResposta(corte),
       municipios: linhas.map((l) => {
         const total = Number(l.total);
         const apos = Number(l.apos_1715);
+        const resumo = resumoPorMunicipio.get(l.cd_municipio_tse) ?? {
+          partido: null,
+          votos: 0,
+          total: 0,
+        };
         return {
           cd_municipio_tse: l.cd_municipio_tse,
           nm_municipio: l.nm_municipio,
           total,
           apos_1715: apos,
           pct_apos_1715: total > 0 ? (apos / total) * 100 : null,
-          partido: l.partido,
-          votos: Number(l.votos_partido ?? 0),
-          pct_votos: Number(l.total_validos) > 0 ? (Number(l.votos_partido) / Number(l.total_validos)) * 100 : null,
+          partido: resumo.partido,
+          votos: resumo.votos,
+          pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
         };
       }),
     };
