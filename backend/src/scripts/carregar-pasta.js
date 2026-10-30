@@ -17,6 +17,7 @@ async function main() {
 
   const cliente = new pg.Client({ connectionString: env.DATABASE_URL });
   await cliente.connect();
+  await cliente.query('SET statement_timeout = 0');
   const { rows } = await cliente.query('select pg_try_advisory_lock($1) as ok', [LOCK]);
   if (!rows[0].ok) {
     console.error('CARGA_EM_ANDAMENTO');
@@ -24,7 +25,8 @@ async function main() {
     process.exit(2);
   }
 
-  const db = criarDb({ connectionString: env.DATABASE_URL });
+  // Lote offline: COPY de arquivos grandes passa dos 60s do limite padrão.
+  const db = criarDb({ connectionString: env.DATABASE_URL, statementTimeout: 0 });
   const cache = criarCache({ url: env.REDIS_URL });
 
   try {
