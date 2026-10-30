@@ -1,6 +1,5 @@
 export const FEATURES = Object.freeze([
   'participacao',
-  'abstencao',
   'biometria',
   'hora',
   'tamanho',
@@ -177,21 +176,28 @@ export function localOutlierFactor(dados, { k = 10, limiar = 2 } = {}) {  const 
   return { scores, k: vizinhosK, limiar }
 }
 
-export function amostraLof(total, scores, limite = 2000) {
+export function amostraLof(total, scores, limite = 2000, semente = 42) {
   if (total <= limite) return Array.from({ length: total }, (_, indice) => indice)
 
+  const rng = mulberry32(semente)
   const ordem = Array.from({ length: total }, (_, indice) => indice).sort(
     (a, b) => scores[b] - scores[a],
   )
   const escolhidos = ordem.slice(0, Math.min(500, total))
   const conjunto = new Set(escolhidos)
-  const restante = limite - escolhidos.length
 
-  for (let i = 0; i < restante; i += 1) {
-    const indice = Math.floor((i * total) / restante)
-    if (conjunto.has(indice)) continue
-    conjunto.add(indice)
-    escolhidos.push(indice)
+  const candidatos = Array.from({ length: total }, (_, indice) => indice).filter(
+    (indice) => !conjunto.has(indice),
+  )
+  for (let i = candidatos.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1))
+    ;[candidatos[i], candidatos[j]] = [candidatos[j], candidatos[i]]
+  }
+
+  const faltam = limite - escolhidos.length
+  for (let i = 0; i < faltam && i < candidatos.length; i += 1) {
+    conjunto.add(candidatos[i])
+    escolhidos.push(candidatos[i])
   }
 
   if (escolhidos.length < limite) {

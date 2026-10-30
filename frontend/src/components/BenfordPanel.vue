@@ -32,12 +32,8 @@ function formatarMad(valor) {
   })
 }
 
-function tom(classificacao) {
-  if (!classificacao) return ''
-  if (classificacao === 'conformidade próxima') return 'chip--ok'
-  if (classificacao === 'conformidade marginal') return 'chip--warn'
-  if (classificacao === 'não conformidade') return 'chip--alert'
-  return ''
+function avisoMetodologico() {
+  return props.dados?.observacao ?? props.dados?.status_metodologico ?? ''
 }
 </script>
 
@@ -93,7 +89,6 @@ function tom(classificacao) {
                 <th scope="col">{{ $t('estatistica.candidato') }}</th>
                 <th scope="col" class="num">n</th>
                 <th scope="col" class="num">MAD</th>
-                <th scope="col">Leitura</th>
               </tr>
             </thead>
             <tbody>
@@ -113,11 +108,6 @@ function tom(classificacao) {
                 </td>
                 <td class="num">{{ formatarNumero(candidato.n) }}</td>
                 <td class="num">{{ formatarMad(candidato.mad) }}</td>
-                <td>
-                  <span class="chip" :class="tom(candidato.classificacao)">
-                    {{ candidato.classificacao ?? 'sem dados' }}
-                  </span>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -127,6 +117,9 @@ function tom(classificacao) {
       <div class="benford__rodape">
         <p class="nota">
           <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> seções abaixo do mínimo
+        </p>
+        <p class="nota">
+          {{ avisoMetodologico() }}
         </p>
       </div>
     </template>

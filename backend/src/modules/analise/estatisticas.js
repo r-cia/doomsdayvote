@@ -4,6 +4,11 @@ import { calcularBenford } from './benford.js'
 
 export const MINIMO_VOTOS_BENFORD = 10
 
+function semClassificacao(resultado) {
+  const { classificacao, ...resto } = resultado
+  return resto
+}
+
 function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
   let qb = db
     .selectFrom('boletim_versao as bv')
@@ -161,15 +166,21 @@ export function benfordDosNiveis(linhas, minimoVotos = MINIMO_VOTOS_BENFORD) {
         total_votos: candidato.total_votos,
         secoes_abaixo_minimo: candidato.secoes.length - secoes.length,
         niveis: {
-          secao: calcularBenford(secoes),
-          zona: calcularBenford(zonas),
-          municipio: calcularBenford(municipios),
+          secao: semClassificacao(calcularBenford(secoes)),
+          zona: semClassificacao(calcularBenford(zonas)),
+          municipio: semClassificacao(calcularBenford(municipios)),
         },
       }
     })
     .sort((a, b) => b.total_votos - a.total_votos)
 
-  return { minimo_votos: minimoVotos, candidatos }
+  return {
+    minimo_votos: minimoVotos,
+    candidatos,
+    status_metodologico: 'em_validacao',
+    observacao:
+      'Leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
+  }
 }
 
 export async function benfordPorCandidato(db, escopo) {

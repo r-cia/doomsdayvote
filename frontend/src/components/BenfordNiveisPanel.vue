@@ -7,14 +7,6 @@ const props = defineProps({
 
 const candidatos = computed(() => props.dados?.candidatos ?? [])
 
-function tom(classificacao) {
-  if (!classificacao) return ''
-  if (classificacao === 'conformidade próxima') return 'chip--ok'
-  if (classificacao === 'conformidade marginal') return 'chip--warn'
-  if (classificacao === 'não conformidade') return 'chip--alert'
-  return ''
-}
-
 function mad(nivel) {
   if (nivel?.mad === null || nivel?.mad === undefined) return '—'
   return Number(nivel.mad).toLocaleString('pt-BR', {
@@ -59,25 +51,22 @@ function mad(nivel) {
             <td>{{ candidato.nm_votavel }}</td>
             <td class="num">{{ candidato.niveis.secao.n }}</td>
             <td class="num">
-              <span :class="tom(candidato.niveis.secao.classificacao)">
-                {{ mad(candidato.niveis.secao) }}
-              </span>
+              {{ mad(candidato.niveis.secao) }}
             </td>
             <td class="num">{{ candidato.niveis.zona.n }}</td>
             <td class="num">
-              <span :class="tom(candidato.niveis.zona.classificacao)">
-                {{ mad(candidato.niveis.zona) }}
-              </span>
+              {{ mad(candidato.niveis.zona) }}
             </td>
             <td class="num">{{ candidato.niveis.municipio.n }}</td>
             <td class="num">
-              <span :class="tom(candidato.niveis.municipio.classificacao)">
-                {{ mad(candidato.niveis.municipio) }}
-              </span>
+              {{ mad(candidato.niveis.municipio) }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+    <p class="nota">
+      {{ props.dados?.observacao ?? props.dados?.status_metodologico ?? '' }}
+    </p>
   </section>
 </template>
