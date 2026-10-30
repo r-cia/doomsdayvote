@@ -600,7 +600,7 @@ select {
 
 .placar__linha {
   display: grid;
-  grid-template-columns: 26px 78px minmax(0, 1fr) 84px 62px 54px;
+  grid-template-columns: 26px 78px minmax(0, 1fr) 84px 62px 84px 62px 84px 62px 54px;
   align-items: center;
   gap: 8px;
   width: 100%;
@@ -752,7 +752,7 @@ select {
 
 .placar__cabecalho {
   display: grid;
-  grid-template-columns: 26px 78px minmax(0, 1fr) 84px 62px 54px;
+  grid-template-columns: 26px 78px minmax(0, 1fr) 84px 62px 84px 62px 84px 62px 54px;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;

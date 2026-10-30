@@ -13,20 +13,32 @@ function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
 }
 
 export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {} }) {
+  const dataPleito = escopo.dataPleito;
+  const corte1715 = dataPleito ? `${dataPleito} 17:15:00-03` : null;
+
+  const colunas = [
+    'rv.cd_tipo_votavel',
+    'rv.nr_votavel',
+    'rv.categoria',
+    sql`max(rv.nm_votavel)`.as('nm_votavel'),
+    sql`max(rv.nr_partido)`.as('nr_partido'),
+    sql`max(rv.sg_partido)`.as('sg_partido'),
+    sql`max(rv.nm_partido)`.as('nm_partido'),
+    sql`max(pc.cor_hex)`.as('cor_hex'),
+    sql`sum(rv.qt_votos)`.as('qt_votos'),
+  ];
+
+  if (corte1715) {
+    colunas.push(
+      sql`sum(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= ${corte1715}::timestamptz then rv.qt_votos else 0 end)`.as('qt_votos_ate_1715'),
+      sql`sum(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then rv.qt_votos else 0 end)`.as('qt_votos_tardios'),
+    );
+  }
+
   const linhas = await base(db, { eleicaoId, cargo, corte, escopo })
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
     .leftJoin('partido_cor as pc', (join) => join.on(sql`pc.sg_partido = coalesce(rv.sg_partido, rv.nm_partido)`))
-    .select([
-      'rv.cd_tipo_votavel',
-      'rv.nr_votavel',
-      'rv.categoria',
-      sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(rv.nr_partido)`.as('nr_partido'),
-      sql`max(rv.sg_partido)`.as('sg_partido'),
-      sql`max(rv.nm_partido)`.as('nm_partido'),
-      sql`max(pc.cor_hex)`.as('cor_hex'),
-      sql`sum(rv.qt_votos)`.as('qt_votos'),
-    ])
+    .select(colunas)
     .where('rv.qt_votos', 'is not', null)
     .groupBy(['rv.cd_tipo_votavel', 'rv.nr_votavel', 'rv.categoria'])
     .execute();
@@ -46,6 +58,8 @@ export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {} }) {
       nm_partido: linha.nm_partido,
       cor_hex: linha.cor_hex,
       qt_votos: Number(linha.qt_votos),
+      qt_votos_ate_1715: Number(linha.qt_votos_ate_1715 ?? 0),
+      qt_votos_tardios: Number(linha.qt_votos_tardios ?? 0),
       percentual: baseValidos > 0 ? (Number(linha.qt_votos) / baseValidos) * 100 : null,
     }))
     .sort((a, b) => b.qt_votos - a.qt_votos);
