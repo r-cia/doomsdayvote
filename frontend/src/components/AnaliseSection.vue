@@ -26,7 +26,7 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível calcular as análises"
+      :titulo="$t('comum.erro')"
       :descricao="error"
       acao="Tentar novamente"
       @acao="emit('retry')"
@@ -54,7 +54,7 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
       <StateBlock
         v-else-if="loading"
         estado="carregando"
-        titulo="Calculando anomalias"
+        :titulo="$t('comum.carregando')"
       />
     </template>
   </section>
