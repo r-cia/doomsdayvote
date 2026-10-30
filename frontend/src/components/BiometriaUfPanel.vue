@@ -6,6 +6,8 @@ const props = defineProps({
   dados: { type: Array, default: () => [] },
 })
 
+const emit = defineEmits(['select'])
+
 const REGIAO = {
   AC: 'Norte', AM: 'Norte', AP: 'Norte', PA: 'Norte', RO: 'Norte', RR: 'Norte', TO: 'Norte',
   AL: 'Nordeste', BA: 'Nordeste', CE: 'Nordeste', MA: 'Nordeste', PB: 'Nordeste',
@@ -133,7 +135,7 @@ function seta(coluna) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="linha in linhas" :key="linha.sg_uf">
+          <tr v-for="linha in linhas" :key="linha.sg_uf" class="linha-clicavel" @click="emit('select', linha.sg_uf)">
             <td>{{ linha.sg_uf }}</td>
             <td class="tabela__numero">
               {{ formatarNumero(linha.qt_habilitados_por_biometria) }}
