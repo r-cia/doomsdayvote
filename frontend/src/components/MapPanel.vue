@@ -665,12 +665,12 @@ onBeforeUnmount(() => {
       estado="erro"
       :titulo="$t('comum.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="$emit('retry')"
     />
 
     <div v-if="loading && !error" class="mapa-status" role="status">
-      Carregando dados do mapa…
+      {{ $t('comum.carregando') }}
     </div>
 
     <StateBlock
@@ -685,7 +685,7 @@ onBeforeUnmount(() => {
         estado="vazio"
         :titulo="$t('comum.semDados')"
         :descricao="`${malhaMensagem} Adicione o arquivo em frontend/public/geo/${arquivoMalha(nivel)}.`"
-        acao="Tentar novamente"
+        :acao="$t('comum.tentarNovamente')"
         @acao="tentarMalhaNovamente"
       />
       <p>
@@ -746,7 +746,7 @@ onBeforeUnmount(() => {
           Sem dados
         </li>
       </ul>
-      <p v-if="legenda.itens.length === 0">Sem líder identificado no corte atual.</p>
+      <p v-if="legenda.itens.length === 0">{{ $t('comum.semDados') }}</p>
     </div>
 
     <MapTable
