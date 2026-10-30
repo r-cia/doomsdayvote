@@ -688,6 +688,7 @@ export async function registrarRotas(app) {
           apos_1715: apos,
           pct_apos_1715: total > 0 ? (apos / total) * 100 : null,
           partido: l.partido,
+          votos: Number(l.votos_partido ?? 0),
           pct_votos: Number(l.total_validos) > 0 ? (Number(l.votos_partido) / Number(l.total_validos)) * 100 : null,
         };
       }),
