@@ -1,21 +1,9 @@
+import i18n from '../i18n'
+
 const FUSO = 'America/Sao_Paulo'
 
-const formatadorNumero = new Intl.NumberFormat('pt-BR')
-const formatadorDataHora = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: FUSO,
-  dateStyle: 'short',
-  timeStyle: 'short',
-})
-const formatadorData = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: FUSO,
-  dateStyle: 'short',
-})
-const formatadorHora = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: FUSO,
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-})
+const localeAtual = () => i18n.global.locale.value
+
 const formatadorPartes = new Intl.DateTimeFormat('en-CA', {
   timeZone: FUSO,
   year: 'numeric',
@@ -33,39 +21,60 @@ const formatadorOffset = new Intl.DateTimeFormat('en-US', {
 export function formatarNumero(valor) {
   if (valor === null || valor === undefined || valor === '') return '—'
   const numero = Number(valor)
-  return Number.isFinite(numero) ? formatadorNumero.format(numero) : '—'
+  return Number.isFinite(numero) ? new Intl.NumberFormat(localeAtual()).format(numero) : '—'
 }
 
 export function formatarPercentual(valor, casas = 2) {
   if (valor === null || valor === undefined || valor === '') return '—'
   const numero = Number(valor)
   if (!Number.isFinite(numero)) return '—'
-  return `${new Intl.NumberFormat('pt-BR', {
+  return `${new Intl.NumberFormat(localeAtual(), {
     minimumFractionDigits: casas,
     maximumFractionDigits: casas,
   }).format(numero)}%`
 }
 
+export function formatarDecimal(valor, casasMinimas = 0, casasMaximas = casasMinimas) {
+  if (valor === null || valor === undefined || valor === '') return '—'
+  const numero = Number(valor)
+  if (!Number.isFinite(numero)) return '—'
+  return new Intl.NumberFormat(localeAtual(), {
+    minimumFractionDigits: casasMinimas,
+    maximumFractionDigits: casasMaximas,
+  }).format(numero)
+}
+
 export function formatarDataHora(valor) {
   if (!valor) return '—'
   const data = valor instanceof Date ? valor : new Date(valor)
-  return Number.isNaN(data.getTime()) ? '—' : formatadorDataHora.format(data)
+  return Number.isNaN(data.getTime())
+    ? '—'
+    : new Intl.DateTimeFormat(localeAtual(), {
+        timeZone: FUSO,
+        dateStyle: 'short',
+        timeStyle: 'short',
+      }).format(data)
 }
 
 export function formatarData(valor) {
   if (!valor) return '—'
-  if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-    const [ano, mes, dia] = valor.split('-')
-    return `${dia}/${mes}/${ano}`
-  }
-  const data = valor instanceof Date ? valor : new Date(valor)
-  return Number.isNaN(data.getTime()) ? '—' : formatadorData.format(data)
+  const data = valor instanceof Date ? valor : new Date(/^\d{4}-\d{2}-\d{2}$/.test(valor) ? `${valor}T12:00:00Z` : valor)
+  return Number.isNaN(data.getTime())
+    ? '—'
+    : new Intl.DateTimeFormat(localeAtual(), { timeZone: FUSO, dateStyle: 'short' }).format(data)
 }
 
 export function formatarHora(valor) {
   if (!valor) return '—'
   const data = valor instanceof Date ? valor : new Date(valor)
-  return Number.isNaN(data.getTime()) ? '—' : formatadorHora.format(data)
+  return Number.isNaN(data.getTime())
+    ? '—'
+    : new Intl.DateTimeFormat(localeAtual(), {
+        timeZone: FUSO,
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      }).format(data)
 }
 
 export function formatarSha(valor, tamanho = 12) {
@@ -104,14 +113,14 @@ export function deInputSaoPaulo(valor) {
 }
 
 export function formatarCorte(corte) {
-  if (!corte) return 'Corte final'
+  if (!corte) return i18n.global.t('format.corteFinal')
   if (corte.tipo === 'recebimento_intradiario' && corte.as_of) {
-    return `Corte até ${formatarDataHora(corte.as_of)}`
+    return `${i18n.global.t('format.corteAte')} ${formatarDataHora(corte.as_of)}`
   }
   if (corte.tipo === 'recebimento_diario' && corte.as_of_date) {
-    return `Corte até ${formatarData(corte.as_of_date)}`
+    return `${i18n.global.t('format.corteAte')} ${formatarData(corte.as_of_date)}`
   }
-  return 'Corte final'
+  return i18n.global.t('format.corteFinal')
 }
 
 export function truncar(texto, tamanho = 60) {

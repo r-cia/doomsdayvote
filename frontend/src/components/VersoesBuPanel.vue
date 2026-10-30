@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { formatarDataHora } from '../lib/format'
 import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
@@ -11,24 +12,19 @@ const props = defineProps({
 const versoes = computed(() => props.dados?.versoes ?? [])
 const comparacao = computed(() => props.dados?.comparacao ?? null)
 
-function formatarDataHora(v) {
-  if (!v) return '—'
-  const d = new Date(v)
-  return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString('pt-BR')
-}
 </script>
 
 <template>
   <section class="painel" aria-labelledby="versoes-titulo">
     <header class="painel__cabecalho">
       <h2 id="versoes-titulo">Versões do BU</h2>
-      <p class="painel__meta">{{ versoes.length }} versões</p>
+      <p v-if="!loading && dados" class="painel__meta">{{ versoes.length }} versões</p>
     </header>
 
-    <StateBlock v-if="loading" estado="carregando" :titulo="'Carregando'" />
-    <StateBlock v-else-if="error" estado="erro" :titulo="'Erro'" :descricao="error" />
+    <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock v-else-if="error" estado="erro" :titulo="$t('comum.erro')" :descricao="error" />
     <div v-else-if="versoes.length === 0" class="vazio">
-      Sem versões registradas.
+      {{ $t('comum.semVersoesRegistradas') }}
     </div>
     <div v-else>
       <ul class="versoes-lista">
@@ -83,7 +79,7 @@ function formatarDataHora(v) {
         </div>
         <p class="observacao">{{ comparacao.observacao }}</p>
       </div>
-      <p v-else class="vazio">Sem versão anterior para comparar.</p>
+      <p v-else class="vazio">{{ $t('comum.semVersaoAnterior') }}</p>
     </div>
   </section>
 </template>

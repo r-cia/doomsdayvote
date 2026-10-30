@@ -1,9 +1,11 @@
 <script setup>
 import { computed } from 'vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  loading: { type: Boolean, default: false },
   votosCandidato: { type: Number, default: null },
   nomeCandidato: { type: String, default: '' },
 })
@@ -43,13 +45,14 @@ const participacao = computed(() => {
   <section class="painel biometria" aria-labelledby="biometria-titulo">
     <header class="painel__cabecalho">
       <h2 id="biometria-titulo">{{ $t('painel.biometria.titulo') }}</h2>
-      <p class="painel__meta">
+      <p v-if="!loading && biometria" class="painel__meta">
         biometria<br />
         <b>{{ formatarNumero(biometria?.secoes) }}</b> seções
       </p>
     </header>
 
-    <div v-if="!biometria" class="vazio">{{ $t('painel.biometria.semComposicao') }}</div>
+    <StateBlock v-if="loading && !biometria" estado="carregando" :titulo="$t('comum.carregando')" />
+    <div v-else-if="!biometria" class="vazio">{{ $t('painel.biometria.semComposicao') }}</div>
 
     <div v-else class="biometria__corpo">
       <div

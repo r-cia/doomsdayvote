@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { formatarDecimal } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -8,11 +9,7 @@ const props = defineProps({
 const candidatos = computed(() => props.dados?.candidatos ?? [])
 
 function mad(nivel) {
-  if (nivel?.mad === null || nivel?.mad === undefined) return '—'
-  return Number(nivel.mad).toLocaleString('pt-BR', {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  })
+  return formatarDecimal(nivel?.mad, 4, 4)
 }
 </script>
 

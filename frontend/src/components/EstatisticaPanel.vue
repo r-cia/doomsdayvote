@@ -1,14 +1,17 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import CoberturaBlock from './CoberturaBlock.vue'
 import { useEstatisticas } from '../composables/queries'
+import { formatarNumero } from '../lib/format'
 
 const props = defineProps({
   eleicoesDisponiveis: { type: Array, default: () => [] },
   electionId: { type: String, default: '' },
 })
 
+const { locale } = useI18n()
 const escopo = ref('turno')
 const estatisticasQuery = useEstatisticas(escopo)
 
@@ -22,12 +25,12 @@ function numero(valor) {
   if (valor === null || valor === undefined) return '—'
   const convertido = Number(valor)
   if (Number.isNaN(convertido)) return '—'
-  return convertido.toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+  return convertido.toLocaleString(locale.value, { maximumFractionDigits: 1 })
 }
 
 function inteiro(valor) {
   if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR')
+  return formatarNumero(valor)
 }
 
 function erroMensagem(erro) {
@@ -43,17 +46,14 @@ function erroMensagem(erro) {
       <div>
         <p class="painel__etiqueta">{{ $t('estatistica.descritiva') }}</p>
         <h2 id="titulo-estatisticas">{{ $t('estatistica.subtitulo') }}</h2>
-        <p class="painel__subtitulo">
-          Votos por seção de cada candidato e comparecimento por seção. Desvio
-          padrão populacional.
-        </p>
+        <p class="painel__subtitulo">{{ $t('estatistica.descricao') }}</p>
       </div>
       <div class="estatistica-controle">
         <label class="campo campo--curto">
-          <span class="campo__rotulo">Escopo</span>
+          <span class="campo__rotulo">{{ $t('filtros.escopo') }}</span>
           <select v-model="escopo">
-            <option value="turno">Turno atual</option>
-            <option v-if="temDoisTurnos" value="ano">Ano (1º e 2º)</option>
+            <option value="turno">{{ $t('filtros.turnoAtual') }}</option>
+            <option v-if="temDoisTurnos" value="ano">{{ $t('filtros.anoCompleto') }}</option>
           </select>
         </label>
       </div>
@@ -62,8 +62,8 @@ function erroMensagem(erro) {
     <StateBlock
       v-if="estatisticasQuery.isLoading.value && blocos.length === 0"
       estado="carregando"
-      titulo="Calculando estatísticas"
-      descricao="Agregando por seção."
+      :titulo="$t('comum.calculandoEstatisticas')"
+      :descricao="$t('comum.agregandoPorSecao')"
     />
     <StateBlock
       v-else-if="estatisticasQuery.error.value"
@@ -77,7 +77,7 @@ function erroMensagem(erro) {
       v-else-if="blocos.length === 0"
       estado="vazio"
       :titulo="$t('comum.semDados')"
-      descricao="Selecione um cargo com seções ativas."
+      :descricao="$t('comum.selecioneCargoAtivo')"
     />
 
     <div v-else class="estatistica-lista">
@@ -95,16 +95,16 @@ function erroMensagem(erro) {
           <table class="tabela">
             <thead>
               <tr>
-                <th>Variável</th>
-                <th class="tabela__numero">Seções</th>
-                <th class="tabela__numero">Média</th>
-                <th class="tabela__numero">Mediana</th>
-                <th class="tabela__numero">Desvio padrão (pop.)</th>
+                <th>{{ $t('estatistica.variavel') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.secoes') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.media') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.mediana') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.desvio') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Comparecimento</td>
+                <td>{{ $t('estatistica.comparecimento') }}</td>
                 <td class="tabela__numero">{{ inteiro(bloco.comparecimento.secoes) }}</td>
                 <td class="tabela__numero">{{ numero(bloco.comparecimento.media) }}</td>
                 <td class="tabela__numero">{{ numero(bloco.comparecimento.mediana) }}</td>
@@ -118,13 +118,13 @@ function erroMensagem(erro) {
           <table class="tabela">
             <thead>
               <tr>
-                <th>Candidato</th>
-                <th>Partido</th>
-                <th class="tabela__numero">Seções</th>
-                <th class="tabela__numero">Seções Zero voto</th>
-                <th class="tabela__numero">Média</th>
-                <th class="tabela__numero">Mediana</th>
-                <th class="tabela__numero">Desvio padrão (pop.)</th>
+                <th>{{ $t('estatistica.candidato') }}</th>
+                <th>{{ $t('estatistica.partido') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.secoes') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.secoesZero') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.media') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.mediana') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.desvio') }}</th>
               </tr>
             </thead>
             <tbody>

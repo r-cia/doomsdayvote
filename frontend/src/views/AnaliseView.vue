@@ -48,6 +48,7 @@ watch(
 
   <AnaliseSection
     :benford="analiseQuery.data.value?.benford ?? null"
+    :benford-loading="analiseQuery.isLoading.value"
     :anomalias="anomaliasQuery.data.value ?? null"
     :selecionado="store.candidato"
     :loading="anomaliasQuery.isLoading.value"

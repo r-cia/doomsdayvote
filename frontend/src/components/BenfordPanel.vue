@@ -1,10 +1,12 @@
 <script setup>
 import { computed } from 'vue'
-import { formatarNumero } from '../lib/format'
+import { formatarDecimal, formatarNumero } from '../lib/format'
+import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   selecionado: { type: Number, default: null },
+  loading: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['select'])
@@ -25,11 +27,7 @@ function altura(valor) {
 }
 
 function formatarMad(valor) {
-  if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR', {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  })
+  return formatarDecimal(valor, 4, 4)
 }
 
 function avisoMetodologico() {
@@ -41,13 +39,14 @@ function avisoMetodologico() {
   <section class="painel" aria-labelledby="benford-titulo">
     <header class="painel__cabecalho">
       <h2 id="benford-titulo">{{ $t('estatistica.benford') }}</h2>
-      <p class="painel__meta">
+      <p v-if="!loading && dados" class="painel__meta">
         primeiro dígito<br />
         <b>{{ formatarNumero(ativo?.n) }}</b> seções
       </p>
     </header>
 
-    <div v-if="!dados || candidatos.length === 0" class="vazio">
+    <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
+    <div v-else-if="!dados || candidatos.length === 0" class="vazio">
       {{ $t("comum.semDados") }}
     </div>
 

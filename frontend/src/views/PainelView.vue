@@ -121,6 +121,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     <PlotDia
       :series="timelineQuery.data.value?.series ?? []"
       :pontos="timelineQuery.data.value?.pontos ?? []"
+      :loading="timelineQuery.isLoading.value"
       :corte="store.asOf"
       :candidato="store.candidato"
       :candidatos="candidatos"
@@ -140,6 +141,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <section class="leituras" :aria-label="$t('painel.composicao')">
     <BiometriaPanel
       :dados="analiseQuery.data.value?.biometria ?? null"
+      :loading="analiseQuery.isLoading.value"
       :votos-candidato="votosDoCandidato"
       :nome-candidato="candidatoSelecionado?.nm_votavel ?? ''"
     />
@@ -149,5 +151,6 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     :key="`${store.asOf ?? 'final'}-${store.cargo}-${store.electionId}-${(candidatos || []).map(c=>c.nr_votavel).join(',')}`"
     :areas="mapaUfQuery.data.value?.areas ?? []"
     :candidatos="resumoQuery.data.value?.votos ?? []"
+    :loading="mapaUfQuery.isLoading.value || resumoQuery.isLoading.value"
   />
 </template>

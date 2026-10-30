@@ -2,10 +2,12 @@
 import { computed, ref, watch } from 'vue'
 import { formatarNumero } from '../lib/format'
 import { candidatosNominais } from '../lib/agregacoes'
+import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   areas: { type: Array, default: () => [] },
   candidatos: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
 })
 
 const ordenacao = ref({ coluna: 'nm_votavel', direcao: 'asc' })
@@ -84,7 +86,8 @@ function seta(coluna) {
       </div>
     </header>
 
-    <div v-if="ufs.length === 0 || listaCandidatos.length === 0" class="vazio">
+    <StateBlock v-if="loading && (ufs.length === 0 || listaCandidatos.length === 0)" estado="carregando" :titulo="$t('comum.carregando')" />
+    <div v-else-if="ufs.length === 0 || listaCandidatos.length === 0" class="vazio">
       {{ $t('mapa.semDadosEstado') }}
     </div>
 

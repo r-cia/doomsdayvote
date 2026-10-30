@@ -8,6 +8,7 @@ import StateBlock from './StateBlock.vue'
 
 defineProps({
   benford: { type: Object, default: null },
+  benfordLoading: { type: Boolean, default: false },
   anomalias: { type: Object, default: null },
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
@@ -37,6 +38,7 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
       <BenfordPanel
         :dados="benford"
         :selecionado="selecionado"
+        :loading="benfordLoading"
         @select="emit('select', $event)"
       />
 

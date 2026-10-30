@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { formatarDecimal } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -12,11 +13,7 @@ const secoes = computed(() => props.dados?.secoes ?? [])
 const parametros = computed(() => props.dados?.parametros ?? {})
 
 function score(valor) {
-  if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR', {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3,
-  })
+  return formatarDecimal(valor, 3, 3)
 }
 
 

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import StateBlock from './StateBlock.vue'
 import { useFiltersStore } from '../stores/filters'
@@ -12,22 +13,23 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['retry'])
+const { t } = useI18n()
 const router = useRouter()
 const store = useFiltersStore()
 
 const itens = computed(() => props.dados?.itens ?? [])
 const cobertura = computed(() => props.dados?.cobertura ?? null)
 
-const rotuloRegra = {
-  comparecimento_vs_votos: 'Comparecimento vs. soma dos votos',
-  aptos_vs_comparecimento_abstencao: 'Aptos vs. comparecimento + abstenções',
-  comparecimento_vs_aptos: 'Comparecimento vs. aptos',
-  biometria_vs_comparecimento: 'Biometria vs. comparecimento',
-}
+const rotuloRegra = computed(() => ({
+  comparecimento_vs_votos: t('analiseUI.regraComparecimentoVotos'),
+  aptos_vs_comparecimento_abstencao: t('analiseUI.regraAptosComparecimento'),
+  comparecimento_vs_aptos: t('analiseUI.regraComparecimentoAptos'),
+  biometria_vs_comparecimento: t('analiseUI.regraBiometriaComparecimento'),
+}))
 
 const resumo = computed(() => [
-  { rotulo: 'Seções consideradas', valor: cobertura.value?.consideradas },
-  { rotulo: 'Seções divergentes', valor: cobertura.value?.com_divergencia },
+  { rotulo: t('analiseUI.secoesConsideradas'), valor: cobertura.value?.consideradas },
+  { rotulo: t('analiseUI.secoesDivergentes'), valor: cobertura.value?.com_divergencia },
 ])
 
 function diferenca(valor) {
@@ -57,29 +59,29 @@ function abrirSecao(item) {
 <template>
   <section class="painel" aria-labelledby="consistencia-titulo">
     <header class="painel__cabecalho">
-      <h2 id="consistencia-titulo">Consistência aritmética</h2>
-      <p class="painel__meta">
-        {{ formatarNumero(dados?.total ?? 0) }} divergências
+      <h2 id="consistencia-titulo">{{ $t('analiseUI.consistencia') }}</h2>
+      <p v-if="!loading && dados" class="painel__meta">
+        {{ formatarNumero(dados?.total ?? 0) }} {{ $t('analiseUI.divergencias') }}
       </p>
     </header>
 
-    <StateBlock v-if="loading" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
     <StateBlock v-else-if="error" estado="erro" :titulo="$t('comum.erro')" :descricao="error" :acao="$t('comum.tentarNovamente')" @acao="emit('retry')" />
     <div v-else-if="itens.length === 0" class="vazio">
-      Nenhuma divergência aritmética no recorte.
+      {{ $t('comum.nenhumaDivergencia') }}
     </div>
     <div v-else class="tabela-scroll">
       <table>
-        <caption class="sr-only">Divergências aritméticas por seção</caption>
+        <caption class="sr-only">{{ $t('analiseUI.consistencia') }}</caption>
         <thead>
           <tr>
             <th scope="col">UF</th>
-            <th scope="col">Município</th>
-            <th scope="col" class="num">Zona</th>
-            <th scope="col" class="num">Seção</th>
-            <th scope="col">Regra</th>
-            <th scope="col" class="num">Diferença</th>
-            <th scope="col"><span class="sr-only">Ação</span></th>
+            <th scope="col">{{ $t('analiseUI.municipio') }}</th>
+            <th scope="col" class="num">{{ $t('analiseUI.zona') }}</th>
+            <th scope="col" class="num">{{ $t('analiseUI.secao') }}</th>
+            <th scope="col">{{ $t('analiseUI.regra') }}</th>
+            <th scope="col" class="num">{{ $t('analiseUI.diferenca') }}</th>
+            <th scope="col"><span class="sr-only">{{ $t('comum.acao') }}</span></th>
           </tr>
         </thead>
         <tbody>
@@ -92,14 +94,14 @@ function abrirSecao(item) {
             <td class="num">{{ diferenca(item.diferenca) }}</td>
             <td>
               <button type="button" class="button button--ghost" @click="abrirSecao(item)">
-                Ver seção
+                {{ $t('analiseUI.verSecao') }}
               </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <dl v-if="cobertura" class="painel-resumo" aria-label="Resumo da cobertura">
+    <dl v-if="cobertura" class="painel-resumo" :aria-label="$t('comum.resumoCobertura')">
       <div v-for="item in resumo" :key="item.rotulo" class="painel-resumo__item">
         <dt>{{ item.rotulo }}</dt>
         <dd>{{ formatarNumero(item.valor) }}</dd>

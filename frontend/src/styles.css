@@ -453,6 +453,57 @@ select {
   background: var(--panel);
 }
 
+.painel > .state {
+  flex: 1;
+  min-height: 160px;
+}
+
+.mapa-card > .state {
+  min-height: 320px;
+}
+
+.state {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--ink-dim);
+}
+
+.state__icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+}
+
+.state__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.state--carregando .state__icon svg {
+  animation: state-spin 900ms linear infinite;
+}
+
+.state__texto strong {
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.state__texto p {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+@keyframes state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .painel__cabecalho {
   display: flex;
   align-items: baseline;
@@ -2139,5 +2190,10 @@ tr.linha--ativa th {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .state--carregando .state__icon svg {
+    stroke-dasharray: none;
+    opacity: 0.7;
   }
 }
