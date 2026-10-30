@@ -55,4 +55,6 @@ Corrigir os estados de carregamento dos gráficos e painéis, fazer os textos e 
 - `mv_secao_candidato_final` atende à base seção-candidato no corte final e é atualizada após a carga.
 - Pool padrão reduzido de 40 para 20; `DB_POOL_MAX` (máximo 32) e `DB_WORK_MEM_MB` (máximo 64) são configuráveis. `maintenance_work_mem` deixa de ser elevado por conexão.
 - A migração `0008_mv_secao_candidato_final.js` foi criada, mas não aplicada.
-- `graphify update .` executado. Testes/build não executados; configuração do serviço Postgres para impor o teto global de 24 GB não existe neste repositório.
+- `graphify update .` executado. Testes/build não executados; o teto global do Postgres depende de instalar o drop-in no host.
+- O host expõe `postgresql@16-main.service`; `MemoryMax` e `MemoryHigh` estão sem limite, com cerca de 15,7 GiB no cgroup durante a inspeção. O drop-in de 24 GB está em `ops/systemd/`, mas não foi instalado.
+- API e carga podem usar heap Node de até 16 GiB por processo. Não reduzi esses limites sem medir o pico das análises e importações, pois isso pode causar OOM; os processos iniciados manualmente também não têm um limite agregado configurado.
