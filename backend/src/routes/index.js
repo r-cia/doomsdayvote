@@ -510,7 +510,7 @@ export async function registrarRotas(app) {
         sql`coalesce(sum(bv.qt_comparecimento), 0)`.as('qt_comparecimento'),
         sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
       ])
-      .groupBy(['s.cd_municipio_tse'])
+      .groupBy(['s.cd_municipio_tse', 's.sg_uf'])
       .orderBy(
         query.ordenar_por === 'percentual'
           ? sql`(coalesce(sum(bv.qt_elei_biom_sem_habilitacao),0)::float / nullif(sum(bv.qt_comparecimento),0)) desc nulls last`
@@ -667,7 +667,7 @@ export async function registrarRotas(app) {
         sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null and rv.sg_partido = (select rv2.sg_partido from resultado_votavel rv2 join boletim_versao bv3 on bv3.id = rv2.boletim_versao_id join secao_eleitoral s3 on s3.id = bv3.secao_id where s3.cd_municipio_tse = s.cd_municipio_tse and s3.sg_uf = s.sg_uf and bv3.eleicao_id = ${eleicao.id} and bv3.cd_cargo_pergunta = ${query.cargo} and bv3.ativo = true and rv2.categoria in ('nominal','legenda') and rv2.qt_votos is not null group by rv2.sg_partido order by sum(rv2.qt_votos) desc limit 1))`.as('votos_partido'),
         sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null)`.as('total_validos'),
       ])
-      .groupBy(['s.cd_municipio_tse'])
+      .groupBy(['s.cd_municipio_tse', 's.sg_uf'])
       .orderBy(
         query.ordenar_por === 'total'
           ? sql`count(*) desc`
