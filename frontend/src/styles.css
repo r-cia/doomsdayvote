@@ -939,7 +939,7 @@ select {
   grid-template-columns: repeat(9, minmax(0, 1fr));
   align-items: end;
   gap: 6px;
-  height: 112px;
+  height: 224px;
   padding: 10px 14px 0;
 }
 

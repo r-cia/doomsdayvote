@@ -58,6 +58,7 @@ const candidatos = computed(() =>
         <RouterLink to="/painel">{{ $t('app.abas.painel') }}</RouterLink>
         <RouterLink to="/mapa">{{ $t('app.abas.mapa') }}</RouterLink>
         <RouterLink to="/analise">{{ $t('app.abas.estatistica') }}</RouterLink>
+        <RouterLink to="/comparacoes">{{ $t('app.abas.comparacoes') }}</RouterLink>
         <RouterLink to="/biometria">{{ $t('app.abas.biometria') }}</RouterLink>
         <RouterLink to="/encerramento">{{ $t('app.abas.encerramento') }}</RouterLink>
       </nav>

@@ -4,10 +4,9 @@ import AnaliseCobertura from '../components/AnaliseCobertura.vue'
 import StateBlock from '../components/StateBlock.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import ConsistenciaPanel from '../components/ConsistenciaPanel.vue'
-import ComparacaoLocalPanel from '../components/ComparacaoLocalPanel.vue'
 import ConcentracaoPanel from '../components/ConcentracaoPanel.vue'
 import { ref, watch } from 'vue'
-import { useAnalise, useAnomalias, useConsistencia, useComparacaoLocal, useConcentracao } from '../composables/queries'
+import { useAnalise, useAnomalias, useConsistencia, useConcentracao } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 
 const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
@@ -16,7 +15,6 @@ const ordenacao = ref('if')
 const analiseQuery = useAnalise()
 const anomaliasQuery = useAnomalias(null, ordenacao)
 const consistenciaQuery = useConsistencia()
-const comparacaoLocalQuery = useComparacaoLocal()
 const concentracaoQuery = useConcentracao()
 
 watch(
@@ -25,7 +23,6 @@ watch(
     analiseQuery.refetch()
     anomaliasQuery.refetch()
     consistenciaQuery.refetch()
-    comparacaoLocalQuery.refetch()
     concentracaoQuery.refetch()
   },
 )
@@ -69,13 +66,6 @@ watch(
     :loading="consistenciaQuery.isLoading.value"
     :error="consistenciaQuery.error.value?.message ?? ''"
     @retry="consistenciaQuery.refetch()"
-  />
-
-  <ComparacaoLocalPanel
-    :dados="comparacaoLocalQuery.data.value ?? null"
-    :loading="comparacaoLocalQuery.isLoading.value"
-    :error="comparacaoLocalQuery.error.value?.message ?? ''"
-    @retry="comparacaoLocalQuery.refetch()"
   />
 
   <ConcentracaoPanel

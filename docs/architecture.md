@@ -19,8 +19,9 @@
 ## Frontend
 
 - Vue 3 + Vite em `frontend/src`.
-- Views por aba: Painel, Mapa, Análise.
+- Views por aba: Painel, Mapa, Estatística (`/analise`), Comparações (`/comparacoes`), Biometria e Encerramento.
 - Componentes de análise em `frontend/src/components`.
+- A aba Comparações apresenta a comparação local entre seções semelhantes.
 - `CoberturaBlock.vue` exibe cobertura e limitações de forma reutilizável.
 - `AnaliseCobertura.vue` apresenta a cobertura da análise agrupando dados ausentes, base considerada e registros abaixo do mínimo de Benford.
 - `StateBlock.vue` apresenta estados compartilhados de carregamento, erro e vazio; os painéis reservam a área de conteúdo para manter o indicador associado ao painel.
