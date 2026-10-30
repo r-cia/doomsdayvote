@@ -16,8 +16,21 @@ const props = defineProps({
 
 defineEmits(['select', 'municipios', 'retry', 'limpar'])
 
-const ordenacao = ref('votos')
+const ordenacao = ref({ coluna: 'total', direcao: 'desc' })
 const agrupar = ref('nenhum')
+
+function alternar(coluna) {
+  if (ordenacao.value.coluna === coluna) {
+    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
+  } else {
+    ordenacao.value = { coluna, direcao: 'asc' }
+  }
+}
+
+function seta(coluna) {
+  if (ordenacao.value.coluna !== coluna) return ''
+  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
+}
 
 const REGIOES = {
   Norte: ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
@@ -59,13 +72,19 @@ const linhas = computed(() => {
     ...linha,
     largura: Math.max(0, Math.min(100, Number(linha.liderPercentual ?? 0))),
   }))
-  const ordenadas =
-    ordenacao.value === 'percentual'
-      ? [...comLargura].sort(
-          (a, b) => (b.liderPercentual ?? -1) - (a.liderPercentual ?? -1),
-        )
-      : [...comLargura].sort((a, b) => b.total - a.total)
-  return ordenadas
+  const lista = [...comLargura]
+  const { coluna, direcao } = ordenacao.value
+  lista.sort((a, b) => {
+    let va, vb
+    if (coluna === 'uf') { va = a.uf ?? ''; vb = b.uf ?? '' }
+    else if (coluna === 'total') { va = a.total; vb = b.total }
+    else if (coluna === 'liderNome') { va = a.liderNome ?? ''; vb = b.liderNome ?? '' }
+    else if (coluna === 'liderPercentual') { va = a.liderPercentual ?? -1; vb = b.liderPercentual ?? -1 }
+    else { va = a[coluna]; vb = b[coluna] }
+    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+    return direcao === 'asc' ? va - vb : vb - va
+  })
+  return lista
 })
 
 const grupos = computed(() => {
@@ -93,10 +112,6 @@ const votosUf = computed(() => candidatosNominais(props.votos))
         </h2>
       </div>
       <div class="uf-painel__acoes">
-        <select v-if="!ufSelecionada" v-model="ordenacao" class="uf-ordenacao">
-          <option value="votos">Votos</option>
-          <option value="percentual">% Líder</option>
-        </select>
         <select v-if="!ufSelecionada" v-model="agrupar" class="uf-ordenacao">
           <option value="nenhum">Sem agrupamento</option>
           <option value="regiao">Por região</option>
@@ -176,10 +191,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
         <caption class="sr-only">Resumo de votos e líder por UF agrupado por região</caption>
         <thead>
           <tr>
-            <th scope="col">UF</th>
-            <th scope="col" class="num">Votos</th>
-            <th scope="col">Líder</th>
-            <th scope="col" class="num">% líder</th>
+            <th scope="col" class="ordenavel" @click="alternar('uf')">UF{{ seta('uf') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('total')">Votos{{ seta('total') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('liderNome')">Líder{{ seta('liderNome') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">% líder{{ seta('liderPercentual') }}</th>
             <th scope="col"><span class="sr-only">Ações</span></th>
           </tr>
         </thead>
@@ -245,10 +260,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
         <caption class="sr-only">Resumo de votos e líder por UF</caption>
         <thead>
           <tr>
-            <th scope="col">UF</th>
-            <th scope="col" class="num">Votos</th>
-            <th scope="col">Líder</th>
-            <th scope="col" class="num">% líder</th>
+            <th scope="col" class="ordenavel" @click="alternar('uf')">UF{{ seta('uf') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('total')">Votos{{ seta('total') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('liderNome')">Líder{{ seta('liderNome') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">% líder{{ seta('liderPercentual') }}</th>
             <th scope="col"><span class="sr-only">Ações</span></th>
           </tr>
         </thead>
