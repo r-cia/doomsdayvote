@@ -17,6 +17,7 @@ const emit = defineEmits(['select'])
 
 const tabela = ref(null)
 const pagina = ref(1)
+const ordenacao = ref({ coluna: 'total', direcao: 'desc' })
 const porPagina = 25
 const partidoPorNumero = computed(() => {
   const mapa = new Map()
@@ -34,7 +35,7 @@ function siglaCandidato(numero) {
   return partidoPorNumero.value.get(numero)?.sg_partido ?? null
 }
 
-const linhas = computed(() =>
+const linhasBase = computed(() =>
   linhasMapa(props.areas, props.nivel).map(({ chave, area }) => {
     const lider = area.lider
     const candidatoArea = candidatoDaArea(area, props.candidato)
@@ -54,6 +55,31 @@ const linhas = computed(() =>
   }),
 )
 
+const linhas = computed(() => {
+  const lista = [...linhasBase.value]
+  const { coluna, direcao } = ordenacao.value
+  lista.sort((a, b) => {
+    let va = a[coluna], vb = b[coluna]
+    if (va == null) va = ''
+    if (vb == null) vb = ''
+    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+    return direcao === 'asc' ? va - vb : vb - va
+  })
+  return lista
+})
+
+function alternar(coluna) {
+  if (ordenacao.value.coluna === coluna) {
+    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
+  } else {
+    ordenacao.value = { coluna, direcao: 'asc' }
+  }
+}
+
+function seta(coluna) {
+  if (ordenacao.value.coluna !== coluna) return ''
+  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
+}
 const totalPaginas = computed(() => Math.max(1, Math.ceil(linhas.value.length / porPagina)))
 const linhasPagina = computed(() => {
   if (pagina.value > totalPaginas.value) pagina.value = totalPaginas.value
@@ -123,13 +149,13 @@ function aoClicarLinha(linha) {
         </caption>
         <thead>
           <tr>
-            <th scope="col">{{ nivel === 'uf' ? 'UF' : 'Município' }}</th>
-            <th scope="col" class="num">Votos</th>
-            <th scope="col" class="num">Válidos</th>
-            <th scope="col">Líder</th>
-            <th scope="col" class="num">% líder</th>
-            <th v-if="candidato" scope="col" class="num">Votos do candidato</th>
-            <th v-if="candidato" scope="col" class="num">% do candidato</th>
+            <th scope="col" class="ordenavel" @click="alternar('rotulo')">{{ nivel === 'uf' ? 'UF' : 'Município' }}{{ seta('rotulo') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('total')">Votos{{ seta('total') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('validos')">Válidos{{ seta('validos') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('liderNome')">Líder{{ seta('liderNome') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">% líder{{ seta('liderPercentual') }}</th>
+            <th v-if="candidato" scope="col" class="num ordenavel" @click="alternar('candidatoVotos')">Votos do candidato{{ seta('candidatoVotos') }}</th>
+            <th v-if="candidato" scope="col" class="num ordenavel" @click="alternar('candidatoPercentual')">% do candidato{{ seta('candidatoPercentual') }}</th>
             <th scope="col"><span class="sr-only">Ação</span></th>
           </tr>
         </thead>
