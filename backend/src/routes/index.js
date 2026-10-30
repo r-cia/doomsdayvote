@@ -12,6 +12,7 @@ import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
 import { consistenciaPorSecao, validarConsistenciaBu } from '../modules/analise/consistencia.js';
 import { compararVersoes } from '../modules/analise/versoes-bu.js';
 import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
+import { concentracao } from '../modules/analise/concentracao.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
 
 const corteSchema = {
@@ -1164,6 +1165,74 @@ export async function registrarRotas(app) {
       page_size: pageSize,
       total: grupos.length,
       grupos: grupos.slice(inicio, inicio + pageSize),
+    };
+  }));
+
+  app.get('/api/concentracao', cacheado('concentracao', 300, baseSchema.extend({
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+    limite: z.coerce.number().int().min(1).max(100).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    pagina: z.coerce.number().int().min(1).optional(),
+    page_size: z.coerce.number().int().min(1).optional(),
+    top: z.coerce.number().int().min(1).max(100).optional(),
+    top_n: z.coerce.number().int().min(1).max(100).optional(),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
+    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
+    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+    const limite = query.limit ?? query.limite ?? query.top ?? query.top_n ?? 20;
+    const pagina = query.pagina ?? query.page ?? 1;
+
+    const resultado = await concentracao(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+      limite,
+    });
+
+    const [metadados, avisos] = await Promise.all([
+      cache
+        .obter('metadados', query, 300, () =>
+          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+      cache
+        .obter('avisos', query, 300, () =>
+          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+    ]);
+
+    const topShare = resultado.top_share ?? [];
+    const topMargem = resultado.top_margem ?? [];
+    const inicioShare = (pagina - 1) * pageSize;
+    const inicioMargem = (pagina - 1) * pageSize;
+
+    const limitacoes = resultado.limitacoes ?? [
+      'Concentração calculada a partir do BU ativo no corte selecionado.',
+      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
+    ];
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      limitacoes,
+      page: pagina,
+      page_size: pageSize,
+      total: topShare.length,
+      total_share: topShare.length,
+      total_margem: topMargem.length,
+      top_share: topShare.slice(inicioShare, inicioShare + pageSize),
+      top_margem: topMargem.slice(inicioMargem, inicioMargem + pageSize),
+      top_por_share: topShare.slice(inicioShare, inicioShare + pageSize),
+      top_por_margem: topMargem.slice(inicioMargem, inicioMargem + pageSize),
+      secoes: resultado.secoes ?? [],
+      grupos: resultado.grupos ?? [],
     };
   }));
 }

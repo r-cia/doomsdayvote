@@ -57,4 +57,5 @@ export const api = {
     obter(`/sections/${encodeURIComponent(id)}/versions`, params, signal),
   consistencia: (params, signal) => obter('/consistencia', params, signal),
   comparacaoLocal: (params, signal) => obter('/comparacao-local', params, signal),
+  concentracao: (params, signal) => obter('/concentracao', params, signal),
 }
