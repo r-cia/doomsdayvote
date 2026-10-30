@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AvisoBanner from '../components/AvisoBanner.vue'
 import MapPanel from '../components/MapPanel.vue'
@@ -14,14 +14,30 @@ const { store } = useSelecaoEleicao()
 
 const resumoQuery = useResumo()
 const mapaQuery = useMapa()
+const candidatos = computed(() =>
+  candidatosNominais(resumoQuery.data.value?.votos ?? []),
+)
 const mapaUfQuery = useMapa('uf', {
   ignorarMunicipio: true,
   ignorarUf: true,
+  incluirTodosCandidatos: true,
+  candidatos: computed(() => {
+    const lista = candidatos.value
+      .map((c) => c.nr_votavel)
+      .filter((n) => n !== null && n !== undefined)
+    return lista.join(',')
+  }),
 })
 const secoesQuery = useSecoes()
 
-const candidatos = computed(() =>
-  candidatosNominais(resumoQuery.data.value?.votos ?? []),
+watch(
+  () => store.asOf,
+  () => {
+    resumoQuery.refetch()
+    mapaQuery.refetch()
+    mapaUfQuery.refetch()
+    secoesQuery.refetch()
+  },
 )
 
 const avisos = computed(() => {

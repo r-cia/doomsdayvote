@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import AvisoBanner from '../components/AvisoBanner.vue'
 import BiometriaPanel from '../components/BiometriaPanel.vue'
 import KpiCards from '../components/KpiCards.vue'
@@ -23,7 +23,23 @@ const analiseQuery = useAnalise()
 const mapaUfQuery = useMapa('uf', {
   ignorarMunicipio: true,
   ignorarUf: true,
+  incluirTodosCandidatos: true,
+  candidatos: computed(() => {
+    const lista = candidatosNominais(resumoQuery.data.value?.votos ?? [])
+      .map((c) => c.nr_votavel)
+      .filter((n) => n !== null && n !== undefined)
+    return lista.join(',')
+  }),
 })
+
+watch(
+  () => store.asOf,
+  () => {
+    resumoQuery.refetch()
+    analiseQuery.refetch()
+    mapaUfQuery.refetch()
+  },
+)
 
 const candidatos = computed(() =>
   candidatosNominais(resumoQuery.data.value?.votos ?? []),
@@ -110,7 +126,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   </section>
 
   <VotosPorEstadoPanel
-    :key="`${store.asOf ?? 'final'}-${store.cargo}-${store.electionId}`"
+    :key="`${store.asOf ?? 'final'}-${store.cargo}-${store.electionId}-${(candidatos || []).map(c=>c.nr_votavel).join(',')}`"
     :areas="mapaUfQuery.data.value?.areas ?? []"
     :candidatos="resumoQuery.data.value?.votos ?? []"
   />
