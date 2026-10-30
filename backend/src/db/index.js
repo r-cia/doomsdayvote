@@ -8,7 +8,7 @@ export function criarDb({
   connectionString,
   readOnly = false,
   statementTimeout = 60000,
-  poolMax = 12,
+  poolMax = 20,
   workMemMb = 64,
 }) {
   // statement_timeout precisa ir em `options`: o pg descarta valor 0 como falsy.

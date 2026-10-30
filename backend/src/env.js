@@ -4,7 +4,7 @@ const nodeEnv = z.enum(['development', 'test', 'production']).default('developme
 const logLevel = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info');
 const booleanEnv = z.enum(['true', 'false']).default('false').transform((valor) => valor === 'true');
 const databaseEnv = {
-  DB_POOL_MAX: z.coerce.number().int().min(1).max(32).default(12),
+  DB_POOL_MAX: z.coerce.number().int().min(1).max(32).default(20),
   DB_WORK_MEM_MB: z.coerce.number().int().min(8).max(64).default(64),
 };
 
