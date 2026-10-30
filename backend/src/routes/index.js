@@ -846,30 +846,75 @@ export async function registrarRotas(app) {
     const linhas = await qb
       .select([
         's.id',
+        sql`bv.id`.as('bu_id'),
         's.nr_zona',
         's.nr_secao',
         sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`.as('dt_encerramento'),
         sql`case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then true else false end`.as('apos_1715'),
-        sql`(select rv.sg_partido from resultado_votavel rv where rv.boletim_versao_id = bv.id and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null group by rv.sg_partido order by sum(rv.qt_votos) desc limit 1)`.as('partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv where rv.boletim_versao_id = bv.id and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null and rv.sg_partido = (select rv2.sg_partido from resultado_votavel rv2 where rv2.boletim_versao_id = bv.id and rv2.categoria in ('nominal','legenda') and rv2.qt_votos is not null group by rv2.sg_partido order by sum(rv2.qt_votos) desc limit 1))`.as('votos_partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv where rv.boletim_versao_id = bv.id and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null)`.as('total_validos'),
       ])
       .orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`)
       .limit(query.limit)
       .execute();
 
+    const ids = linhas.map((linha) => linha.bu_id).filter(Boolean);
+    const resumoPorBu = new Map();
+    if (ids.length > 0) {
+      const linhasPartidos = await db
+        .selectFrom('resultado_votavel as rv')
+        .select([
+          'rv.boletim_versao_id',
+          'rv.sg_partido',
+          sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('votos'),
+        ])
+        .where('rv.boletim_versao_id', 'in', ids)
+        .where('rv.categoria', 'in', ['nominal', 'legenda'])
+        .where('rv.qt_votos', 'is not', null)
+        .groupBy(['rv.boletim_versao_id', 'rv.sg_partido'])
+        .execute();
+
+      const acumuladoPorBu = new Map();
+      for (const linha of linhasPartidos) {
+        if (!acumuladoPorBu.has(linha.boletim_versao_id)) {
+          acumuladoPorBu.set(linha.boletim_versao_id, { total: 0, partidos: new Map() });
+        }
+        const acumulado = acumuladoPorBu.get(linha.boletim_versao_id);
+        const votos = Number(linha.votos);
+        acumulado.total += votos;
+        const atual = acumulado.partidos.get(linha.sg_partido) ?? 0;
+        acumulado.partidos.set(linha.sg_partido, atual + votos);
+      }
+      for (const [buId, acumulado] of acumuladoPorBu) {
+        let partido = null;
+        let votosPartido = 0;
+        for (const [nome, votos] of acumulado.partidos) {
+          if (votos > votosPartido) {
+            votosPartido = votos;
+            partido = nome;
+          }
+        }
+        resumoPorBu.set(buId, {
+          partido,
+          votos: votosPartido,
+          total: acumulado.total,
+        });
+      }
+    }
+
     return {
       corte: corteResposta(corte),
-      secoes: linhas.map((l) => ({
-        id: l.id,
-        nr_zona: l.nr_zona,
-        nr_secao: l.nr_secao,
-        dt_encerramento: l.dt_encerramento,
-        apos_1715: Boolean(l.apos_1715),
-        partido: l.partido,
-        votos: Number(l.votos_partido ?? 0),
-        pct_votos: Number(l.total_validos) > 0 ? (Number(l.votos_partido) / Number(l.total_validos)) * 100 : null,
-      })),
+      secoes: linhas.map((l) => {
+        const resumo = resumoPorBu.get(l.bu_id) ?? { partido: null, votos: 0, total: 0 };
+        return {
+          id: l.id,
+          nr_zona: l.nr_zona,
+          nr_secao: l.nr_secao,
+          dt_encerramento: l.dt_encerramento,
+          apos_1715: Boolean(l.apos_1715),
+          partido: resumo.partido,
+          votos: resumo.votos,
+          pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
+        };
+      }),
     };
   }));
 
