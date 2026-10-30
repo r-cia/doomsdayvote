@@ -44,7 +44,7 @@ export function useResumo() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -72,7 +72,7 @@ export function useTimeline() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -99,7 +99,7 @@ export function useAnalise() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -137,7 +137,7 @@ export function useAnomalias(habilitado = null, ordenarPor = null) {
       ),
     enabled: computed(
       () =>
-        Boolean(store.electionId && store.cargo) &&
+        Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)) &&
         (habilitado ? habilitado.value : true),
     ),
     placeholderData: keepPreviousData,
@@ -169,7 +169,7 @@ export function useEstatisticas(escopo) {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -226,7 +226,7 @@ export function useMapa(nivel = null, opcoes = {}) {
       ),
     enabled: computed(
       () =>
-        Boolean(store.electionId && store.cargo) &&
+        Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)) &&
         (nivelEfetivo.value !== 'municipio' || Boolean(ufDoMapa.value)),
     ),
     placeholderData: keepPreviousData,
@@ -268,7 +268,7 @@ export function useSecoes() {
         signal,
       ),
     enabled: computed(() =>
-      Boolean(store.electionId && store.cargo && store.municipio),
+      Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf) && store.municipio),
     ),
     placeholderData: keepPreviousData,
   })
@@ -299,7 +299,7 @@ export function useSecao(id) {
         signal,
       ),
     enabled: computed(() =>
-      Boolean(idEfetivo.value && store.electionId && store.cargo),
+      Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
     ),
   })
 }

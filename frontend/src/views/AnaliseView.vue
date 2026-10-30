@@ -1,5 +1,6 @@
 <script setup>
 import AnaliseSection from '../components/AnaliseSection.vue'
+import StateBlock from '../components/StateBlock.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import { ref, watch } from 'vue'
 import { useAnalise, useAnomalias } from '../composables/queries'
@@ -23,6 +24,13 @@ watch(
 </script>
 
 <template>
+  <StateBlock
+    v-if="store.governadorSemUf"
+    estado="vazio"
+    titulo="Selecione um estado"
+    descricao="Resultados de governador são específicos por estado."
+  />
+
   <EstatisticaPanel
     :eleicoes-disponiveis="eleicoesDisponiveis"
     :election-id="store.electionId"

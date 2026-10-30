@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AvisoBanner from '../components/AvisoBanner.vue'
 import MapPanel from '../components/MapPanel.vue'
+import StateBlock from '../components/StateBlock.vue'
 import SectionsTable from '../components/SectionsTable.vue'
 import SecaoView from '../views/SecaoView.vue'
 import UfPanel from '../components/UfPanel.vue'
@@ -109,6 +110,13 @@ function atualizarSecoes() {
 
 <template>
   <AvisoBanner v-if="avisos.length > 0" :avisos="avisos" />
+
+  <StateBlock
+    v-if="store.governadorSemUf"
+    estado="vazio"
+    titulo="Selecione um estado"
+    descricao="Resultados de governador são específicos por estado."
+  />
 
   <section class="malha" :aria-label="$t('mapa.malha')">
     <MapPanel

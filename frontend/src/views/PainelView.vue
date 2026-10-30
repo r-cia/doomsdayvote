@@ -102,6 +102,13 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <AvisoBanner v-if="avisos.length > 0" :avisos="avisos" />
 
   <StateBlock
+    v-if="store.governadorSemUf"
+    estado="vazio"
+    titulo="Selecione um estado"
+    descricao="Resultados de governador são específicos por estado."
+  />
+
+  <StateBlock
     v-if="resumoQuery.error.value"
     estado="erro"
     :titulo="$t('comum.erro')"
