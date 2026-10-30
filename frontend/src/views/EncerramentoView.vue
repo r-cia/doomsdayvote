@@ -117,6 +117,8 @@ function abrirSecao(item) {
 
 onMounted(carregarUrnas)
 watch(() => store.asOf, carregarUrnas)
+watch(() => store.electionId, carregarUrnas)
+watch(() => store.cargo, carregarUrnas)
 </script>
 
 <template>
