@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/totais.js": {
-    "mtime": 1793372335.3378258,
-    "seen": 1793372354.2518444,
-    "ast_hash": "debc56905b1e87aff22ea19db1fa6fba",
+    "mtime": 1793375721.0871208,
+    "seen": 1793375745.982926,
+    "ast_hash": "523cf0b432c829b6feda884dd0c35a5f",
     "semantic_hash": ""
   },
   "backend/src/modules/importacao/bweb/campos.js": {
@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793375013.7843995,
-    "seen": 1793375068.5094292,
-    "ast_hash": "65b0219403212272d85ce105c2a53ae7",
+    "mtime": 1793375731.6842473,
+    "seen": 1793375745.983217,
+    "ast_hash": "9013edcf5205a942d144e910447c4c29",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793375013.7853997,
-    "seen": 1793375068.5094,
-    "ast_hash": "1f25b9408646181896eb8cf130d4fd53",
+    "mtime": 1793375731.6832473,
+    "seen": 1793375745.983205,
+    "ast_hash": "de80f37bd948a63b742559515f8dba59",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {

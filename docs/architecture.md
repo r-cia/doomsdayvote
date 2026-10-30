@@ -7,6 +7,7 @@
 - Apuração/corte em `backend/src/modules/apuracao/`.
 - Cache Redis via `backend/src/lib/cache.js`.
 - Banco Postgres via Kysely.
+- O mapa usa `mv_totais_area` no corte final; ao exibir por UF, soma primeiro os totais pré-agregados de cada município por candidato antes de calcular líder e percentuais.
 - Observabilidade: hook `onResponse` em `backend/src/app.js` registra rota, status, duração e bytes; `cache.obter` registra hit/miss/off e duração da função. Logs estruturados via pino.
 
 ## Frontend

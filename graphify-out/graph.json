@@ -7295,7 +7295,7 @@
       "node_kind": "heading",
       "norm_label": "validacao",
       "source_file": "docs/current-plan.md",
-      "source_location": "L15"
+      "source_location": "L16"
     },
     {
       "id": "backend_src_env",
@@ -12916,7 +12916,7 @@
       "node_kind": "heading",
       "norm_label": "fluxo de analise",
       "source_file": "docs/architecture.md",
-      "source_location": "L21"
+      "source_location": "L22"
     },
     {
       "id": "docs_architecture_frontend",
@@ -12928,7 +12928,7 @@
       "node_kind": "heading",
       "norm_label": "frontend",
       "source_file": "docs/architecture.md",
-      "source_location": "L12"
+      "source_location": "L13"
     },
     {
       "id": "frontend_vite_config",
@@ -14785,7 +14785,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L147",
+      "source_location": "L159",
       "weight": 1.0
     },
     {
@@ -33349,7 +33349,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/architecture.md",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -33360,7 +33360,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/architecture.md",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -33525,7 +33525,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -39391,5 +39391,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6d7dba64bea81798c1ccae3882176d4387914a9f"
+  "built_at_commit": "99fd9f300b284387cbb50cc66afc3dbe8553b441"
 }
