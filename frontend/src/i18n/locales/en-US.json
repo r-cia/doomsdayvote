@@ -1,0 +1,143 @@
+{
+  "app": {
+    "titulo": "Doomsday Vote",
+    "subtitulo": "ballot box audit",
+    "classificacao": "Unofficial · TSE",
+    "abas": {
+      "painel": "Dashboard",
+      "mapa": "Map",
+      "estatistica": "Statistics",
+      "biometria": "Biometrics",
+      "encerramento": "Closing"
+    },
+    "idioma": "Language"
+  },
+  "comum": {
+    "carregando": "Loading…",
+    "erro": "Error",
+    "vazio": "No data",
+    "todos": "All",
+    "tentarNovamente": "Try again",
+    "detalhe": "Detail",
+    "voltar": "Back to dashboard",
+    "fechar": "Close",
+    "brasil": "Brazil",
+    "municipios": "Municipalities",
+    "carregandoDados": "Loading data…",
+    "semDados": "No data.",
+    "semDadosRecorte": "No data for this filter.",
+    "semDadosBiometria": "No biometrics data.",
+    "semSecoes": "Not enough sections for the calculation in this filter."
+  },
+  "filtros": {
+    "cargo": "Office",
+    "ano": "Year",
+    "turno": "Round",
+    "candidato": "Candidate",
+    "corte": "Day cutoff",
+    "uf": "State",
+    "municipio": "Municipality",
+    "limparMunicipio": "Clear municipality",
+    "limpar": "Clear filters",
+    "escopo": "Scope",
+    "turnoAtual": "Current round",
+    "anoCompleto": "Year (1st and 2nd)",
+    "ordenarPor": "Sort by"
+  },
+  "painel": {
+    "titulo": "Dashboard",
+    "composicao": "Filter composition",
+    "mesa": "Plotting table and scoreboard",
+    "leituras": "Readings",
+    "plotDia": "Day trace",
+    "placar": "Scoreboard",
+    "kpi": {
+      "comparecimento": "Attendance",
+      "secoesComBu": "Sections with BU",
+      "votosValidos": "Valid votes",
+      "ultimaCarga": "Last load"
+    },
+    "biometria": {
+      "titulo": "Filter composition",
+      "secoes": "sections",
+      "comparecimento": "Attendance",
+      "habilitados": "Enabled by biometrics",
+      "naoHabilitada": "Biometrics not enabled",
+      "aptos": "Eligible",
+      "semComposicao": "No composition for this filter."
+    }
+  },
+  "mapa": {
+    "titulo": "Map",
+    "malha": "Map and state reading",
+    "ufPainel": "State panel",
+    "votosPorEstado": "Votes by state",
+    "secoes": "Polling sections",
+    "semDadosUf": "No state with data for current filters.",
+    "semDadosEstado": "No data by state for current cutoff."
+  },
+  "estatistica": {
+    "titulo": "Statistics",
+    "descritiva": "Descriptive statistics",
+    "subtitulo": "Mean, median and population standard deviation per section",
+    "descricao": "Votes per section for each candidate and attendance per section. Population standard deviation.",
+    "variavel": "Variable",
+    "candidato": "Candidate",
+    "partido": "Party",
+    "secoes": "Sections",
+    "secoesZero": "Sections with zero votes",
+    "media": "Mean",
+    "mediana": "Median",
+    "desvio": "Standard deviation (pop.)",
+    "comparecimento": "Attendance",
+    "benford": "Benford",
+    "duplicacao": "Duplication",
+    "isolamento": "Isolation and LOF"
+  },
+  "biometria": {
+    "titulo": "Biometrics",
+    "porEstado": "Biometrics by state",
+    "uf": "State",
+    "votosComBiometria": "Votes with biometrics",
+    "pctComBiometria": "% with biometrics",
+    "votosNaoHabilitada": "Votes without biometrics enabled",
+    "pctNaoHabilitada": "% not enabled",
+    "agruparRegiao": "Group by region",
+    "semAgrupamento": "No grouping",
+    "porRegiao": "By region",
+    "regiao": "Region",
+    "municipios": "Municipalities with highest non-enabled biometrics",
+    "secoes": "Sections with highest % non-enabled"
+  },
+  "encerramento": {
+    "titulo": "Closing",
+    "urnas": "Ballot boxes",
+    "uf": "State",
+    "numUrnas": "No. of boxes",
+    "ate1715": "Until 17:15",
+    "pct1715": "% until 17:15",
+    "ate1915": "Until 19:15",
+    "pct1915": "% until 19:15",
+    "apos1915": "After 19:15",
+    "pctApos1915": "% after 19:15",
+    "municipios": "Municipalities with highest % after 17:15",
+    "secoes": "Sections with highest % after 17:15",
+    "total": "Total",
+    "apos1715": "After 17:15",
+    "percentual": "%",
+    "encerramento": "Closing",
+    "partido": "Party",
+    "votos": "Votes",
+    "pctVotos": "% Votes",
+    "zona": "Zone",
+    "secao": "Section"
+  },
+  "format": {
+    "corteFinal": "Final cutoff",
+    "corteAte": "Cutoff until"
+  },
+  "status": {
+    "recebido": "BU received",
+    "pendente": "Pending"
+  }
+}
