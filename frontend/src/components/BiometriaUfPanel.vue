@@ -15,7 +15,8 @@ const REGIAO = {
   PR: 'Sul', RS: 'Sul', SC: 'Sul',
 }
 
-const agruparRegiao = ref(false)
+const agrupar = ref('nenhum')
+const agruparRegiao = computed(() => agrupar.value === 'regiao')
 const ordenacao = ref({ coluna: 'sg_uf', direcao: 'asc' })
 
 function alternar(coluna) {
@@ -101,10 +102,10 @@ function seta(coluna) {
         <h2 id="biometria-uf-titulo">Biometria por estado</h2>
       </div>
       <div class="estatistica-controle">
-        <label class="campo campo--curto">
-          <span class="campo__rotulo">Agrupar por região</span>
-          <input type="checkbox" v-model="agruparRegiao" />
-        </label>
+        <select v-model="agrupar" class="uf-ordenacao">
+          <option value="nenhum">Sem agrupamento</option>
+          <option value="regiao">Por região</option>
+        </select>
       </div>
     </header>
 
