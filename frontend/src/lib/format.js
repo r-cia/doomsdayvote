@@ -123,6 +123,11 @@ export function formatarCorte(corte) {
   return i18n.global.t('format.corteFinal')
 }
 
+export function formatarCargo(valor) {
+  const texto = String(valor ?? '').trim()
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
+}
+
 export function truncar(texto, tamanho = 60) {
   if (!texto) return '—'
   const valor = String(texto)

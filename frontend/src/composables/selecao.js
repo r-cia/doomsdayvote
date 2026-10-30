@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { useFiltersStore, ordemCargo } from '../stores/filters'
 import { useEleicoes } from './queries'
+import { formatarCargo } from '../lib/format'
 
 export function useSelecaoEleicao() {
   const store = useFiltersStore()
@@ -25,7 +26,7 @@ export function useSelecaoEleicao() {
     for (const eleicao of eleicoesDisponiveis.value) {
       for (const cargo of eleicao.cargos ?? []) {
         if (ordemCargo(cargo.ds_cargo_pergunta) === undefined) continue
-        mapa.set(cargo.cd_cargo_pergunta, cargo.ds_cargo_pergunta)
+        mapa.set(cargo.cd_cargo_pergunta, formatarCargo(cargo.ds_cargo_pergunta))
       }
     }
     return [...mapa.entries()]

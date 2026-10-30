@@ -774,9 +774,9 @@
     "semantic_hash": ""
   },
   "frontend/src/composables/selecao.js": {
-    "mtime": 1793400031.978176,
-    "seen": 1793400076.118085,
-    "ast_hash": "645dda09848a471bba033d52cf103a29",
+    "mtime": 1793400136.0094335,
+    "seen": 1793400189.7014573,
+    "ast_hash": "20b360a02f92ab8828c3bd4bddba7e84",
     "semantic_hash": ""
   },
   "frontend/src/i18n/index.js": {
@@ -816,9 +816,9 @@
     "semantic_hash": ""
   },
   "frontend/src/lib/format.js": {
-    "mtime": 1793374982.7979975,
-    "seen": 1793375068.5092752,
-    "ast_hash": "0132f76f62ac86c3d77e20c6bb145ca8",
+    "mtime": 1793400135.0924225,
+    "seen": 1793400189.701472,
+    "ast_hash": "4e88406996d3818ee286c84af3550b46",
     "semantic_hash": ""
   },
   "frontend/src/lib/status.js": {
@@ -888,9 +888,9 @@
     "semantic_hash": ""
   },
   "frontend/tests/lib.test.js": {
-    "mtime": 1793361794.5325203,
-    "seen": 1793364259.1281104,
-    "ast_hash": "53adae0225e29a93a7e4e9e071181ca7",
+    "mtime": 1793400137.2564485,
+    "seen": 1793400189.7015,
+    "ast_hash": "231dd288f42c64f47ff3925484d425f6",
     "semantic_hash": ""
   },
   "frontend/tests/setup.js": {
