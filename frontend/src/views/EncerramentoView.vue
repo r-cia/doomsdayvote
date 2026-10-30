@@ -237,7 +237,7 @@ watch(() => store.cargo, carregarUrnas)
               <td class="num">{{ formatarNumero(s.votos) }}</td>
               <td class="num">{{ formatarPercentual(s.pct_votos) }}</td>
               <td>
-                <button type="button" class="button button--ghost button--compacto" @click="abrirSecao(s)">Detalhe</button>
+                <button type="button" class="button button--ghost button--compacto" @click="abrirSecao(s)">{{ $t('comum.detalhe') }}</button>
               </td>
             </tr>
           </tbody>
