@@ -607,7 +607,7 @@ export async function registrarRotas(app) {
         's.sg_uf',
         sql`count(*)::int`.as('total'),
         sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento <= timestamptz '2026-10-04 20:15:00-03')::int`.as('ate_1715'),
-        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento <= timestamptz '2026-10-04 22:15:00-03')::int`.as('ate_1915'),
+        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03' and bv.dt_encerramento <= timestamptz '2026-10-04 22:15:00-03')::int`.as('ate_1915'),
         sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 22:15:00-03')::int`.as('apos_1915'),
       ])
       .groupBy('s.sg_uf')
