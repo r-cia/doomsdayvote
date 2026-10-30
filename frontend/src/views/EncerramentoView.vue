@@ -181,6 +181,7 @@ watch(() => store.cargo, carregarUrnas)
               <th scope="col" class="num">Após 17:15</th>
               <th scope="col" class="num">%</th>
               <th scope="col">Partido</th>
+              <th scope="col" class="num">Votos</th>
               <th scope="col" class="num">% Votos</th>
             </tr>
           </thead>
@@ -196,6 +197,7 @@ watch(() => store.cargo, carregarUrnas)
               <td class="num">{{ formatarNumero(m.apos_1715) }}</td>
               <td class="num">{{ formatarPercentual(m.pct_apos_1715) }}</td>
               <td>{{ m.partido ?? '—' }}</td>
+              <td class="num">{{ formatarNumero(m.votos) }}</td>
               <td class="num">{{ formatarPercentual(m.pct_votos) }}</td>
             </tr>
           </tbody>
@@ -221,6 +223,7 @@ watch(() => store.cargo, carregarUrnas)
               <th scope="col">Seção</th>
               <th scope="col" class="num">Encerramento</th>
               <th scope="col">Partido</th>
+              <th scope="col" class="num">Votos</th>
               <th scope="col" class="num">% Votos</th>
               <th scope="col"><span class="sr-only">Detalhe</span></th>
             </tr>
@@ -231,6 +234,7 @@ watch(() => store.cargo, carregarUrnas)
               <td>{{ s.nr_secao }}</td>
               <td class="num">{{ s.dt_encerramento ? new Date(s.dt_encerramento).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—' }}</td>
               <td>{{ s.partido ?? '—' }}</td>
+              <td class="num">{{ formatarNumero(s.votos) }}</td>
               <td class="num">{{ formatarPercentual(s.pct_votos) }}</td>
               <td>
                 <button type="button" class="button button--ghost button--compacto" @click="abrirSecao(s)">Detalhe</button>
