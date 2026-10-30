@@ -31,7 +31,7 @@ function escopoDe(query) {
 async function buscarEleicao(db, id) {
   const eleicao = await db
     .selectFrom('eleicao')
-    .select(['id', 'ano_eleicao', 'cd_pleito', 'nr_turno', 'metadados_derivados'])
+    .select(['id', 'ano_eleicao', 'cd_pleito', 'nr_turno', 'dt_pleito', 'dt_eleicao', 'metadados_derivados'])
     .where('id', '=', id)
     .executeTakeFirst();
   if (!eleicao) throw new AppError('NOT_FOUND', 404, 'Eleição não encontrada');
@@ -594,6 +594,8 @@ export async function registrarRotas(app) {
   app.get('/api/encerramento/urnas', cacheado('encerramento-urnas', 300, baseSchema, async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
+    const corte1715 = `${eleicao.dt_pleito} 17:15:00-03`;
+    const corte1915 = `${eleicao.dt_pleito} 19:15:00-03`;
 
     let qb = db
       .selectFrom('boletim_versao as bv')
@@ -606,9 +608,9 @@ export async function registrarRotas(app) {
       .select([
         's.sg_uf',
         sql`count(*)::int`.as('total'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= timestamptz '2026-10-04 20:15:00-03')::int`.as('ate_1715'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03' and coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= timestamptz '2026-10-04 22:15:00-03')::int`.as('ate_1915'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 22:15:00-03')::int`.as('apos_1915'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= ${corte1715}::timestamptz)::int`.as('ate_1715'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz and coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= ${corte1915}::timestamptz)::int`.as('ate_1915'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1915}::timestamptz)::int`.as('apos_1915'),
       ])
       .groupBy('s.sg_uf')
       .orderBy('s.sg_uf')
@@ -642,6 +644,7 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
+    const corte1715 = `${eleicao.dt_pleito} 17:15:00-03`;
 
     let qb = db
       .selectFrom('boletim_versao as bv')
@@ -659,13 +662,13 @@ export async function registrarRotas(app) {
         's.cd_municipio_tse',
         sql`max(l.nm_municipio)`.as('nm_municipio'),
         sql`count(*)::int`.as('total'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03')::int`.as('apos_1715'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz)::int`.as('apos_1715'),
       ])
       .groupBy(['s.cd_municipio_tse'])
       .orderBy(
         query.ordenar_por === 'total'
           ? sql`count(*) desc`
-          : sql`(count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03'))::float / nullif(count(*),0) desc nulls last`,
+          : sql`(count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz))::float / nullif(count(*),0) desc nulls last`,
       )
       .limit(query.limit)
       .execute();
@@ -693,6 +696,7 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
+    const corte1715 = `${eleicao.dt_pleito} 17:15:00-03`;
 
     let qb = db
       .selectFrom('boletim_versao as bv')
@@ -708,8 +712,9 @@ export async function registrarRotas(app) {
         's.nr_zona',
         's.nr_secao',
         sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`.as('dt_encerramento'),
+        sql`case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then true else false end`.as('apos_1715'),
       ])
-      .orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03' then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`)
+      .orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`)
       .limit(query.limit)
       .execute();
 
@@ -720,7 +725,7 @@ export async function registrarRotas(app) {
         nr_zona: l.nr_zona,
         nr_secao: l.nr_secao,
         dt_encerramento: l.dt_encerramento,
-        apos_1715: l.dt_encerramento ? new Date(l.dt_encerramento) > new Date('2026-10-04T20:15:00-03:00') : false,
+        apos_1715: Boolean(l.apos_1715),
       })),
     };
   }));
