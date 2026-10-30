@@ -1,5 +1,6 @@
 <script setup>
 import AnaliseSection from '../components/AnaliseSection.vue'
+import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import { ref, watch } from 'vue'
 import { useAnalise, useAnomalias } from '../composables/queries'
@@ -27,6 +28,8 @@ watch(
     :eleicoes-disponiveis="eleicoesDisponiveis"
     :election-id="store.electionId"
   />
+
+  <BiometriaUfPanel :dados="analiseQuery.data.value?.biometria_uf ?? []" />
 
   <AnaliseSection
     :benford="analiseQuery.data.value?.benford ?? null"

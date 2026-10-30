@@ -6,7 +6,7 @@ import { avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../mo
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
-import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
+import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
 import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
@@ -288,8 +288,9 @@ export async function registrarRotas(app) {
       escopo: escopoDe(query),
     };
 
-    const [biometria, benford, metadados, avisos] = await Promise.all([
+    const [biometria, biometriaUf, benford, metadados, avisos] = await Promise.all([
       composicaoBiometria(db, escopo),
+      biometriaPorUf(db, escopo),
       benfordPorCandidato(db, escopo),
       cache.obter('metadados', query, 300, () => metadadosCorte(db, escopo, corte)).then((r) => r.valor),
       cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
@@ -300,6 +301,7 @@ export async function registrarRotas(app) {
       ...metadados,
       avisos,
       biometria,
+      biometria_uf: biometriaUf,
       benford: {
         minimo_votos: benford.minimo_votos,
         candidatos: benford.candidatos.map(({ niveis, ...candidato }) => ({
