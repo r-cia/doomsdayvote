@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import StateBlock from './StateBlock.vue'
+import CoberturaBlock from './CoberturaBlock.vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -52,5 +53,6 @@ function formatPercentual(valor) {
         </ul>
       </article>
     </div>
+    <CoberturaBlock :dados="dados" />
   </section>
 </template>

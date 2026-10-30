@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import StateBlock from './StateBlock.vue'
+import CoberturaBlock from './CoberturaBlock.vue'
 import { useFiltersStore } from '../stores/filters'
 
 const props = defineProps({
@@ -83,5 +84,6 @@ function abrirSecao(item) {
         </tbody>
       </table>
     </div>
+    <CoberturaBlock :dados="dados" />
   </section>
 </template>

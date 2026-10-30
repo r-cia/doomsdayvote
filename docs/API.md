@@ -91,6 +91,8 @@ Duas leituras no recorte e no corte atuais.
 
 Benford usa o primeiro dígito dos votos por seção com 10 votos ou mais, a distribuição esperada `log10(1 + 1/d)` e o MAD de Nigrini (0,006 / 0,012 / 0,015). É leitura descritiva, não prova de fraude.
 
+`/api/analysis` também retorna `cobertura` (seções consideradas, BUs sem campos) e `limitacoes`.
+
 ## `GET /api/anomalies`
 
 Benford por nível, duplicação de vetor de votos e outliers por seção, no corte e no recorte.
@@ -100,6 +102,8 @@ Benford por nível, duplicação de vetor de votos e outliers por seção, no co
 - `outliers`: `features` (6), `parametros` (`isolamento`: 100 árvores, amostra 256; `lof`: k 10, amostra até 2.000) e as 20 seções com maior score. Sem rótulos de limiar.
 
 `GET /api/sections` aceita `municipio_nome` (nome parcial), `zona` e `secao` como filtros separados, além de `uf` e `municipio`.
+
+`/api/anomalies` também retorna `cobertura` (seções consideradas, grupos de duplicação, outliers limitados) e `limitacoes`.
 
 ## `GET /api/consistencia`
 
@@ -118,6 +122,8 @@ Parâmetros: `election_id`, `cargo`, `as_of` opcional, `uf` opcional, `municipio
 Quando `escopo=ano` e o ano tem dois turnos, devolve dois blocos lado a lado, sem somá-los.
 
 Cada bloco traz `comparecimento` (média, mediana e desvio padrão populacional dos `qt_comparecimento` por seção) e `candidatos` (para cada candidato nominal, média, mediana e desvio padrão populacional dos votos por seção). `secoes` é o número de seções do recorte; `secoes_com_voto` é o número de seções em que o candidato teve algum voto. Cache Redis TTL 300 s, cabeçalho `x-cache: hit|miss|off`.
+
+`/api/estatisticas` também retorna `cobertura` (seções consideradas) e `limitacoes`.
 
 ## `GET /api/sections/:id/versions`
 

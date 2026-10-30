@@ -125,7 +125,10 @@ export async function registrarRotas(app) {
         ? sql`select qt_aptos, qt_comparecimento, qt_abstencoes, bus_considerados from mv_metricas_final where eleicao_id = ${eleicao.id} and cargo = ${query.cargo}`
             .execute(db)
             .then((r) => {
-              const linha = r.rows[0] ?? {};
+              const linha = r.rows[0];
+              if (!linha) {
+                return somarMetricasSecao(db, escopo);
+              }
               return {
                 qt_aptos: Number(linha.qt_aptos ?? 0),
                 qt_comparecimento: Number(linha.qt_comparecimento ?? 0),
@@ -275,6 +278,13 @@ export async function registrarRotas(app) {
       cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
     ]);
 
+    const limitacoesAnalise = [
+      'Biometria agregada por seção, sem vínculo individual.',
+      'Benford é leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
+      'Campos ausentes não são tratados como zero.',
+      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
+    ];
+
     return {
       corte: corteResposta(corte),
       ...metadados,
@@ -292,6 +302,18 @@ export async function registrarRotas(app) {
           benford.observacao ??
           'Leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
       },
+      cobertura: {
+        consideradas: biometria.secoes,
+        bus_sem_aptos: biometria.bus_sem_aptos,
+        bus_sem_comparecimento: biometria.bus_sem_comparecimento,
+        bus_sem_abstencoes: biometria.bus_sem_abstencoes,
+        bus_sem_biometria: biometria.bus_sem_biometria,
+        secoes_abaixo_minimo_benford: benford.candidatos.reduce(
+          (total, candidato) => total + (candidato.secoes_abaixo_minimo ?? 0),
+          0,
+        ),
+      },
+      limitacoes: limitacoesAnalise,
     };
   }));
 
@@ -383,6 +405,14 @@ export async function registrarRotas(app) {
       })
       .slice(0, 20);
 
+    const limitacoesAnomalias = [
+      'Benford por nível é leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
+      'Duplicação busca vetores idênticos; frequência esperada cresce com a escala do escopo.',
+      'Isolation Forest e LOF são ordenação exploratória, sem limiares de alerta.',
+      'Campos ausentes não são tratados como zero.',
+      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
+    ];
+
     return {
       corte: corteResposta(corte),
       ...metadados,
@@ -405,6 +435,22 @@ export async function registrarRotas(app) {
         total_secoes: secoes.length,
         secoes: ranking,
       },
+      cobertura: {
+        consideradas: secoes.length,
+        benford_abaixo_minimo: benford.candidatos.reduce(
+          (total, candidato) =>
+            total +
+            (candidato.niveis?.secao?.secoes_abaixo_minimo ??
+              candidato.secoes_abaixo_minimo ??
+              0),
+          0,
+        ),
+        duplicacao_grupos: duplicacao.total_grupos ?? 0,
+        duplicacao_secoes: duplicacao.total_secoes ?? 0,
+        duplicacao_secoes_escopo: duplicacao.total_secoes_escopo ?? 0,
+        outliers_limitado: secoes.length > indices.length,
+      },
+      limitacoes: limitacoesAnomalias,
     };
   }));
 
@@ -422,11 +468,27 @@ export async function registrarRotas(app) {
       blocos.push(await estatisticasDaEleicao(db, { eleicao: alvo, ...recorte }));
     }
 
+    const secoesConsideradas = blocos.reduce(
+      (total, bloco) => total + Number(bloco.comparecimento?.secoes ?? 0),
+      0,
+    );
+
+    const limitacoesEstatisticas = [
+      'Estatísticas descritivas agregadas por seção, sem vínculo individual.',
+      'Campos ausentes não são tratados como zero.',
+      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
+    ];
+
     return {
       corte: corteResposta(corte),
       escopo: query.escopo,
       turnos_disponiveis: irmaos.map((irmao) => irmao.nr_turno),
       blocos,
+      cobertura: {
+        consideradas: secoesConsideradas,
+        blocos: blocos.length,
+      },
+      limitacoes: limitacoesEstatisticas,
     };
   }));
 

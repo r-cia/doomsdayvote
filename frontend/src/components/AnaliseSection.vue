@@ -1,6 +1,7 @@
 <script setup>
 import BenfordNiveisPanel from './BenfordNiveisPanel.vue'
 import BenfordPanel from './BenfordPanel.vue'
+import CoberturaBlock from './CoberturaBlock.vue'
 import DuplicacaoPanel from './DuplicacaoPanel.vue'
 import OutliersPanel from './OutliersPanel.vue'
 import StateBlock from './StateBlock.vue'
@@ -51,6 +52,7 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
         </div>
       </template>
 
+      <CoberturaBlock v-if="anomalias" :dados="anomalias" />
       <StateBlock
         v-else-if="loading"
         estado="carregando"

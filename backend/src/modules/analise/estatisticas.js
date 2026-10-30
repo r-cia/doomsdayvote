@@ -55,6 +55,10 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
       sql`coalesce(sum(bv.qt_comparecimento), 0)`.as('qt_comparecimento'),
       sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
       sql`count(*)`.as('secoes'),
+      sql`count(*) filter (where bv.qt_aptos is null)`.as('bus_sem_aptos'),
+      sql`count(*) filter (where bv.qt_comparecimento is null)`.as('bus_sem_comparecimento'),
+      sql`count(*) filter (where bv.qt_abstencoes is null)`.as('bus_sem_abstencoes'),
+      sql`count(*) filter (where bv.qt_elei_biom_sem_habilitacao is null)`.as('bus_sem_biometria'),
       sql`count(*) filter (where bv.qt_elei_biom_sem_habilitacao is null)`.as('secoes_sem_campo'),
     ])
     .executeTakeFirstOrThrow()
@@ -67,6 +71,10 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
   return {
     secoes: Number(linha.secoes),
     secoes_sem_campo: Number(linha.secoes_sem_campo),
+    bus_sem_aptos: Number(linha.bus_sem_aptos),
+    bus_sem_comparecimento: Number(linha.bus_sem_comparecimento),
+    bus_sem_abstencoes: Number(linha.bus_sem_abstencoes),
+    bus_sem_biometria: Number(linha.bus_sem_biometria),
     qt_aptos: aptos,
     qt_comparecimento: comparecimento,
     qt_habilitados_por_biometria: habilitada,
