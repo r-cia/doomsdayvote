@@ -1,22 +1,15 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { formatarNumero } from '../lib/format'
 import { candidatosNominais } from '../lib/agregacoes'
 
 const props = defineProps({
   areas: { type: Array, default: () => [] },
+  areasAnteriores: { type: Array, default: () => [] },
   candidatos: { type: Array, default: () => [] },
 })
 
-const areasAnteriores = ref([])
-
-watch(
-  () => props.areas,
-  (novo, antigo) => {
-    areasAnteriores.value = antigo ?? []
-  },
-  { immediate: false },
-)
+const areasAnteriores = computed(() => props.areasAnteriores ?? [])
 
 const ordenacao = ref({ coluna: 'nm_votavel', direcao: 'asc' })
 
@@ -67,8 +60,9 @@ function totalPorCandidato(nrVotavel) {
 }
 
 function votosAnteriores(area, nrVotavel) {
-  const antiga = (areasAnteriores.value ?? []).find((a) => a.sg_uf === area.sg_uf)
-  if (!antiga) return 0
+  if (!areasAnteriores.value || areasAnteriores.value.length === 0) return null
+  const antiga = areasAnteriores.value.find((a) => a.sg_uf === area.sg_uf)
+  if (!antiga) return null
   const linha = (antiga.candidatos ?? []).find(
     (c) => Number(c.nr_votavel) === Number(nrVotavel),
   )
@@ -76,7 +70,10 @@ function votosAnteriores(area, nrVotavel) {
 }
 
 function delta(area, nrVotavel) {
-  return votosPorCandidato(area, nrVotavel) - votosAnteriores(area, nrVotavel)
+  const ant = votosAnteriores(area, nrVotavel)
+  if (ant === null) return 0
+  const d = votosPorCandidato(area, nrVotavel) - ant
+  return d < 0 ? 0 : d
 }
 
 function deltaTotal(nrVotavel) {
