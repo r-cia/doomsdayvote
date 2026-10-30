@@ -13,6 +13,38 @@ function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
 }
 
 export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {}, dataPleito }) {
+  const semEscopo = !escopo?.sgUf && !escopo?.cdMunicipio;
+
+  if (corte.tipo === 'final' && semEscopo) {
+    const linhas = await db
+      .selectFrom('mv_votos_final')
+      .selectAll()
+      .where('eleicao_id', '=', eleicaoId)
+      .where('cargo', '=', cargo)
+      .execute();
+
+    const baseValidos = linhas
+      .filter((linha) => linha.categoria === 'nominal' || linha.categoria === 'legenda')
+      .reduce((total, linha) => total + Number(linha.qt_votos), 0);
+
+    return linhas
+      .map((linha) => ({
+        cd_tipo_votavel: linha.cd_tipo_votavel,
+        nr_votavel: linha.nr_votavel,
+        nm_votavel: linha.nm_votavel,
+        categoria: linha.categoria,
+        nr_partido: linha.nr_partido,
+        sg_partido: linha.sg_partido,
+        nm_partido: linha.nm_partido,
+        cor_hex: linha.cor_hex,
+        qt_votos: Number(linha.qt_votos),
+        qt_votos_ate_1715: Number(linha.qt_votos_ate_1715 ?? 0),
+        qt_votos_tardios: Number(linha.qt_votos_tardios ?? 0),
+        percentual: baseValidos > 0 ? (Number(linha.qt_votos) / baseValidos) * 100 : null,
+      }))
+      .sort((a, b) => b.qt_votos - a.qt_votos);
+  }
+
   const corte1715 = dataPleito ? `${dataPleito} 17:15:00-03` : null;
 
   const colunas = [
