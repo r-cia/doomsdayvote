@@ -736,6 +736,7 @@ export async function registrarRotas(app) {
         dt_encerramento: l.dt_encerramento,
         apos_1715: Boolean(l.apos_1715),
         partido: l.partido,
+        votos: Number(l.votos_partido ?? 0),
         pct_votos: Number(l.total_validos) > 0 ? (Number(l.votos_partido) / Number(l.total_validos)) * 100 : null,
       })),
     };
