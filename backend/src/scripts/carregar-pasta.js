@@ -43,6 +43,9 @@ async function main() {
     await cliente
       .query('refresh materialized view concurrently mv_metricas_final')
       .catch(() => cliente.query('refresh materialized view mv_metricas_final'));
+    await cliente
+      .query('refresh materialized view concurrently mv_totais_area')
+      .catch(() => cliente.query('refresh materialized view mv_totais_area'));
     await cache.invalidar();
     await cache.fechar();
     await db.destroy();
