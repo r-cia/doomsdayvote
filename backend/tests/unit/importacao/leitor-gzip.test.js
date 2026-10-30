@@ -37,6 +37,20 @@ describe('leitor com gzip', () => {
     expect(primeira.campos).toHaveLength(45);
   });
 
+  it('descarta bytes NUL sem quebra de linha', async () => {
+    const comprimido = path.join(diretorio, 'nulos.csv.gz');
+    const conteudo = Buffer.concat([
+      Buffer.from('"A";"B"\r\n"1";"2"'),
+      Buffer.alloc(8 * 1024 * 1024),
+      Buffer.from('\r\n"3";"4"\r\n'),
+    ]);
+    await writeFile(comprimido, gzipSync(conteudo));
+
+    const linhas = [];
+    for await (const { campos } of lerLinhas(comprimido)) linhas.push(campos);
+    expect(linhas).toEqual([['A', 'B'], ['1', '2'], ['3', '4']]);
+  });
+
   it('recusa um .gz corrompido com código próprio', async () => {
     const quebrado = path.join(diretorio, 'quebrado.csv.gz');
     await writeFile(quebrado, Buffer.from('isto nao e um arquivo gzip'));
