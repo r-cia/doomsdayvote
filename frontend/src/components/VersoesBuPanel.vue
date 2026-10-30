@@ -2,11 +2,13 @@
 import { computed } from 'vue'
 import { formatarDataHora } from '../lib/format'
 import StateBlock from './StateBlock.vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ordenacaoCampos: { type: Object, default: () => useOrdenacao('campos') },
   ordenacaoVotaveis: { type: Object, default: () => useOrdenacao('votaveis') },
@@ -56,6 +58,7 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
         <h3>{{ $t('versoesBU.comparacao', { previous: comparacao.anterior, current: comparacao.atual }) }}</h3>
         <div v-if="comparacao.campos_alterados?.length">
           <h4>{{ $t('versoesBU.camposAlterados') }}</h4>
+          <TabelaScroll :atualizando="atualizando">
           <table>
             <thead>
               <tr>
@@ -74,9 +77,11 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
               </tr>
             </tbody>
           </table>
+          </TabelaScroll>
         </div>
         <div v-if="comparacao.votaveis_alterados?.length">
           <h4>{{ $t('versoesBU.votaveisAlterados') }}</h4>
+          <TabelaScroll :atualizando="atualizando">
           <table>
             <thead>
               <tr>
@@ -97,6 +102,7 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
               </tr>
             </tbody>
           </table>
+          </TabelaScroll>
         </div>
       </div>
       <p v-else class="vazio">{{ $t('comum.semVersaoAnterior') }}</p>

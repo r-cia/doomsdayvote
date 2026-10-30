@@ -21,6 +21,7 @@ const comparacaoLocalQuery = useComparacaoLocal(ordenacao.params)
   <ComparacaoLocalPanel
     :dados="comparacaoLocalQuery.data.value ?? null"
     :loading="comparacaoLocalQuery.isLoading.value"
+    :atualizando="comparacaoLocalQuery.isFetching.value"
     :error="comparacaoLocalQuery.error.value?.message ?? ''"
     :ordenacao="ordenacao"
     @retry="comparacaoLocalQuery.refetch()"

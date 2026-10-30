@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { formatarNumero } from '../lib/format'
 import { nominaisNaOrdemDoServidor } from '../lib/agregacoes'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -9,6 +10,7 @@ const props = defineProps({
   areas: { type: Array, default: () => [] },
   candidatos: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -61,7 +63,7 @@ function deltaTotal(nrVotavel) {
       {{ $t('mapa.semDadosEstado') }}
     </div>
 
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="atualizando">
       <table class="tabela-votos-estado">
         <thead>
           <tr>
@@ -95,6 +97,6 @@ function deltaTotal(nrVotavel) {
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
   </section>
 </template>

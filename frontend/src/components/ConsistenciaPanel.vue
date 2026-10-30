@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import StateBlock from './StateBlock.vue'
@@ -10,6 +11,7 @@ import { useOrdenacao } from '../composables/ordenacao'
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
@@ -74,7 +76,7 @@ function abrirSecao(item) {
     <div v-else-if="itens.length === 0" class="vazio">
       {{ $t('comum.nenhumaDivergencia') }}
     </div>
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="atualizando">
       <table>
         <caption class="sr-only">{{ $t('analiseUI.consistencia') }}</caption>
         <thead>
@@ -104,7 +106,7 @@ function abrirSecao(item) {
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
     <dl v-if="cobertura" class="painel-resumo" :aria-label="$t('comum.resumoCobertura')">
       <div v-for="item in resumo" :key="item.rotulo" class="painel-resumo__item">
         <dt>{{ item.rotulo }}</dt>

@@ -1,12 +1,14 @@
 <script setup>
 import { computed } from 'vue'
 import StateBlock from './StateBlock.vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ordenacaoShare: { type: Object, default: () => useOrdenacao('share') },
   ordenacaoMargem: { type: Object, default: () => useOrdenacao('margem') },
@@ -63,7 +65,7 @@ function municipio(secao) {
         <header class="grupo__cabecalho">
           <h3>{{ $t('analiseUI.maiorParticipacao') }}</h3>
         </header>
-        <div class="tabela-scroll">
+        <TabelaScroll :atualizando="atualizando">
           <table class="analise-tabela">
             <caption class="sr-only">{{ $t('analiseUI.secoesPorParticipacao') }}</caption>
             <thead>
@@ -91,13 +93,13 @@ function municipio(secao) {
               </tr>
             </tbody>
           </table>
-        </div>
+        </TabelaScroll>
       </article>
       <article class="concentracao-grade__grupo">
         <header class="grupo__cabecalho">
           <h3>{{ $t('analiseUI.maiorMargem') }}</h3>
         </header>
-        <div class="tabela-scroll">
+        <TabelaScroll :atualizando="atualizando">
           <table class="analise-tabela">
             <caption class="sr-only">{{ $t('analiseUI.secoesPorMargem') }}</caption>
             <thead>
@@ -125,7 +127,7 @@ function municipio(secao) {
               </tr>
             </tbody>
           </table>
-        </div>
+        </TabelaScroll>
       </article>
     </div>
     <dl v-if="cobertura" class="painel-resumo" :aria-label="$t('comum.resumoCobertura')">

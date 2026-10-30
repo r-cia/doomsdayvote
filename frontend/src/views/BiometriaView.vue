@@ -7,6 +7,7 @@ import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
+import TabelaScroll from '../components/TabelaScroll.vue'
 
 const secaoModalId = ref(null)
 
@@ -84,6 +85,7 @@ function abrirSecao(item) {
   <BiometriaUfPanel
     :dados="analiseQuery.data.value?.biometria_uf ?? []"
     :loading="analiseQuery.isLoading.value"
+    :atualizando="analiseQuery.isFetching.value"
     :ordenacao="ordemUf"
     @select="carregarMunicipios"
   />
@@ -95,9 +97,9 @@ function abrirSecao(item) {
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
-      <div v-else-if="carregandoMunicipios" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="carregandoMunicipios && municipios.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
       <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
-      <div v-else class="tabela-scroll">
+      <TabelaScroll v-else :atualizando="carregandoMunicipios">
         <table>
           <thead>
             <tr>
@@ -119,7 +121,7 @@ function abrirSecao(item) {
             </tr>
           </tbody>
         </table>
-      </div>
+      </TabelaScroll>
     </div>
 
     <div class="card">
@@ -130,9 +132,9 @@ function abrirSecao(item) {
         </p>
       </div>
       <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') || 'Clique em um município.' }}</div>
-      <div v-else-if="carregandoSecoes" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="carregandoSecoes && secoes.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
       <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
-      <div v-else class="tabela-scroll">
+      <TabelaScroll v-else :atualizando="carregandoSecoes">
         <table>
           <thead>
             <tr>
@@ -161,7 +163,7 @@ function abrirSecao(item) {
             </tr>
           </tbody>
         </table>
-      </div>
+      </TabelaScroll>
     </div>
   </div>
 

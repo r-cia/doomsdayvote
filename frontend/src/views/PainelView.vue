@@ -156,5 +156,6 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     :candidatos="resumoTabelaQuery.data.value?.votos ?? []"
     :ordenacao="ordemVotosEstado"
     :loading="mapaUfQuery.isLoading.value || resumoTabelaQuery.isLoading.value"
+    :atualizando="mapaUfQuery.isFetching.value || resumoTabelaQuery.isFetching.value"
   />
 </template>

@@ -1249,6 +1249,33 @@ select {
   overflow: auto;
 }
 
+.tabela-carga {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tabela-carga > .tabela-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.tabela-carga > .tabela-scroll[aria-busy='true'] {
+  opacity: 0.4;
+  transition: opacity 120ms linear;
+}
+
+.tabela-carga__spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-dim);
+  pointer-events: none;
+}
+
 .analise-tabela {
   min-width: 760px;
 }
@@ -1793,14 +1820,6 @@ tr.linha--ativa th {
   gap: 8px;
   padding: 10px 14px;
   border-bottom: 1px solid var(--line-soft);
-}
-
-.secoes__atualizando {
-  padding: 4px 14px;
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--warn);
 }
 
 .paginacao {

@@ -1,10 +1,12 @@
 <script setup>
 import { computed } from 'vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { formatarDecimal } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  atualizando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -34,7 +36,7 @@ function score(valor) {
       {{ $t('comum.semSecoes') }}
     </div>
 
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="atualizando">
       <table>
         <caption class="sr-only">
           Seções com maior score de anomalia
@@ -71,6 +73,6 @@ function score(valor) {
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
   </section>
 </template>

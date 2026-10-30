@@ -41,6 +41,7 @@ const props = defineProps({
   candidatos: { type: Array, default: () => [] },
   uf: { type: String, default: null },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   altura: { type: String, default: '440px' },
   areasTabela: { type: Array, default: null },
@@ -753,6 +754,7 @@ onBeforeUnmount(() => {
       :candidato="candidato"
       :candidatos="candidatos"
       :uf="uf"
+      :atualizando="atualizando"
       @select="$emit('select', $event)"
     />
   </section>

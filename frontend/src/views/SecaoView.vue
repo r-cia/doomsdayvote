@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StateBlock from '../components/StateBlock.vue'
+import TabelaScroll from '../components/TabelaScroll.vue'
 import VersoesBuPanel from '../components/VersoesBuPanel.vue'
 
 const props = defineProps({
@@ -255,7 +256,7 @@ function voltar() { fechar() }
           estado="vazio"
           :titulo="$t('comum.semDados')"
         />
-        <div v-else class="tabela-scroll">
+        <TabelaScroll v-else :atualizando="consulta.isFetching.value">
           <table>
             <caption class="sr-only">Resultados por votável na seção</caption>
             <thead>
@@ -293,13 +294,14 @@ function voltar() { fechar() }
               </tr>
             </tbody>
           </table>
-        </div>
+        </TabelaScroll>
       </section>
     </template>
 
       <VersoesBuPanel
         :dados="versoesDados"
         :loading="versoesConsulta.isLoading.value"
+        :atualizando="versoesConsulta.isFetching.value"
         :error="versoesConsulta.error.value?.message"
         :ordenacao-campos="ordemCampos"
         :ordenacao-votaveis="ordemVotaveis"

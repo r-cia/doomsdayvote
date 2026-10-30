@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 import StateBlock from './StateBlock.vue'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -7,6 +8,7 @@ import { useOrdenacao } from '../composables/ordenacao'
 const props = defineProps({
   dados: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -79,7 +81,7 @@ const linhas = agregado
     <StateBlock v-if="loading && linhas.length === 0" estado="carregando" :titulo="$t('comum.carregando')" />
     <div v-else-if="linhas.length === 0" class="vazio">{{ $t('comum.semDadosBiometria') }}</div>
 
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="atualizando">
       <table class="tabela">
         <thead>
           <tr>
@@ -118,6 +120,6 @@ const linhas = agregado
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
   </section>
 </template>
