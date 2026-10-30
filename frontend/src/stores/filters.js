@@ -1,18 +1,22 @@
 import { defineStore } from 'pinia'
 import { deInputSaoPaulo } from '../lib/format'
 
-const CARGOS_PERMITIDOS = new Set(['Presidente', 'Governador'])
+const ORDEM_CARGOS = { presidente: 0, governador: 1 }
+
+export const ordemCargo = (ds) => ORDEM_CARGOS[ds?.toLowerCase()]
+
+const ehPresidente = (cargo) => ordemCargo(cargo.ds_cargo_pergunta) === 0
 
 function cargosPermitidos(eleicao) {
-  return (eleicao?.cargos ?? []).filter((cargo) =>
-    CARGOS_PERMITIDOS.has(cargo.ds_cargo_pergunta),
+  return (eleicao?.cargos ?? []).filter(
+    (cargo) => ordemCargo(cargo.ds_cargo_pergunta) !== undefined,
   )
 }
 
 function cargoPadrao(eleicao) {
   const cargos = cargosPermitidos(eleicao)
   return (
-    cargos.find((cargo) => cargo.ds_cargo_pergunta === 'Presidente') ??
+    cargos.find(ehPresidente) ??
     cargos[0] ??
     null
   )
@@ -53,9 +57,7 @@ export const useFiltersStore = defineStore('filters', {
       const atual = disponiveis.find((eleicao) => eleicao.id === this.electionId)
       if (!atual) {
         const comPresidente = disponiveis.find((eleicao) =>
-          cargosPermitidos(eleicao).some(
-            (cargo) => cargo.ds_cargo_pergunta === 'Presidente',
-          ),
+          cargosPermitidos(eleicao).some(ehPresidente),
         )
         this.definirEleicao(comPresidente ?? disponiveis[0])
         return

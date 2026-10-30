@@ -321,7 +321,7 @@ export async function registrarRotas(app) {
     const cargos = await db
       .selectFrom('boletim_versao')
       .select(['eleicao_id', 'cd_cargo_pergunta', 'ds_cargo_pergunta'])
-      .where('ds_cargo_pergunta', 'in', ['Presidente', 'Governador'])
+      .where(sql`lower(ds_cargo_pergunta) in ('presidente', 'governador')`)
       .distinct()
       .execute();
 
