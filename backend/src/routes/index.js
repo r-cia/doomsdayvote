@@ -287,6 +287,10 @@ export async function registrarRotas(app) {
           ...candidato,
           ...niveis.secao,
         })),
+        status_metodologico: benford.status_metodologico ?? 'em_validacao',
+        observacao:
+          benford.observacao ??
+          'Leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
       },
     };
   }));
@@ -387,16 +391,16 @@ export async function registrarRotas(app) {
       duplicacao,
       outliers: {
         features: FEATURES,
-        isolamento: {
-          arvores: isolamento.arvores,
-          amostra: isolamento.amostra,
-          limiar: isolamento.limiar,
-        },
-        lof: {
-          k: lof.k,
-          amostra: indices.length,
-          limitado: secoes.length > indices.length,
-          limiar: lof.limiar,
+        parametros: {
+          isolamento: {
+            arvores: isolamento.arvores,
+            amostra: isolamento.amostra,
+          },
+          lof: {
+            k: lof.k,
+            amostra: indices.length,
+            limitado: secoes.length > indices.length,
+          },
         },
         total_secoes: secoes.length,
         secoes: ranking,

@@ -80,7 +80,9 @@ Duas leituras no recorte e no corte atuais.
   },
   "benford": {
     "minimo_votos": 10,
-    "candidatos": [{ "nr_votavel": 13, "nm_votavel": "…", "sg_partido": "PT", "total_votos": 0, "n": 17520, "secoes_abaixo_minimo": 8, "mad": 0.0881, "classificacao": "não conformidade", "digitos": [{ "digito": 1, "observado": 0, "observado_percentual": 0, "esperado_percentual": 30.103 }] }]
+    "candidatos": [{ "nr_votavel": 13, "nm_votavel": "…", "sg_partido": "PT", "total_votos": 0, "n": 17520, "secoes_abaixo_minimo": 8, "mad": 0.0881, "digitos": [{ "digito": 1, "observado": 0, "observado_percentual": 0, "esperado_percentual": 30.103 }] }],
+    "status_metodologico": "em_validacao",
+    "observacao": "Leitura exploratória, sem rótulo de conformidade; metodologia em validação."
   }
 }
 ```
@@ -93,9 +95,9 @@ Benford usa o primeiro dígito dos votos por seção com 10 votos ou mais, a dis
 
 Benford por nível, duplicação de vetor de votos e outliers por seção, no corte e no recorte.
 
-- `benford_niveis`: por candidato, `niveis.secao`, `niveis.zona` e `niveis.municipio`, cada um com `n`, `mad`, `classificacao` e `digitos`; mínimo de 10 votos por unidade.
-- `duplicacao`: `grupos` com a mesma assinatura do vetor de votos, `mesma_zona`, `secoes_consecutivas` e `mesmo_municipio`.
-- `outliers`: `features` (7), `isolamento` (100 árvores, amostra 256, limiar 0,6), `lof` (k 10, amostra até 2.000, limiar 2) e as 20 seções com maior score.
+- `benford_niveis`: por candidato, `niveis.secao`, `niveis.zona` e `niveis.municipio`, cada um com `n`, `mad` e `digitos`; mínimo de 10 votos por unidade; `status_metodologico: em_validacao` e `observacao`.
+- `duplicacao`: `grupos` com a mesma assinatura do vetor de votos, `mesma_zona`, `mesmo_municipio`, `mesmo_local`, `secoes_consecutivas`; cada seção inclui `nr_local_votacao`, `qt_aptos` e `qt_comparecimento`; `total_secoes_escopo` e `observacao` sobre frequência esperada por escala. Sem rótulo de alerta.
+- `outliers`: `features` (6), `parametros` (`isolamento`: 100 árvores, amostra 256; `lof`: k 10, amostra até 2.000) e as 20 seções com maior score. Sem rótulos de limiar.
 
 `GET /api/sections` aceita `municipio_nome` (nome parcial), `zona` e `secao` como filtros separados, além de `uf` e `municipio`.
 

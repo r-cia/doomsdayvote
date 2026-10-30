@@ -25,6 +25,11 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
 
     const zonas = new Set(lista.map(chaveZona))
     const municipios = new Set(lista.map(chaveMunicipio))
+    const locais = lista
+      .map((secao) => secao.nr_local_votacao)
+      .filter((valor) => valor !== null && valor !== undefined)
+    const mesmoLocal =
+      locais.length === lista.length && new Set(locais).size === 1
     const ordenadas = [...lista].sort((a, b) => a.nr_secao - b.nr_secao)
 
     let consecutivas = false
@@ -55,6 +60,7 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
       votaveis: Number(lista[0].votaveis ?? 0),
       mesma_zona: zonas.size === 1,
       mesmo_municipio: municipios.size === 1,
+      mesmo_local: mesmoLocal,
       secoes_consecutivas: consecutivas,
       vencedor_comum: vencedorComum,
       secoes: lista.map((secao) => ({
@@ -64,6 +70,9 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
         nm_municipio: secao.nm_municipio ?? null,
         nr_zona: secao.nr_zona,
         nr_secao: secao.nr_secao,
+        nr_local_votacao: secao.nr_local_votacao ?? null,
+        qt_aptos: secao.qt_aptos === null || secao.qt_aptos === undefined ? null : Number(secao.qt_aptos),
+        qt_comparecimento: secao.qt_comparecimento === null || secao.qt_comparecimento === undefined ? null : Number(secao.qt_comparecimento),
       })),
     })
   }
@@ -75,6 +84,9 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
     grupos: limitados,
     total_grupos: grupos.length,
     total_secoes: grupos.reduce((total, grupo) => total + grupo.secoes.length, 0),
+    total_secoes_escopo: secoes.length,
+    observacao:
+      'Frequência esperada de coincidências cresce com a escala do escopo; resultado descritivo, sem rótulo de alerta.',
   }
 }
 
@@ -120,7 +132,10 @@ export async function duplicacaoPorAssinatura(
       's.cd_municipio_tse',
       's.nr_zona',
       's.nr_secao',
+      's.nr_local_votacao',
       sql`max(l.nm_municipio)`.as('nm_municipio'),
+      sql`max(bv.qt_aptos)`.as('qt_aptos'),
+      sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
       'venc.nr_votavel as vencedor_nr',
       'venc.nm_votavel as vencedor_nm',
       'venc.sg_partido as vencedor_sg',
@@ -136,6 +151,7 @@ export async function duplicacaoPorAssinatura(
       's.cd_municipio_tse',
       's.nr_zona',
       's.nr_secao',
+      's.nr_local_votacao',
       'venc.nr_votavel',
       'venc.nm_votavel',
       'venc.sg_partido',
