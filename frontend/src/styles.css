@@ -1573,6 +1573,12 @@ tr.linha--ativa th {
   background: var(--bg);
 }
 
+.tabela-votos-estado .delta {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
 .tabela-votos-estado th,
 .tabela-votos-estado td {
   white-space: nowrap;
