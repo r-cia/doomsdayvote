@@ -15,6 +15,34 @@ function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
   return aplicarEscopo(qb, escopo)
 }
 
+export async function biometriaPorUf(db, { eleicaoId, cargo, corte, escopo = {} }) {
+  const linhas = await base(db, { eleicaoId, cargo, corte, escopo })
+    .select([
+      's.sg_uf',
+      sql`coalesce(sum(bv.qt_comparecimento), 0)`.as('qt_comparecimento'),
+      sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
+    ])
+    .groupBy('s.sg_uf')
+    .orderBy('s.sg_uf')
+    .execute();
+
+  return linhas.map((linha) => {
+    const comparecimento = Number(linha.qt_comparecimento);
+    const naoHabilitada = Number(linha.qt_nao_habilitada);
+    const habilitada = Math.max(0, comparecimento - naoHabilitada);
+    return {
+      sg_uf: linha.sg_uf,
+      qt_comparecimento: comparecimento,
+      qt_habilitados_por_biometria: habilitada,
+      qt_biometria_nao_habilitada: naoHabilitada,
+      percentual_habilitada:
+        comparecimento > 0 ? (habilitada / comparecimento) * 100 : null,
+      percentual_nao_habilitada:
+        comparecimento > 0 ? (naoHabilitada / comparecimento) * 100 : null,
+    };
+  });
+}
+
 export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo = {} }) {
   const linha = await base(db, { eleicaoId, cargo, corte, escopo })
     .select([
