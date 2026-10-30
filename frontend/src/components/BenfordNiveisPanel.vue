@@ -27,7 +27,7 @@ function mad(nivel) {
 <template>
   <section class="painel" aria-labelledby="benford-niveis-titulo">
     <header class="painel__cabecalho">
-      <h2 id="benford-niveis-titulo">Benford por nível</h2>
+      <h2 id="benford-niveis-titulo">{{ $t('estatistica.benford') }}</h2>
       <p class="painel__meta">
         seção · zona · município<br />
         <b>{{ candidatos.length }}</b> candidatos
@@ -35,7 +35,7 @@ function mad(nivel) {
     </header>
 
     <div v-if="candidatos.length === 0" class="vazio">
-      Sem dados de Benford no recorte.
+      {{ $t('comum.semDados') }}
     </div>
 
     <div v-else class="tabela-scroll">
