@@ -21,3 +21,4 @@
 - Cada painel consome queries do TanStack Vue Query.
 - Endpoints retornam `cobertura` e `limitacoes` padronizados.
 - A consistência agrega votos por BU no Postgres antes de retornar os dados, evitando transferir todas as linhas de resultado ou montar uma lista de parâmetros por BU.
+- As consultas analíticas agrupam resultados por seção e candidato, mantendo os atributos geográficos como agregados; a base de seção-candidato é compartilhada entre análise e anomalias enquanto a mesma consulta está em andamento.

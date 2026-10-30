@@ -313,11 +313,11 @@ export async function comparacaoLocal(db, { eleicaoId, cargo, corte, escopo = {}
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
     .select([
       'bv.secao_id as secao_id',
-      's.sg_uf',
-      's.cd_municipio_tse',
-      's.nr_zona',
-      's.nr_secao',
-      's.nr_local_votacao',
+      sql`max(s.sg_uf)`.as('sg_uf'),
+      sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
+      sql`max(s.nr_zona)`.as('nr_zona'),
+      sql`max(s.nr_secao)`.as('nr_secao'),
+      sql`max(s.nr_local_votacao)`.as('nr_local_votacao'),
       sql`max(l.nm_municipio)`.as('nm_municipio'),
       sql`max(bv.qt_aptos)`.as('qt_aptos'),
       sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
@@ -331,11 +331,6 @@ export async function comparacaoLocal(db, { eleicaoId, cargo, corte, escopo = {}
     .where('rv.qt_votos', 'is not', null)
     .groupBy([
       'bv.secao_id',
-      's.sg_uf',
-      's.cd_municipio_tse',
-      's.nr_zona',
-      's.nr_secao',
-      's.nr_local_votacao',
       'rv.nr_votavel',
     ])
     .execute();
