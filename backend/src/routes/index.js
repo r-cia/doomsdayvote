@@ -2,7 +2,7 @@ import { sql } from 'kysely';
 import { z } from 'zod';
 import { AppError } from '../lib/erros.js';
 import { validar } from '../lib/validar.js';
-import { avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../modules/apuracao/corte.js';
+import { aplicarFiltroCorte, avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../modules/apuracao/corte.js';
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
@@ -480,6 +480,100 @@ export async function registrarRotas(app) {
       ...metadados,
       avisos,
       areas,
+    };
+  }));
+
+  app.get('/api/biometria/municipios', cacheado('biometria-municipios', 300, baseSchema.extend({
+    uf: z.string().length(2),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
+
+    let qb = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .leftJoin('localidade as l', (join) =>
+        join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+      )
+      .where('bv.eleicao_id', '=', eleicao.id)
+      .where('bv.cd_cargo_pergunta', '=', query.cargo);
+    qb = aplicarFiltroCorte(qb, corte);
+    qb = qb.where('s.sg_uf', '=', query.uf);
+
+    const linhas = await qb
+      .select([
+        's.cd_municipio_tse',
+        sql`max(l.nm_municipio)`.as('nm_municipio'),
+        sql`coalesce(sum(bv.qt_comparecimento), 0)`.as('qt_comparecimento'),
+        sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
+      ])
+      .groupBy(['s.cd_municipio_tse'])
+      .orderBy(sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0) desc`)
+      .limit(query.limit)
+      .execute();
+
+    return {
+      corte: corteResposta(corte),
+      municipios: linhas.map((linha) => {
+        const comparecimento = Number(linha.qt_comparecimento);
+        const naoHabilitada = Number(linha.qt_nao_habilitada);
+        return {
+          cd_municipio_tse: linha.cd_municipio_tse,
+          nm_municipio: linha.nm_municipio,
+          qt_comparecimento: comparecimento,
+          qt_nao_habilitada: naoHabilitada,
+          percentual_nao_habilitada:
+            comparecimento > 0 ? (naoHabilitada / comparecimento) * 100 : null,
+        };
+      }),
+    };
+  }));
+
+  app.get('/api/biometria/secoes', cacheado('biometria-secoes', 300, baseSchema.extend({
+    uf: z.string().length(2),
+    municipio: z.coerce.number().int(),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+
+    let qb = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .where('bv.eleicao_id', '=', eleicao.id)
+      .where('bv.cd_cargo_pergunta', '=', query.cargo);
+    qb = aplicarFiltroCorte(qb, corte);
+    qb = qb.where('s.sg_uf', '=', query.uf).where('s.cd_municipio_tse', '=', query.municipio);
+
+    const linhas = await qb
+      .select([
+        's.id',
+        's.nr_zona',
+        's.nr_secao',
+        sql`bv.qt_comparecimento`.as('qt_comparecimento'),
+        sql`bv.qt_elei_biom_sem_habilitacao`.as('qt_nao_habilitada'),
+      ])
+      .orderBy(sql`(coalesce(bv.qt_elei_biom_sem_habilitacao,0)::float / nullif(bv.qt_comparecimento,0)) desc nulls last`)
+      .limit(query.limit)
+      .execute();
+
+    return {
+      corte: corteResposta(corte),
+      secoes: linhas.map((linha) => {
+        const comparecimento = Number(linha.qt_comparecimento ?? 0);
+        const naoHabilitada = Number(linha.qt_nao_habilitada ?? 0);
+        return {
+          id: linha.id,
+          nr_zona: linha.nr_zona,
+          nr_secao: linha.nr_secao,
+          qt_comparecimento: comparecimento,
+          qt_nao_habilitada: naoHabilitada,
+          percentual_nao_habilitada:
+            comparecimento > 0 ? (naoHabilitada / comparecimento) * 100 : null,
+        };
+      }),
     };
   }));
 
