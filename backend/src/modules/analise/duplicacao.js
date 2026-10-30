@@ -142,8 +142,82 @@ export async function duplicacaoPorAssinatura(
     ])
     .execute()
 
+  // Garante que o vencedor só é exibido se ele venceu em TODAS as seções
+  // de TODAS as zonas envolvidas (não apenas nas seções duplicadas).
+  const zonasUnicas = [
+    ...new Set(linhas.map((linha) => `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`)),
+  ]
+  const vencedorPorZona = new Map()
+  if (zonasUnicas.length > 0) {
+    let consultaZonas = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .leftJoin('localidade as l', (join) =>
+        join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+      )
+      .where('bv.eleicao_id', '=', eleicaoId)
+      .where('bv.cd_cargo_pergunta', '=', cargo)
+    consultaZonas = aplicarFiltroCorte(consultaZonas, corte)
+    consultaZonas = aplicarEscopo(consultaZonas, escopo)
+    consultaZonas = consultaZonas
+      .leftJoinLateral(
+        (eb) =>
+          eb
+            .selectFrom('resultado_votavel as rv2')
+            .select(['rv2.nr_votavel'])
+            .whereRef('rv2.boletim_versao_id', '=', 'bv.id')
+            .where('rv2.categoria', '=', 'nominal')
+            .where('rv2.qt_votos', 'is not', null)
+            .orderBy('rv2.qt_votos', 'desc')
+            .orderBy('rv2.nr_votavel', 'asc')
+            .limit(1)
+            .as('venc'),
+        (join) => join.onTrue(),
+      )
+      .select([
+        's.sg_uf',
+        's.cd_municipio_tse',
+        's.nr_zona',
+        'venc.nr_votavel as vencedor_nr',
+      ])
+      .where(
+        sql`(s.sg_uf, s.cd_municipio_tse, s.nr_zona) in (${sql.join(
+          zonasUnicas.map((zona) => {
+            const [uf, municipio, numero] = zona.split('|')
+            return sql`(${uf}, ${Number(municipio)}, ${Number(numero)})`
+          }),
+          sql`, `,
+        )})`,
+      )
+
+    const linhasZonas = await consultaZonas.execute()
+    const porZona = new Map()
+    for (const linha of linhasZonas) {
+      const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`
+      if (!porZona.has(chave)) porZona.set(chave, [])
+      porZona.get(chave).push(linha.vencedor_nr)
+    }
+    for (const [chave, vencedores] of porZona) {
+      const validos = vencedores.filter((v) => v !== null && v !== undefined)
+      if (validos.length === vencedores.length && validos.length > 0 && validos.every((v) => Number(v) === Number(validos[0]))) {
+        vencedorPorZona.set(chave, Number(validos[0]))
+      } else {
+        vencedorPorZona.set(chave, null)
+      }
+    }
+  }
+
+  const linhasAjustadas = linhas.map((linha) => {
+    const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`
+    const vencedorZona = vencedorPorZona.get(chave)
+    if (vencedorZona === null || vencedorZona === undefined || Number(linha.vencedor_nr) !== vencedorZona) {
+      return { ...linha, vencedor_nr: null, vencedor_nm: null, vencedor_sg: null }
+    }
+    return linha
+  })
+
   return agruparAssinaturas(
-    linhas.map((linha) => ({ ...linha, votaveis: Number(linha.votaveis) })),
+    linhasAjustadas.map((linha) => ({ ...linha, votaveis: Number(linha.votaveis) })),
     limite,
   )
 }
