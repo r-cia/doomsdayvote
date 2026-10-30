@@ -992,6 +992,7 @@ export async function registrarRotas(app) {
         'bv.dt_emissao_bu',
         'bv.dt_bu_recebido_ts',
         'bv.dt_bu_recebido_data',
+        ...(query.status ? [] : [sql`count(*) over()`.as('total_count')]),
       ])
       .where('s.ano_eleicao', '=', eleicao.ano_eleicao)
       .where('s.cd_pleito', '=', eleicao.cd_pleito)
@@ -1017,12 +1018,27 @@ export async function registrarRotas(app) {
       )`);
     }
 
-    const linhas = await consulta.execute();
-    const itens = linhas
-      .map((linha) => itemSecao(linha, corte))
-      .filter((item) => (query.status ? item.status === query.status : true));
+    if (!query.status) {
+      consulta = consulta
+        .limit(pageSize)
+        .offset((query.page - 1) * pageSize);
+    }
 
-    const inicio = (query.page - 1) * pageSize;
+    const linhas = await consulta.execute();
+    let itens;
+    let total;
+    if (query.status) {
+      const todos = linhas
+        .map((linha) => itemSecao(linha, corte))
+        .filter((item) => item.status === query.status);
+      total = todos.length;
+      const inicio = (query.page - 1) * pageSize;
+      itens = todos.slice(inicio, inicio + pageSize);
+    } else {
+      total = Number(linhas[0]?.total_count ?? 0);
+      itens = linhas.map((linha) => itemSecao(linha, corte));
+    }
+
     const [metadados, avisos] = await Promise.all([
       cache
         .obter('metadados', query, 300, () =>
@@ -1042,8 +1058,8 @@ export async function registrarRotas(app) {
       avisos,
       page: query.page,
       page_size: pageSize,
-      total: itens.length,
-      items: itens.slice(inicio, inicio + pageSize),
+      total,
+      items: itens,
     };
   }));
 
