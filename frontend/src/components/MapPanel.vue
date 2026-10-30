@@ -246,7 +246,7 @@ async function carregarMalha(nivel) {
     malhaMensagem.value =
       erro instanceof Error
         ? erro.message
-        : `Não foi possível carregar /geo/${arquivoMalha(nivel)}.`
+        : t('comum.erro')
   }
 }
 

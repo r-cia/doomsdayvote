@@ -140,6 +140,24 @@
   },
   "status": {
     "recebido": "BU recibido",
-    "pendente": "Pendiente"
+    "pendente": "Pendiente",
+    "semBu": "Sin BU",
+    "aguardandoBu": "Cerrada, esperando BU",
+    "buRecebido": "BU recibido",
+    "naoApurada": "No escrutada",
+    "anuladaApuradaSeparado": "Anulada, escrutada por separado",
+    "anulada": "Anulada",
+    "naoInstalada": "No instalada",
+    "desconhecido": "Desconocido",
+    "naoReconhecido": "Estado no reconocido por la interfaz.",
+    "precisaoInsuficiente": "La fecha de recepción del BU no tiene precisión suficiente para este corte.",
+    "horariosInconsistentes": "Los horarios del BU son inconsistentes.",
+    "tipoUrnaAusente": "No se informó el tipo de urna.",
+    "corteInvalido": "El corte informado no pudo aplicarse."
+  },
+  "avisos": {
+    "precisaoInsuficiente": "Precisión insuficiente",
+    "corteIndisponivel": "Corte no disponible",
+    "metadadosDerivados": "Metadatos derivados"
   }
 }

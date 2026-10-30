@@ -140,6 +140,24 @@
   },
   "status": {
     "recebido": "BU received",
-    "pendente": "Pending"
+    "pendente": "Pending",
+    "semBu": "No BU",
+    "aguardandoBu": "Closed, awaiting BU",
+    "buRecebido": "BU received",
+    "naoApurada": "Not tallied",
+    "anuladaApuradaSeparado": "Annulled, tallied separately",
+    "anulada": "Annulled",
+    "naoInstalada": "Not installed",
+    "desconhecido": "Unknown",
+    "naoReconhecido": "Status not recognized by the interface.",
+    "precisaoInsuficiente": "The BU receipt date lacks sufficient precision for this cutoff.",
+    "horariosInconsistentes": "BU times are inconsistent.",
+    "tipoUrnaAusente": "Ballot box type not informed.",
+    "corteInvalido": "The informed cutoff could not be applied."
+  },
+  "avisos": {
+    "precisaoInsuficiente": "Insufficient precision",
+    "corteIndisponivel": "Cutoff unavailable",
+    "metadadosDerivados": "Derived metadata"
   }
 }
