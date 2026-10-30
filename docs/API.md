@@ -105,4 +105,4 @@ Parâmetros: `election_id`, `cargo`, `as_of` opcional, `uf` opcional, `municipio
 
 Quando `escopo=ano` e o ano tem dois turnos, devolve dois blocos lado a lado, sem somá-los.
 
-Cada bloco traz `comparecimento` (média, mediana e desvio padrão populacional dos `qt_comparecimento` por seção) e `candidatos` (para cada candidato nominal, média, mediana e desvio padrão populacional dos votos por seção). `secoes` é o número de seções do recorte. Cache Redis TTL 300 s, cabeçalho `x-cache: hit|miss|off`.
+Cada bloco traz `comparecimento` (média, mediana e desvio padrão populacional dos `qt_comparecimento` por seção) e `candidatos` (para cada candidato nominal, média, mediana e desvio padrão populacional dos votos por seção). `secoes` é o número de seções do recorte; `secoes_com_voto` é o número de seções em que o candidato teve algum voto. Cache Redis TTL 300 s, cabeçalho `x-cache: hit|miss|off`.
