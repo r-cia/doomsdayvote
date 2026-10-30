@@ -572,7 +572,7 @@
       "file_type": "code",
       "norm_label": "corteresposta()",
       "source_file": "backend/src/modules/apuracao/corte.js",
-      "source_location": "L194"
+      "source_location": "L202"
     },
     {
       "id": "backend_src_modules_apuracao_corte_datavalida",
@@ -14478,7 +14478,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/apuracao/corte.js",
-      "source_location": "L169",
+      "source_location": "L175",
       "weight": 1.0
     },
     {
@@ -14490,7 +14490,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/apuracao/corte.js",
-      "source_location": "L170",
+      "source_location": "L176",
       "weight": 1.0
     },
     {
@@ -15714,7 +15714,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1032",
+      "source_location": "L1077",
       "weight": 1.0
     },
     {
@@ -15726,31 +15726,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1094",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_routes_index_registrarrotas",
-      "target": "backend_src_modules_analise_consistencia_validarconsistenciabu",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "backend/src/routes/index.js",
-      "source_location": "L1130",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_routes_index_registrarrotas",
-      "target": "backend_src_modules_apuracao_status_secao_classificarstatussecao",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "backend/src/routes/index.js",
-      "source_location": "L1143",
+      "source_location": "L1139",
       "weight": 1.0
     },
     {
@@ -15767,6 +15743,18 @@
     },
     {
       "source": "backend_src_routes_index_registrarrotas",
+      "target": "backend_src_modules_analise_consistencia_validarconsistenciabu",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "backend/src/routes/index.js",
+      "source_location": "L1175",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_routes_index_registrarrotas",
       "target": "backend_src_routes_index_buscareleicao",
       "relation": "calls",
       "_origin": "ast",
@@ -15775,6 +15763,18 @@
       "context": "call",
       "source_file": "backend/src/routes/index.js",
       "source_location": "L118",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_routes_index_registrarrotas",
+      "target": "backend_src_modules_apuracao_status_secao_classificarstatussecao",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "backend/src/routes/index.js",
+      "source_location": "L1188",
       "weight": 1.0
     },
     {
@@ -15810,19 +15810,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1235",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_routes_index_registrarrotas",
-      "target": "backend_src_modules_analise_comparacao_local_comparacaolocal",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "backend/src/routes/index.js",
-      "source_location": "L1257",
+      "source_location": "L1280",
       "weight": 1.0
     },
     {
@@ -15839,6 +15827,18 @@
     },
     {
       "source": "backend_src_routes_index_registrarrotas",
+      "target": "backend_src_modules_analise_comparacao_local_comparacaolocal",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "backend/src/routes/index.js",
+      "source_location": "L1302",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_routes_index_registrarrotas",
       "target": "backend_src_modules_analise_concentracao_concentracao",
       "relation": "calls",
       "_origin": "ast",
@@ -15846,7 +15846,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1317",
+      "source_location": "L1362",
       "weight": 1.0
     },
     {
@@ -16086,7 +16086,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L892",
+      "source_location": "L937",
       "weight": 1.0
     },
     {
@@ -29549,7 +29549,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/modules/apuracao/corte.js",
-      "source_location": "L194",
+      "source_location": "L202",
       "weight": 1.0
     },
     {
@@ -38649,5 +38649,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "ca3cd34858122df4c64642902f1667953efc2ce8"
+  "built_at_commit": "cc8c45965487c88d0b76ca99643a46c2ef1faa97"
 }
