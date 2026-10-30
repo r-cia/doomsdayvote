@@ -33,7 +33,7 @@ function tomLof(valor) {
 <template>
   <section class="painel" aria-labelledby="outliers-titulo">
     <header class="painel__cabecalho">
-      <h2 id="outliers-titulo">Isolamento e LOF</h2>
+      <h2 id="outliers-titulo">{{ $t('estatistica.isolamento') }}</h2>
       <div class="estatistica-controle">
         <label class="campo campo--curto">
           <span class="campo__rotulo">Ordenar por</span>
@@ -54,7 +54,7 @@ function tomLof(valor) {
     </header>
 
     <div v-if="secoes.length === 0" class="vazio">
-      Sem seções suficientes para o cálculo no recorte.
+      {{ $t('comum.semSecoes') }}
     </div>
 
     <div v-else class="tabela-scroll">

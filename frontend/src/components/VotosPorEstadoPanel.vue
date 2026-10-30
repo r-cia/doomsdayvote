@@ -85,7 +85,7 @@ function seta(coluna) {
     </header>
 
     <div v-if="ufs.length === 0 || listaCandidatos.length === 0" class="vazio">
-      Sem dados por estado para o corte atual.
+      {{ $t('mapa.semDadosEstado') }}
     </div>
 
     <div v-else class="tabela-scroll">
