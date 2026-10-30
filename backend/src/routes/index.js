@@ -606,9 +606,9 @@ export async function registrarRotas(app) {
       .select([
         's.sg_uf',
         sql`count(*)::int`.as('total'),
-        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento <= timestamptz '2026-10-04 20:15:00-03')::int`.as('ate_1715'),
-        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03' and bv.dt_encerramento <= timestamptz '2026-10-04 22:15:00-03')::int`.as('ate_1915'),
-        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 22:15:00-03')::int`.as('apos_1915'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= timestamptz '2026-10-04 20:15:00-03')::int`.as('ate_1715'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03' and coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= timestamptz '2026-10-04 22:15:00-03')::int`.as('ate_1915'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 22:15:00-03')::int`.as('apos_1915'),
       ])
       .groupBy('s.sg_uf')
       .orderBy('s.sg_uf')
@@ -659,13 +659,13 @@ export async function registrarRotas(app) {
         's.cd_municipio_tse',
         sql`max(l.nm_municipio)`.as('nm_municipio'),
         sql`count(*)::int`.as('total'),
-        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03')::int`.as('apos_1715'),
+        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03')::int`.as('apos_1715'),
       ])
       .groupBy(['s.cd_municipio_tse'])
       .orderBy(
         query.ordenar_por === 'total'
           ? sql`count(*) desc`
-          : sql`(count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03'))::float / nullif(count(*),0) desc nulls last`,
+          : sql`(count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03'))::float / nullif(count(*),0) desc nulls last`,
       )
       .limit(query.limit)
       .execute();
@@ -707,9 +707,9 @@ export async function registrarRotas(app) {
         's.id',
         's.nr_zona',
         's.nr_secao',
-        sql`bv.dt_encerramento`.as('dt_encerramento'),
+        sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`.as('dt_encerramento'),
       ])
-      .orderBy(sql`(case when bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03' then 1 else 0 end) desc, bv.dt_encerramento desc nulls last`)
+      .orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > timestamptz '2026-10-04 20:15:00-03' then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`)
       .limit(query.limit)
       .execute();
 
