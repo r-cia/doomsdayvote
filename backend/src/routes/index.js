@@ -2,7 +2,7 @@ import { sql } from 'kysely';
 import { z } from 'zod';
 import { AppError } from '../lib/erros.js';
 import { validar } from '../lib/validar.js';
-import { aplicarFiltroCorte, avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../modules/apuracao/corte.js';
+import { aplicarEscopo, aplicarFiltroCorte, avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../modules/apuracao/corte.js';
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';

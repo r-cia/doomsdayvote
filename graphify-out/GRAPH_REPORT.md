@@ -1,16 +1,16 @@
 # Graph Report - doomsdayvote  (2026-10-30)
 
 ## Corpus Check
-- 184 files · ~173,383 words
+- 184 files · ~173,396 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1224 nodes · 2301 edges · 82 communities (62 shown, 9 thin omitted)
+- 1224 nodes · 2304 edges · 82 communities (62 shown, 9 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 32 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `12cecd78`
+- Built from commit: `bfd054dc`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -95,8 +95,8 @@
 5. `criarDb()` - 29 edges
 6. `useFiltersStore` - 23 edges
 7. `aplicarFiltroCorte()` - 22 edges
-8. `useSelecaoEleicao()` - 21 edges
-9. `aplicarEscopo()` - 20 edges
+8. `aplicarEscopo()` - 21 edges
+9. `useSelecaoEleicao()` - 21 edges
 10. `formatarPercentual()` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -392,7 +392,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `formatarNumero()` connect `formatarNumero` to `AnaliseCobertura.vue`, `MapPanel.vue`, `SecaoView.vue`, `PlotDia.vue`, `BiometriaView.vue`, `EncerramentoView.vue`, `MapTable.vue`, `format.js`, `ConsistenciaPanel.vue`, `EstatisticaPanel.vue`, `BiometriaUfPanel.vue`, `SectionsTable.vue`, `UfPanel.vue`, `VotosPorEstadoPanel.vue`, `StateBlock.vue`, `lib.test.js`, `PlacarRanking.vue`, `BiometriaPanel.vue`, `RelatorioView.vue`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Why does `criarDb()` connect `criarDb` to `server.js`, `versoes.test.js`, `geo-carregar.js`, `criarCache`, `partido-cor.test.js`, `integration/status-secao.test.js`, `env.js`, `integration/comparacao-local.test.js`, `integration/corte.test.js`, `app.js`, `caminhoFixture`, `integration/estatisticas.test.js`, `lote.test.js`, `importarArquivo`, `fixtures.js`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `registrarRotas()` (e.g. with `main()` and `api.test.js`) actually correct?**
   _`registrarRotas()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `name`, `version`, `private` to the rest of the system?**

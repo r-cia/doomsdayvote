@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793380433.2975678,
-    "seen": 1793380494.0115306,
-    "ast_hash": "6c9032155c3a0a53ba1093994d1c9a61",
+    "mtime": 1793386465.0811942,
+    "seen": 1793386474.3816082,
+    "ast_hash": "b11bb59015d029513a634e5cede9001f",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -1128,9 +1128,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/RelatorioView.vue": {
-    "mtime": 1793380477.946069,
-    "seen": 1793380494.0117624,
-    "ast_hash": "d1196aa18db5585e042ba0c56a14cf82",
+    "mtime": 1793380508.2594094,
+    "seen": 1793386474.3818223,
+    "ast_hash": "d533c4b70392bbd6c11d8c07cdbcb026",
     "semantic_hash": ""
   }
 }

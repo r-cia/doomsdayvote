@@ -3404,7 +3404,7 @@
       "file_type": "code",
       "norm_label": "diferenca()",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L29"
+      "source_location": "L31"
     },
     {
       "id": "frontend_src_components_mappanel_nomedafeicao",
@@ -5720,7 +5720,7 @@
       "file_type": "code",
       "norm_label": "identificador()",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L34"
+      "source_location": "L36"
     },
     {
       "id": "frontend_src_components_analisecobertura",
@@ -13704,7 +13704,7 @@
       "file_type": "code",
       "norm_label": "alvo",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L17"
+      "source_location": "L19"
     },
     {
       "id": "frontend_src_views_relatorioview_cargoselecionado",
@@ -13715,7 +13715,7 @@
       "file_type": "code",
       "norm_label": "cargoselecionado",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L25"
+      "source_location": "L27"
     },
     {
       "id": "frontend_src_views_relatorioview_cobertura",
@@ -13726,7 +13726,7 @@
       "file_type": "code",
       "norm_label": "cobertura",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L20"
+      "source_location": "L22"
     },
     {
       "id": "frontend_src_views_relatorioview_consistencia",
@@ -13737,7 +13737,7 @@
       "file_type": "code",
       "norm_label": "consistencia",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L14"
+      "source_location": "L16"
     },
     {
       "id": "frontend_src_views_relatorioview_linhas",
@@ -13748,7 +13748,7 @@
       "file_type": "code",
       "norm_label": "linhas",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L19"
+      "source_location": "L21"
     },
     {
       "id": "frontend_src_views_relatorioview_mostraranalises",
@@ -13759,7 +13759,7 @@
       "file_type": "code",
       "norm_label": "mostraranalises",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L15"
+      "source_location": "L17"
     },
     {
       "id": "frontend_src_views_relatorioview_percentualcobertura",
@@ -13770,7 +13770,7 @@
       "file_type": "code",
       "norm_label": "percentualcobertura",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L21"
+      "source_location": "L23"
     },
     {
       "id": "frontend_src_views_relatorioview_referencias",
@@ -13781,7 +13781,7 @@
       "file_type": "code",
       "norm_label": "referencias",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L18"
+      "source_location": "L20"
     },
     {
       "id": "frontend_src_views_relatorioview_relatorio",
@@ -13792,7 +13792,7 @@
       "file_type": "code",
       "norm_label": "relatorio",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L13"
+      "source_location": "L15"
     },
     {
       "id": "frontend_src_views_relatorioview_store_eleicaoatual_cargos",
@@ -13803,7 +13803,7 @@
       "file_type": "code",
       "norm_label": "{ store, eleicaoatual, cargos }",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L12"
+      "source_location": "L14"
     },
     {
       "id": "frontend_src_views_relatorioview_t",
@@ -13814,7 +13814,7 @@
       "file_type": "code",
       "norm_label": "{ t }",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L11"
+      "source_location": "L13"
     },
     {
       "id": "readme",
@@ -18975,7 +18975,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L31",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -20412,6 +20412,18 @@
       "context": "import",
       "source_file": "backend/src/routes/index.js",
       "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_routes_index",
+      "target": "backend_src_modules_apuracao_corte_aplicarescopo",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "backend/src/routes/index.js",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -24184,30 +24196,6 @@
     },
     {
       "source": "frontend_src_views_relatorioview",
-      "target": "frontend_src_composables_queries_useconsistencia",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "frontend_src_views_relatorioview",
-      "target": "frontend_src_composables_queries_userelatorio",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "frontend_src_views_relatorioview",
       "target": "frontend_src_composables_selecao_useselecaoeleicao",
       "relation": "imports",
       "_origin": "ast",
@@ -24215,7 +24203,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L8",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -24227,7 +24215,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L9",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -24239,12 +24227,36 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L9",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
       "source": "frontend_src_views_relatorioview",
       "target": "frontend_src_lib_format_formatarpercentual",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/views/RelatorioView.vue",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_views_relatorioview",
+      "target": "frontend_src_composables_queries_useconsistencia",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/views/RelatorioView.vue",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_views_relatorioview",
+      "target": "frontend_src_composables_queries_userelatorio",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -28756,6 +28768,30 @@
     },
     {
       "source": "frontend_src_views_relatorioview",
+      "target": "frontend_src_composables_selecao",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/views/RelatorioView.vue",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_views_relatorioview",
+      "target": "frontend_src_lib_format",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/views/RelatorioView.vue",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_views_relatorioview",
       "target": "frontend_src_views_analiseview",
       "relation": "imports_from",
       "_origin": "ast",
@@ -28780,7 +28816,7 @@
     },
     {
       "source": "frontend_src_views_relatorioview",
-      "target": "frontend_src_components_stateblock",
+      "target": "frontend_src_views_biometriaview",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -28792,7 +28828,7 @@
     },
     {
       "source": "frontend_src_views_relatorioview",
-      "target": "frontend_src_composables_queries",
+      "target": "frontend_src_views_encerramentoview",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -28804,7 +28840,7 @@
     },
     {
       "source": "frontend_src_views_relatorioview",
-      "target": "frontend_src_composables_selecao",
+      "target": "frontend_src_components_stateblock",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -28816,7 +28852,7 @@
     },
     {
       "source": "frontend_src_views_relatorioview",
-      "target": "frontend_src_lib_format",
+      "target": "frontend_src_composables_queries",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -39087,7 +39123,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L11",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -39098,7 +39134,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L12",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -39109,7 +39145,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L13",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -39120,7 +39156,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L14",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -39131,7 +39167,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L15",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -39142,7 +39178,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -39153,7 +39189,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L18",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -39164,7 +39200,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -39175,7 +39211,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L20",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -39186,7 +39222,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L21",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -39197,7 +39233,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L25",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -39208,7 +39244,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L29",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -39219,7 +39255,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/views/RelatorioView.vue",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -40692,5 +40728,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "12cecd787b1271165fb58796757074a3ffce5eda"
+  "built_at_commit": "bfd054dc406f4e0304f07b396c9e4264fbadaa02"
 }
