@@ -1,8 +1,6 @@
 import { computed } from 'vue'
-import { useFiltersStore } from '../stores/filters'
+import { useFiltersStore, ordemCargo } from '../stores/filters'
 import { useEleicoes } from './queries'
-
-const ORDEM_CARGOS = { Presidente: 0, Governador: 1 }
 
 export function useSelecaoEleicao() {
   const store = useFiltersStore()
@@ -13,7 +11,7 @@ export function useSelecaoEleicao() {
   const eleicoesDisponiveis = computed(() =>
     eleicoes.value.filter((eleicao) =>
       (eleicao.cargos ?? []).some(
-        (cargo) => cargo.ds_cargo_pergunta in ORDEM_CARGOS,
+        (cargo) => ordemCargo(cargo.ds_cargo_pergunta) !== undefined,
       ),
     ),
   )
@@ -26,7 +24,7 @@ export function useSelecaoEleicao() {
     const mapa = new Map()
     for (const eleicao of eleicoesDisponiveis.value) {
       for (const cargo of eleicao.cargos ?? []) {
-        if (!(cargo.ds_cargo_pergunta in ORDEM_CARGOS)) continue
+        if (ordemCargo(cargo.ds_cargo_pergunta) === undefined) continue
         mapa.set(cargo.cd_cargo_pergunta, cargo.ds_cargo_pergunta)
       }
     }
@@ -34,8 +32,8 @@ export function useSelecaoEleicao() {
       .map(([cd, ds]) => ({ cd_cargo_pergunta: cd, ds_cargo_pergunta: ds }))
       .sort(
         (a, b) =>
-          (ORDEM_CARGOS[a.ds_cargo_pergunta] ?? 9) -
-          (ORDEM_CARGOS[b.ds_cargo_pergunta] ?? 9),
+          (ordemCargo(a.ds_cargo_pergunta) ?? 9) -
+          (ordemCargo(b.ds_cargo_pergunta) ?? 9),
       )
   })
 

@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/consistencia.js": {
-    "mtime": 1793380477.943069,
-    "seen": 1793380494.011472,
-    "ast_hash": "f72150022c4abc901835896ca1f22245",
+    "mtime": 1793397894.732325,
+    "seen": 1793398552.8773167,
+    "ast_hash": "bba18f95253e07c5c46650a4d612982b",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/descritivas.js": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793394980.330867,
-    "seen": 1793395538.2130337,
-    "ast_hash": "9f55a10748b7a98341895cdb37ca0816",
+    "mtime": 1793397895.3023314,
+    "seen": 1793398552.877376,
+    "ast_hash": "fd902cf7d0e74ec27288882d23daec0f",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -960,9 +960,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793395019.1222908,
-    "seen": 1793395538.213277,
-    "ast_hash": "b9f2249463b98c827dfe8d1110879938",
+    "mtime": 1793397896.0893402,
+    "seen": 1793398552.87765,
+    "ast_hash": "fb82ec27c876772620cc9109e9a6cb2e",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -1068,15 +1068,15 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793395031.3244243,
-    "seen": 1793395538.213279,
-    "ast_hash": "bbd9d93fc572503e676c4ee67398ac0e",
+    "mtime": 1793397905.6154468,
+    "seen": 1793398552.877652,
+    "ast_hash": "6685c6904f2a85a1f5eb7a589ff551af",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
-    "mtime": 1793395031.4414256,
-    "seen": 1793395538.2132804,
-    "ast_hash": "f4a65a7c57ed542da5a78a9b30e5bcd3",
+    "mtime": 1793397904.7884376,
+    "seen": 1793398552.8776543,
+    "ast_hash": "fe2ba84b23bf8719b9f8654f9be4f2a9",
     "semantic_hash": ""
   },
   "backend/src/migrations/0006_mv_votos_final_splits.js": {
