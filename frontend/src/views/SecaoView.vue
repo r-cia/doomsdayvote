@@ -108,8 +108,9 @@ function voltar() { fechar() }
 </script>
 
 <template>
-  <div :class="modal ? 'secao-modal__overlay' : 'page page--extrato'" @click.self="modal && fechar()">
-    <div :class="modal ? 'secao-modal' : ''">
+  <Teleport to="body" :disabled="!modal">
+    <div :class="modal ? 'secao-modal__overlay' : 'page page--extrato'" @click.self="modal && fechar()">
+      <div :class="modal ? 'secao-modal' : ''">
       <div class="extrato-topo">
         <button
           v-if="!modal"
@@ -288,4 +289,5 @@ function voltar() { fechar() }
     </template>
     </div>
   </div>
+  </Teleport>
 </template>
