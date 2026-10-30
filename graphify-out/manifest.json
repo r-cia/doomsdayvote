@@ -678,9 +678,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/ConsistenciaPanel.vue": {
-    "mtime": 1793364051.2708006,
-    "seen": 1793364259.1280499,
-    "ast_hash": "bfdb97378322b549f54a36a67b7a9e4c",
+    "mtime": 1793373965.6115234,
+    "seen": 1793374013.5461714,
+    "ast_hash": "c1fb13ea9c98140e83b13d07f1647a92",
     "semantic_hash": ""
   },
   "frontend/src/components/DuplicacaoPanel.vue": {
@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793370007.25412,
-    "seen": 1793371590.7604916,
-    "ast_hash": "11d752a92de625f13afe4f818438d658",
+    "mtime": 1793373800.6588337,
+    "seen": 1793374013.5462723,
+    "ast_hash": "5bcec9ecb1fbc5fde8a5db4a79f613eb",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1056,15 +1056,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/ComparacaoLocalPanel.vue": {
-    "mtime": 1793364051.2708006,
-    "seen": 1793364259.128047,
-    "ast_hash": "17e568111e7728942bb74c7a0942f1df",
+    "mtime": 1793373976.2296321,
+    "seen": 1793374013.546167,
+    "ast_hash": "e73d1b73c2c6bcad59c8849617dddb04",
     "semantic_hash": ""
   },
   "frontend/src/components/ConcentracaoPanel.vue": {
-    "mtime": 1793364051.2708006,
-    "seen": 1793364259.1280484,
-    "ast_hash": "141f1b30c92f5fac08f720fa5dacbeec",
+    "mtime": 1793373982.5606968,
+    "seen": 1793374013.5461693,
+    "ast_hash": "20b484ad41e5297436b165e44d630b85",
     "semantic_hash": ""
   },
   "docs/architecture.md": {
