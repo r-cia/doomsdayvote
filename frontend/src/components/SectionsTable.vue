@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
 import { formatarData, formatarDataHora, formatarNumero } from '../lib/format'
 import { motivoSecao, opcoesStatus, statusSecao } from '../lib/status'
@@ -8,6 +9,7 @@ import { motivoSecao, opcoesStatus, statusSecao } from '../lib/status'
 const props = defineProps({
   data: { type: Object, default: null },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   status: { type: String, default: '' },
   zona: { type: Number, default: null },
@@ -176,10 +178,7 @@ function navegarLinhas(evento) {
       <p v-else-if="itens.length === 0" class="vazio">{{ $t('comum.semDados') }}</p>
 
       <template v-else>
-        <p v-if="loading" class="secoes__atualizando" role="status">
-          Atualizando…
-        </p>
-        <div class="tabela-scroll">
+        <TabelaScroll :atualizando="atualizando">
           <table ref="tabela" @keydown="navegarLinhas">
             <caption class="sr-only">
               Seções eleitorais com status e horário de recebimento do BU
@@ -229,7 +228,7 @@ function navegarLinhas(evento) {
               </tr>
             </tbody>
           </table>
-        </div>
+        </TabelaScroll>
 
         <nav class="paginacao" aria-label="Paginação das seções">
           <span>Página {{ pagina }} de {{ totalPaginas }}</span>

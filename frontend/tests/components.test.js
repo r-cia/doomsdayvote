@@ -11,6 +11,7 @@ import PlotDia from '../src/components/PlotDia.vue'
 import PlacarRanking from '../src/components/PlacarRanking.vue'
 import BiometriaPanel from '../src/components/BiometriaPanel.vue'
 import BenfordPanel from '../src/components/BenfordPanel.vue'
+import TabelaScroll from '../src/components/TabelaScroll.vue'
 
 vi.mock('vue-chartjs', () => ({
   Line: {
@@ -638,5 +639,24 @@ describe('MapPanel', () => {
     mapa.handlers.click({ point: { x: 1, y: 1 } })
 
     expect(wrapper.emitted('select')[0][0]).toEqual({ tipo: 'uf', valor: 'SP' })
+  })
+})
+
+describe('TabelaScroll', () => {
+  const slots = { default: '<table><tbody><tr><td>x</td></tr></tbody></table>' }
+
+  it('marca aria-busy e exibe o spinner ao recarregar', () => {
+    const wrapper = mount(TabelaScroll, { props: { atualizando: true }, slots })
+
+    expect(wrapper.find('.tabela-scroll').attributes('aria-busy')).toBe('true')
+    expect(wrapper.find('.tabela-carga__spinner[role="status"]').exists()).toBe(true)
+    expect(wrapper.find('table').exists()).toBe(true)
+  })
+
+  it('não exibe overlay quando não está recarregando', () => {
+    const wrapper = mount(TabelaScroll, { props: { atualizando: false }, slots })
+
+    expect(wrapper.find('.tabela-scroll').attributes('aria-busy')).toBeUndefined()
+    expect(wrapper.find('.tabela-carga__spinner').exists()).toBe(false)
   })
 })

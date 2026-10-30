@@ -6,6 +6,7 @@ import ComparacoesView from './ComparacoesView.vue'
 import BiometriaView from './BiometriaView.vue'
 import EncerramentoView from './EncerramentoView.vue'
 import StateBlock from '../components/StateBlock.vue'
+import TabelaScroll from '../components/TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
 import { useConsistencia, useRelatorio } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
@@ -114,7 +115,7 @@ function identificador(linha) {
         </p>
         <template v-else-if="relatorio.data.value.comparacao_final_disponivel">
           <div v-if="linhas.length" class="relatorio__tabelas">
-            <div class="tabela-scroll">
+            <TabelaScroll :atualizando="relatorio.isFetching.value">
               <table class="tabela relatorio__tabela">
                 <caption class="sr-only">{{ $t('relatorio.historico') }}</caption>
                 <thead>
@@ -138,9 +139,9 @@ function identificador(linha) {
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </TabelaScroll>
 
-            <div class="tabela-scroll">
+            <TabelaScroll :atualizando="relatorio.isFetching.value">
               <table class="tabela relatorio__tabela">
                 <caption class="sr-only">{{ $t('relatorio.recebimento') }}</caption>
                 <thead>
@@ -172,7 +173,7 @@ function identificador(linha) {
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </TabelaScroll>
           </div>
         </template>
       </section>

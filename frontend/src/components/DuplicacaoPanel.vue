@@ -1,10 +1,12 @@
 <script setup>
 import { computed } from 'vue'
 import CoberturaBlock from './CoberturaBlock.vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  atualizando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -44,7 +46,7 @@ function numeros(grupo) {
       {{ $t('comum.semDados') }}
     </div>
 
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="atualizando">
       <table>
         <caption class="sr-only">
           Grupos de seções com o mesmo vetor de votos
@@ -106,7 +108,7 @@ function numeros(grupo) {
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
     <CoberturaBlock :dados="dados" />
   </section>
 </template>

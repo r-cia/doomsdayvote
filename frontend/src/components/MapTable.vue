@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
 import { candidatoDaArea, linhasMapa } from '../lib/agregacoes'
 import { corDaArea, corPartido, corTextoContraste } from '../lib/colors'
@@ -12,6 +13,7 @@ const props = defineProps({
   candidato: { type: Number, default: null },
   candidatos: { type: Array, default: () => [] },
   uf: { type: String, default: null },
+  atualizando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -125,7 +127,7 @@ function aoClicarLinha(linha) {
       {{ $t('comum.semDados') }}
     </p>
 
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="atualizando">
       <table ref="tabela">
         <caption class="sr-only">
           Votos por {{ nivel === 'uf' ? 'UF' : 'município' }}, líder e participação
@@ -190,7 +192,7 @@ function aoClicarLinha(linha) {
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
 
     <footer v-if="linhas.length > porPagina" class="paginacao">
       <span>Página {{ pagina }} de {{ totalPaginas }} · {{ linhas.length }} áreas</span>

@@ -1,10 +1,12 @@
 <script setup>
 import { computed } from 'vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { formatarDecimal } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  atualizando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -30,7 +32,7 @@ function mad(nivel) {
       {{ $t('comum.semDados') }}
     </div>
 
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="atualizando">
       <table>
         <caption class="sr-only">
           Aderência à lei de Benford por candidato em seção, zona e município
@@ -64,6 +66,6 @@ function mad(nivel) {
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
   </section>
 </template>

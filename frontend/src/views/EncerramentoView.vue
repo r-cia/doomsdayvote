@@ -5,6 +5,7 @@ import { api } from '../api/client'
 import { useOrdenacao } from '../composables/ordenacao'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarHora, formatarNumero, formatarPercentual } from '../lib/format'
+import TabelaScroll from '../components/TabelaScroll.vue'
 import SecaoView from './SecaoView.vue'
 
 const { store } = useSelecaoEleicao()
@@ -113,10 +114,10 @@ watch(ordemSecoes.params, () => {
       </div>
     </header>
 
-    <div v-if="carregandoUrnas" class="vazio">{{ $t('comum.carregando') }}</div>
+    <div v-if="carregandoUrnas && urnas.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
     <div v-else-if="urnas.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
 
-    <div v-else class="tabela-scroll">
+    <TabelaScroll v-else :atualizando="carregandoUrnas">
       <table class="tabela">
         <thead>
           <tr>
@@ -143,7 +144,7 @@ watch(ordemSecoes.params, () => {
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
   </section>
 
   <div class="mesa">
@@ -153,9 +154,9 @@ watch(ordemSecoes.params, () => {
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
-      <div v-else-if="carregandoMunicipios" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="carregandoMunicipios && municipios.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
       <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
-      <div v-else class="tabela-scroll">
+      <TabelaScroll v-else :atualizando="carregandoMunicipios">
         <table>
           <thead>
             <tr>
@@ -185,7 +186,7 @@ watch(ordemSecoes.params, () => {
             </tr>
           </tbody>
         </table>
-      </div>
+      </TabelaScroll>
     </div>
 
     <div class="card">
@@ -196,9 +197,9 @@ watch(ordemSecoes.params, () => {
         </p>
       </div>
       <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') }}</div>
-      <div v-else-if="carregandoSecoes" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="carregandoSecoes && secoes.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
       <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
-      <div v-else class="tabela-scroll">
+      <TabelaScroll v-else :atualizando="carregandoSecoes">
         <table>
           <thead>
             <tr>
@@ -225,7 +226,7 @@ watch(ordemSecoes.params, () => {
             </tr>
           </tbody>
         </table>
-      </div>
+      </TabelaScroll>
     </div>
   </div>
 

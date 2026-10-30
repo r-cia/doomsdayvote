@@ -65,9 +65,11 @@ watch(
   <AnaliseSection
     :benford="analiseQuery.data.value?.benford ?? null"
     :benford-loading="analiseQuery.isLoading.value"
+    :benford-atualizando="analiseQuery.isFetching.value"
     :anomalias="anomaliasQuery.data.value ?? null"
     :selecionado="store.candidato"
     :loading="anomaliasQuery.isLoading.value"
+    :atualizando="anomaliasQuery.isFetching.value"
     :error="anomaliasQuery.error.value?.message ?? ''"
     :ordenacoes="ordenacoes"
     @retry="anomaliasQuery.refetch()"
@@ -82,6 +84,7 @@ watch(
   <ConsistenciaPanel
     :dados="consistenciaQuery.data.value ?? null"
     :loading="consistenciaQuery.isLoading.value"
+    :atualizando="consistenciaQuery.isFetching.value"
     :error="consistenciaQuery.error.value?.message ?? ''"
     :ordenacao="ordemConsistencia"
     @retry="consistenciaQuery.refetch()"
@@ -90,6 +93,7 @@ watch(
   <ConcentracaoPanel
     :dados="concentracaoQuery.data.value ?? null"
     :loading="concentracaoQuery.isLoading.value"
+    :atualizando="concentracaoQuery.isFetching.value"
     :error="concentracaoQuery.error.value?.message ?? ''"
     :ordenacao-share="ordemShare"
     :ordenacao-margem="ordemMargem"

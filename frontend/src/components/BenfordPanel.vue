@@ -2,12 +2,14 @@
 import { computed } from 'vue'
 import { formatarDecimal, formatarNumero } from '../lib/format'
 import StateBlock from './StateBlock.vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -78,7 +80,7 @@ function formatarMad(valor) {
           </div>
         </div>
 
-        <div class="benford__tabela">
+        <TabelaScroll class="benford__tabela" :atualizando="atualizando">
           <table>
             <caption class="sr-only">
               Aderência à lei de Benford por candidato no corte atual
@@ -110,7 +112,7 @@ function formatarMad(valor) {
               </tr>
             </tbody>
           </table>
-        </div>
+        </TabelaScroll>
       </div>
 
       <div class="benford__rodape">

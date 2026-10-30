@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useEstatisticas } from '../composables/queries'
 import { formatarNumero } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -92,6 +93,7 @@ function erroMensagem(erro) {
         </header>
 
         <section class="estatistica-tabela-wrap" aria-label="Comparecimento por seção">
+          <TabelaScroll :atualizando="estatisticasQuery.isFetching.value">
           <table class="tabela">
             <thead>
               <tr>
@@ -112,9 +114,11 @@ function erroMensagem(erro) {
               </tr>
             </tbody>
           </table>
+          </TabelaScroll>
         </section>
 
         <section class="estatistica-tabela-wrap" aria-label="Votos por seção por candidato">
+          <TabelaScroll :atualizando="estatisticasQuery.isFetching.value">
           <table class="tabela">
             <thead>
               <tr>
@@ -144,6 +148,7 @@ function erroMensagem(erro) {
               </tr>
             </tbody>
           </table>
+          </TabelaScroll>
         </section>
       </article>
     </div>

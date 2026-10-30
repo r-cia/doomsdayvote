@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { linhasMapa, nominaisNaOrdemDoServidor } from '../lib/agregacoes'
 import { useOrdenacao } from '../composables/ordenacao'
 import { corPartido, corTextoContraste } from '../lib/colors'
@@ -11,6 +12,7 @@ const props = defineProps({
   candidatos: { type: Array, default: () => [] },
   votos: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ufSelecionada: { type: String, default: null },
   ordenacao: { type: Object, default: () => useOrdenacao() },
@@ -133,7 +135,7 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
       :titulo="$t('comum.carregando')"
     />
 
-    <div v-else-if="ufSelecionada" class="tabela-scroll uf-painel__scroll">
+    <TabelaScroll v-else-if="ufSelecionada" class="uf-painel__scroll" :atualizando="atualizando">
       <table>
         <caption class="sr-only">Votos por candidato em {{ ufSelecionada }}</caption>
         <thead>
@@ -162,13 +164,13 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
         </tbody>
       </table>
       <p v-if="votosUf.length === 0" class="vazio">{{ $t('comum.semDados') }}</p>
-    </div>
+    </TabelaScroll>
 
     <p v-else-if="linhas.length === 0" class="vazio">
       {{ $t('mapa.semDadosUf') }}
     </p>
 
-    <div v-else-if="agrupar === 'regiao' && grupos" class="tabela-scroll uf-painel__scroll">
+    <TabelaScroll v-else-if="agrupar === 'regiao' && grupos" class="uf-painel__scroll" :atualizando="atualizando">
       <table>
         <caption class="sr-only">Resumo de votos e líder por UF agrupado por região</caption>
         <thead>
@@ -235,9 +237,9 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
           </template>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
 
-    <div v-else class="tabela-scroll uf-painel__scroll">
+    <TabelaScroll v-else class="uf-painel__scroll" :atualizando="atualizando">
       <table>
         <caption class="sr-only">Resumo de votos e líder por UF</caption>
         <thead>
@@ -299,6 +301,6 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
           </tr>
         </tbody>
       </table>
-    </div>
+    </TabelaScroll>
   </section>
 </template>

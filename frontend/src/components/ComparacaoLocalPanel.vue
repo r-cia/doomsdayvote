@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import TabelaScroll from './TabelaScroll.vue'
 import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
@@ -8,6 +9,7 @@ import { useOrdenacao } from '../composables/ordenacao'
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
+  atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
@@ -65,7 +67,7 @@ function nivel(rotulo) {
           <h3>{{ nivel(grupo.nivel) }} · {{ formatarNumero(grupo.tamanho) }} {{ $t('analiseUI.secoes') }}</h3>
           <span v-if="grupo.dados_insuficientes" class="status status--warning">{{ $t('analiseUI.dadosInsuficientes') }}</span>
         </header>
-        <div class="tabela-scroll">
+        <TabelaScroll :atualizando="atualizando">
           <table class="analise-tabela">
             <caption class="sr-only">{{ $t('analiseUI.secoesGrupo', { level: nivel(grupo.nivel) }) }}</caption>
             <thead>
@@ -93,7 +95,7 @@ function nivel(rotulo) {
               </tr>
             </tbody>
           </table>
-        </div>
+        </TabelaScroll>
       </article>
     </div>
     <dl v-if="cobertura" class="painel-resumo" :aria-label="$t('comum.resumoCobertura')">
