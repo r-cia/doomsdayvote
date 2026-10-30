@@ -630,9 +630,9 @@
     "semantic_hash": ""
   },
   "frontend/src/App.vue": {
-    "mtime": 1793334509.0723968,
-    "seen": 1793360126.8219187,
-    "ast_hash": "f16f5e3a6d95a96ab4e6cd4ecb678601",
+    "mtime": 1793378352.0176003,
+    "seen": 1793378375.3504698,
+    "ast_hash": "c064eee3d0c09af6e6bb2daf62b8c3bc",
     "semantic_hash": ""
   },
   "frontend/src/api/client.js": {
@@ -786,21 +786,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793375975.9581473,
-    "seen": 1793375990.6784985,
-    "ast_hash": "728e1d1dcdcad7d474762c9e7ebe5af2",
+    "mtime": 1793378352.0236003,
+    "seen": 1793378375.3505268,
+    "ast_hash": "8adba7ab780233eaf66031cf2622c9bb",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793375975.9591472,
-    "seen": 1793375990.6785002,
-    "ast_hash": "f5659316a411688570ee3394e0ea82ae",
+    "mtime": 1793378352.0256004,
+    "seen": 1793378375.3505285,
+    "ast_hash": "ea875d866392d911d7476a991f2dad43",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793375975.9571471,
-    "seen": 1793375990.6785018,
-    "ast_hash": "a380b692acb7e24676977a9cc6e0c81f",
+    "mtime": 1793378352.0226004,
+    "seen": 1793378375.3505304,
+    "ast_hash": "711c9bd4e6e0eafbe6f179fe1c9a433f",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -834,9 +834,9 @@
     "semantic_hash": ""
   },
   "frontend/src/router.js": {
-    "mtime": 1793325167.9738975,
-    "seen": 1793360126.8219755,
-    "ast_hash": "81577c4eb41ae451fabf1d99a1890603",
+    "mtime": 1793378352.0186005,
+    "seen": 1793378375.3505416,
+    "ast_hash": "b93dd967b7e576bf4f0e001d5b301172",
     "semantic_hash": ""
   },
   "frontend/src/stores/filters.js": {
@@ -846,9 +846,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/AnaliseView.vue": {
-    "mtime": 1793375875.63896,
-    "seen": 1793375943.2040555,
-    "ast_hash": "3bf41fb09736dfc6ec5d8a3aaf369050",
+    "mtime": 1793378352.0186005,
+    "seen": 1793378375.350545,
+    "ast_hash": "eb0486f95091b90c3fbee39ed20a3338",
     "semantic_hash": ""
   },
   "frontend/src/views/BiometriaView.vue": {
@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793377622.978554,
-    "seen": 1793377630.324262,
-    "ast_hash": "6670662feb34e82815d46f58e46b2cd9",
+    "mtime": 1793378365.4497385,
+    "seen": 1793378375.3505948,
+    "ast_hash": "590c4657e63f6f039049a51b1a7d318c",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793377622.977554,
-    "seen": 1793377630.3242497,
-    "ast_hash": "ed14b5ce6499ef80a8405710afc61698",
+    "mtime": 1793378352.0266004,
+    "seen": 1793378375.350584,
+    "ast_hash": "ed84dbed056e05ecd4d2c5e76b6e32da",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
@@ -1119,6 +1119,12 @@
     "mtime": 1793377120.09583,
     "seen": 1793377132.228442,
     "ast_hash": "064b386cbca5e63c2f6430f3c3ce213b",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/ComparacoesView.vue": {
+    "mtime": 1793378352.0196004,
+    "seen": 1793378375.3505485,
+    "ast_hash": "2397fe3873e6bded2ee6a097b3960918",
     "semantic_hash": ""
   }
 }

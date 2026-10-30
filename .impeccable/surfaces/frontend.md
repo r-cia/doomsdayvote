@@ -18,3 +18,17 @@ FIRST VIEWPORT: Faixa de classificação de 46px com logo e "não oficial"; linh
 FORM: direção pinada pelo usuário (terminal militar, guerra fria, monitor de fósforo) sobre a direção sorteada 5; a semente do sorteio é de82dfdb. O mundo entra só como tipo, paleta, densidade e um movimento-assinatura: o traçado do dia.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+## Direction contract: relatório
+
+THESIS: A leitura executiva mostra o que foi verificado no recorte e o que permanece inconclusivo. Recusa misturar turnos ou anos na nota e recusa transformar desvio estatístico em prova.
+
+OWN-WORLD: Herdar a sala de plotagem existente: fundo escuro esverdeado, painéis de fio fino, âmbar para hierarquia, verde para igualdade aritmética e vermelho para divergência confirmada. Dados em Fragment Mono; títulos Archivo Narrow. Tabelas e regras mantêm links de rastreio.
+
+STORY: O visitante identifica eleição, ano, turno, cargo e cobertura; lê a nota como percentual de BUs avaliados sem divergência nas regras aritméticas aplicáveis; abre cada regra e encontra sinais estatísticos e comparações históricas em grupos separados. Anos/turnos de referência contextualizam mudanças, sem entrar no universo ou na nota do alvo.
+
+FIRST VIEWPORT: Título “Relatório” e identificação do recorte; faixa de nota, base avaliada e cobertura; abaixo, tabela curta com os resultados das regras aritméticas e o primeiro bloco de diferenças históricas. Benford, duplicação, outliers, biometria, concentração e comparação local seguem em seções rastreáveis abaixo.
+
+FORM: Extensão operacional de uma rota existente, código sobre componentes, tabelas, tipografia e tokens da interface atual; sem nova identidade visual ou assets.
+
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
