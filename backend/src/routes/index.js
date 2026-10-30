@@ -1102,33 +1102,29 @@ export async function registrarRotas(app) {
       .where('ativo', '=', true)
       .executeTakeFirst();
 
-    const resultados = boletim
-      ? await db
-          .selectFrom('resultado_votavel')
-          .selectAll()
-          .where('boletim_versao_id', '=', boletim.id)
-          .orderBy('qt_votos', 'desc')
-          .execute()
-      : [];
-
-    const lote = boletim
-      ? await db
-          .selectFrom('lote_importacao')
-          .select(['id', 'nome_arquivo', 'sha256'])
-          .where('id', '=', boletim.lote_id)
-          .executeTakeFirst()
-      : null;
-
-    const anteriores = boletim
-      ? await db
-          .selectFrom('boletim_versao')
-          .select(({ fn }) => fn.countAll().as('total'))
-          .where('secao_id', '=', query.id)
-          .where('eleicao_id', '=', eleicao.id)
-          .where('cd_cargo_pergunta', '=', query.cargo)
-          .where('versao', '<', boletim.versao)
-          .executeTakeFirstOrThrow()
-      : { total: 0 };
+    const [resultados, lote, anteriores] = boletim
+      ? await Promise.all([
+          db
+            .selectFrom('resultado_votavel')
+            .selectAll()
+            .where('boletim_versao_id', '=', boletim.id)
+            .orderBy('qt_votos', 'desc')
+            .execute(),
+          db
+            .selectFrom('lote_importacao')
+            .select(['id', 'nome_arquivo', 'sha256'])
+            .where('id', '=', boletim.lote_id)
+            .executeTakeFirst(),
+          db
+            .selectFrom('boletim_versao')
+            .select(({ fn }) => fn.countAll().as('total'))
+            .where('secao_id', '=', query.id)
+            .where('eleicao_id', '=', eleicao.id)
+            .where('cd_cargo_pergunta', '=', query.cargo)
+            .where('versao', '<', boletim.versao)
+            .executeTakeFirstOrThrow(),
+        ])
+      : [[], null, { total: 0 }];
 
     const consistencia = boletim
       ? validarConsistenciaBu(
