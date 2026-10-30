@@ -134,7 +134,7 @@ describe('status', () => {
   it('mapeia status conhecidos e desconhecidos', () => {
     expect(statusSecao('bu_recebido').tom).toBe('success')
     expect(statusSecao('anulada').tom).toBe('danger')
-    expect(statusSecao('status_inexistente').rotulo).toBe('status_inexistente')
+    expect(statusSecao('status_inexistente').rotulo).toBe('Desconhecido')
     expect(opcoesStatus()).toHaveLength(8)
   })
 

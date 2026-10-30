@@ -73,5 +73,8 @@ export function avisoInfo(codigo) {
 }
 
 export function opcoesStatus() {
-  return []
+  return Object.keys(STATUS_KEYS).map((valor) => ({
+    valor,
+    rotulo: i18n.global.t(STATUS_KEYS[valor]),
+  }))
 }
