@@ -660,9 +660,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordPanel.vue": {
-    "mtime": 1793375095.458448,
-    "seen": 1793375176.5128527,
-    "ast_hash": "358b464aeca03b24416eedff9c297721",
+    "mtime": 1793375913.795412,
+    "seen": 1793375943.203985,
+    "ast_hash": "02154c91cd927c4be3dd4ecfa2ff2482",
     "semantic_hash": ""
   },
   "frontend/src/components/BiometriaPanel.vue": {
@@ -786,21 +786,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793375618.9338968,
-    "seen": 1793375638.729387,
-    "ast_hash": "9645cb206dbfc7f29366b5c444661a80",
+    "mtime": 1793375975.9581473,
+    "seen": 1793375990.6784985,
+    "ast_hash": "728e1d1dcdcad7d474762c9e7ebe5af2",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793375618.934897,
-    "seen": 1793375638.7293887,
-    "ast_hash": "3172d2cd2938368aa4904367503a333e",
+    "mtime": 1793375975.9591472,
+    "seen": 1793375990.6785002,
+    "ast_hash": "f5659316a411688570ee3394e0ea82ae",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793375618.9328969,
-    "seen": 1793375638.7293904,
-    "ast_hash": "39a7304c0aa6e825d5308730b5cb0618",
+    "mtime": 1793375975.9571471,
+    "seen": 1793375990.6785018,
+    "ast_hash": "a380b692acb7e24676977a9cc6e0c81f",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -846,9 +846,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/AnaliseView.vue": {
-    "mtime": 1793375095.459448,
-    "seen": 1793375176.5130024,
-    "ast_hash": "212981e14ff13b81a8a573826d78366d",
+    "mtime": 1793375875.63896,
+    "seen": 1793375943.2040555,
+    "ast_hash": "3bf41fb09736dfc6ec5d8a3aaf369050",
     "semantic_hash": ""
   },
   "frontend/src/views/BiometriaView.vue": {
@@ -1107,6 +1107,12 @@
     "mtime": 1793374271.570568,
     "seen": 1793375068.508498,
     "ast_hash": "f0e171bf8dad7043fef4c4d8b7890aec",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AnaliseCobertura.vue": {
+    "mtime": 1793375975.9561472,
+    "seen": 1793375990.6784441,
+    "ast_hash": "be15d17183568acc939eb5784673ee75",
     "semantic_hash": ""
   }
 }

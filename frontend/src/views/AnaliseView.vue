@@ -1,6 +1,6 @@
 <script setup>
 import AnaliseSection from '../components/AnaliseSection.vue'
-import CoberturaBlock from '../components/CoberturaBlock.vue'
+import AnaliseCobertura from '../components/AnaliseCobertura.vue'
 import StateBlock from '../components/StateBlock.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import ConsistenciaPanel from '../components/ConsistenciaPanel.vue'
@@ -59,9 +59,9 @@ watch(
     @update:ordenacao="ordenacao = $event"
   />
 
-  <CoberturaBlock
+  <AnaliseCobertura
     :cobertura="analiseQuery.data.value?.cobertura ?? null"
-    :limitacoes="analiseQuery.data.value?.limitacoes ?? []"
+    :minimo-benford="analiseQuery.data.value?.benford?.minimo_votos ?? 10"
   />
 
   <ConsistenciaPanel

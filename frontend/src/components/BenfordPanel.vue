@@ -30,9 +30,6 @@ function formatarMad(valor) {
   return formatarDecimal(valor, 4, 4)
 }
 
-function avisoMetodologico() {
-  return props.dados?.observacao ?? props.dados?.status_metodologico ?? ''
-}
 </script>
 
 <template>
@@ -116,9 +113,6 @@ function avisoMetodologico() {
       <div class="benford__rodape">
         <p class="nota">
           <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> seções abaixo do mínimo
-        </p>
-        <p class="nota">
-          {{ avisoMetodologico() }}
         </p>
       </div>
     </template>
