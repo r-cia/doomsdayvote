@@ -45,5 +45,5 @@ export function compararVersoes(anterior,atual){
     votaveis_alterados.push({nr_votavel:nrVotavel,nm_votavel:nmVotavel,anterior:va,atual:vb,diferenca:diferencaNumerica(va,vb)});
   }
   votaveis_alterados.sort((x,y)=>Number(x.nr_votavel)-Number(y.nr_votavel));
-  return {campos_alterados,votaveis_alterados,causa:null,observacao:'A ferramenta não presume a causa da diferença.'};
+  return {campos_alterados,votaveis_alterados,causa:null};
 }

@@ -621,7 +621,6 @@ onBeforeUnmount(() => {
     <div class="card__cabecalho mapa-card__cabecalho">
       <div>
         <h2 id="mapa-titulo">{{ $t('mapa.titulo') }}</h2>
-        <p>{{ $t('mapa.malhaLocal') }}</p>
       </div>
       <div class="mapa-controles">
         <div class="segmented" role="group" :aria-label="$t('mapa.nivel')">
@@ -685,14 +684,10 @@ onBeforeUnmount(() => {
       <StateBlock
         estado="vazio"
         :titulo="$t('comum.semDados')"
-        :descricao="`${malhaMensagem} Adicione o arquivo em frontend/public/geo/${arquivoMalha(nivel)}.`"
+        :descricao="malhaMensagem"
         :acao="$t('comum.tentarNovamente')"
         @acao="tentarMalhaNovamente"
       />
-      <p>
-        {{ $t('comum.semDados') }}
-        disponível com os dados da API.
-      </p>
     </div>
 
     <div

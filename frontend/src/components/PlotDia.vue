@@ -352,10 +352,7 @@ watch(
 
     <StateBlock v-if="loading" estado="carregando" :titulo="$t('comum.carregando')" class="tracado__estado" />
     <div v-else-if="pontos.length === 0" class="tracado__vazio">
-      <strong>{{ $t('painel.linhaTempoIndisponivel') }}</strong>
-      <p>
-        {{ $t('painel.fonteSemLinhaTempo') }}
-      </p>
+      <strong>{{ $t('comum.linhaTempoIndisponivel') }}</strong>
     </div>
 
     <template v-else>

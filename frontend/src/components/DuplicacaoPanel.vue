@@ -34,12 +34,10 @@ function numeros(grupo) {
     <header class="painel__cabecalho">
       <h2 id="duplicacao-titulo">{{ $t('estatistica.duplicacao') }}</h2>
       <p class="painel__meta">
-        vetor de votos idêntico<br />
         <b>{{ dados?.total_grupos ?? 0 }}</b> grupos ·
         {{ dados?.total_secoes ?? 0 }} seções ·
         escopo {{ dados?.total_secoes_escopo ?? 0 }}
       </p>
-      <p class="nota" v-if="dados?.observacao">{{ dados.observacao }}</p>
     </header>
 
     <div v-if="grupos.length === 0" class="vazio">

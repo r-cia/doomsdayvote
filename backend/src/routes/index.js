@@ -506,13 +506,6 @@ export async function registrarRotas(app) {
       cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
     ]);
 
-    const limitacoesAnalise = [
-      'Biometria agregada por seção, sem vínculo individual.',
-      'Benford é leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
-      'Campos ausentes não são tratados como zero.',
-      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
-    ];
-
     return {
       corte: corteResposta(corte),
       ...metadados,
@@ -529,10 +522,6 @@ export async function registrarRotas(app) {
           COLUNAS_BENFORD,
           lerOrdenacao(query),
         ),
-        status_metodologico: benford.status_metodologico ?? 'em_validacao',
-        observacao:
-          benford.observacao ??
-          'Leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
       },
       cobertura: {
         consideradas: biometria.secoes,
@@ -545,7 +534,6 @@ export async function registrarRotas(app) {
           0,
         ),
       },
-      limitacoes: limitacoesAnalise,
     };
   }));
 
@@ -638,14 +626,6 @@ export async function registrarRotas(app) {
       lerOrdenacao(query),
     ).slice(0, 20);
 
-    const limitacoesAnomalias = [
-      'Benford por nível é leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
-      'Duplicação busca vetores idênticos; frequência esperada cresce com a escala do escopo.',
-      'Isolation Forest e LOF são ordenação exploratória, sem limiares de alerta.',
-      'Campos ausentes não são tratados como zero.',
-      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
-    ];
-
     return {
       corte: corteResposta(corte),
       ...metadados,
@@ -683,7 +663,6 @@ export async function registrarRotas(app) {
         duplicacao_secoes_escopo: duplicacao.total_secoes_escopo ?? 0,
         outliers_limitado: secoes.length > indices.length,
       },
-      limitacoes: limitacoesAnomalias,
     };
   }));
 
@@ -712,12 +691,6 @@ export async function registrarRotas(app) {
       0,
     );
 
-    const limitacoesEstatisticas = [
-      'Estatísticas descritivas agregadas por seção, sem vínculo individual.',
-      'Campos ausentes não são tratados como zero.',
-      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
-    ];
-
     return {
       corte: corteResposta(corte),
       escopo: query.escopo,
@@ -727,7 +700,6 @@ export async function registrarRotas(app) {
         consideradas: secoesConsideradas,
         blocos: blocos.length,
       },
-      limitacoes: limitacoesEstatisticas,
     };
   }));
 
@@ -1232,13 +1204,6 @@ export async function registrarRotas(app) {
       escopo: escopoDe(query),
     });
 
-    const limitacoes = [
-      'Consistência aritmética calculada a partir do BU ativo no corte selecionado.',
-      'Campos ausentes (nulos) não são tratados como zero e não geram divergência.',
-      'Biometria é agregada por seção, sem vínculo individual.',
-      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
-    ];
-
     const divergenciasBase = [];
     for (const item of resultado.secoes) {
       for (const regra of item.regras) {
@@ -1272,7 +1237,6 @@ export async function registrarRotas(app) {
       avisos,
       cobertura: resultado.cobertura,
       indice_consistencia: resultado.indice_consistencia,
-      limitacoes,
       page: query.page,
       page_size: pageSize,
       total: divergencias.length,
@@ -1731,20 +1695,11 @@ export async function registrarRotas(app) {
 
     const grupos = resultado.grupos ?? [];
     const inicio = (query.page - 1) * pageSize;
-    const limitacoes = [
-      'Grupos formados por local de votação, com fallback para zona e município quando a amostra for insuficiente.',
-      'Controle de escala por aptos (±50% da mediana do grupo).',
-      'Métricas relativas: participação, abstenção e share por candidato.',
-      'Ausência de campo não é tratada como zero.',
-      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
-    ];
-
     return {
       corte: corteResposta(corte),
       ...metadados,
       avisos,
       cobertura: resultado.cobertura,
-      limitacoes,
       page: query.page,
       page_size: pageSize,
       total: grupos.length,
@@ -1797,17 +1752,11 @@ export async function registrarRotas(app) {
     const inicioShare = (pagina - 1) * pageSize;
     const inicioMargem = (pagina - 1) * pageSize;
 
-    const limitacoes = resultado.limitacoes ?? [
-      'Concentração calculada a partir do BU ativo no corte selecionado.',
-      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
-    ];
-
     return {
       corte: corteResposta(corte),
       ...metadados,
       avisos,
       cobertura: resultado.cobertura,
-      limitacoes,
       page: pagina,
       page_size: pageSize,
       total: topShare.length,

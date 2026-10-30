@@ -147,7 +147,6 @@ function voltar() { fechar() }
       v-if="!habilitado"
       estado="vazio"
       :titulo="$t('comum.filtrosNaoInformados') || 'Filtros não informados'"
-      descricao="Volte ao painel, selecione uma eleição e um cargo e abra o detalhe pela tabela de seções."
       acao="Ir ao painel"
       @acao="voltar"
     />
@@ -212,7 +211,6 @@ function voltar() { fechar() }
             v-if="!boletim"
             estado="vazio"
             :titulo="$t('comum.semDados')"
-            descricao="Não há boletim de urna considerado para esta seção."
           />
           <dl v-else class="dados">
             <div><dt>Tipo de urna</dt><dd>{{ boletim.ds_tipo_urna ?? boletim.cd_tipo_urna ?? '—' }}</dd></div>

@@ -47,7 +47,6 @@ function erroMensagem(erro) {
       <div>
         <p class="painel__etiqueta">{{ $t('estatistica.descritiva') }}</p>
         <h2 id="titulo-estatisticas">{{ $t('estatistica.subtitulo') }}</h2>
-        <p class="painel__subtitulo">{{ $t('estatistica.descricao') }}</p>
       </div>
       <div class="estatistica-controle">
         <label class="campo campo--curto">

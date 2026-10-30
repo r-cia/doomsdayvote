@@ -17,7 +17,6 @@ describe('compararVersoes', () => {
     expect(r.campos_alterados).toContainEqual({ campo: 'qt_comparecimento', anterior: 80, atual: 81, diferenca: 1 });
     expect(r.votaveis_alterados).toContainEqual({ nr_votavel: 13, nm_votavel: 'A', anterior: 50, atual: 51, diferenca: 1 });
     expect(r.causa).toBeNull();
-    expect(r.observacao).toBe('A ferramenta não presume a causa da diferença.');
   });
 
   it('trata ausencia como null', () => {

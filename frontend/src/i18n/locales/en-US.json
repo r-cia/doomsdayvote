@@ -35,7 +35,6 @@
     "semSecoes": "Not enough sections for the calculation in this filter.",
     "atualizando": "Updating data…",
     "linhaTempoIndisponivel": "Timeline unavailable",
-    "fonteSemLinhaTempo": "This year's source does not provide a time-based timeline.",
     "semGruposComparaveis": "No comparable groups for this filter.",
     "nenhumaSecaoRecorte": "No sections for this filter.",
     "nenhumaDivergencia": "No arithmetic discrepancies for this filter.",
@@ -48,10 +47,7 @@
     "carregandoMalha": "Loading geographic map…",
     "acao": "Action",
     "resumoCobertura": "Coverage summary",
-    "votos": "votes",
-    "camposAusentesNaoZero": "Missing fields are not treated as zero.",
-    "semLimiarAlertaDescritivo": "The tool does not set alert thresholds; results are descriptive.",
-    "naoConcluiFraude": "The tool does not conclude fraud; it flags deviations for review."
+    "votos": "votes"
   },
   "filtros": {
     "cargo": "Office",
@@ -65,8 +61,7 @@
     "limpar": "Clear filters",
     "escopo": "Scope",
     "turnoAtual": "Current round",
-    "anoCompleto": "Year (1st and 2nd)",
-    "ordenarPor": "Sort by"
+    "anoCompleto": "Year (1st and 2nd)"
   },
   "painel": {
     "titulo": "Dashboard",
@@ -105,14 +100,12 @@
     "municipios": "Municipalities",
     "lider": "Leader",
     "percentual": "Percentage",
-    "selecioneUfMunicipios": "Select a state to view municipalities",
-    "malhaLocal": "Local IBGE map layer."
+    "selecioneUfMunicipios": "Select a state to view municipalities"
   },
   "estatistica": {
     "titulo": "Statistics",
     "descritiva": "Descriptive statistics",
     "subtitulo": "Mean, median and population standard deviation per section",
-    "descricao": "Votes per section for each candidate and attendance per section. Population standard deviation.",
     "variavel": "Variable",
     "candidato": "Candidate",
     "partido": "Party",
@@ -124,8 +117,7 @@
     "comparecimento": "Attendance",
     "benford": "Benford",
     "duplicacao": "Duplication",
-    "isolamento": "Isolation and LOF",
-    "limitacaoAgregacaoPorSecao": "Descriptive statistics aggregated by section, with no individual-level linkage."
+    "isolamento": "Isolation and LOF"
   },
   "analiseUI": {
     "consistencia": "Arithmetic consistency",
@@ -215,8 +207,7 @@
     "porRegiao": "By region",
     "regiao": "Region",
     "municipios": "Municipalities with highest non-enabled biometrics",
-    "secoes": "Sections with highest % non-enabled",
-    "limitacaoAgregacaoPorSecao": "Biometrics aggregated by section, with no individual-level linkage."
+    "secoes": "Sections with highest % non-enabled"
   },
   "encerramento": {
     "titulo": "Closing",
@@ -245,18 +236,12 @@
     "titulo": "Consistency report",
     "nota": "Arithmetic consistency index",
     "notaInconclusiva": "No arithmetic rules can be checked for this selection.",
-    "descricaoNota": "Share of assessed polling-place records with no divergence in applicable arithmetic rules.",
-    "limiteNota": "The score describes observed arithmetic consistency only. It does not estimate probability or certify legitimacy.",
     "avaliadas": "Assessed records",
     "consideradas": "Records considered",
     "semDivergencia": "No divergence",
     "comDivergencia": "With divergence",
     "cobertura": "Assessment coverage",
-    "metodoNota": "How the score is calculated",
-    "metodoNotaDescricao": "Each polling-place record counts once. It enters the denominator when at least one rule can be checked and the numerator when none of its checkable rules diverges. Missing fields are not treated as zero and do not lower the score. Coverage shows how many records could be assessed.",
     "historico": "Election comparisons",
-    "historicoDescricao": "Each year, round, and election code is shown separately. References use active bulletins at the final cut and provide context for change; they never enter the assessed selection or its score.",
-    "historicoIndisponivel": "Historical references appear only at the final cut so the periods remain comparable.",
     "semHistorico": "No comparable election is available for this office and area.",
     "selecioneUf": "Select a state to analyze governor results.",
     "alvo": "Assessed selection",
@@ -279,7 +264,6 @@
     "antesEmissao": "Received before BU issuance",
     "medianaAtraso": "Median closing → receipt (min)",
     "p90Atraso": "P90 closing → receipt (min)",
-    "metodoRecebimento": "Delay is calculated only when both closing and receipt include date and time. Date-only or missing receipt values are excluded and shown in coverage. Receipt before closing or issuance is a chronology signal for review, not proof, and does not affect the score.",
     "analises": "Additional analyses",
     "mostrarAnalises": "Show statistics and exploratory signals",
     "ocultarAnalises": "Hide additional analyses"

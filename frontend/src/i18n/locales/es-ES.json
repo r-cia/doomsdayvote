@@ -35,7 +35,6 @@
     "semSecoes": "Secciones insuficientes para el cálculo en este filtro.",
     "atualizando": "Actualizando datos…",
     "linhaTempoIndisponivel": "Cronología no disponible",
-    "fonteSemLinhaTempo": "La fuente de este año no ofrece una cronología por horario.",
     "semGruposComparaveis": "No hay grupos comparables para este filtro.",
     "nenhumaSecaoRecorte": "No hay secciones para este filtro.",
     "nenhumaDivergencia": "No hay discrepancias aritméticas para este filtro.",
@@ -48,10 +47,7 @@
     "carregandoMalha": "Cargando el mapa geográfico…",
     "acao": "Acción",
     "resumoCobertura": "Resumen de cobertura",
-    "votos": "votos",
-    "camposAusentesNaoZero": "Los campos ausentes no se tratan como cero.",
-    "semLimiarAlertaDescritivo": "La herramienta no define umbrales de alerta; los resultados son descriptivos.",
-    "naoConcluiFraude": "La herramienta no concluye que haya fraude; señala desviaciones para su revisión."
+    "votos": "votos"
   },
   "filtros": {
     "cargo": "Cargo",
@@ -65,8 +61,7 @@
     "limpar": "Limpiar filtros",
     "escopo": "Alcance",
     "turnoAtual": "Turno actual",
-    "anoCompleto": "Año (1º y 2º)",
-    "ordenarPor": "Ordenar por"
+    "anoCompleto": "Año (1º y 2º)"
   },
   "painel": {
     "titulo": "Panel",
@@ -105,14 +100,12 @@
     "municipios": "Municipios",
     "lider": "Líder",
     "percentual": "Porcentaje",
-    "selecioneUfMunicipios": "Seleccione un estado para ver municipios",
-    "malhaLocal": "Capa local del IBGE."
+    "selecioneUfMunicipios": "Seleccione un estado para ver municipios"
   },
   "estatistica": {
     "titulo": "Estadística",
     "descritiva": "Estadística descriptiva",
     "subtitulo": "Media, mediana y desviación estándar poblacional por sección",
-    "descricao": "Votos por sección de cada candidato y asistencia por sección. Desviación estándar poblacional.",
     "variavel": "Variable",
     "candidato": "Candidato",
     "partido": "Partido",
@@ -124,8 +117,7 @@
     "comparecimento": "Asistencia",
     "benford": "Benford",
     "duplicacao": "Duplicación",
-    "isolamento": "Aislamiento y LOF",
-    "limitacaoAgregacaoPorSecao": "Estadísticas descriptivas agregadas por sección, sin vínculo individual."
+    "isolamento": "Aislamiento y LOF"
   },
   "analiseUI": {
     "consistencia": "Consistencia aritmética",
@@ -215,8 +207,7 @@
     "porRegiao": "Por región",
     "regiao": "Región",
     "municipios": "Municipios con mayor biometría no habilitada",
-    "secoes": "Secciones con mayor % no habilitada",
-    "limitacaoAgregacaoPorSecao": "Biometría agregada por sección, sin vínculo individual."
+    "secoes": "Secciones con mayor % no habilitada"
   },
   "encerramento": {
     "titulo": "Cierre",
@@ -245,18 +236,12 @@
     "titulo": "Informe de consistencia",
     "nota": "Índice de consistencia aritmética",
     "notaInconclusiva": "No se pueden verificar reglas aritméticas en este recorte.",
-    "descricaoNota": "Porcentaje de actas evaluadas sin divergencias en las reglas aritméticas aplicables.",
-    "limiteNota": "La nota describe solo la consistencia aritmética observada. No estima una probabilidad ni certifica legitimidad.",
     "avaliadas": "Actas evaluadas",
     "consideradas": "Actas consideradas",
     "semDivergencia": "Sin divergencias",
     "comDivergencia": "Con divergencias",
     "cobertura": "Cobertura de la evaluación",
-    "metodoNota": "Cómo se calcula la nota",
-    "metodoNotaDescricao": "Cada acta cuenta una vez. Entra en el denominador cuando se puede verificar al menos una regla y en el numerador cuando ninguna regla verificable diverge. Los campos ausentes no se tratan como cero ni reducen la nota. La cobertura muestra cuántas actas pudieron evaluarse.",
     "historico": "Comparación entre elecciones",
-    "historicoDescricao": "Cada año, turno y código de elección aparece por separado. Las referencias usan actas activas en el corte final y contextualizan cambios; nunca entran en el recorte evaluado ni en su nota.",
-    "historicoIndisponivel": "Las referencias históricas solo se muestran en el corte final para comparar periodos equivalentes.",
     "semHistorico": "No hay otra elección comparable para este cargo y ámbito.",
     "selecioneUf": "Seleccione un estado para analizar los resultados de gobernador.",
     "alvo": "Recorte evaluado",
@@ -279,7 +264,6 @@
     "antesEmissao": "Recepción anterior a la emisión del acta",
     "medianaAtraso": "Mediana cierre → recepción (min)",
     "p90Atraso": "P90 cierre → recepción (min)",
-    "metodoRecebimento": "El retraso solo se calcula cuando tanto el cierre como la recepción incluyen fecha y hora. Los datos con solo fecha o sin recepción se excluyen y se muestran en la cobertura. La recepción anterior al cierre o a la emisión es una señal cronológica para revisar, no una prueba y no afecta la nota.",
     "analises": "Análisis complementarios",
     "mostrarAnalises": "Mostrar estadísticas y señales exploratorias",
     "ocultarAnalises": "Ocultar análisis complementarios"
