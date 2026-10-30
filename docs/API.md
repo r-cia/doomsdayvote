@@ -116,3 +116,48 @@ Parâmetros: `election_id`, `cargo`, `as_of` opcional, `uf` opcional, `municipio
 Quando `escopo=ano` e o ano tem dois turnos, devolve dois blocos lado a lado, sem somá-los.
 
 Cada bloco traz `comparecimento` (média, mediana e desvio padrão populacional dos `qt_comparecimento` por seção) e `candidatos` (para cada candidato nominal, média, mediana e desvio padrão populacional dos votos por seção). `secoes` é o número de seções do recorte; `secoes_com_voto` é o número de seções em que o candidato teve algum voto. Cache Redis TTL 300 s, cabeçalho `x-cache: hit|miss|off`.
+
+## `GET /api/sections/:id/versions`
+
+Histórico de versões do BU da seção. Retorna todas as versões com metadados, totais e votos por votável, além da comparação entre a versão ativa e a anterior imediata (ou a versão indicada em `comparar_com`).
+
+```json
+{
+  "corte": { "tipo": "final" },
+  "secao": { "id": "…", "sg_uf": "AC", "nr_zona": 9, "nr_secao": 1 },
+  "versoes": [
+    {
+      "versao": 1,
+      "ativo": true,
+      "substitui_versao_id": null,
+      "dt_geracao": "…",
+      "dt_abertura": "…",
+      "dt_encerramento": "…",
+      "dt_emissao_bu": "…",
+      "dt_bu_recebido_ts": "…",
+      "dt_bu_recebido_data": null,
+      "precisao": "DATA_HORA",
+      "qt_aptos": 100,
+      "qt_comparecimento": 80,
+      "qt_abstencoes": 20,
+      "qt_elei_biom_sem_habilitacao": 10,
+      "cd_tipo_urna": 1,
+      "ds_tipo_urna": "…",
+      "lote": { "id": "…", "nome_arquivo": "…", "sha256": "…" },
+      "conteudo_sha256": "…",
+      "imported_at": "…",
+      "resultados": [{ "nr_votavel": 13, "nm_votavel": "…", "qt_votos": 50 }]
+    }
+  ],
+  "comparacao": {
+    "anterior": 1,
+    "atual": 2,
+    "campos_alterados": [{ "campo": "qt_comparecimento", "anterior": 80, "atual": 81, "diferenca": 1 }],
+    "votaveis_alterados": [{ "nr_votavel": 13, "nm_votavel": "…", "anterior": 50, "atual": 51, "diferenca": 1 }],
+    "causa": null,
+    "observacao": "A ferramenta não presume a causa da diferença."
+  }
+}
+```
+
+Ausência de campo não é tratada como zero. A ferramenta não presume a causa da diferença entre versões.

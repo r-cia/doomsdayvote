@@ -53,5 +53,7 @@ export const api = {
   estatisticas: (params, signal) => obter('/estatisticas', params, signal),
   secao: (id, params, signal) =>
     obter(`/sections/${encodeURIComponent(id)}`, params, signal),
+  secaoVersoes: (id, params, signal) =>
+    obter(`/sections/${encodeURIComponent(id)}/versions`, params, signal),
   consistencia: (params, signal) => obter('/consistencia', params, signal),
 }
