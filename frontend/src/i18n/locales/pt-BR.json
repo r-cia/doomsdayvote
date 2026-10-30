@@ -94,7 +94,14 @@
     "votosPorEstado": "Votos por estado",
     "secoes": "Seções eleitorais",
     "semDadosUf": "Nenhuma UF com dados para os filtros atuais.",
-    "semDadosEstado": "Sem dados por estado para o corte atual."
+    "semDadosEstado": "Sem dados por estado para o corte atual.",
+    "nivel": "Nível do mapa",
+    "modoCor": "Modo de cor do mapa",
+    "municipios": "Municípios",
+    "lider": "Líder",
+    "percentual": "Percentual",
+    "selecioneUfMunicipios": "Selecione uma UF para ver municípios",
+    "malhaLocal": "Malha IBGE local."
   },
   "estatistica": {
     "titulo": "Estatística",
@@ -156,6 +163,28 @@
     "secoesGrupo": "Seções do grupo {level}",
     "secoesPorParticipacao": "Seções classificadas pela participação do líder",
     "secoesPorMargem": "Seções classificadas pela margem entre os dois primeiros"
+  },
+  "versoesBU": {
+    "titulo": "Versões do BU",
+    "versoes": "versões",
+    "ativa": "ativa",
+    "abertura": "Abertura",
+    "encerramento": "Encerramento",
+    "emissao": "Emissão",
+    "aptos": "Aptos",
+    "comparecimento": "Comparecimento",
+    "abstencoes": "Abstenções",
+    "lote": "Lote",
+    "hashConteudo": "SHA-256 conteúdo",
+    "comparacao": "Comparação v{previous} → v{current}",
+    "camposAlterados": "Campos alterados",
+    "campo": "Campo",
+    "anterior": "Anterior",
+    "atual": "Atual",
+    "diferenca": "Diferença",
+    "votaveisAlterados": "Votáveis alterados",
+    "numero": "Número",
+    "votavel": "Votável"
   },
   "biometria": {
     "titulo": "Biometria",

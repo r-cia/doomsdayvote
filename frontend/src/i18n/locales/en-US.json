@@ -94,7 +94,14 @@
     "votosPorEstado": "Votes by state",
     "secoes": "Polling sections",
     "semDadosUf": "No state with data for current filters.",
-    "semDadosEstado": "No data by state for current cutoff."
+    "semDadosEstado": "No data by state for current cutoff.",
+    "nivel": "Map level",
+    "modoCor": "Map color mode",
+    "municipios": "Municipalities",
+    "lider": "Leader",
+    "percentual": "Percentage",
+    "selecioneUfMunicipios": "Select a state to view municipalities",
+    "malhaLocal": "Local IBGE map layer."
   },
   "estatistica": {
     "titulo": "Statistics",
@@ -156,6 +163,28 @@
     "secoesGrupo": "Sections in the {level} group",
     "secoesPorParticipacao": "Sections ranked by the leader's share",
     "secoesPorMargem": "Sections ranked by the margin between the top two"
+  },
+  "versoesBU": {
+    "titulo": "BU versions",
+    "versoes": "versions",
+    "ativa": "active",
+    "abertura": "Opening",
+    "encerramento": "Closing",
+    "emissao": "Issued",
+    "aptos": "Eligible voters",
+    "comparecimento": "Turnout",
+    "abstencoes": "Abstentions",
+    "lote": "Batch",
+    "hashConteudo": "Content SHA-256",
+    "comparacao": "Comparison v{previous} → v{current}",
+    "camposAlterados": "Changed fields",
+    "campo": "Field",
+    "anterior": "Previous",
+    "atual": "Current",
+    "diferenca": "Difference",
+    "votaveisAlterados": "Changed voteables",
+    "numero": "Number",
+    "votavel": "Voteable"
   },
   "biometria": {
     "titulo": "Biometrics",

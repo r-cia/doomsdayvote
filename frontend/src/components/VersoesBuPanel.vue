@@ -17,8 +17,8 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
 <template>
   <section class="painel" aria-labelledby="versoes-titulo">
     <header class="painel__cabecalho">
-      <h2 id="versoes-titulo">Versões do BU</h2>
-      <p v-if="!loading && dados" class="painel__meta">{{ versoes.length }} versões</p>
+      <h2 id="versoes-titulo">{{ $t('versoesBU.titulo') }}</h2>
+      <p v-if="!loading && dados" class="painel__meta">{{ versoes.length }} {{ $t('versoesBU.versoes') }}</p>
     </header>
 
     <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
@@ -30,28 +30,28 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
       <ul class="versoes-lista">
         <li v-for="v in versoes" :key="v.id" class="versao-item">
           <div class="versao-item__topo">
-            <strong>Versão {{ v.versao }}</strong>
-            <span v-if="v.ativo" class="status status--ok">ativa</span>
+            <strong>{{ $t('versoesBU.titulo') }} {{ v.versao }}</strong>
+            <span v-if="v.ativo" class="status status--ok">{{ $t('versoesBU.ativa') }}</span>
           </div>
           <dl class="dados dados--linha">
-            <div><dt>Abertura</dt><dd>{{ formatarDataHora(v.dt_abertura) }}</dd></div>
-            <div><dt>Encerramento</dt><dd>{{ formatarDataHora(v.dt_encerramento) }}</dd></div>
-            <div><dt>Emissão</dt><dd>{{ formatarDataHora(v.dt_emissao_bu) }}</dd></div>
-            <div><dt>Aptos</dt><dd>{{ v.qt_aptos ?? '—' }}</dd></div>
-            <div><dt>Comparecimento</dt><dd>{{ v.qt_comparecimento ?? '—' }}</dd></div>
-            <div><dt>Abstenções</dt><dd>{{ v.qt_abstencoes ?? '—' }}</dd></div>
-            <div><dt>Lote</dt><dd>{{ v.lote?.nome_arquivo ?? '—' }}</dd></div>
-            <div><dt>SHA-256 conteúdo</dt><dd class="mono">{{ v.conteudo_sha256 ?? '—' }}</dd></div>
+            <div><dt>{{ $t('versoesBU.abertura') }}</dt><dd>{{ formatarDataHora(v.dt_abertura) }}</dd></div>
+            <div><dt>{{ $t('versoesBU.encerramento') }}</dt><dd>{{ formatarDataHora(v.dt_encerramento) }}</dd></div>
+            <div><dt>{{ $t('versoesBU.emissao') }}</dt><dd>{{ formatarDataHora(v.dt_emissao_bu) }}</dd></div>
+            <div><dt>{{ $t('versoesBU.aptos') }}</dt><dd>{{ v.qt_aptos ?? '—' }}</dd></div>
+            <div><dt>{{ $t('versoesBU.comparecimento') }}</dt><dd>{{ v.qt_comparecimento ?? '—' }}</dd></div>
+            <div><dt>{{ $t('versoesBU.abstencoes') }}</dt><dd>{{ v.qt_abstencoes ?? '—' }}</dd></div>
+            <div><dt>{{ $t('versoesBU.lote') }}</dt><dd>{{ v.lote?.nome_arquivo ?? '—' }}</dd></div>
+            <div><dt>{{ $t('versoesBU.hashConteudo') }}</dt><dd class="mono">{{ v.conteudo_sha256 ?? '—' }}</dd></div>
           </dl>
         </li>
       </ul>
 
       <div v-if="comparacao" class="comparacao">
-        <h3>Comparação v{{ comparacao.anterior }} → v{{ comparacao.atual }}</h3>
+        <h3>{{ $t('versoesBU.comparacao', { previous: comparacao.anterior, current: comparacao.atual }) }}</h3>
         <div v-if="comparacao.campos_alterados?.length">
-          <h4>Campos alterados</h4>
+          <h4>{{ $t('versoesBU.camposAlterados') }}</h4>
           <table>
-            <thead><tr><th>Campo</th><th>Anterior</th><th>Atual</th><th>Diferença</th></tr></thead>
+            <thead><tr><th>{{ $t('versoesBU.campo') }}</th><th>{{ $t('versoesBU.anterior') }}</th><th>{{ $t('versoesBU.atual') }}</th><th>{{ $t('versoesBU.diferenca') }}</th></tr></thead>
             <tbody>
               <tr v-for="(c, i) in comparacao.campos_alterados" :key="i">
                 <td>{{ c.campo }}</td>
@@ -63,9 +63,9 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
           </table>
         </div>
         <div v-if="comparacao.votaveis_alterados?.length">
-          <h4>Votáveis alterados</h4>
+          <h4>{{ $t('versoesBU.votaveisAlterados') }}</h4>
           <table>
-            <thead><tr><th>Número</th><th>Votável</th><th>Anterior</th><th>Atual</th><th>Diferença</th></tr></thead>
+            <thead><tr><th>{{ $t('versoesBU.numero') }}</th><th>{{ $t('versoesBU.votavel') }}</th><th>{{ $t('versoesBU.anterior') }}</th><th>{{ $t('versoesBU.atual') }}</th><th>{{ $t('versoesBU.diferenca') }}</th></tr></thead>
             <tbody>
               <tr v-for="(v, i) in comparacao.votaveis_alterados" :key="i">
                 <td>{{ v.nr_votavel }}</td>

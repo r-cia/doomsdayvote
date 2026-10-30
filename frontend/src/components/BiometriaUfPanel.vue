@@ -121,19 +121,19 @@ function seta(coluna) {
         <thead>
           <tr>
             <th scope="col" class="ordenavel" @click="alternar('sg_uf')">
-              {{ agruparRegiao ? 'Região' : 'UF' }}{{ seta('sg_uf') }}
+              {{ agruparRegiao ? $t('biometria.regiao') : $t('biometria.uf') }}{{ seta('sg_uf') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_habilitados_por_biometria')">
-              Votos com biometria{{ seta('qt_habilitados_por_biometria') }}
+              {{ $t('biometria.votosComBiometria') }}{{ seta('qt_habilitados_por_biometria') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_habilitada')">
-              % com biometria{{ seta('percentual_habilitada') }}
+              {{ $t('biometria.pctComBiometria') }}{{ seta('percentual_habilitada') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_biometria_nao_habilitada')">
-              Votos biometria não habilitada{{ seta('qt_biometria_nao_habilitada') }}
+              {{ $t('biometria.votosNaoHabilitada') }}{{ seta('qt_biometria_nao_habilitada') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_nao_habilitada')">
-              % não habilitada{{ seta('percentual_nao_habilitada') }}
+              {{ $t('biometria.pctNaoHabilitada') }}{{ seta('percentual_nao_habilitada') }}
             </th>
           </tr>
         </thead>

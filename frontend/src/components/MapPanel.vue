@@ -615,11 +615,11 @@ onBeforeUnmount(() => {
   <section class="card mapa-card" aria-labelledby="mapa-titulo">
     <div class="card__cabecalho mapa-card__cabecalho">
       <div>
-        <h2 id="mapa-titulo">Mapa</h2>
-        <p>Malha IBGE local.</p>
+        <h2 id="mapa-titulo">{{ $t('mapa.titulo') }}</h2>
+        <p>{{ $t('mapa.malhaLocal') }}</p>
       </div>
       <div class="mapa-controles">
-        <div class="segmented" role="group" aria-label="Nível do mapa">
+        <div class="segmented" role="group" :aria-label="$t('mapa.nivel')">
           <button
             type="button"
             :aria-pressed="nivel === 'uf'"
@@ -633,20 +633,20 @@ onBeforeUnmount(() => {
             :aria-pressed="nivel === 'municipio'"
             :class="{ ativo: nivel === 'municipio' }"
             :disabled="!uf"
-            :title="!uf ? 'Selecione uma UF para ver municípios' : undefined"
+            :title="!uf ? $t('mapa.selecioneUfMunicipios') : undefined"
             @click="$emit('update:level', 'municipio')"
           >
-            Municípios
+            {{ $t('mapa.municipios') }}
           </button>
         </div>
-        <div class="segmented" role="group" aria-label="Modo de cor do mapa">
+        <div class="segmented" role="group" :aria-label="$t('mapa.modoCor')">
           <button
             type="button"
             :aria-pressed="modo === 'lider'"
             :class="{ ativo: modo === 'lider' }"
             @click="$emit('update:mode', 'lider')"
           >
-            Líder
+            {{ $t('mapa.lider') }}
           </button>
           <button
             type="button"
@@ -654,7 +654,7 @@ onBeforeUnmount(() => {
             :class="{ ativo: modo === 'percentual' }"
             @click="$emit('update:mode', 'percentual')"
           >
-            Percentual
+            {{ $t('mapa.percentual') }}
           </button>
         </div>
       </div>
