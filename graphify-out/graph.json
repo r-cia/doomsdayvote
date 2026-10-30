@@ -1655,6 +1655,30 @@
       "source_location": "L147"
     },
     {
+      "id": "frontend_src_composables_queries_usemapa",
+      "label": "useMapa()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 13,
+      "community_name": "queries.js",
+      "file_type": "code",
+      "norm_label": "usemapa()",
+      "source_file": "frontend/src/composables/queries.js",
+      "source_location": "L177"
+    },
+    {
+      "id": "frontend_src_composables_queries_useresumo",
+      "label": "useResumo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 13,
+      "community_name": "queries.js",
+      "file_type": "code",
+      "norm_label": "useresumo()",
+      "source_file": "frontend/src/composables/queries.js",
+      "source_location": "L25"
+    },
+    {
       "id": "frontend_src_composables_queries_usesecao",
       "label": "useSecao()",
       "_callable": true,
@@ -1679,6 +1703,30 @@
       "source_location": "L394"
     },
     {
+      "id": "frontend_src_composables_queries_usesecoes",
+      "label": "useSecoes()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 13,
+      "community_name": "queries.js",
+      "file_type": "code",
+      "norm_label": "usesecoes()",
+      "source_file": "frontend/src/composables/queries.js",
+      "source_location": "L236"
+    },
+    {
+      "id": "frontend_src_composables_queries_usetimeline",
+      "label": "useTimeline()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 13,
+      "community_name": "queries.js",
+      "file_type": "code",
+      "norm_label": "usetimeline()",
+      "source_file": "frontend/src/composables/queries.js",
+      "source_location": "L52"
+    },
+    {
       "id": "frontend_src_stores_filters_cargopadrao",
       "label": "cargoPadrao()",
       "_callable": true,
@@ -1701,18 +1749,6 @@
       "norm_label": "cargospermitidos()",
       "source_file": "frontend/src/stores/filters.js",
       "source_location": "L6"
-    },
-    {
-      "id": "frontend_src_composables_queries_useresumo",
-      "label": "useResumo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "useresumo()",
-      "source_file": "frontend/src/composables/queries.js",
-      "source_location": "L25"
     },
     {
       "id": "frontend_src_i18n_index_definirlocale",
@@ -1835,16 +1871,16 @@
       "source_location": "L34"
     },
     {
-      "id": "frontend_src_components_comparacaolocalpanel_percentual",
-      "label": "percentual()",
+      "id": "frontend_src_components_analisecobertura_numero",
+      "label": "numero()",
       "_callable": true,
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
-      "norm_label": "percentual()",
-      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
-      "source_location": "L19"
+      "norm_label": "numero()",
+      "source_file": "frontend/src/components/AnaliseCobertura.vue",
+      "source_location": "L35"
     },
     {
       "id": "frontend_src_components_concentracaopanel_municipio",
@@ -1852,35 +1888,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "municipio()",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
       "source_location": "L35"
-    },
-    {
-      "id": "frontend_src_components_concentracaopanel_percentual",
-      "label": "percentual()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "formatarPercentual",
-      "file_type": "code",
-      "norm_label": "percentual()",
-      "source_file": "frontend/src/components/ConcentracaoPanel.vue",
-      "source_location": "L23"
-    },
-    {
-      "id": "frontend_src_components_concentracaopanel_percentualrazao",
-      "label": "percentualRazao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "formatarPercentual",
-      "file_type": "code",
-      "norm_label": "percentualrazao()",
-      "source_file": "frontend/src/components/ConcentracaoPanel.vue",
-      "source_location": "L18"
     },
     {
       "id": "frontend_src_components_concentracaopanel_pontospercentuais",
@@ -1888,23 +1900,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "pontospercentuais()",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
       "source_location": "L28"
     },
     {
-      "id": "frontend_src_lib_format_formatarpercentual",
-      "label": "formatarPercentual()",
+      "id": "frontend_src_lib_format_formatarnumero",
+      "label": "formatarNumero()",
       "_callable": true,
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
-      "norm_label": "formatarpercentual()",
+      "norm_label": "formatarnumero()",
       "source_file": "frontend/src/lib/format.js",
-      "source_location": "L27"
+      "source_location": "L21"
     },
     {
       "id": "backend_src_env_loadworkerenv",
@@ -2157,18 +2169,6 @@
       "norm_label": "siglatemcor()",
       "source_file": "frontend/src/lib/colors.js",
       "source_location": "L62"
-    },
-    {
-      "id": "frontend_src_composables_queries_usesecoes",
-      "label": "useSecoes()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "MapaView.vue",
-      "file_type": "code",
-      "norm_label": "usesecoes()",
-      "source_file": "frontend/src/composables/queries.js",
-      "source_location": "L236"
     },
     {
       "id": "frontend_src_views_mapaview_abrirsecao",
@@ -2456,7 +2456,7 @@
       "file_type": "code",
       "norm_label": "erromensagem()",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L36"
+      "source_location": "L35"
     },
     {
       "id": "frontend_src_components_estatisticapanel_inteiro",
@@ -2468,7 +2468,7 @@
       "file_type": "code",
       "norm_label": "inteiro()",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L31"
+      "source_location": "L30"
     },
     {
       "id": "frontend_src_components_estatisticapanel_numero",
@@ -2480,7 +2480,7 @@
       "file_type": "code",
       "norm_label": "numero()",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L24"
+      "source_location": "L23"
     },
     {
       "id": "backend_tests_helpers_fixtures_caminhofixture",
@@ -2541,30 +2541,6 @@
       "norm_label": "importar()",
       "source_file": "backend/tests/integration/regressao-apuracao.test.js",
       "source_location": "L24"
-    },
-    {
-      "id": "frontend_src_composables_queries_usemapa",
-      "label": "useMapa()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "PainelView.vue",
-      "file_type": "code",
-      "norm_label": "usemapa()",
-      "source_file": "frontend/src/composables/queries.js",
-      "source_location": "L177"
-    },
-    {
-      "id": "frontend_src_composables_queries_usetimeline",
-      "label": "useTimeline()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "PainelView.vue",
-      "file_type": "code",
-      "norm_label": "usetimeline()",
-      "source_file": "frontend/src/composables/queries.js",
-      "source_location": "L52"
     },
     {
       "id": "frontend_src_lib_agregacoes_candidatosnominais",
@@ -2747,24 +2723,12 @@
       "source_location": "L8"
     },
     {
-      "id": "frontend_src_components_analisecobertura_numero",
-      "label": "numero()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "formatarNumero",
-      "file_type": "code",
-      "norm_label": "numero()",
-      "source_file": "frontend/src/components/AnaliseCobertura.vue",
-      "source_location": "L35"
-    },
-    {
       "id": "frontend_src_components_comparacaolocalpanel_municipio",
       "label": "municipio()",
       "_callable": true,
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "municipio()",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
@@ -2776,11 +2740,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "nivel()",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
       "source_location": "L35"
+    },
+    {
+      "id": "frontend_src_components_comparacaolocalpanel_percentual",
+      "label": "percentual()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "percentual()",
+      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
+      "source_location": "L19"
     },
     {
       "id": "frontend_src_components_comparacaolocalpanel_pontospercentuais",
@@ -2788,23 +2764,47 @@
       "_callable": true,
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "pontospercentuais()",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
       "source_location": "L24"
     },
     {
-      "id": "frontend_src_lib_format_formatarnumero",
-      "label": "formatarNumero()",
+      "id": "frontend_src_components_concentracaopanel_percentual",
+      "label": "percentual()",
       "_callable": true,
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
-      "norm_label": "formatarnumero()",
+      "norm_label": "percentual()",
+      "source_file": "frontend/src/components/ConcentracaoPanel.vue",
+      "source_location": "L23"
+    },
+    {
+      "id": "frontend_src_components_concentracaopanel_percentualrazao",
+      "label": "percentualRazao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "percentualrazao()",
+      "source_file": "frontend/src/components/ConcentracaoPanel.vue",
+      "source_location": "L18"
+    },
+    {
+      "id": "frontend_src_lib_format_formatarpercentual",
+      "label": "formatarPercentual()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "formatarpercentual()",
       "source_file": "frontend/src/lib/format.js",
-      "source_location": "L21"
+      "source_location": "L27"
     },
     {
       "id": "frontend_src_components_biometriaufpanel_alternar",
@@ -2961,6 +2961,18 @@
       "norm_label": "opcoesstatus()",
       "source_file": "frontend/src/lib/status.js",
       "source_location": "L75"
+    },
+    {
+      "id": "frontend_src_lib_status_statussecao",
+      "label": "statusSecao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "status.js",
+      "file_type": "code",
+      "norm_label": "statussecao()",
+      "source_file": "frontend/src/lib/status.js",
+      "source_location": "L38"
     },
     {
       "id": "frontend_src_components_ufpanel_alternar",
@@ -4859,6 +4871,18 @@
       "source_location": "L3"
     },
     {
+      "id": "frontend_src_lib_status_motivosecao",
+      "label": "motivoSecao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "motivoSecao",
+      "file_type": "code",
+      "norm_label": "motivosecao()",
+      "source_file": "frontend/src/lib/status.js",
+      "source_location": "L48"
+    },
+    {
       "id": "backend_tests_integration_comparacao_local_test_importar",
       "label": "importar()",
       "_callable": true,
@@ -4869,30 +4893,6 @@
       "norm_label": "importar()",
       "source_file": "backend/tests/integration/comparacao-local.test.js",
       "source_location": "L26"
-    },
-    {
-      "id": "frontend_src_lib_status_motivosecao",
-      "label": "motivoSecao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "SecaoView.vue",
-      "file_type": "code",
-      "norm_label": "motivosecao()",
-      "source_file": "frontend/src/lib/status.js",
-      "source_location": "L48"
-    },
-    {
-      "id": "frontend_src_lib_status_statussecao",
-      "label": "statusSecao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "SecaoView.vue",
-      "file_type": "code",
-      "norm_label": "statussecao()",
-      "source_file": "frontend/src/lib/status.js",
-      "source_location": "L38"
     },
     {
       "id": "frontend_src_views_secaoview_fechar",
@@ -7007,6 +7007,17 @@
       "source_location": "L1"
     },
     {
+      "id": "frontend_src_app_candidatos",
+      "label": "candidatos",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "App.vue",
+      "file_type": "code",
+      "norm_label": "candidatos",
+      "source_file": "frontend/src/App.vue",
+      "source_location": "L30"
+    },
+    {
       "id": "frontend_src_app_eleicoesquery_eleicoesdisponiveis_cargos_anos_turnos_filtros_aocargo_aoano_aoturno_aocandidato_aocorte_aouf_limparmunicipio_limpar",
       "label": "{\n  eleicoesQuery,\n  eleicoesDisponiveis,\n  cargos,\n  anos,\n  turnos,\n  filtros,\n  aoCargo,\n  aoAno,\n  aoTurno,\n  aoCandidato,\n  aoCorte,\n  aoUf,\n  limparMunicipio,\n  limpar,\n}",
       "_origin": "ast",
@@ -7238,11 +7249,77 @@
       "source_location": "L83"
     },
     {
+      "id": "frontend_src_components_analisecobertura",
+      "label": "AnaliseCobertura.vue",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "formatarNumero",
+      "file_type": "code",
+      "norm_label": "analisecobertura.vue",
+      "source_file": "frontend/src/components/AnaliseCobertura.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_analisecobertura_campos",
+      "label": "campos",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "formatarNumero",
+      "file_type": "code",
+      "norm_label": "campos",
+      "source_file": "frontend/src/components/AnaliseCobertura.vue",
+      "source_location": "L13"
+    },
+    {
+      "id": "frontend_src_components_analisecobertura_camposausentes",
+      "label": "camposAusentes",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "formatarNumero",
+      "file_type": "code",
+      "norm_label": "camposausentes",
+      "source_file": "frontend/src/components/AnaliseCobertura.vue",
+      "source_location": "L32"
+    },
+    {
+      "id": "frontend_src_components_analisecobertura_camposnaoinformados",
+      "label": "camposNaoInformados",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "formatarNumero",
+      "file_type": "code",
+      "norm_label": "camposnaoinformados",
+      "source_file": "frontend/src/components/AnaliseCobertura.vue",
+      "source_location": "L33"
+    },
+    {
+      "id": "frontend_src_components_analisecobertura_props",
+      "label": "props",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "formatarNumero",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "frontend/src/components/AnaliseCobertura.vue",
+      "source_location": "L6"
+    },
+    {
+      "id": "frontend_src_components_analisecobertura_t",
+      "label": "{ t }",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "formatarNumero",
+      "file_type": "code",
+      "norm_label": "{ t }",
+      "source_file": "frontend/src/components/AnaliseCobertura.vue",
+      "source_location": "L11"
+    },
+    {
       "id": "frontend_src_components_concentracaopanel",
       "label": "ConcentracaoPanel.vue",
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "concentracaopanel.vue",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -7253,7 +7330,7 @@
       "label": "cobertura",
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "cobertura",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -7264,7 +7341,7 @@
       "label": "emit",
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "emit",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -7275,7 +7352,7 @@
       "label": "props",
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "props",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -7286,7 +7363,7 @@
       "label": "topMargem",
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "topmargem",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -7297,7 +7374,7 @@
       "label": "topShare",
       "_origin": "ast",
       "community": 16,
-      "community_name": "formatarPercentual",
+      "community_name": "formatarNumero",
       "file_type": "code",
       "norm_label": "topshare",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -7361,7 +7438,7 @@
       "node_kind": "heading",
       "norm_label": "validacao",
       "source_file": "docs/current-plan.md",
-      "source_location": "L16"
+      "source_location": "L17"
     },
     {
       "id": "backend_src_scripts_cores_pendentes",
@@ -8663,7 +8740,7 @@
       "file_type": "code",
       "norm_label": "blocos",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L22"
+      "source_location": "L21"
     },
     {
       "id": "frontend_src_components_estatisticapanel_escopo",
@@ -8674,7 +8751,7 @@
       "file_type": "code",
       "norm_label": "escopo",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L15"
+      "source_location": "L14"
     },
     {
       "id": "frontend_src_components_estatisticapanel_estatisticasquery",
@@ -8685,7 +8762,7 @@
       "file_type": "code",
       "norm_label": "estatisticasquery",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L16"
+      "source_location": "L15"
     },
     {
       "id": "frontend_src_components_estatisticapanel_locale",
@@ -8696,7 +8773,7 @@
       "file_type": "code",
       "norm_label": "{ locale }",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L14"
+      "source_location": "L13"
     },
     {
       "id": "frontend_src_components_estatisticapanel_props",
@@ -8707,7 +8784,7 @@
       "file_type": "code",
       "norm_label": "props",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L9"
+      "source_location": "L8"
     },
     {
       "id": "frontend_src_components_estatisticapanel_temdoisturnos",
@@ -8718,7 +8795,7 @@
       "file_type": "code",
       "norm_label": "temdoisturnos",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L18"
+      "source_location": "L17"
     },
     {
       "id": "backend_tests_integration_api_test",
@@ -8774,17 +8851,6 @@
       "norm_label": "db",
       "source_file": "backend/tests/integration/progresso.test.js",
       "source_location": "L16"
-    },
-    {
-      "id": "frontend_src_app_candidatos",
-      "label": "candidatos",
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "PainelView.vue",
-      "file_type": "code",
-      "norm_label": "candidatos",
-      "source_file": "frontend/src/App.vue",
-      "source_location": "L30"
     },
     {
       "id": "frontend_src_components_ufpanel_votosuf",
@@ -9594,77 +9660,11 @@
       "source_location": "L1"
     },
     {
-      "id": "frontend_src_components_analisecobertura",
-      "label": "AnaliseCobertura.vue",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "formatarNumero",
-      "file_type": "code",
-      "norm_label": "analisecobertura.vue",
-      "source_file": "frontend/src/components/AnaliseCobertura.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_analisecobertura_campos",
-      "label": "campos",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "formatarNumero",
-      "file_type": "code",
-      "norm_label": "campos",
-      "source_file": "frontend/src/components/AnaliseCobertura.vue",
-      "source_location": "L13"
-    },
-    {
-      "id": "frontend_src_components_analisecobertura_camposausentes",
-      "label": "camposAusentes",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "formatarNumero",
-      "file_type": "code",
-      "norm_label": "camposausentes",
-      "source_file": "frontend/src/components/AnaliseCobertura.vue",
-      "source_location": "L32"
-    },
-    {
-      "id": "frontend_src_components_analisecobertura_camposnaoinformados",
-      "label": "camposNaoInformados",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "formatarNumero",
-      "file_type": "code",
-      "norm_label": "camposnaoinformados",
-      "source_file": "frontend/src/components/AnaliseCobertura.vue",
-      "source_location": "L33"
-    },
-    {
-      "id": "frontend_src_components_analisecobertura_props",
-      "label": "props",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "formatarNumero",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "frontend/src/components/AnaliseCobertura.vue",
-      "source_location": "L6"
-    },
-    {
-      "id": "frontend_src_components_analisecobertura_t",
-      "label": "{ t }",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "formatarNumero",
-      "file_type": "code",
-      "norm_label": "{ t }",
-      "source_file": "frontend/src/components/AnaliseCobertura.vue",
-      "source_location": "L11"
-    },
-    {
       "id": "frontend_src_components_comparacaolocalpanel",
       "label": "ComparacaoLocalPanel.vue",
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "comparacaolocalpanel.vue",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
@@ -9675,7 +9675,7 @@
       "label": "cobertura",
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "cobertura",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
@@ -9686,7 +9686,7 @@
       "label": "emit",
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "emit",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
@@ -9697,7 +9697,7 @@
       "label": "grupos",
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "grupos",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
@@ -9708,7 +9708,7 @@
       "label": "props",
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "props",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
@@ -9719,11 +9719,66 @@
       "label": "{ t }",
       "_origin": "ast",
       "community": 31,
-      "community_name": "formatarNumero",
+      "community_name": "formatarPercentual",
       "file_type": "code",
       "norm_label": "{ t }",
       "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
       "source_location": "L14"
+    },
+    {
+      "id": "frontend_src_components_kpicards",
+      "label": "KpiCards.vue",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "kpicards.vue",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_kpicards_participacao",
+      "label": "participacao",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "participacao",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L26"
+    },
+    {
+      "id": "frontend_src_components_kpicards_percentualdocandidato",
+      "label": "percentualDoCandidato",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "percentualdocandidato",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L21"
+    },
+    {
+      "id": "frontend_src_components_kpicards_props",
+      "label": "props",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L6"
+    },
+    {
+      "id": "frontend_src_components_kpicards_votosdocandidato",
+      "label": "votosDoCandidato",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "formatarPercentual",
+      "file_type": "code",
+      "norm_label": "votosdocandidato",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L13"
     },
     {
       "id": "frontend_src_components_biometriaufpanel",
@@ -10120,6 +10175,17 @@
       "norm_label": "status_secao",
       "source_file": "frontend/src/lib/status.js",
       "source_location": "L14"
+    },
+    {
+      "id": "frontend_src_views_secaoview_statusinfo",
+      "label": "statusInfo",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "status.js",
+      "file_type": "code",
+      "norm_label": "statusinfo",
+      "source_file": "frontend/src/views/SecaoView.vue",
+      "source_location": "L59"
     },
     {
       "id": "frontend_src_components_ufpanel",
@@ -12059,59 +12125,15 @@
       "source_location": "L1"
     },
     {
-      "id": "frontend_src_components_kpicards",
-      "label": "KpiCards.vue",
+      "id": "frontend_src_views_secaoview_motivo",
+      "label": "motivo",
       "_origin": "ast",
       "community": 58,
-      "community_name": "KpiCards.vue",
+      "community_name": "motivoSecao",
       "file_type": "code",
-      "norm_label": "kpicards.vue",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_kpicards_participacao",
-      "label": "participacao",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "KpiCards.vue",
-      "file_type": "code",
-      "norm_label": "participacao",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L26"
-    },
-    {
-      "id": "frontend_src_components_kpicards_percentualdocandidato",
-      "label": "percentualDoCandidato",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "KpiCards.vue",
-      "file_type": "code",
-      "norm_label": "percentualdocandidato",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L21"
-    },
-    {
-      "id": "frontend_src_components_kpicards_props",
-      "label": "props",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "KpiCards.vue",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L6"
-    },
-    {
-      "id": "frontend_src_components_kpicards_votosdocandidato",
-      "label": "votosDoCandidato",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "KpiCards.vue",
-      "file_type": "code",
-      "norm_label": "votosdocandidato",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L13"
+      "norm_label": "motivo",
+      "source_file": "frontend/src/views/SecaoView.vue",
+      "source_location": "L60"
     },
     {
       "id": "backend_tests_integration_comparacao_local_test",
@@ -12235,17 +12257,6 @@
       "source_location": "L56"
     },
     {
-      "id": "frontend_src_views_secaoview_motivo",
-      "label": "motivo",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "SecaoView.vue",
-      "file_type": "code",
-      "norm_label": "motivo",
-      "source_file": "frontend/src/views/SecaoView.vue",
-      "source_location": "L60"
-    },
-    {
       "id": "frontend_src_views_secaoview_props",
       "label": "props",
       "_origin": "ast",
@@ -12310,17 +12321,6 @@
       "norm_label": "status",
       "source_file": "frontend/src/views/SecaoView.vue",
       "source_location": "L58"
-    },
-    {
-      "id": "frontend_src_views_secaoview_statusinfo",
-      "label": "statusInfo",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "SecaoView.vue",
-      "file_type": "code",
-      "norm_label": "statusinfo",
-      "source_file": "frontend/src/views/SecaoView.vue",
-      "source_location": "L59"
     },
     {
       "id": "frontend_src_views_secaoview_store",
@@ -12971,7 +12971,7 @@
       "node_kind": "heading",
       "norm_label": "fluxo de analise",
       "source_file": "docs/architecture.md",
-      "source_location": "L22"
+      "source_location": "L23"
     },
     {
       "id": "docs_architecture_frontend",
@@ -16963,7 +16963,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L33",
+      "source_location": "L32",
       "weight": 1.0
     },
     {
@@ -22597,7 +22597,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L6",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -22609,7 +22609,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L7",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -27126,7 +27126,7 @@
     },
     {
       "source": "frontend_src_components_estatisticapanel",
-      "target": "frontend_src_components_coberturablock",
+      "target": "frontend_src_composables_queries",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -27138,18 +27138,6 @@
     },
     {
       "source": "frontend_src_components_estatisticapanel",
-      "target": "frontend_src_composables_queries",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "frontend_src_components_estatisticapanel",
       "target": "frontend_src_lib_format",
       "relation": "imports_from",
       "_origin": "ast",
@@ -27157,7 +27145,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L7",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -33462,7 +33450,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/architecture.md",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -33627,7 +33615,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -34848,7 +34836,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -34859,7 +34847,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L15",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -34870,7 +34858,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L16",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -34881,7 +34869,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L18",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -34892,7 +34880,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L22",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -34903,7 +34891,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L24",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -34914,7 +34902,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L31",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -34925,7 +34913,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L36",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -34936,7 +34924,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/components/EstatisticaPanel.vue",
-      "source_location": "L9",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -39548,5 +39536,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "8ef895832ceaaa3d2c45105e1380fb56a1b10fb3"
+  "built_at_commit": "9ccde711126a545447dc99f55692dfe3503a4600"
 }

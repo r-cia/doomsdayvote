@@ -690,9 +690,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/EstatisticaPanel.vue": {
-    "mtime": 1793374827.9329448,
-    "seen": 1793375068.5091739,
-    "ast_hash": "e5b939015c77e75a7e99d40536b69251",
+    "mtime": 1793376189.2865376,
+    "seen": 1793376202.3099134,
+    "ast_hash": "c1725b841cf918be1bb75aaa9400972f",
     "semantic_hash": ""
   },
   "frontend/src/components/FilterBar.vue": {
@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793375731.6842473,
-    "seen": 1793375745.983217,
-    "ast_hash": "9013edcf5205a942d144e910447c4c29",
+    "mtime": 1793376006.0455024,
+    "seen": 1793376202.3101845,
+    "ast_hash": "d8ce8b6b78f6d0cc7287bed1a885c0cc",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793375731.6832473,
-    "seen": 1793375745.983205,
-    "ast_hash": "de80f37bd948a63b742559515f8dba59",
+    "mtime": 1793376006.0455024,
+    "seen": 1793376202.310154,
+    "ast_hash": "e0254c27901bfac9df9df4215eb0da59",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
