@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/corte.js": {
-    "mtime": 1793248014.4444149,
-    "seen": 1793360126.8218122,
-    "ast_hash": "66451d7ea72eb54c84f84b20efd6568c",
+    "mtime": 1793371862.4649844,
+    "seen": 1793371925.757938,
+    "ast_hash": "993827c6c84410ee65e67bccf5254bd2",
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/progresso.js": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793371717.2554984,
-    "seen": 1793371758.9624856,
-    "ast_hash": "f1d2cbd9217df89ca91e81b3862c760b",
+    "mtime": 1793371893.956307,
+    "seen": 1793371925.758027,
+    "ast_hash": "e8ced98c426653857067e276e16868fa",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
