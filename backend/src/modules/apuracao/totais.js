@@ -142,6 +142,18 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
       cor_hex: linha.cor_hex,
       qt_votos: linha.qt_votos,
     }));
+    const agregadas = new Map();
+    for (const linha of linhas) {
+      const area = nivel === 'uf' ? linha.sg_uf : linha.cd_municipio_tse;
+      const chave = `${area}|${linha.nr_votavel}|${linha.categoria}`;
+      const atual = agregadas.get(chave);
+      if (atual) {
+        atual.qt_votos += Number(linha.qt_votos);
+      } else {
+        agregadas.set(chave, { ...linha, qt_votos: Number(linha.qt_votos) });
+      }
+    }
+    linhas = [...agregadas.values()];
   } else {
     const coluna = nivel === 'uf' ? 's.sg_uf' : 's.cd_municipio_tse';
     linhas = await base(db, { eleicaoId, cargo, corte, escopo: sgUf ? { sgUf } : {} })
