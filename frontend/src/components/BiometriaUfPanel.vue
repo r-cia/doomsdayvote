@@ -1,16 +1,96 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Array, default: () => [] },
 })
 
-const linhas = computed(() =>
-  [...(props.dados ?? [])].sort((a, b) =>
-    (a.sg_uf ?? '').localeCompare(b.sg_uf ?? ''),
-  ),
-)
+const REGIAO = {
+  AC: 'Norte', AM: 'Norte', AP: 'Norte', PA: 'Norte', RO: 'Norte', RR: 'Norte', TO: 'Norte',
+  AL: 'Nordeste', BA: 'Nordeste', CE: 'Nordeste', MA: 'Nordeste', PB: 'Nordeste',
+  PE: 'Nordeste', PI: 'Nordeste', RN: 'Nordeste', SE: 'Nordeste',
+  DF: 'Centro-Oeste', GO: 'Centro-Oeste', MS: 'Centro-Oeste', MT: 'Centro-Oeste',
+  ES: 'Sudeste', MG: 'Sudeste', RJ: 'Sudeste', SP: 'Sudeste',
+  PR: 'Sul', RS: 'Sul', SC: 'Sul',
+}
+
+const agruparRegiao = ref(false)
+const ordenacao = ref({ coluna: 'sg_uf', direcao: 'asc' })
+
+function alternar(coluna) {
+  if (ordenacao.value.coluna === coluna) {
+    ordenacao.value = {
+      coluna,
+      direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc',
+    }
+  } else {
+    ordenacao.value = { coluna, direcao: 'asc' }
+  }
+}
+
+const base = computed(() => [...(props.dados ?? [])])
+
+const agregado = computed(() => {
+  if (!agruparRegiao.value) return base.value
+  const mapa = new Map()
+  for (const linha of base.value) {
+    const regiao = REGIAO[linha.sg_uf] ?? linha.sg_uf
+    if (!mapa.has(regiao)) {
+      mapa.set(regiao, {
+        sg_uf: regiao,
+        qt_habilitados_por_biometria: 0,
+        qt_biometria_nao_habilitada: 0,
+        qt_comparecimento: 0,
+      })
+    }
+    const acc = mapa.get(regiao)
+    acc.qt_habilitados_por_biometria += Number(linha.qt_habilitados_por_biometria ?? 0)
+    acc.qt_biometria_nao_habilitada += Number(linha.qt_biometria_nao_habilitada ?? 0)
+    acc.qt_comparecimento += Number(linha.qt_comparecimento ?? 0)
+  }
+  return [...mapa.values()].map((item) => ({
+    ...item,
+    percentual_habilitada:
+      item.qt_comparecimento > 0
+        ? (item.qt_habilitados_por_biometria / item.qt_comparecimento) * 100
+        : null,
+    percentual_nao_habilitada:
+      item.qt_comparecimento > 0
+        ? (item.qt_biometria_nao_habilitada / item.qt_comparecimento) * 100
+        : null,
+  }))
+})
+
+function valor(linha, coluna) {
+  if (coluna === 'sg_uf') return linha.sg_uf ?? ''
+  if (coluna === 'qt_habilitados_por_biometria') return Number(linha.qt_habilitados_por_biometria ?? 0)
+  if (coluna === 'percentual_habilitada') return Number(linha.percentual_habilitada ?? 0)
+  if (coluna === 'qt_biometria_nao_habilitada') return Number(linha.qt_biometria_nao_habilitada ?? 0)
+  if (coluna === 'percentual_nao_habilitada') return Number(linha.percentual_nao_habilitada ?? 0)
+  return 0
+}
+
+const linhas = computed(() => {
+  const lista = [...agregado.value]
+  const { coluna, direcao } = ordenacao.value
+  lista.sort((a, b) => {
+    const va = valor(a, coluna)
+    const vb = valor(b, coluna)
+    if (typeof va === 'string' || typeof vb === 'string') {
+      return direcao === 'asc'
+        ? String(va).localeCompare(String(vb))
+        : String(vb).localeCompare(String(va))
+    }
+    return direcao === 'asc' ? va - vb : vb - va
+  })
+  return lista
+})
+
+function seta(coluna) {
+  if (ordenacao.value.coluna !== coluna) return ''
+  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
+}
 </script>
 
 <template>
@@ -20,6 +100,12 @@ const linhas = computed(() =>
         <p class="painel__etiqueta">Biometria</p>
         <h2 id="biometria-uf-titulo">Biometria por estado</h2>
       </div>
+      <div class="estatistica-controle">
+        <label class="campo campo--curto">
+          <span class="campo__rotulo">Agrupar por região</span>
+          <input type="checkbox" v-model="agruparRegiao" />
+        </label>
+      </div>
     </header>
 
     <div v-if="linhas.length === 0" class="vazio">Sem dados de biometria.</div>
@@ -28,11 +114,21 @@ const linhas = computed(() =>
       <table class="tabela">
         <thead>
           <tr>
-            <th scope="col">UF</th>
-            <th scope="col" class="tabela__numero">Votos com biometria</th>
-            <th scope="col" class="tabela__numero">% com biometria</th>
-            <th scope="col" class="tabela__numero">Votos biometria não habilitada</th>
-            <th scope="col" class="tabela__numero">% não habilitada</th>
+            <th scope="col" class="ordenavel" @click="alternar('sg_uf')">
+              {{ agruparRegiao ? 'Região' : 'UF' }}{{ seta('sg_uf') }}
+            </th>
+            <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_habilitados_por_biometria')">
+              Votos com biometria{{ seta('qt_habilitados_por_biometria') }}
+            </th>
+            <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_habilitada')">
+              % com biometria{{ seta('percentual_habilitada') }}
+            </th>
+            <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_biometria_nao_habilitada')">
+              Votos biometria não habilitada{{ seta('qt_biometria_nao_habilitada') }}
+            </th>
+            <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_nao_habilitada')">
+              % não habilitada{{ seta('percentual_nao_habilitada') }}
+            </th>
           </tr>
         </thead>
         <tbody>
