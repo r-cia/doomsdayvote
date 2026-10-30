@@ -16,6 +16,18 @@ const emit = defineEmits(['select'])
 const candidatos = computed(() => candidatosNominais(props.votos))
 const validos = computed(() => votosValidos(props.votos))
 
+const validosAte1715 = computed(() =>
+  (props.votos ?? [])
+    .filter((v) => v.categoria === 'nominal' || v.categoria === 'legenda')
+    .reduce((t, v) => t + Number(v.qt_votos_ate_1715 ?? 0), 0),
+)
+
+const validosTardios = computed(() =>
+  (props.votos ?? [])
+    .filter((v) => v.categoria === 'nominal' || v.categoria === 'legenda')
+    .reduce((t, v) => t + Number(v.qt_votos_tardios ?? 0), 0),
+)
+
 const deltas = computed(() => {
   const mapa = new Map()
   const alvo = props.corte ? new Date(props.corte).getTime() : Infinity
@@ -58,8 +70,12 @@ function escolher(candidato) {
       <span>#</span>
       <span>partido</span>
       <span>candidato</span>
-      <span class="num">votos</span>
-      <span class="num">% válidos</span>
+      <span class="num">Total</span>
+      <span class="num">% Válidos total</span>
+      <span class="num">Votos</span>
+      <span class="num">% Válidos</span>
+      <span class="num">Tardios</span>
+      <span class="num">% Válidos Tardios</span>
       <span class="num">Δ corte</span>
     </div>
 
@@ -85,6 +101,10 @@ function escolher(candidato) {
         <span class="placar__nome">{{ candidato.nm_votavel }}</span>
         <span class="placar__votos">{{ formatarNumero(candidato.qt_votos) }}</span>
         <span class="placar__percentual">{{ formatarPercentual(candidato.percentual) }}</span>
+        <span class="placar__votos">{{ formatarNumero(candidato.qt_votos_ate_1715) }}</span>
+        <span class="placar__percentual">{{ formatarPercentual(validosAte1715 > 0 ? (Number(candidato.qt_votos_ate_1715) / validosAte1715) * 100 : null) }}</span>
+        <span class="placar__votos">{{ formatarNumero(candidato.qt_votos_tardios) }}</span>
+        <span class="placar__percentual">{{ formatarPercentual(validosTardios > 0 ? (Number(candidato.qt_votos_tardios) / validosTardios) * 100 : null) }}</span>
         <span
           class="placar__delta"
           :class="deltas.has(candidato.nr_votavel) ? 'placar__delta--novo' : ''"
