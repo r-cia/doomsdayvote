@@ -375,14 +375,6 @@ export function concentracaoPura(entrada, opcoes = {}) {
 
   const comContexto = secoesFinais.filter((s) => s.contexto?.estado === 'ok').length;
 
-  const limitacoes = [
-    'Concentração calculada a partir do BU ativo no corte selecionado.',
-    'Votos válidos = nominal + legenda; ausência de campo não é tratada como zero.',
-    'Contexto por grupo comparável (local, zona ou município) com controle de escala por aptos; fallback por faixa de aptos quando a amostra for insuficiente.',
-    'Seções com menos de dois candidatos não possuem margem para o segundo colocado.',
-    'A ferramenta não define limiares de alerta; os resultados são descritivos.',
-  ];
-
   const resultado = {
     secoes: secoesFinais,
     grupos: gruposComp.grupos ?? [],
@@ -401,7 +393,6 @@ export function concentracaoPura(entrada, opcoes = {}) {
         (gruposComp.grupos ?? []).filter((g) => g.dados_insuficientes).length,
       faixas_aptos: faixasUtilizadas,
     },
-    limitacoes,
     total: secoesFinais.length,
     top: topN,
     top_n: topN,

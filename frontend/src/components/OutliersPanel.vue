@@ -28,9 +28,6 @@ function score(valor) {
         <b>{{ dados?.total_secoes ?? 0 }}</b> seções · amostra LOF {{ parametros.lof?.amostra ?? dados?.lof?.amostra ?? 0 }}
         <template v-if="parametros.lof?.limitado ?? dados?.lof?.limitado"> (limitada)</template>
       </p>
-      <p class="painel__meta">
-        Features: {{ (dados?.features ?? []).join(', ') }}
-      </p>
     </header>
 
     <div v-if="secoes.length === 0" class="vazio">

@@ -98,7 +98,6 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
             </tbody>
           </table>
         </div>
-        <p class="observacao">{{ comparacao.observacao }}</p>
       </div>
       <p v-else class="vazio">{{ $t('comum.semVersaoAnterior') }}</p>
     </div>

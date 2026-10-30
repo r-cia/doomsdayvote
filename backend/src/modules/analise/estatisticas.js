@@ -222,9 +222,6 @@ export function benfordDosNiveis(linhas, minimoVotos = MINIMO_VOTOS_BENFORD) {
   return {
     minimo_votos: minimoVotos,
     candidatos,
-    status_metodologico: 'em_validacao',
-    observacao:
-      'Leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
   }
 }
 

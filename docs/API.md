@@ -109,37 +109,34 @@ Duas leituras no recorte e no corte atuais.
   },
   "benford": {
     "minimo_votos": 10,
-    "candidatos": [{ "nr_votavel": 13, "nm_votavel": "…", "sg_partido": "PT", "total_votos": 0, "n": 17520, "secoes_abaixo_minimo": 8, "mad": 0.0881, "digitos": [{ "digito": 1, "observado": 0, "observado_percentual": 0, "esperado_percentual": 30.103 }] }],
-    "status_metodologico": "em_validacao",
-    "observacao": "Leitura exploratória, sem rótulo de conformidade; metodologia em validação."
+    "candidatos": [{ "nr_votavel": 13, "nm_votavel": "…", "sg_partido": "PT", "total_votos": 0, "n": 17520, "secoes_abaixo_minimo": 8, "mad": 0.0881, "digitos": [{ "digito": 1, "observado": 0, "observado_percentual": 0, "esperado_percentual": 30.103 }] }]
   }
 }
 ```
 
 `qt_habilitados_por_biometria` é `qt_comparecimento − qt_biometria_nao_habilitada`. O campo `QT_ELEI_BIOM_SEM_HABILITACAO` do BU conta eleitores **com** biometria que não foram habilitados por ela; não há biometria por candidato e a API não rateia.
 
-Benford usa o primeiro dígito dos votos por seção com 10 votos ou mais, a distribuição esperada `log10(1 + 1/d)` e o MAD de Nigrini (0,006 / 0,012 / 0,015). É leitura descritiva, não prova de fraude.
-
-`/api/analysis` também retorna `cobertura` (seções consideradas, BUs sem campos) e `limitacoes`.
+Benford usa o primeiro dígito dos votos por seção com 10 votos ou mais, a distribuição esperada `log10(1 + 1/d)` e o MAD de Nigrini (0,006 / 0,012 / 0,015).
+`/api/analysis` também retorna `cobertura` (seções consideradas, BUs sem campos).
 
 ## `GET /api/anomalies`
 
 Benford por nível, duplicação de vetor de votos e outliers por seção, no corte e no recorte.
 
-- `benford_niveis`: por candidato, `niveis.secao`, `niveis.zona` e `niveis.municipio`, cada um com `n`, `mad` e `digitos`; mínimo de 10 votos por unidade; `status_metodologico: em_validacao` e `observacao`.
-- `duplicacao`: `grupos` com a mesma assinatura do vetor de votos, `mesma_zona`, `mesmo_municipio`, `mesmo_local`, `secoes_consecutivas`; cada seção inclui `nr_local_votacao`, `qt_aptos` e `qt_comparecimento`; `total_secoes_escopo` e `observacao` sobre frequência esperada por escala. Sem rótulo de alerta.
+- `benford_niveis`: por candidato, `niveis.secao`, `niveis.zona` e `niveis.municipio`, cada um com `n`, `mad` e `digitos`; mínimo de 10 votos por unidade.
+- `duplicacao`: `grupos` com a mesma assinatura do vetor de votos, `mesma_zona`, `mesmo_municipio`, `mesmo_local`, `secoes_consecutivas`; cada seção inclui `nr_local_votacao`, `qt_aptos` e `qt_comparecimento`; `total_secoes_escopo`.
 - `outliers`: `features` (6), `parametros` (`isolamento`: 100 árvores, amostra 256; `lof`: k 10, amostra até 2.000) e as 20 seções com maior score. Sem rótulos de limiar.
 
 `GET /api/sections` aceita `municipio_nome` (nome parcial), `zona` e `secao` como filtros separados, além de `uf` e `municipio`.
 
-`/api/anomalies` também retorna `cobertura` (seções consideradas, grupos de duplicação, outliers limitados) e `limitacoes`.
+`/api/anomalies` também retorna `cobertura` (seções consideradas, grupos de duplicação, outliers limitados).
 
 ## `GET /api/consistencia`
 
-Consistência aritmética por seção no BU ativo: `comparecimento_vs_votos`, `aptos_vs_comparecimento_abstencao`, `comparecimento_vs_aptos`, `biometria_vs_comparecimento`. Retorna apenas as regras divergentes (uma linha por regra), com `cobertura` (consideradas, avaliadas, sem divergência, com divergência, sem campo e divergências por regra), `indice_consistencia` de 0 a 100 arredondado a uma casa decimal e `limitacoes`. Aceita `regra`, `page` e `page_size`. Ausência de campo ou de resultados não é tratada como zero.
+Consistência aritmética por seção no BU ativo: `comparecimento_vs_votos`, `aptos_vs_comparecimento_abstencao`, `comparecimento_vs_aptos`, `biometria_vs_comparecimento`. Retorna apenas as regras divergentes (uma linha por regra), com `cobertura` (consideradas, avaliadas, sem divergência, com divergência, sem campo e divergências por regra), `indice_consistencia` de 0 a 100 arredondado a uma casa decimal. Aceita `regra`, `page` e `page_size`. Ausência de campo ou de resultados não é tratada como zero.
 
 ```json
-{ "corte": { "tipo": "final" }, "cobertura": { "consideradas": 100, "com_divergencia": 2, "sem_campo_por_regra": { "comparecimento_vs_votos": 0 } }, "limitacoes": [], "page": 1, "page_size": 50, "total": 2, "itens": [{ "secao": { "id": "…", "sg_uf": "AC" }, "regra": "comparecimento_vs_votos", "diferenca": 3, "campos": ["qt_comparecimento", "qt_votos"], "valores": { "qt_comparecimento": 80, "soma_qt_votos": 83 }, "bu": { "id": "…", "versao": 1, "lote": { "id": "…", "nome": "…" }, "sha256": "…", "timestamps": {} } }] }
+{ "corte": { "tipo": "final" }, "cobertura": { "consideradas": 100, "com_divergencia": 2, "sem_campo_por_regra": { "comparecimento_vs_votos": 0 } }, "page": 1, "page_size": 50, "total": 2, "itens": [{ "secao": { "id": "…", "sg_uf": "AC" }, "regra": "comparecimento_vs_votos", "diferenca": 3, "campos": ["qt_comparecimento", "qt_votos"], "valores": { "qt_comparecimento": 80, "soma_qt_votos": 83 }, "bu": { "id": "…", "versao": 1, "lote": { "id": "…", "nome": "…" }, "sha256": "…", "timestamps": {} } }] }
 ```
 
 O índice conta cada BU no máximo uma vez: entra na base se pelo menos uma regra puder ser verificada e conta como consistente se nenhuma regra verificável divergir. A cobertura é exibida separadamente; o índice não é probabilidade nem conclusão sobre fraude.
@@ -154,7 +151,7 @@ Quando `escopo=ano` e o ano tem dois turnos, devolve dois blocos lado a lado, se
 
 Cada bloco traz `comparecimento` (média, mediana e desvio padrão populacional dos `qt_comparecimento` por seção) e `candidatos` (para cada candidato nominal, média, mediana e desvio padrão populacional dos votos por seção). `secoes` é o número de seções do recorte; `secoes_com_voto` é o número de seções em que o candidato teve algum voto. Cache Redis TTL 300 s, cabeçalho `x-cache: hit|miss|off`.
 
-`/api/estatisticas` também retorna `cobertura` (seções consideradas) e `limitacoes`.
+`/api/estatisticas` também retorna `cobertura` (seções consideradas).
 
 ## `GET /api/sections/:id/versions`
 
@@ -193,8 +190,7 @@ Histórico de versões do BU da seção. Retorna todas as versões com metadados
     "atual": 2,
     "campos_alterados": [{ "campo": "qt_comparecimento", "anterior": 80, "atual": 81, "diferenca": 1 }],
     "votaveis_alterados": [{ "nr_votavel": 13, "nm_votavel": "…", "anterior": 50, "atual": 51, "diferenca": 1 }],
-    "causa": null,
-    "observacao": "A ferramenta não presume a causa da diferença."
+    "causa": null
   }
 }
 ```
@@ -209,7 +205,6 @@ Comparações locais entre seções semelhantes. Grupos formados por local de vo
 {
   "corte": { "tipo": "final" },
   "cobertura": { "consideradas": 100, "com_grupo": 95, "sem_grupo": 5, "grupos": 10, "grupos_insuficientes": 2 },
-  "limitacoes": [],
   "page": 1,
   "page_size": 50,
   "total": 10,
@@ -241,7 +236,6 @@ Concentração do candidato mais votado e margem para o segundo colocado por se�
 {
   "corte": { "tipo": "final" },
   "cobertura": { "consideradas": 100, "com_contexto": 95, "sem_contexto": 5, "grupos": 10, "grupos_insuficientes": 2, "faixas_aptos": 4 },
-  "limitacoes": [],
   "page": 1,
   "page_size": 50,
   "total": 20,
@@ -286,5 +280,3 @@ Em corte final, `referencias` lista cada outra eleição compatível com cargo, 
   }]
 }
 ```
-
-Recebimento anterior ao encerramento/emissão é um sinal cronológico para revisão. A API não o converte em conclusão sobre fraude nem o inclui no índice aritmético.

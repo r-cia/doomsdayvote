@@ -82,7 +82,6 @@ function identificador(linha) {
           </strong>
           <strong v-else-if="consistencia.isLoading.value">{{ $t('comum.carregando') }}</strong>
           <strong v-else>{{ $t('relatorio.notaInconclusiva') }}</strong>
-          <p>{{ $t('relatorio.descricaoNota') }}</p>
         </div>
         <dl v-if="cobertura" class="relatorio__medidas">
           <div>
@@ -102,27 +101,18 @@ function identificador(linha) {
             <dd>{{ formatarNumero(cobertura.com_divergencia) }}</dd>
           </div>
         </dl>
-        <div class="relatorio__metodo">
-          <h3>{{ $t('relatorio.metodoNota') }}</h3>
-          <p>{{ $t('relatorio.metodoNotaDescricao') }}</p>
-          <p>{{ $t('relatorio.limiteNota') }}</p>
-        </div>
       </section>
 
       <section class="relatorio__historico painel" aria-labelledby="relatorio-historico">
         <header class="painel__cabecalho">
           <div>
             <h2 id="relatorio-historico">{{ $t('relatorio.historico') }}</h2>
-            <p>{{ $t('relatorio.historicoDescricao') }}</p>
           </div>
         </header>
-        <p v-if="!relatorio.data.value.comparacao_final_disponivel" class="vazio">
-          {{ $t('relatorio.historicoIndisponivel') }}
-        </p>
-        <p v-else-if="referencias.length === 0" class="vazio">
+        <p v-if="relatorio.data.value.comparacao_final_disponivel && referencias.length === 0" class="vazio">
           {{ $t('relatorio.semHistorico') }}
         </p>
-        <template v-else>
+        <template v-else-if="relatorio.data.value.comparacao_final_disponivel">
           <div v-if="linhas.length" class="relatorio__tabelas">
             <div class="tabela-scroll">
               <table class="tabela relatorio__tabela">
@@ -184,9 +174,6 @@ function identificador(linha) {
               </table>
             </div>
           </div>
-          <p v-if="linhas.length" class="relatorio__nota-metodo">
-            {{ $t('relatorio.metodoRecebimento') }}
-          </p>
         </template>
       </section>
 
@@ -227,9 +214,7 @@ function identificador(linha) {
 }
 
 .relatorio__cabecalho p,
-.relatorio__historico header p,
-.relatorio__metodo p,
-.relatorio__nota-metodo {
+.relatorio__historico header p {
   color: var(--ink-dim);
   font-size: 12px;
 }
@@ -251,11 +236,6 @@ function identificador(linha) {
   font-weight: 400;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-}
-
-.relatorio__nota p,
-.relatorio__metodo p {
-  max-width: 70ch;
 }
 
 .relatorio__medidas {
@@ -282,14 +262,6 @@ function identificador(linha) {
   font-size: 18px;
 }
 
-.relatorio__metodo {
-  display: grid;
-  grid-column: 1 / -1;
-  gap: 6px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-}
-
 .relatorio__historico {
   min-width: 0;
 }
@@ -311,11 +283,6 @@ function identificador(linha) {
 .relatorio__alvo {
   color: var(--amber);
   background: var(--amber-soft);
-}
-
-.relatorio__nota-metodo {
-  margin-top: 12px;
-  max-width: 85ch;
 }
 
 .relatorio__analises {

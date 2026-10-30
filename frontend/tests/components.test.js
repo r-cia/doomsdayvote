@@ -304,7 +304,6 @@ describe('PlotDia', () => {
     })
 
     expect(wrapper.text()).toContain('Linha do tempo indisponível')
-    expect(wrapper.text()).toContain('não permite linha do tempo')
     expect(wrapper.find('input[type="range"]').exists()).toBe(false)
   })
 })

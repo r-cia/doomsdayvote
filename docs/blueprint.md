@@ -2,7 +2,7 @@
 
 ## Análise e cobertura
 
-- Toda análise informa `cobertura` (seções consideradas/excluídas e motivos) e `limitacoes`.
+- Toda análise informa `cobertura` (seções consideradas/excluídas e motivos).
 - Zero não é tratado como ausência: campo ausente vira `null` e é contado em `bus_sem_*`.
 - Resultados são descritivos; não há rótulo de fraude, conformidade ou não conformidade.
 - Benford é leitura exploratória em validação.

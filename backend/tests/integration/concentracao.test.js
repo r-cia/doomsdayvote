@@ -63,7 +63,6 @@ describe('concentração e margem', () => {
     expect(Array.isArray(corpo.top_share)).toBe(true);
     expect(Array.isArray(corpo.top_margem)).toBe(true);
     expect(corpo.cobertura).toBeDefined();
-    expect(Array.isArray(corpo.limitacoes)).toBe(true);
     expect(typeof corpo.total).toBe('number');
   });
 });

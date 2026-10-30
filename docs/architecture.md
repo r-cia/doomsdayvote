@@ -31,7 +31,7 @@
 ## Fluxo de análise
 
 - Cada painel consome queries do TanStack Vue Query.
-- Endpoints retornam `cobertura` e `limitacoes` padronizados.
+- Endpoints retornam `cobertura` padronizada.
 - A consistência agrega votos por BU no Postgres antes de retornar os dados, evitando transferir todas as linhas de resultado ou montar uma lista de parâmetros por BU.
 - O índice conta cada BU avaliável uma vez; ausências ficam na cobertura, não reduzem a nota. Comparações históricas agrupam por `election_id` e usam apenas o corte final, sem entrarem na nota do alvo.
 - O endpoint de relatório agrega por eleição, cargo e escopo. A latência entre encerramento e recebimento exige precisão de data/hora; contagens de precisão menor são exibidas sem inventar horário.

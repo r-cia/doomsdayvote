@@ -63,7 +63,6 @@ describe('consistência aritmética', () => {
     expect(corpo.cobertura).toBeDefined();
     expect(typeof corpo.cobertura.consideradas).toBe('number');
     expect(corpo.cobertura.sem_campo_por_regra).toBeDefined();
-    expect(Array.isArray(corpo.limitacoes)).toBe(true);
     expect(Array.isArray(corpo.itens)).toBe(true);
     expect(typeof corpo.total).toBe('number');
   });

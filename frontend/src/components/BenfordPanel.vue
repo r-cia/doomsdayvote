@@ -41,7 +41,6 @@ function formatarMad(valor) {
     <header class="painel__cabecalho">
       <h2 id="benford-titulo">{{ $t('estatistica.benford') }}</h2>
       <p v-if="!loading && dados" class="painel__meta">
-        primeiro dígito<br />
         <b>{{ formatarNumero(ativo?.n) }}</b> seções
       </p>
     </header>

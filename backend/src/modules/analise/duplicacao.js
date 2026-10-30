@@ -102,8 +102,6 @@ export function agruparAssinaturas(secoes = [], limite = 50, ordenacao = null) {
       sem_grupo: secoes.length - totalSecoesGrupos,
       grupos: grupos.length,
     },
-    observacao:
-      'Frequência esperada de coincidências cresce com a escala do escopo; resultado descritivo, sem rótulo de alerta.',
   }
 }
 

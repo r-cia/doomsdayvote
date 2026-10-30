@@ -22,7 +22,6 @@ function mad(nivel) {
     <header class="painel__cabecalho">
       <h2 id="benford-niveis-titulo">{{ $t('estatistica.benford') }}</h2>
       <p class="painel__meta">
-        seção · zona · município<br />
         <b>{{ candidatos.length }}</b> candidatos
       </p>
     </header>
@@ -66,8 +65,5 @@ function mad(nivel) {
         </tbody>
       </table>
     </div>
-    <p class="nota">
-      {{ props.dados?.observacao ?? props.dados?.status_metodologico ?? '' }}
-    </p>
   </section>
 </template>

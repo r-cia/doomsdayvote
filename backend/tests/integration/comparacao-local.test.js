@@ -62,7 +62,6 @@ describe('comparação local', () => {
     const corpo = resposta.json();
     expect(Array.isArray(corpo.grupos)).toBe(true);
     expect(corpo.cobertura).toBeDefined();
-    expect(Array.isArray(corpo.limitacoes)).toBe(true);
     expect(typeof corpo.total).toBe('number');
   });
 });

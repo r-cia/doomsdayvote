@@ -35,7 +35,6 @@
     "semSecoes": "Sem seções suficientes para o cálculo no recorte.",
     "atualizando": "Atualizando dados…",
     "linhaTempoIndisponivel": "Linha do tempo indisponível",
-    "fonteSemLinhaTempo": "A fonte deste ano não permite linha do tempo por horário.",
     "semGruposComparaveis": "Nenhum grupo comparável neste recorte.",
     "nenhumaSecaoRecorte": "Nenhuma seção neste recorte.",
     "nenhumaDivergencia": "Nenhuma divergência aritmética neste recorte.",
@@ -48,10 +47,7 @@
     "carregandoMalha": "Carregando o mapa geográfico…",
     "acao": "Ação",
     "resumoCobertura": "Resumo da cobertura",
-    "votos": "votos",
-    "camposAusentesNaoZero": "Campos ausentes não são tratados como zero.",
-    "semLimiarAlertaDescritivo": "A ferramenta não define limiares de alerta; os resultados são descritivos.",
-    "naoConcluiFraude": "A ferramenta não conclui fraude; sinaliza desvios para revisão."
+    "votos": "votos"
   },
   "filtros": {
     "cargo": "Cargo",
@@ -65,8 +61,7 @@
     "limpar": "Limpar filtros",
     "escopo": "Escopo",
     "turnoAtual": "Turno atual",
-    "anoCompleto": "Ano (1º e 2º)",
-    "ordenarPor": "Ordenar por"
+    "anoCompleto": "Ano (1º e 2º)"
   },
   "painel": {
     "titulo": "Painel",
@@ -105,14 +100,12 @@
     "municipios": "Municípios",
     "lider": "Líder",
     "percentual": "Percentual",
-    "selecioneUfMunicipios": "Selecione uma UF para ver municípios",
-    "malhaLocal": "Malha IBGE local."
+    "selecioneUfMunicipios": "Selecione uma UF para ver municípios"
   },
   "estatistica": {
     "titulo": "Estatística",
     "descritiva": "Estatística descritiva",
     "subtitulo": "Média, mediana e desvio padrão por seção",
-    "descricao": "Votos por seção de cada candidato e comparecimento por seção. Desvio padrão populacional.",
     "variavel": "Variável",
     "candidato": "Candidato",
     "partido": "Partido",
@@ -124,8 +117,7 @@
     "comparecimento": "Comparecimento",
     "benford": "Benford",
     "duplicacao": "Duplicação",
-    "isolamento": "Isolamento e LOF",
-    "limitacaoAgregacaoPorSecao": "Estatísticas descritivas agregadas por seção, sem vínculo individual."
+    "isolamento": "Isolamento e LOF"
   },
   "analiseUI": {
     "consistencia": "Consistência aritmética",
@@ -215,8 +207,7 @@
     "porRegiao": "Por região",
     "regiao": "Região",
     "municipios": "Municípios com maior biometria não habilitada",
-    "secoes": "Seções com maior % não habilitada",
-    "limitacaoAgregacaoPorSecao": "Biometria agregada por seção, sem vínculo individual."
+    "secoes": "Seções com maior % não habilitada"
   },
   "encerramento": {
     "titulo": "Encerramento",
@@ -245,18 +236,12 @@
     "titulo": "Relatório de consistência",
     "nota": "Índice de consistência aritmética",
     "notaInconclusiva": "Sem regras aritméticas verificáveis neste recorte.",
-    "descricaoNota": "Percentual de BUs avaliados sem divergência nas regras aritméticas aplicáveis.",
-    "limiteNota": "A nota descreve apenas consistência aritmética observada. Não estima probabilidade nem atesta legitimidade.",
     "avaliadas": "BUs avaliados",
     "consideradas": "BUs considerados",
     "semDivergencia": "Sem divergência",
     "comDivergencia": "Com divergência",
     "cobertura": "Cobertura da avaliação",
-    "metodoNota": "Como a nota é calculada",
-    "metodoNotaDescricao": "Cada BU conta uma vez. Entra no denominador quando ao menos uma regra pode ser verificada; fica no numerador quando nenhuma regra verificável diverge. Campos ausentes não são tratados como zero nem reduzem a nota. A cobertura mostra quantos BUs puderam ser avaliados.",
     "historico": "Comparação entre eleições",
-    "historicoDescricao": "Cada ano, turno e código de eleição aparece separado. As referências usam BUs ativos no corte final e contextualizam mudanças; nunca entram na nota do recorte avaliado.",
-    "historicoIndisponivel": "Referências históricas são exibidas apenas no corte final, para manter períodos comparáveis.",
     "semHistorico": "Não há outra eleição comparável para este cargo e escopo.",
     "selecioneUf": "Selecione uma UF para analisar governador.",
     "alvo": "Recorte avaliado",
@@ -279,7 +264,6 @@
     "antesEmissao": "Recebimento anterior à emissão do BU",
     "medianaAtraso": "Mediana encerramento → recebimento (min)",
     "p90Atraso": "P90 encerramento → recebimento (min)",
-    "metodoRecebimento": "O atraso só é calculado quando encerramento e recebimento têm data e hora. Registros com precisão de apenas data ou sem recebimento ficam fora do cálculo e aparecem na cobertura. Recebimento anterior ao encerramento ou à emissão é um sinal cronológico para revisão, não uma prova e não altera a nota.",
     "analises": "Análises complementares",
     "mostrarAnalises": "Mostrar estatísticas e sinais exploratórios",
     "ocultarAnalises": "Ocultar análises complementares"
