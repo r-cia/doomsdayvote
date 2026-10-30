@@ -108,9 +108,9 @@ const candidatos = computed(() =>
       <StateBlock
         v-else-if="eleicoesQuery.error.value"
         estado="erro"
-        titulo="Não foi possível carregar as eleições"
+        :titulo="$t('comum.erro')"
         :descricao="eleicoesQuery.error.value.message"
-        acao="Tentar novamente"
+        :acao="$t('comum.tentarNovamente')"
         @acao="eleicoesQuery.refetch()"
       />
       <StateBlock

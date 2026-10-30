@@ -28,7 +28,7 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
       estado="erro"
       :titulo="$t('comum.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="emit('retry')"
     />
 
