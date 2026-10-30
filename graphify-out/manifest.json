@@ -786,21 +786,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793375319.5062544,
-    "seen": 1793375406.9245703,
-    "ast_hash": "d1a0a7df8a0a7fcbff773ee5aef53b14",
+    "mtime": 1793375618.9338968,
+    "seen": 1793375638.729387,
+    "ast_hash": "9645cb206dbfc7f29366b5c444661a80",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793375319.5062544,
-    "seen": 1793375406.9245722,
-    "ast_hash": "e43ed2642d9219bc84d4e64a126255f3",
+    "mtime": 1793375618.934897,
+    "seen": 1793375638.7293887,
+    "ast_hash": "3172d2cd2938368aa4904367503a333e",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793375319.5052545,
-    "seen": 1793375406.9245737,
-    "ast_hash": "de10367e8b911afec5630c50f4826bfd",
+    "mtime": 1793375618.9328969,
+    "seen": 1793375638.7293904,
+    "ast_hash": "39a7304c0aa6e825d5308730b5cb0618",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/CoberturaBlock.vue": {
-    "mtime": 1793361962.7892256,
-    "seen": 1793364259.1280456,
-    "ast_hash": "9a36c54f6290afe9c572745d3380696b",
+    "mtime": 1793375588.5665314,
+    "seen": 1793375638.729346,
+    "ast_hash": "726ce7ea0953eaea31822e456bd00da8",
     "semantic_hash": ""
   },
   "frontend/src/components/ComparacaoLocalPanel.vue": {

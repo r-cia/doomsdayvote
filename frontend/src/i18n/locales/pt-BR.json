@@ -46,7 +46,10 @@
     "carregandoMalha": "Carregando o mapa geográfico…",
     "acao": "Ação",
     "resumoCobertura": "Resumo da cobertura",
-    "votos": "votos"
+    "votos": "votos",
+    "camposAusentesNaoZero": "Campos ausentes não são tratados como zero.",
+    "semLimiarAlertaDescritivo": "A ferramenta não define limiares de alerta; os resultados são descritivos.",
+    "naoConcluiFraude": "A ferramenta não conclui fraude; sinaliza desvios para revisão."
   },
   "filtros": {
     "cargo": "Cargo",
@@ -119,7 +122,8 @@
     "comparecimento": "Comparecimento",
     "benford": "Benford",
     "duplicacao": "Duplicação",
-    "isolamento": "Isolamento e LOF"
+    "isolamento": "Isolamento e LOF",
+    "limitacaoAgregacaoPorSecao": "Estatísticas descritivas agregadas por seção, sem vínculo individual."
   },
   "analiseUI": {
     "consistencia": "Consistência aritmética",
@@ -199,7 +203,8 @@
     "porRegiao": "Por região",
     "regiao": "Região",
     "municipios": "Municípios com maior biometria não habilitada",
-    "secoes": "Seções com maior % não habilitada"
+    "secoes": "Seções com maior % não habilitada",
+    "limitacaoAgregacaoPorSecao": "Biometria agregada por seção, sem vínculo individual."
   },
   "encerramento": {
     "titulo": "Encerramento",
