@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StateBlock from '../components/StateBlock.vue'
+import VersoesBuPanel from '../components/VersoesBuPanel.vue'
 
 const props = defineProps({
   modal: { type: Boolean, default: false },
@@ -14,7 +15,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
-import { useSecao } from '../composables/queries'
+import { useSecao, useSecaoVersoes } from '../composables/queries'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import {
   formatarData,
@@ -47,6 +48,8 @@ if (props.modal) {
 
 const id = computed(() => (props.modal ? String(props.idProp) : String(rota.params.id)))
 const consulta = useSecao(id)
+const versoesConsulta = useSecaoVersoes(id)
+const versoesDados = computed(() => versoesConsulta.data.value ?? null)
 const dados = computed(() => consulta.data.value ?? null)
 const secao = computed(() => dados.value?.secao ?? null)
 const boletim = computed(() => dados.value?.boletim ?? null)
@@ -287,6 +290,8 @@ function voltar() { fechar() }
         </div>
       </section>
     </template>
+
+      <VersoesBuPanel :dados="versoesDados" :loading="versoesConsulta.isLoading.value" :error="versoesConsulta.error.value?.message" />
     </div>
   </div>
   </Teleport>

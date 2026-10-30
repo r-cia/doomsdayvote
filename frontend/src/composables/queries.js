@@ -335,3 +335,34 @@ export function useSecao(id) {
     ),
   })
 }
+
+
+export function useSecaoVersoes(id) {
+  const store = useFiltersStore()
+  const idEfetivo = computed(() => {
+    const valor = isRef(id) ? id.value : id
+    return valor ? String(valor) : null
+  })
+  return useQuery({
+    queryKey: computed(() => [
+      'secao-versoes',
+      idEfetivo.value,
+      store.electionId,
+      store.cargo,
+      store.asOf,
+    ]),
+    queryFn: ({ signal }) =>
+      api.secaoVersoes(
+        idEfetivo.value,
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+        },
+        signal,
+      ),
+    enabled: computed(() =>
+      Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
+    ),
+  })
+}

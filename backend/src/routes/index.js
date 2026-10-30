@@ -10,6 +10,7 @@ import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPor
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
 import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
 import { consistenciaPorSecao, validarConsistenciaBu } from '../modules/analise/consistencia.js';
+import { compararVersoes } from '../modules/analise/versoes-bu.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
 
 const corteSchema = {
@@ -1014,6 +1015,101 @@ export async function registrarRotas(app) {
       lote,
       versoes_anteriores: Number(anteriores.total),
       consistencia,
+    };
+  }));
+
+  app.get('/api/sections/:id/versions', cacheado('section-versions', 300, z.object({
+    id: z.string().uuid(),
+    election_id: z.string().uuid(),
+    cargo: z.coerce.number().int(),
+    comparar_com: z.coerce.number().int().optional(),
+    ...corteSchema,
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+
+    const secao = await db
+      .selectFrom('secao_eleitoral as s')
+      .innerJoin('localidade as l', (join) =>
+        join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+      )
+      .select(['s.id','s.sg_uf','s.cd_municipio_tse','s.nr_zona','s.nr_secao','s.nr_local_votacao','l.nm_municipio'])
+      .where('s.id', '=', query.id)
+      .executeTakeFirst();
+    if (!secao) throw new AppError('NOT_FOUND', 404, 'Seção não encontrada');
+
+    const versoesRows = await db
+      .selectFrom('boletim_versao')
+      .selectAll()
+      .where('secao_id', '=', query.id)
+      .where('eleicao_id', '=', eleicao.id)
+      .where('cd_cargo_pergunta', '=', query.cargo)
+      .orderBy('versao', 'asc')
+      .execute();
+
+    const ids = versoesRows.map((v) => v.id);
+    const resultados = ids.length
+      ? await db.selectFrom('resultado_votavel').selectAll().where('boletim_versao_id', 'in', ids).execute()
+      : [];
+    const porBu = new Map();
+    for (const r of resultados) {
+      if (!porBu.has(r.boletim_versao_id)) porBu.set(r.boletim_versao_id, []);
+      porBu.get(r.boletim_versao_id).push(r);
+    }
+    const loteIds = [...new Set(versoesRows.map((v) => v.lote_id))];
+    const lotes = loteIds.length
+      ? await db.selectFrom('lote_importacao').select(['id','nome_arquivo','sha256']).where('id', 'in', loteIds).execute()
+      : [];
+    const loteMap = new Map(lotes.map((l) => [l.id, l]));
+
+    const versoes = versoesRows.map((bv) => ({
+      id: bv.id,
+      versao: bv.versao,
+      ativo: bv.ativo,
+      substitui_versao_id: bv.substitui_versao_id,
+      dt_geracao: bv.dt_geracao,
+      dt_abertura: bv.dt_abertura,
+      dt_encerramento: bv.dt_encerramento,
+      dt_emissao_bu: bv.dt_emissao_bu,
+      dt_bu_recebido_ts: bv.dt_bu_recebido_ts,
+      dt_bu_recebido_data: bv.dt_bu_recebido_data,
+      precisao: bv.precisao_dt_bu_recebido,
+      precisao_dt_bu_recebido: bv.precisao_dt_bu_recebido,
+      qt_aptos: bv.qt_aptos,
+      qt_comparecimento: bv.qt_comparecimento,
+      qt_abstencoes: bv.qt_abstencoes,
+      qt_elei_biom_sem_habilitacao: bv.qt_elei_biom_sem_habilitacao,
+      cd_tipo_urna: bv.cd_tipo_urna,
+      ds_tipo_urna: bv.ds_tipo_urna,
+      lote: loteMap.get(bv.lote_id) ? { id: loteMap.get(bv.lote_id).id, nome_arquivo: loteMap.get(bv.lote_id).nome_arquivo, sha256: loteMap.get(bv.lote_id).sha256 } : null,
+      conteudo_sha256: bv.conteudo_sha256,
+      imported_at: bv.imported_at,
+      resultados: (porBu.get(bv.id) ?? []).sort((x, y) => Number(y.qt_votos ?? 0) - Number(x.qt_votos ?? 0)),
+    }));
+
+    const atual = versoes.find((v) => v.ativo) ?? versoes[versoes.length - 1] ?? null;
+    let anterior = null;
+    if (atual) {
+      if (query.comparar_com !== undefined) {
+        anterior = versoes.find((v) => v.versao === query.comparar_com) ?? null;
+      } else {
+        const candidatos = versoes.filter((v) => v.versao < atual.versao);
+        anterior = candidatos.sort((x, y) => y.versao - x.versao)[0] ?? null;
+      }
+    }
+    const comparacao = anterior && atual
+      ? {
+          anterior: anterior.versao,
+          atual: atual.versao,
+          ...compararVersoes(anterior, atual),
+        }
+      : null;
+
+    return {
+      corte: corteResposta(corte),
+      secao,
+      versoes,
+      comparacao,
     };
   }));
 }
