@@ -234,12 +234,7 @@
   },
   "relatorio": {
     "titulo": "Consistency report",
-    "nota": "Arithmetic consistency index",
-    "notaInconclusiva": "No arithmetic rules can be checked for this selection.",
     "avaliadas": "Assessed records",
-    "consideradas": "Records considered",
-    "semDivergencia": "No divergence",
-    "comDivergencia": "With divergence",
     "cobertura": "Assessment coverage",
     "historico": "Election comparisons",
     "semHistorico": "No comparable election is available for this office and area.",
@@ -263,10 +258,7 @@
     "antesEncerramento": "Received before closing",
     "antesEmissao": "Received before BU issuance",
     "medianaAtraso": "Median closing → receipt (min)",
-    "p90Atraso": "P90 closing → receipt (min)",
-    "analises": "Additional analyses",
-    "mostrarAnalises": "Show statistics and exploratory signals",
-    "ocultarAnalises": "Hide additional analyses"
+    "p90Atraso": "P90 closing → receipt (min)"
   },
   "format": {
     "corteFinal": "Final cutoff",

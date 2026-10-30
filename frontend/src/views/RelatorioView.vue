@@ -1,10 +1,6 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import AnaliseView from './AnaliseView.vue'
-import ComparacoesView from './ComparacoesView.vue'
-import BiometriaView from './BiometriaView.vue'
-import EncerramentoView from './EncerramentoView.vue'
 import StateBlock from '../components/StateBlock.vue'
 import TabelaScroll from '../components/TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -17,7 +13,6 @@ const { store, eleicaoAtual, cargos } = useSelecaoEleicao()
 const { alternar, ariaSort, seta, params } = useOrdenacao()
 const relatorio = useRelatorio(params)
 const consistencia = useConsistencia()
-const mostrarAnalises = ref(false)
 
 const alvo = computed(() => relatorio.data.value?.alvo ?? null)
 const referencias = computed(() => relatorio.data.value?.referencias ?? [])
@@ -75,31 +70,15 @@ function identificador(linha) {
     />
 
     <template v-if="alvo">
-      <section class="relatorio__indice" aria-labelledby="relatorio-nota">
-        <div class="relatorio__nota">
-          <h3 id="relatorio-nota">{{ $t('relatorio.nota') }}</h3>
-          <strong v-if="consistencia.data.value?.indice_consistencia !== null && consistencia.data.value?.indice_consistencia !== undefined">
-            {{ formatarPercentual(consistencia.data.value.indice_consistencia, 1) }}
-          </strong>
-          <strong v-else-if="consistencia.isLoading.value">{{ $t('comum.carregando') }}</strong>
-          <strong v-else>{{ $t('relatorio.notaInconclusiva') }}</strong>
-        </div>
+      <section class="relatorio__indice">
         <dl v-if="cobertura" class="relatorio__medidas">
           <div>
             <dt>{{ $t('relatorio.avaliadas') }}</dt>
             <dd>{{ formatarNumero(cobertura.avaliadas) }}</dd>
           </div>
           <div>
-            <dt>{{ $t('relatorio.consideradas') }}</dt>
-            <dd>{{ formatarNumero(cobertura.consideradas) }}</dd>
-          </div>
-          <div>
             <dt>{{ $t('relatorio.cobertura') }}</dt>
             <dd>{{ formatarPercentual(percentualCobertura, 1) }}</dd>
-          </div>
-          <div>
-            <dt>{{ $t('relatorio.comDivergencia') }}</dt>
-            <dd>{{ formatarNumero(cobertura.com_divergencia) }}</dd>
           </div>
         </dl>
       </section>
@@ -177,26 +156,6 @@ function identificador(linha) {
           </div>
         </template>
       </section>
-
-      <section class="relatorio__analises" aria-labelledby="relatorio-analises">
-        <header class="relatorio__analises-cabecalho">
-          <h2 id="relatorio-analises">{{ $t('relatorio.analises') }}</h2>
-          <button
-            type="button"
-            class="button button--ghost"
-            :aria-expanded="mostrarAnalises"
-            @click="mostrarAnalises = !mostrarAnalises"
-          >
-            {{ mostrarAnalises ? $t('relatorio.ocultarAnalises') : $t('relatorio.mostrarAnalises') }}
-          </button>
-        </header>
-        <template v-if="mostrarAnalises">
-          <AnaliseView />
-          <ComparacoesView />
-          <BiometriaView />
-          <EncerramentoView />
-        </template>
-      </section>
     </template>
   </section>
 </template>
@@ -221,22 +180,9 @@ function identificador(linha) {
 }
 
 .relatorio__indice {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(250px, 1.2fr);
-  gap: 16px 24px;
   padding: 16px;
   background: var(--panel);
   border: 1px solid var(--line);
-}
-
-.relatorio__nota strong {
-  display: block;
-  margin: 8px 0;
-  color: var(--amber);
-  font-size: clamp(30px, 5vw, 54px);
-  font-weight: 400;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
 
 .relatorio__medidas {
@@ -286,30 +232,4 @@ function identificador(linha) {
   background: var(--amber-soft);
 }
 
-.relatorio__analises {
-  display: grid;
-  gap: 12px;
-}
-
-.relatorio__analises-cabecalho {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-@media (max-width: 760px) {
-  .relatorio__indice {
-    grid-template-columns: 1fr;
-  }
-
-  .relatorio__medidas {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .relatorio__analises-cabecalho {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}
 </style>

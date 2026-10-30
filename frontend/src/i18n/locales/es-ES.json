@@ -234,12 +234,7 @@
   },
   "relatorio": {
     "titulo": "Informe de consistencia",
-    "nota": "Índice de consistencia aritmética",
-    "notaInconclusiva": "No se pueden verificar reglas aritméticas en este recorte.",
     "avaliadas": "Actas evaluadas",
-    "consideradas": "Actas consideradas",
-    "semDivergencia": "Sin divergencias",
-    "comDivergencia": "Con divergencias",
     "cobertura": "Cobertura de la evaluación",
     "historico": "Comparación entre elecciones",
     "semHistorico": "No hay otra elección comparable para este cargo y ámbito.",
@@ -263,10 +258,7 @@
     "antesEncerramento": "Recepción anterior al cierre",
     "antesEmissao": "Recepción anterior a la emisión del acta",
     "medianaAtraso": "Mediana cierre → recepción (min)",
-    "p90Atraso": "P90 cierre → recepción (min)",
-    "analises": "Análisis complementarios",
-    "mostrarAnalises": "Mostrar estadísticas y señales exploratorias",
-    "ocultarAnalises": "Ocultar análisis complementarios"
+    "p90Atraso": "P90 cierre → recepción (min)"
   },
   "format": {
     "corteFinal": "Corte final",
