@@ -11,6 +11,7 @@ import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descrit
 import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
 import { consistenciaPorSecao, validarConsistenciaBu } from '../modules/analise/consistencia.js';
 import { compararVersoes } from '../modules/analise/versoes-bu.js';
+import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
 
 const corteSchema = {
@@ -1110,6 +1111,59 @@ export async function registrarRotas(app) {
       secao,
       versoes,
       comparacao,
+    };
+  }));
+
+  app.get('/api/comparacao-local', cacheado('comparacao-local', 300, baseSchema.extend({
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
+    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
+    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+
+    const resultado = await comparacaoLocal(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    });
+
+    const [metadados, avisos] = await Promise.all([
+      cache
+        .obter('metadados', query, 300, () =>
+          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+      cache
+        .obter('avisos', query, 300, () =>
+          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+    ]);
+
+    const grupos = resultado.grupos ?? [];
+    const inicio = (query.page - 1) * pageSize;
+    const limitacoes = [
+      'Grupos formados por local de votação, com fallback para zona e município quando a amostra for insuficiente.',
+      'Controle de escala por aptos (±50% da mediana do grupo).',
+      'Métricas relativas: participação, abstenção e share por candidato.',
+      'Ausência de campo não é tratada como zero.',
+      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
+    ];
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      limitacoes,
+      page: query.page,
+      page_size: pageSize,
+      total: grupos.length,
+      grupos: grupos.slice(inicio, inicio + pageSize),
     };
   }));
 }

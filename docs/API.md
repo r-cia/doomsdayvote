@@ -161,3 +161,35 @@ Histórico de versões do BU da seção. Retorna todas as versões com metadados
 ```
 
 Ausência de campo não é tratada como zero. A ferramenta não presume a causa da diferença entre versões.
+
+## `GET /api/comparacao-local`
+
+Comparações locais entre seções semelhantes. Grupos formados por local de votação, com fallback para zona e município quando a amostra for insuficiente; controle de escala por aptos (±50% da mediana do grupo); mínimo de 5 seções por grupo. Sem limiares de alerta. Métricas relativas: participação, abstenção e share por candidato, com distância em pontos percentuais e percentil. Grupos com menos de 5 seções recebem estado `dados_insuficientes`.
+
+```json
+{
+  "corte": { "tipo": "final" },
+  "cobertura": { "consideradas": 100, "com_grupo": 95, "sem_grupo": 5, "grupos": 10, "grupos_insuficientes": 2 },
+  "limitacoes": [],
+  "page": 1,
+  "page_size": 50,
+  "total": 10,
+  "grupos": [
+    {
+      "nivel": "local",
+      "tamanho": 8,
+      "estado": "ok",
+      "dados_insuficientes": false,
+      "metricas_grupo": { "participacao": { "mediana": 0.8 }, "abstencao": { "mediana": 0.2 }, "candidatos": [] },
+      "secoes": [
+        {
+          "secao": { "id": "…", "sg_uf": "AC", "nr_zona": 9, "nr_secao": 1 },
+          "metricas": { "participacao": 0.82, "abstencao": 0.18, "candidatos": [] },
+          "distancia_pp": { "participacao": 2.0, "abstencao": -2.0 },
+          "percentil": { "participacao": 75.0 }
+        }
+      ]
+    }
+  ]
+}
+```

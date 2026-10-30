@@ -306,6 +306,33 @@ export function useConsistencia(regra = null) {
   })
 }
 
+export function useComparacaoLocal() {
+  const store = useFiltersStore()
+  return useQuery({
+    queryKey: computed(() => [
+      'comparacao-local',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+    ]),
+    queryFn: ({ signal }) =>
+      api.comparacaoLocal(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    placeholderData: keepPreviousData,
+  })
+}
+
 export function useSecao(id) {
   const store = useFiltersStore()
   const idEfetivo = computed(() => {
