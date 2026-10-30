@@ -4,7 +4,7 @@
   "2": "scripts",
   "3": "dependencies",
   "4": "MapPanel.vue",
-  "5": "components.test.js",
+  "5": "MapaFalso",
   "6": "SecaoView.vue",
   "7": "persistir-bus.js",
   "8": "PlotDia.vue",
@@ -83,5 +83,6 @@
   "81": "BiometriaPanel.vue",
   "82": "duplicacao.js",
   "83": "integration/corte.test.js",
-  "84": "analise/estatisticas.test.js"
+  "84": "analise/estatisticas.test.js",
+  "85": "ComparacoesView.vue"
 }

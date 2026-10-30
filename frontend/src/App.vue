@@ -61,6 +61,7 @@ const candidatos = computed(() =>
         <RouterLink to="/comparacoes">{{ $t('app.abas.comparacoes') }}</RouterLink>
         <RouterLink to="/biometria">{{ $t('app.abas.biometria') }}</RouterLink>
         <RouterLink to="/encerramento">{{ $t('app.abas.encerramento') }}</RouterLink>
+        <RouterLink to="/relatorio">{{ $t('app.abas.relatorio') }}</RouterLink>
       </nav>
 
       <p class="classificacao">

@@ -58,4 +58,5 @@ export const api = {
   consistencia: (params, signal) => obter('/consistencia', params, signal),
   comparacaoLocal: (params, signal) => obter('/comparacao-local', params, signal),
   concentracao: (params, signal) => obter('/concentracao', params, signal),
+  relatorio: (params, signal) => obter('/relatorio', params, signal),
 }

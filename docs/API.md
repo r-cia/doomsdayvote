@@ -107,11 +107,13 @@ Benford por nível, duplicação de vetor de votos e outliers por seção, no co
 
 ## `GET /api/consistencia`
 
-Consistência aritmética por seção no BU ativo: `comparecimento_vs_votos`, `aptos_vs_comparecimento_abstencao`, `comparecimento_vs_aptos`, `biometria_vs_comparecimento`. Retorna apenas as regras divergentes (uma linha por regra), com `cobertura` (consideradas, com divergência, sem campo por regra) e `limitacoes`. Aceita `regra`, `page` e `page_size`. Ausência de campo não é tratada como zero e não gera divergência.
+Consistência aritmética por seção no BU ativo: `comparecimento_vs_votos`, `aptos_vs_comparecimento_abstencao`, `comparecimento_vs_aptos`, `biometria_vs_comparecimento`. Retorna apenas as regras divergentes (uma linha por regra), com `cobertura` (consideradas, avaliadas, sem divergência, com divergência, sem campo e divergências por regra), `indice_consistencia` de 0 a 100 arredondado a uma casa decimal e `limitacoes`. Aceita `regra`, `page` e `page_size`. Ausência de campo ou de resultados não é tratada como zero.
 
 ```json
 { "corte": { "tipo": "final" }, "cobertura": { "consideradas": 100, "com_divergencia": 2, "sem_campo_por_regra": { "comparecimento_vs_votos": 0 } }, "limitacoes": [], "page": 1, "page_size": 50, "total": 2, "itens": [{ "secao": { "id": "…", "sg_uf": "AC" }, "regra": "comparecimento_vs_votos", "diferenca": 3, "campos": ["qt_comparecimento", "qt_votos"], "valores": { "qt_comparecimento": 80, "soma_qt_votos": 83 }, "bu": { "id": "…", "versao": 1, "lote": { "id": "…", "nome": "…" }, "sha256": "…", "timestamps": {} } }] }
 ```
+
+O índice conta cada BU no máximo uma vez: entra na base se pelo menos uma regra puder ser verificada e conta como consistente se nenhuma regra verificável divergir. A cobertura é exibida separadamente; o índice não é probabilidade nem conclusão sobre fraude.
 
 `GET /api/sections/:id` inclui `consistencia`: array com todas as regras e seus status (`ok`, `divergente`, `dados_insuficientes`) para o BU ativo.
 
@@ -228,3 +230,32 @@ Concentração do candidato mais votado e margem para o segundo colocado por se�
 ```
 
 Ausência de campo não é tratada como zero. A ferramenta não define limiares de alerta; os resultados são descritivos.
+
+## `GET /api/relatorio`
+
+Usa os parâmetros comuns. `alvo` contém apenas o `election_id`, ano, turno, cargo e escopo selecionados, no corte atual. `participacao_pct` e `abstencao_pct` são nulos quando faltam campos para compor o total sem lacunas. `recebimento` informa cobertura por precisão, horários ausentes, recebimento anterior ao encerramento/emissão e mediana/P90 do atraso em minutos; o atraso só considera BUs com hora precisa e os dois horários disponíveis.
+
+Em corte final, `referencias` lista cada outra eleição compatível com cargo, tipo de eleição e escopo como linha independente, sempre com seus dados finais ativos. Não agrupa anos, turnos ou `election_id`. Em corte parcial, `referencias` fica vazio e `comparacao_final_disponivel` é `false` para evitar comparação de bases temporais diferentes.
+
+```json
+{
+  "alvo": {
+    "election_id": "…", "ano_eleicao": 2026, "nr_turno": 1, "cd_eleicao": 6257,
+    "bus": 100, "participacao_pct": 78.4, "abstencao_pct": 21.6,
+    "cobertura": { "sem_aptos": 0, "sem_comparecimento": 0, "sem_abstencoes": 0 },
+    "recebimento": {
+      "data_hora": 100, "somente_data": 0, "ausente": 0, "outra_precisao": 0, "sem_encerramento": 0,
+      "antes_encerramento": 0, "antes_emissao": 0,
+      "mediana_atraso_min": 93.4, "p90_atraso_min": 165.2
+    }
+  },
+  "comparacao_final_disponivel": true,
+  "referencias": [{
+    "election_id": "…", "ano_eleicao": 2022, "nr_turno": 1, "cd_eleicao": 544,
+    "bus": 98, "participacao_pct": 80.1, "abstencao_pct": 19.9,
+    "cobertura": {}, "recebimento": {}
+  }]
+}
+```
+
+Recebimento anterior ao encerramento/emissão é um sinal cronológico para revisão. A API não o converte em conclusão sobre fraude nem o inclui no índice aritmético.

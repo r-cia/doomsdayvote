@@ -23,7 +23,10 @@ export function validarConsistenciaBu(bu = {}, resultados = []) {
     const agregado = !lista && resultados && typeof resultados === 'object' ? resultados : null;
     let soma = lista ? 0 : Number(agregado?.somaVotos ?? 0);
     let temNulo = agregado?.temVotosNulos === true;
-    let insuficiente = ausente(comparecimento) || (lista === null && agregado === null);
+    let insuficiente =
+      ausente(comparecimento) ||
+      (lista === null && agregado === null) ||
+      agregado?.temResultados === false;
     if (lista) {
       for (const item of lista) {
         if (ausente(item?.qt_votos)) {
@@ -167,6 +170,7 @@ export async function consistenciaPorSecao(db, { eleicaoId, cargo, corte, escopo
       'lot.dt_geracao_arquivo',
       'lot.captured_at',
       sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('soma_votos'),
+      sql`count(rv.id)::int`.as('resultados_considerados'),
       sql`coalesce(bool_or(rv.qt_votos is null) filter (where rv.id is not null), false)`.as('tem_votos_nulos'),
     ])
     .groupBy([
@@ -206,6 +210,7 @@ export async function consistenciaPorSecao(db, { eleicaoId, cargo, corte, escopo
     };
     const regras = validarConsistenciaBu(buObj, {
       somaVotos: b.soma_votos,
+      temResultados: Number(b.resultados_considerados) > 0,
       temVotosNulos: b.tem_votos_nulos,
     });
     return {
@@ -239,12 +244,23 @@ export async function consistenciaPorSecao(db, { eleicaoId, cargo, corte, escopo
     };
   });
 
-  const semCampoPorRegra = {};
-  for (const nome of REGRAS) {
-    semCampoPorRegra[nome] = secoes.reduce(
-      (acc, s) => acc + (s.regras.find((r) => r.regra === nome)?.status === 'dados_insuficientes' ? 1 : 0),
-      0,
-    );
+  const semCampoPorRegra = Object.fromEntries(REGRAS.map((regra) => [regra, 0]));
+  const divergenciasPorRegra = Object.fromEntries(REGRAS.map((regra) => [regra, 0]));
+  let avaliadas = 0;
+  let semDivergencia = 0;
+  for (const secao of secoes) {
+    let avaliavel = false;
+    for (const regra of secao.regras) {
+      if (regra.status === 'dados_insuficientes') semCampoPorRegra[regra.regra] += 1;
+      else {
+        avaliavel = true;
+        if (regra.status === 'divergente') divergenciasPorRegra[regra.regra] += 1;
+      }
+    }
+    if (avaliavel) {
+      avaliadas += 1;
+      if (!secao.divergente) semDivergencia += 1;
+    }
   }
 
   return {
@@ -252,7 +268,12 @@ export async function consistenciaPorSecao(db, { eleicaoId, cargo, corte, escopo
     cobertura: {
       consideradas: secoes.length,
       com_divergencia: secoes.filter((s) => s.divergente).length,
+      avaliadas,
+      sem_divergencia: semDivergencia,
       sem_campo_por_regra: semCampoPorRegra,
+      divergencias_por_regra: divergenciasPorRegra,
     },
+    indice_consistencia:
+      avaliadas > 0 ? Number(((semDivergencia / avaliadas) * 100).toFixed(1)) : null,
   };
 }

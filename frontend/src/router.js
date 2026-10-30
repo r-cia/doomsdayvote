@@ -35,6 +35,11 @@ const router = createRouter({
       component: () => import('./views/EncerramentoView.vue'),
     },
     {
+      path: '/relatorio',
+      name: 'relatorio',
+      component: () => import('./views/RelatorioView.vue'),
+    },
+    {
       path: '/auditoria',
       redirect: '/painel',
     },
