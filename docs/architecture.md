@@ -12,6 +12,8 @@
 - Metadados e avisos usam chaves de cache por eleição, cargo, escopo e corte, com validade de 24 horas e invalidação por versão após cargas.
 - A listagem de seções aplica filtro de status e paginação no Postgres antes de transferir os resultados.
 - O orçamento de 24 GB para o Postgres requer também um limite no serviço ou contêiner do banco; a configuração de pool da aplicação não estabelece esse teto global.
+- No host verificado, `postgresql@16-main.service` estava sem `MemoryHigh`/`MemoryMax` e com cerca de 15,7 GiB em seu cgroup. `ops/systemd/postgresql@16-main.service.d/override.conf` define `MemoryHigh=22G` e `MemoryMax=24G`; instalar o drop-in e reiniciar o serviço exige uma ação administrativa no servidor.
+- Os scripts da API e carga permitem heap Node de até 16 GiB por processo. Como os processos são iniciados manualmente e as análises carregam grandes conjuntos em memória, limites menores precisam ser definidos considerando o pico real de RSS para evitar OOM.
 - Observabilidade: hook `onResponse` em `backend/src/app.js` registra rota, status, duração e bytes; `cache.obter` registra hit/miss/off e duração da função. Logs estruturados via pino.
 
 ## Frontend
