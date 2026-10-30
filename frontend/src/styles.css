@@ -1774,6 +1774,7 @@ tr.linha--ativa th {
 
 .secao-modal {
   background: var(--panel);
+  color: var(--ink);
   border-radius: var(--raio);
   max-width: 1680px;
   width: 100%;
