@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { api } from '../api/client'
 import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
@@ -15,6 +15,8 @@ const municipios = ref([])
 const secoes = ref([])
 const carregandoMunicipios = ref(false)
 const carregandoSecoes = ref(false)
+const ordenarMunicipios = ref('nao_habilitada')
+const ordenarSecoes = ref('percentual')
 
 async function carregarMunicipios(uf) {
   ufSelecionada.value = uf
@@ -27,6 +29,7 @@ async function carregarMunicipios(uf) {
       cargo: store.cargo,
       as_of: store.asOf,
       uf,
+      ordenar_por: ordenarMunicipios.value,
     })
     municipios.value = r.municipios ?? []
   } catch (e) {
@@ -46,6 +49,7 @@ async function carregarSecoes(municipio) {
       as_of: store.asOf,
       uf: ufSelecionada.value,
       municipio,
+      ordenar_por: ordenarSecoes.value,
     })
     secoes.value = r.secoes ?? []
   } catch (e) {
@@ -54,6 +58,13 @@ async function carregarSecoes(municipio) {
     carregandoSecoes.value = false
   }
 }
+
+watch(ordenarMunicipios, () => {
+  if (ufSelecionada.value) carregarMunicipios(ufSelecionada.value)
+})
+watch(ordenarSecoes, () => {
+  if (municipioSelecionado.value) carregarSecoes(municipioSelecionado.value)
+})
 
 function nomeMunicipio(m) {
   return m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
@@ -70,6 +81,13 @@ function nomeMunicipio(m) {
     <div class="card">
       <div class="card__cabecalho">
         <h2>Municípios com maior biometria não habilitada</h2>
+        <div class="uf-painel__acoes">
+          <select v-if="ufSelecionada" v-model="ordenarMunicipios" class="uf-ordenacao">
+            <option value="nao_habilitada">Não habilitada</option>
+            <option value="percentual">% não habilitada</option>
+            <option value="comparecimento">Comparecimento</option>
+          </select>
+        </div>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">Clique em um estado na tabela acima.</div>
@@ -103,6 +121,13 @@ function nomeMunicipio(m) {
     <div class="card">
       <div class="card__cabecalho">
         <h2>Seções com maior % não habilitada</h2>
+        <div class="uf-painel__acoes">
+          <select v-if="municipioSelecionado" v-model="ordenarSecoes" class="uf-ordenacao">
+            <option value="percentual">% não habilitada</option>
+            <option value="nao_habilitada">Não habilitada</option>
+            <option value="comparecimento">Comparecimento</option>
+          </select>
+        </div>
         <p v-if="municipioSelecionado" class="card__meta">
           {{ nomeMunicipio(municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}) }}
         </p>
