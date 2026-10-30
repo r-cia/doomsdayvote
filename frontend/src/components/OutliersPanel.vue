@@ -1,11 +1,22 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
 })
 
-const secoes = computed(() => props.dados?.secoes ?? [])
+const ordenacao = ref('if')
+
+const secoesBase = computed(() => props.dados?.secoes ?? [])
+const secoes = computed(() => {
+  const lista = [...secoesBase.value]
+  if (ordenacao.value === 'lof') {
+    lista.sort((a, b) => (b.score_lof ?? -Infinity) - (a.score_lof ?? -Infinity))
+  } else {
+    lista.sort((a, b) => (b.score_if ?? -Infinity) - (a.score_if ?? -Infinity))
+  }
+  return lista
+})
 const limiarIf = computed(() => props.dados?.isolamento?.limiar ?? 0.6)
 const limiarLof = computed(() => props.dados?.lof?.limiar ?? 2)
 
@@ -31,6 +42,15 @@ function tomLof(valor) {
   <section class="painel" aria-labelledby="outliers-titulo">
     <header class="painel__cabecalho">
       <h2 id="outliers-titulo">Isolamento e LOF</h2>
+      <div class="estatistica-controle">
+        <label class="campo campo--curto">
+          <span class="campo__rotulo">Ordenar por</span>
+          <select v-model="ordenacao">
+            <option value="if">Maior IF</option>
+            <option value="lof">Maior LOF</option>
+          </select>
+        </label>
+      </div>
       <p class="painel__meta">
         <b>{{ dados?.total_secoes ?? 0 }}</b> seções · IF ≥ {{ limiarIf }}<br />
         LOF ≥ {{ limiarLof }} · amostra {{ dados?.lof?.amostra ?? 0 }}
