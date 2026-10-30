@@ -132,21 +132,21 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/duplicacao.js": {
-    "mtime": 1793318844.1974387,
-    "seen": 1793360126.8218055,
-    "ast_hash": "5656e6fccf74ec6377aed52e931575eb",
+    "mtime": 1793364051.2698004,
+    "seen": 1793364259.127867,
+    "ast_hash": "4051578fc0c47b3cdc40d3e1c7c1baed",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatisticas.js": {
-    "mtime": 1793322689.8713272,
-    "seen": 1793360126.821807,
-    "ast_hash": "9888e461b8429ad6f690492da85037c8",
+    "mtime": 1793364051.2698004,
+    "seen": 1793364259.127869,
+    "ast_hash": "e930b0e40c6407368eb6f395f13f9c98",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/outliers.js": {
-    "mtime": 1793293492.8650537,
-    "seen": 1793360126.821808,
-    "ast_hash": "229e7054d1a2140d76cb2ac3bfd348d0",
+    "mtime": 1793361352.7880068,
+    "seen": 1793364259.1278708,
+    "ast_hash": "3532e74d68033fd457ca00c8bbf5c819",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/versoes-bu.js": {
@@ -252,8 +252,8 @@
     "semantic_hash": ""
   },
   "backend/src/modules/importacao/importar-arquivo.js": {
-    "mtime": 1793305449.842525,
-    "seen": 1793360126.8218317,
+    "mtime": 1793362908.2578578,
+    "seen": 1793364259.1279037,
     "ast_hash": "9d63144e6b72467cc1e6a35fe43e58f1",
     "semantic_hash": ""
   },
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793360096.709205,
-    "seen": 1793360126.8218417,
-    "ast_hash": "ad36596f66fe9a1aba18a66c839c7483",
+    "mtime": 1793364051.2698004,
+    "seen": 1793364259.1279125,
+    "ast_hash": "686245129d35f824f5006d5961f40b07",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/api.test.js": {
-    "mtime": 1793302873.1986828,
-    "seen": 1793360126.8218563,
-    "ast_hash": "2075b87a1c69ad7adeaf9d7280dff462",
+    "mtime": 1793361352.7880068,
+    "seen": 1793364259.127932,
+    "ast_hash": "67a1c32dfbed2a59161c30c5cf026d94",
     "semantic_hash": ""
   },
   "backend/tests/integration/cache.test.js": {
@@ -636,15 +636,15 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.js": {
-    "mtime": 1793360096.7102048,
-    "seen": 1793360126.8219202,
-    "ast_hash": "c00367d6f3daa6c0da60ada1ea6961c8",
+    "mtime": 1793360890.4002821,
+    "seen": 1793364259.128034,
+    "ast_hash": "ad70e5cfcb080fa670da6ff349985e47",
     "semantic_hash": ""
   },
   "frontend/src/components/AnaliseSection.vue": {
-    "mtime": 1793334339.4574916,
-    "seen": 1793360126.8219216,
-    "ast_hash": "b7416667891e360e4e868d4758259aa5",
+    "mtime": 1793364051.2708006,
+    "seen": 1793364259.1280355,
+    "ast_hash": "deaebd4e892371781316f0b64e5fc7ae",
     "semantic_hash": ""
   },
   "frontend/src/components/AvisoBanner.vue": {
@@ -654,15 +654,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordNiveisPanel.vue": {
-    "mtime": 1793334070.9654613,
-    "seen": 1793360126.8219242,
-    "ast_hash": "b0d31eed90dbbb02ebc0e1f26b51720d",
+    "mtime": 1793361352.7890067,
+    "seen": 1793364259.128039,
+    "ast_hash": "7af059908190515d68fe958e51043b14",
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordPanel.vue": {
-    "mtime": 1793335130.8363483,
-    "seen": 1793360126.8219254,
-    "ast_hash": "4cc2bdabedd732621a1f0047c5ba160c",
+    "mtime": 1793361352.7890067,
+    "seen": 1793364259.1280406,
+    "ast_hash": "37d8f5d98af181b4af69f3ba81b3618f",
     "semantic_hash": ""
   },
   "frontend/src/components/BiometriaPanel.vue": {
@@ -678,21 +678,21 @@
     "semantic_hash": ""
   },
   "frontend/src/components/ConsistenciaPanel.vue": {
-    "mtime": 1793359702.0772314,
-    "seen": 1793360126.8219292,
-    "ast_hash": "ac5a03aaec0f9d980e1285dcb74476da",
+    "mtime": 1793364051.2708006,
+    "seen": 1793364259.1280499,
+    "ast_hash": "bfdb97378322b549f54a36a67b7a9e4c",
     "semantic_hash": ""
   },
   "frontend/src/components/DuplicacaoPanel.vue": {
-    "mtime": 1793334047.7851985,
-    "seen": 1793360126.8219304,
-    "ast_hash": "8ea79bd45bf478a91fbddff316acba23",
+    "mtime": 1793364051.2708006,
+    "seen": 1793364259.1280515,
+    "ast_hash": "96da125f8ca4b7262b290c9900988212",
     "semantic_hash": ""
   },
   "frontend/src/components/EstatisticaPanel.vue": {
-    "mtime": 1793334336.7924616,
-    "seen": 1793360126.821932,
-    "ast_hash": "2c334ebbb92a827adec4c8fa89218f58",
+    "mtime": 1793364051.2718005,
+    "seen": 1793364259.1280527,
+    "ast_hash": "2ebb9e152fa922e62e773c49acc61dba",
     "semantic_hash": ""
   },
   "frontend/src/components/FilterBar.vue": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/OutliersPanel.vue": {
-    "mtime": 1793333295.050456,
-    "seen": 1793360126.8219383,
-    "ast_hash": "196d4a6a905b97097d917b6846e41c12",
+    "mtime": 1793361352.7890067,
+    "seen": 1793364259.1280618,
+    "ast_hash": "43d16687ae291891d21cea27f50e7b23",
     "semantic_hash": ""
   },
   "frontend/src/components/PlacarRanking.vue": {
@@ -768,9 +768,9 @@
     "semantic_hash": ""
   },
   "frontend/src/composables/queries.js": {
-    "mtime": 1793360096.7102048,
-    "seen": 1793360126.8219485,
-    "ast_hash": "5e9168c1003ec39d5c240d05cee1a727",
+    "mtime": 1793360890.4002821,
+    "seen": 1793364259.1280758,
+    "ast_hash": "dbaa856a482ae274c940df1a9937667e",
     "semantic_hash": ""
   },
   "frontend/src/composables/selecao.js": {
@@ -822,9 +822,9 @@
     "semantic_hash": ""
   },
   "frontend/src/lib/status.js": {
-    "mtime": 1793335068.2656493,
-    "seen": 1793360126.8219728,
-    "ast_hash": "3517cb0d8b9409aee3ccaa320111cd5c",
+    "mtime": 1793361768.407256,
+    "seen": 1793364259.1280916,
+    "ast_hash": "74a942e3115f3443412609a352078847",
     "semantic_hash": ""
   },
   "frontend/src/main.js": {
@@ -846,9 +846,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/AnaliseView.vue": {
-    "mtime": 1793359712.5413375,
-    "seen": 1793360126.8219783,
-    "ast_hash": "4c3ea07eb0f7f9c5a4a4fdbc16a08f44",
+    "mtime": 1793364051.2718005,
+    "seen": 1793364259.1280985,
+    "ast_hash": "0654ef18571f57626efa43d8bd1a8826",
     "semantic_hash": ""
   },
   "frontend/src/views/BiometriaView.vue": {
@@ -882,21 +882,21 @@
     "semantic_hash": ""
   },
   "frontend/tests/components.test.js": {
-    "mtime": 1793306579.5291693,
-    "seen": 1793360126.8219862,
-    "ast_hash": "8a2ec786732653eafacba8ec91a0d80e",
+    "mtime": 1793361789.877473,
+    "seen": 1793364259.1281087,
+    "ast_hash": "813f62b92f5424a73728ffc6a9a3b7bd",
     "semantic_hash": ""
   },
   "frontend/tests/lib.test.js": {
-    "mtime": 1793286777.0095804,
-    "seen": 1793360126.8219876,
-    "ast_hash": "b5aa50223831f49aff62a43cb6b50631",
+    "mtime": 1793361794.5325203,
+    "seen": 1793364259.1281104,
+    "ast_hash": "53adae0225e29a93a7e4e9e071181ca7",
     "semantic_hash": ""
   },
   "frontend/tests/setup.js": {
-    "mtime": 1793280793.5099547,
-    "seen": 1793360126.821989,
-    "ast_hash": "ea96d20db8f4f6474733ef1d6c4c3b66",
+    "mtime": 1793361352.7890067,
+    "seen": 1793364259.1281118,
+    "ast_hash": "d92187b24c295bc418cdce5b28f4cf2b",
     "semantic_hash": ""
   },
   "frontend/tests/store.test.js": {
@@ -960,9 +960,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793360096.709205,
-    "seen": 1793360126.8220043,
-    "ast_hash": "226c6080e137c63c135e7247d3fbe29f",
+    "mtime": 1793364051.2708006,
+    "seen": 1793364259.1281314,
+    "ast_hash": "ccd746bcbdaabe6f9400608f02212bcf",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -1011,6 +1011,72 @@
     "mtime": 1793289031.0720704,
     "seen": 1793360126.8220155,
     "ast_hash": "baff015109068c802e4738209382bb7e",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/comparacao-local.js": {
+    "mtime": 1793360267.2739341,
+    "seen": 1793364259.1278546,
+    "ast_hash": "cb414360a7a944ea207ba988308144db",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/concentracao.js": {
+    "mtime": 1793360702.0343597,
+    "seen": 1793364259.127857,
+    "ast_hash": "2e15087725307051177e6dd839072860",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/comparacao-local.test.js": {
+    "mtime": 1793360300.643273,
+    "seen": 1793364259.1279376,
+    "ast_hash": "33bdd5085789e78dadd43b92e66c3791",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/concentracao.test.js": {
+    "mtime": 1793360869.428068,
+    "seen": 1793364259.127939,
+    "ast_hash": "78d9af8f020344c36f214d2383f8a335",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/comparacao-local.test.js": {
+    "mtime": 1793360296.998236,
+    "seen": 1793364259.1279836,
+    "ast_hash": "bedbb353b7f5b31de472a95c685b1bc6",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/concentracao.test.js": {
+    "mtime": 1793360872.7591019,
+    "seen": 1793364259.1279852,
+    "ast_hash": "526e38135026410b5c02188e0742c6b9",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/CoberturaBlock.vue": {
+    "mtime": 1793361962.7892256,
+    "seen": 1793364259.1280456,
+    "ast_hash": "9a36c54f6290afe9c572745d3380696b",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ComparacaoLocalPanel.vue": {
+    "mtime": 1793364051.2708006,
+    "seen": 1793364259.128047,
+    "ast_hash": "17e568111e7728942bb74c7a0942f1df",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ConcentracaoPanel.vue": {
+    "mtime": 1793364051.2708006,
+    "seen": 1793364259.1280484,
+    "ast_hash": "141f1b30c92f5fac08f720fa5dacbeec",
+    "semantic_hash": ""
+  },
+  "docs/architecture.md": {
+    "mtime": 1793362013.9197447,
+    "seen": 1793364259.1281326,
+    "ast_hash": "0329304f557ca1984fd7a9cfdf981736",
+    "semantic_hash": ""
+  },
+  "docs/blueprint.md": {
+    "mtime": 1793362002.351627,
+    "seen": 1793364259.1281338,
+    "ast_hash": "3ecd4231c888ab0e32d03355edfef91a",
     "semantic_hash": ""
   }
 }

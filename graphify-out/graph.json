@@ -35,8 +35,8 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 11,
-      "community_name": "BiometriaView.vue",
+      "community": 26,
+      "community_name": "client.js",
       "file_type": "code",
       "norm_label": "apierror",
       "source_file": "frontend/src/api/client.js",
@@ -656,7 +656,7 @@
       "file_type": "code",
       "norm_label": "somarmetricassecao()",
       "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L67"
+      "source_location": "L99"
     },
     {
       "id": "backend_src_modules_apuracao_totais_somarvotos",
@@ -680,7 +680,7 @@
       "file_type": "code",
       "norm_label": "totaisporarea()",
       "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L91"
+      "source_location": "L123"
     },
     {
       "id": "backend_src_routes_index_budasecao",
@@ -741,18 +741,6 @@
       "norm_label": "registrarrotas()",
       "source_file": "backend/src/routes/index.js",
       "source_location": "L75"
-    },
-    {
-      "id": "backend_tests_integration_totais_test_alvocargo",
-      "label": "alvoCargo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "routes/index.js",
-      "file_type": "code",
-      "norm_label": "alvocargo()",
-      "source_file": "backend/tests/integration/totais.test.js",
-      "source_location": "L23"
     },
     {
       "id": "backend_tests_unit_analise_duplicacao_test_secao",
@@ -1305,42 +1293,6 @@
       "norm_label": "contarlinhas()",
       "source_file": "backend/tests/unit/importacao/leitor-gzip.test.js",
       "source_location": "L12"
-    },
-    {
-      "id": "frontend_src_api_client_apierror_constructor",
-      "label": ".constructor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "BiometriaView.vue",
-      "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "frontend/src/api/client.js",
-      "source_location": "L4"
-    },
-    {
-      "id": "frontend_src_api_client_montarquery",
-      "label": "montarQuery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "BiometriaView.vue",
-      "file_type": "code",
-      "norm_label": "montarquery()",
-      "source_file": "frontend/src/api/client.js",
-      "source_location": "L11"
-    },
-    {
-      "id": "frontend_src_api_client_obter",
-      "label": "obter()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "BiometriaView.vue",
-      "file_type": "code",
-      "norm_label": "obter()",
-      "source_file": "frontend/src/api/client.js",
-      "source_location": "L21"
     },
     {
       "id": "frontend_src_views_biometriaview_abrirsecao",
@@ -1931,167 +1883,11 @@
       "source_location": "L34"
     },
     {
-      "id": "backend_src_modules_importacao_validacoes_alerta",
-      "label": "alerta()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "alerta()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L50"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_cargoemescopo",
-      "label": "cargoEmEscopo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "cargoemescopo()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L27"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_chavebu",
-      "label": "chaveBu()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "chavebu()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L35"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_chavenatural",
-      "label": "chaveNatural()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "chavenatural()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L31"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_encodingsuspeito",
-      "label": "encodingSuspeito()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "encodingsuspeito()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L54"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_normalizar",
-      "label": "normalizar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "normalizar()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L19"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_validarbu",
-      "label": "validarBu()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "validarbu()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L137"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_validarlinha",
-      "label": "validarLinha()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "validarlinha()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L63"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_validarmetadadosincremental",
-      "label": "validarMetadadosIncremental()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "validarmetadadosincremental()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L110"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes_validarregistros",
-      "label": "validarRegistros()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "validarregistros()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L220"
-    },
-    {
-      "id": "backend_tests_unit_validacoes_test_codigos",
-      "label": "codigos()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "codigos()",
-      "source_file": "backend/tests/unit/validacoes.test.js",
-      "source_location": "L36"
-    },
-    {
-      "id": "backend_tests_unit_validacoes_test_datahora",
-      "label": "dataHora()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "datahora()",
-      "source_file": "backend/tests/unit/validacoes.test.js",
-      "source_location": "L4"
-    },
-    {
-      "id": "backend_tests_unit_validacoes_test_registro",
-      "label": "registro()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "registro()",
-      "source_file": "backend/tests/unit/validacoes.test.js",
-      "source_location": "L8"
-    },
-    {
       "id": "backend_src_env_carregar",
       "label": "carregar()",
       "_callable": true,
       "_origin": "ast",
-      "community": 18,
+      "community": 16,
       "community_name": "env.js",
       "file_type": "code",
       "norm_label": "carregar()",
@@ -2099,28 +1895,100 @@
       "source_location": "L43"
     },
     {
+      "id": "backend_src_env_loadmigrateenv",
+      "label": "loadMigrateEnv()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "env.js",
+      "file_type": "code",
+      "norm_label": "loadmigrateenv()",
+      "source_file": "backend/src/env.js",
+      "source_location": "L59"
+    },
+    {
+      "id": "backend_src_scripts_migrate_main",
+      "label": "main()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "env.js",
+      "file_type": "code",
+      "norm_label": "main()",
+      "source_file": "backend/src/scripts/migrate.js",
+      "source_location": "L8"
+    },
+    {
+      "id": "backend_src_db_index_criardb",
+      "label": "criarDb()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "criarDb",
+      "file_type": "code",
+      "norm_label": "criardb()",
+      "source_file": "backend/src/db/index.js",
+      "source_location": "L8"
+    },
+    {
       "id": "backend_src_env_loadworkerenv",
       "label": "loadWorkerEnv()",
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "loadworkerenv()",
       "source_file": "backend/src/env.js",
       "source_location": "L55"
     },
     {
-      "id": "backend_src_scripts_carregar_pasta_main",
+      "id": "backend_src_scripts_purge_originais_main",
       "label": "main()",
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "main()",
-      "source_file": "backend/src/scripts/carregar-pasta.js",
-      "source_location": "L9"
+      "source_file": "backend/src/scripts/purge-originais.js",
+      "source_location": "L6"
+    },
+    {
+      "id": "backend_tests_integration_regressao_apuracao_test_alvocargo",
+      "label": "alvoCargo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "criarDb",
+      "file_type": "code",
+      "norm_label": "alvocargo()",
+      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
+      "source_location": "L28"
+    },
+    {
+      "id": "backend_tests_integration_regressao_apuracao_test_importar",
+      "label": "importar()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "criarDb",
+      "file_type": "code",
+      "norm_label": "importar()",
+      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
+      "source_location": "L24"
+    },
+    {
+      "id": "backend_tests_integration_regressao_apuracao_test_juntar",
+      "label": "juntar()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "criarDb",
+      "file_type": "code",
+      "norm_label": "juntar()",
+      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
+      "source_location": "L20"
     },
     {
       "id": "backend_src_modules_importacao_importar_arquivo_escaparcopy",
@@ -2207,16 +2075,16 @@
       "source_location": "L33"
     },
     {
-      "id": "backend_src_modules_importacao_validacoes_criarvalidador",
-      "label": "criarValidador()",
+      "id": "backend_tests_integration_concentracao_test_importar",
+      "label": "importar()",
       "_callable": true,
       "_origin": "ast",
       "community": 19,
       "community_name": "importarArquivo",
       "file_type": "code",
-      "norm_label": "criarvalidador()",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L197"
+      "norm_label": "importar()",
+      "source_file": "backend/tests/integration/concentracao.test.js",
+      "source_location": "L26"
     },
     {
       "id": "backend_tests_integration_progresso_test_alvocargo",
@@ -2447,18 +2315,6 @@
       "source_location": "L89"
     },
     {
-      "id": "frontend_src_components_mappanel_linhastooltip",
-      "label": "linhasTooltip()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "linhastooltip()",
-      "source_file": "frontend/src/components/MapPanel.vue",
-      "source_location": "L431"
-    },
-    {
       "id": "frontend_src_lib_format_deinputsaopaulo",
       "label": "deInputSaoPaulo()",
       "_callable": true,
@@ -2469,30 +2325,6 @@
       "norm_label": "deinputsaopaulo()",
       "source_file": "frontend/src/lib/format.js",
       "source_location": "L98"
-    },
-    {
-      "id": "frontend_src_lib_format_formatarnumero",
-      "label": "formatarNumero()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "formatarnumero()",
-      "source_file": "frontend/src/lib/format.js",
-      "source_location": "L33"
-    },
-    {
-      "id": "frontend_src_lib_format_formatarpercentual",
-      "label": "formatarPercentual()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "formatarpercentual()",
-      "source_file": "frontend/src/lib/format.js",
-      "source_location": "L39"
     },
     {
       "id": "frontend_src_lib_format_formatarsha",
@@ -2543,72 +2375,36 @@
       "source_location": "L28"
     },
     {
-      "id": "backend_src_modules_importacao_carregar_pasta_carimbo",
-      "label": "carimbo()",
+      "id": "backend_tests_helpers_db_teste_contar",
+      "label": "contar()",
       "_callable": true,
       "_origin": "ast",
       "community": 25,
       "community_name": "fixtures.js",
       "file_type": "code",
-      "norm_label": "carimbo()",
-      "source_file": "backend/src/modules/importacao/carregar-pasta.js",
-      "source_location": "L8"
+      "norm_label": "contar()",
+      "source_file": "backend/tests/helpers/db-teste.js",
+      "source_location": "L17"
     },
     {
-      "id": "backend_src_modules_importacao_carregar_pasta_carregarpasta",
-      "label": "carregarPasta()",
+      "id": "backend_tests_helpers_db_teste_limparbanco",
+      "label": "limparBanco()",
       "_callable": true,
       "_origin": "ast",
       "community": 25,
       "community_name": "fixtures.js",
       "file_type": "code",
-      "norm_label": "carregarpasta()",
-      "source_file": "backend/src/modules/importacao/carregar-pasta.js",
-      "source_location": "L13"
-    },
-    {
-      "id": "backend_src_modules_importacao_relatorio_gerarrelatoriolote",
-      "label": "gerarRelatorioLote()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "fixtures.js",
-      "file_type": "code",
-      "norm_label": "gerarrelatoriolote()",
-      "source_file": "backend/src/modules/importacao/relatorio.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_db_index_criardb",
-      "label": "criarDb()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "criardb()",
-      "source_file": "backend/src/db/index.js",
-      "source_location": "L8"
-    },
-    {
-      "id": "backend_src_scripts_purge_originais_main",
-      "label": "main()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "main()",
-      "source_file": "backend/src/scripts/purge-originais.js",
-      "source_location": "L6"
+      "norm_label": "limparbanco()",
+      "source_file": "backend/tests/helpers/db-teste.js",
+      "source_location": "L3"
     },
     {
       "id": "backend_tests_integration_importacao_fora_de_ordem_test_contar",
       "label": "contar()",
       "_callable": true,
       "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
+      "community": 25,
+      "community_name": "fixtures.js",
       "file_type": "code",
       "norm_label": "contar()",
       "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
@@ -2619,12 +2415,48 @@
       "label": "escreverEmbaralhado()",
       "_callable": true,
       "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
+      "community": 25,
+      "community_name": "fixtures.js",
       "file_type": "code",
       "norm_label": "escreverembaralhado()",
       "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
       "source_location": "L25"
+    },
+    {
+      "id": "frontend_src_api_client_apierror_constructor",
+      "label": ".constructor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "client.js",
+      "file_type": "code",
+      "norm_label": ".constructor()",
+      "source_file": "frontend/src/api/client.js",
+      "source_location": "L4"
+    },
+    {
+      "id": "frontend_src_api_client_montarquery",
+      "label": "montarQuery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "client.js",
+      "file_type": "code",
+      "norm_label": "montarquery()",
+      "source_file": "frontend/src/api/client.js",
+      "source_location": "L11"
+    },
+    {
+      "id": "frontend_src_api_client_obter",
+      "label": "obter()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "client.js",
+      "file_type": "code",
+      "norm_label": "obter()",
+      "source_file": "frontend/src/api/client.js",
+      "source_location": "L21"
     },
     {
       "id": "backend_tests_helpers_fixtures_caminhofixture",
@@ -2639,7 +2471,7 @@
       "source_location": "L21"
     },
     {
-      "id": "backend_tests_integration_consistencia_test_importar",
+      "id": "backend_tests_integration_comparacao_local_test_importar",
       "label": "importar()",
       "_callable": true,
       "_origin": "ast",
@@ -2647,7 +2479,7 @@
       "community_name": "caminhoFixture",
       "file_type": "code",
       "norm_label": "importar()",
-      "source_file": "backend/tests/integration/consistencia.test.js",
+      "source_file": "backend/tests/integration/comparacao-local.test.js",
       "source_location": "L26"
     },
     {
@@ -2687,6 +2519,18 @@
       "source_location": "L18"
     },
     {
+      "id": "backend_tests_integration_totais_test_alvocargo",
+      "label": "alvoCargo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "caminhoFixture",
+      "file_type": "code",
+      "norm_label": "alvocargo()",
+      "source_file": "backend/tests/integration/totais.test.js",
+      "source_location": "L23"
+    },
+    {
       "id": "backend_tests_integration_totais_test_importar",
       "label": "importar()",
       "_callable": true,
@@ -2697,6 +2541,30 @@
       "norm_label": "importar()",
       "source_file": "backend/tests/integration/totais.test.js",
       "source_location": "L19"
+    },
+    {
+      "id": "frontend_src_i18n_index_definirlocale",
+      "label": "definirLocale()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "definirlocale()",
+      "source_file": "frontend/src/i18n/index.js",
+      "source_location": "L29"
+    },
+    {
+      "id": "frontend_src_i18n_index_detectar",
+      "label": "detectar()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "detectar()",
+      "source_file": "frontend/src/i18n/index.js",
+      "source_location": "L9"
     },
     {
       "id": "frontend_src_lib_agregacoes_candidatosnominais",
@@ -2711,28 +2579,16 @@
       "source_location": "L13"
     },
     {
-      "id": "frontend_src_i18n_index_definirlocale",
-      "label": "definirLocale()",
+      "id": "backend_tests_integration_estatisticas_test_importar",
+      "label": "importar()",
       "_callable": true,
       "_origin": "ast",
       "community": 30,
-      "community_name": "App.vue",
+      "community_name": "estatisticas.test.js",
       "file_type": "code",
-      "norm_label": "definirlocale()",
-      "source_file": "frontend/src/i18n/index.js",
-      "source_location": "L29"
-    },
-    {
-      "id": "frontend_src_i18n_index_detectar",
-      "label": "detectar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "detectar()",
-      "source_file": "frontend/src/i18n/index.js",
-      "source_location": "L9"
+      "norm_label": "importar()",
+      "source_file": "backend/tests/integration/estatisticas.test.js",
+      "source_location": "L26"
     },
     {
       "id": "frontend_src_components_benfordniveispanel_mad",
@@ -2740,7 +2596,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 31,
-      "community_name": "StateBlock.vue",
+      "community_name": "BenfordNiveisPanel.vue",
       "file_type": "code",
       "norm_label": "mad()",
       "source_file": "frontend/src/components/BenfordNiveisPanel.vue",
@@ -2841,6 +2697,18 @@
       "norm_label": "opcoesstatus()",
       "source_file": "frontend/src/lib/status.js",
       "source_location": "L75"
+    },
+    {
+      "id": "frontend_src_lib_status_statussecao",
+      "label": "statusSecao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "status.js",
+      "file_type": "code",
+      "norm_label": "statussecao()",
+      "source_file": "frontend/src/lib/status.js",
+      "source_location": "L38"
     },
     {
       "id": "frontend_src_components_ufpanel_alternar",
@@ -3177,30 +3045,6 @@
       "norm_label": "ufdafeicao()",
       "source_file": "frontend/src/components/MapPanel.vue",
       "source_location": "L189"
-    },
-    {
-      "id": "backend_src_env_loadmigrateenv",
-      "label": "loadMigrateEnv()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "schema.test.js",
-      "file_type": "code",
-      "norm_label": "loadmigrateenv()",
-      "source_file": "backend/src/env.js",
-      "source_location": "L59"
-    },
-    {
-      "id": "backend_src_scripts_migrate_main",
-      "label": "main()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "schema.test.js",
-      "file_type": "code",
-      "norm_label": "main()",
-      "source_file": "backend/src/scripts/migrate.js",
-      "source_location": "L8"
     },
     {
       "id": "backend_tests_integration_schema_test_criarbase",
@@ -3791,12 +3635,24 @@
       "source_location": "L4"
     },
     {
+      "id": "frontend_src_components_comparacaolocalpanel_formatpercentual",
+      "label": "formatPercentual()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "formatpercentual()",
+      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
+      "source_location": "L17"
+    },
+    {
       "id": "frontend_src_components_concentracaopanel_formatnumero",
       "label": "formatNumero()",
       "_callable": true,
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "formatnumero()",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -3808,7 +3664,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "formatpercentual()",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -3899,6 +3755,18 @@
       "source_location": "L18"
     },
     {
+      "id": "backend_src_composition_root_criardependencias",
+      "label": "criarDependencias()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 46,
+      "community_name": "criarCache",
+      "file_type": "code",
+      "norm_label": "criardependencias()",
+      "source_file": "backend/src/composition-root.js",
+      "source_location": "L5"
+    },
+    {
       "id": "backend_src_lib_cache_criarcache",
       "label": "criarCache()",
       "_callable": true,
@@ -3920,7 +3788,7 @@
       "file_type": "code",
       "norm_label": "fechar()",
       "source_file": "backend/src/lib/cache.js",
-      "source_location": "L91"
+      "source_location": "L107"
     },
     {
       "id": "backend_src_lib_cache_criarcache_invalidar",
@@ -3932,7 +3800,7 @@
       "file_type": "code",
       "norm_label": "invalidar()",
       "source_file": "backend/src/lib/cache.js",
-      "source_location": "L87"
+      "source_location": "L103"
     },
     {
       "id": "backend_src_lib_cache_criarcache_obter",
@@ -3957,6 +3825,18 @@
       "norm_label": "hash()",
       "source_file": "backend/src/lib/cache.js",
       "source_location": "L6"
+    },
+    {
+      "id": "backend_src_lib_logger_criarlogger",
+      "label": "criarLogger()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 46,
+      "community_name": "criarCache",
+      "file_type": "code",
+      "norm_label": "criarlogger()",
+      "source_file": "backend/src/lib/logger.js",
+      "source_location": "L3"
     },
     {
       "id": "backend_src_modules_analise_benford_calcularbenford",
@@ -4259,6 +4139,18 @@
       "source_location": "L46"
     },
     {
+      "id": "frontend_src_components_mappanel_linhastooltip",
+      "label": "linhasTooltip()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "linhastooltip()",
+      "source_file": "frontend/src/components/MapPanel.vue",
+      "source_location": "L431"
+    },
+    {
       "id": "frontend_src_components_placarranking_escolher",
       "label": "escolher()",
       "_callable": true,
@@ -4269,6 +4161,30 @@
       "norm_label": "escolher()",
       "source_file": "frontend/src/components/PlacarRanking.vue",
       "source_location": "L54"
+    },
+    {
+      "id": "frontend_src_lib_format_formatarnumero",
+      "label": "formatarNumero()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "formatarnumero()",
+      "source_file": "frontend/src/lib/format.js",
+      "source_location": "L33"
+    },
+    {
+      "id": "frontend_src_lib_format_formatarpercentual",
+      "label": "formatarPercentual()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "formatarpercentual()",
+      "source_file": "frontend/src/lib/format.js",
+      "source_location": "L39"
     },
     {
       "id": "backend_src_app_buildapp",
@@ -4343,7 +4259,7 @@
       "source_location": "L25"
     },
     {
-      "id": "backend_tests_integration_estatisticas_test_importar",
+      "id": "backend_tests_integration_consistencia_test_importar",
       "label": "importar()",
       "_callable": true,
       "_origin": "ast",
@@ -4351,20 +4267,8 @@
       "community_name": "app.js",
       "file_type": "code",
       "norm_label": "importar()",
-      "source_file": "backend/tests/integration/estatisticas.test.js",
+      "source_file": "backend/tests/integration/consistencia.test.js",
       "source_location": "L26"
-    },
-    {
-      "id": "backend_src_composition_root_criardependencias",
-      "label": "criarDependencias()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "server.js",
-      "file_type": "code",
-      "norm_label": "criardependencias()",
-      "source_file": "backend/src/composition-root.js",
-      "source_location": "L5"
     },
     {
       "id": "backend_src_db_migracoes_migracoespendentes",
@@ -4391,18 +4295,6 @@
       "source_location": "L51"
     },
     {
-      "id": "backend_src_lib_logger_criarlogger",
-      "label": "criarLogger()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "server.js",
-      "file_type": "code",
-      "norm_label": "criarlogger()",
-      "source_file": "backend/src/lib/logger.js",
-      "source_location": "L3"
-    },
-    {
       "id": "backend_src_server_main",
       "label": "main()",
       "_callable": true,
@@ -4415,36 +4307,12 @@
       "source_location": "L7"
     },
     {
-      "id": "backend_tests_helpers_db_teste_contar",
-      "label": "contar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "db-teste.js",
-      "file_type": "code",
-      "norm_label": "contar()",
-      "source_file": "backend/tests/helpers/db-teste.js",
-      "source_location": "L17"
-    },
-    {
-      "id": "backend_tests_helpers_db_teste_limparbanco",
-      "label": "limparBanco()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "db-teste.js",
-      "file_type": "code",
-      "norm_label": "limparbanco()",
-      "source_file": "backend/tests/helpers/db-teste.js",
-      "source_location": "L3"
-    },
-    {
       "id": "backend_tests_integration_partido_cor_test_alvocargo",
       "label": "alvoCargo()",
       "_callable": true,
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "alvocargo()",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -4456,7 +4324,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "ambiente()",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -4468,7 +4336,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "semear()",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -4533,6 +4401,54 @@
       "norm_label": "primeirocargo()",
       "source_file": "backend/tests/integration/corte.test.js",
       "source_location": "L31"
+    },
+    {
+      "id": "backend_src_modules_importacao_carregar_pasta_carimbo",
+      "label": "carimbo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "lote.test.js",
+      "file_type": "code",
+      "norm_label": "carimbo()",
+      "source_file": "backend/src/modules/importacao/carregar-pasta.js",
+      "source_location": "L8"
+    },
+    {
+      "id": "backend_src_modules_importacao_carregar_pasta_carregarpasta",
+      "label": "carregarPasta()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "lote.test.js",
+      "file_type": "code",
+      "norm_label": "carregarpasta()",
+      "source_file": "backend/src/modules/importacao/carregar-pasta.js",
+      "source_location": "L13"
+    },
+    {
+      "id": "backend_src_modules_importacao_relatorio_gerarrelatoriolote",
+      "label": "gerarRelatorioLote()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "lote.test.js",
+      "file_type": "code",
+      "norm_label": "gerarrelatoriolote()",
+      "source_file": "backend/src/modules/importacao/relatorio.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_scripts_carregar_pasta_main",
+      "label": "main()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "lote.test.js",
+      "file_type": "code",
+      "norm_label": "main()",
+      "source_file": "backend/src/scripts/carregar-pasta.js",
+      "source_location": "L9"
     },
     {
       "id": "backend_tests_integration_lote_test_contar",
@@ -4655,40 +4571,28 @@
       "source_location": "L16"
     },
     {
-      "id": "backend_tests_integration_regressao_apuracao_test_alvocargo",
-      "label": "alvoCargo()",
+      "id": "backend_src_migrations_0006_mv_votos_final_splits_down",
+      "label": "down()",
       "_callable": true,
       "_origin": "ast",
       "community": 57,
-      "community_name": "regressao-apuracao.test.js",
+      "community_name": "0006_mv_votos_final_splits.js",
       "file_type": "code",
-      "norm_label": "alvocargo()",
-      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
-      "source_location": "L28"
+      "norm_label": "down()",
+      "source_file": "backend/src/migrations/0006_mv_votos_final_splits.js",
+      "source_location": "L41"
     },
     {
-      "id": "backend_tests_integration_regressao_apuracao_test_importar",
-      "label": "importar()",
+      "id": "backend_src_migrations_0006_mv_votos_final_splits_up",
+      "label": "up()",
       "_callable": true,
       "_origin": "ast",
       "community": 57,
-      "community_name": "regressao-apuracao.test.js",
+      "community_name": "0006_mv_votos_final_splits.js",
       "file_type": "code",
-      "norm_label": "importar()",
-      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
-      "source_location": "L24"
-    },
-    {
-      "id": "backend_tests_integration_regressao_apuracao_test_juntar",
-      "label": "juntar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 57,
-      "community_name": "regressao-apuracao.test.js",
-      "file_type": "code",
-      "norm_label": "juntar()",
-      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
-      "source_location": "L20"
+      "norm_label": "up()",
+      "source_file": "backend/src/migrations/0006_mv_votos_final_splits.js",
+      "source_location": "L3"
     },
     {
       "id": "frontend_src_components_sectionstable_recebimento",
@@ -4761,6 +4665,18 @@
       "norm_label": "formatardatahora()",
       "source_file": "frontend/src/components/VersoesBuPanel.vue",
       "source_location": "L14"
+    },
+    {
+      "id": "frontend_src_lib_status_motivosecao",
+      "label": "motivoSecao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "SecaoView.vue",
+      "file_type": "code",
+      "norm_label": "motivosecao()",
+      "source_file": "frontend/src/lib/status.js",
+      "source_location": "L48"
     },
     {
       "id": "frontend_src_views_secaoview_fechar",
@@ -4845,18 +4761,6 @@
       "norm_label": "up()",
       "source_file": "backend/src/migrations/0002_resultado_votavel_colunas.js",
       "source_location": "L15"
-    },
-    {
-      "id": "frontend_src_components_comparacaolocalpanel_formatpercentual",
-      "label": "formatPercentual()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 61,
-      "community_name": "ComparacaoLocalPanel.vue",
-      "file_type": "code",
-      "norm_label": "formatpercentual()",
-      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
-      "source_location": "L17"
     },
     {
       "id": "backend_src_migrations_0001_schema_inicial_down",
@@ -4984,7 +4888,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "dataorigem()",
       "source_file": "backend/src/lib/datas.js",
@@ -4996,7 +4900,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "instanteorigemsql()",
       "source_file": "backend/src/lib/datas.js",
@@ -5008,7 +4912,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "localorigem()",
       "source_file": "backend/src/lib/datas.js",
@@ -5020,7 +4924,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "categorizar()",
       "source_file": "backend/src/modules/apuracao/categoria-votavel.js",
@@ -5032,7 +4936,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "normalizartexto()",
       "source_file": "backend/src/modules/apuracao/categoria-votavel.js",
@@ -5044,7 +4948,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "datahora()",
       "source_file": "backend/src/modules/importacao/conteudo-bu.js",
@@ -5056,7 +4960,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "hashconteudobu()",
       "source_file": "backend/src/modules/importacao/conteudo-bu.js",
@@ -5068,7 +4972,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "montarconteudobu()",
       "source_file": "backend/src/modules/importacao/conteudo-bu.js",
@@ -5080,7 +4984,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "ordenarchaves()",
       "source_file": "backend/src/modules/importacao/conteudo-bu.js",
@@ -5092,7 +4996,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "chavegrupo()",
       "source_file": "backend/src/modules/importacao/persistir-bus.js",
@@ -5104,7 +5008,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "persistirarquivo()",
       "source_file": "backend/src/modules/importacao/persistir-bus.js",
@@ -5116,7 +5020,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "upserteleicao()",
       "source_file": "backend/src/modules/importacao/persistir-bus.js",
@@ -5128,7 +5032,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "upsertlocalidade()",
       "source_file": "backend/src/modules/importacao/persistir-bus.js",
@@ -5140,7 +5044,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "upsertsecao()",
       "source_file": "backend/src/modules/importacao/persistir-bus.js",
@@ -5152,11 +5056,179 @@
       "_callable": true,
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "valoresboletim()",
       "source_file": "backend/src/modules/importacao/persistir-bus.js",
       "source_location": "L87"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_alerta",
+      "label": "alerta()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "alerta()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L50"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_cargoemescopo",
+      "label": "cargoEmEscopo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "cargoemescopo()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L27"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_chavebu",
+      "label": "chaveBu()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "chavebu()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L35"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_chavenatural",
+      "label": "chaveNatural()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "chavenatural()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L31"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_criarvalidador",
+      "label": "criarValidador()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "criarvalidador()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L197"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_encodingsuspeito",
+      "label": "encodingSuspeito()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "encodingsuspeito()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L54"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_normalizar",
+      "label": "normalizar()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "normalizar()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L19"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_validarbu",
+      "label": "validarBu()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "validarbu()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L137"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_validarlinha",
+      "label": "validarLinha()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "validarlinha()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L63"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_validarmetadadosincremental",
+      "label": "validarMetadadosIncremental()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "validarmetadadosincremental()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L110"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_validarregistros",
+      "label": "validarRegistros()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "validarregistros()",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L220"
+    },
+    {
+      "id": "backend_tests_unit_validacoes_test_codigos",
+      "label": "codigos()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "codigos()",
+      "source_file": "backend/tests/unit/validacoes.test.js",
+      "source_location": "L36"
+    },
+    {
+      "id": "backend_tests_unit_validacoes_test_datahora",
+      "label": "dataHora()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "datahora()",
+      "source_file": "backend/tests/unit/validacoes.test.js",
+      "source_location": "L4"
+    },
+    {
+      "id": "backend_tests_unit_validacoes_test_registro",
+      "label": "registro()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "registro()",
+      "source_file": "backend/tests/unit/validacoes.test.js",
+      "source_location": "L8"
     },
     {
       "id": "frontend_src_components_duplicacaopanel_numeros",
@@ -5327,30 +5399,6 @@
       "source_location": "L77"
     },
     {
-      "id": "backend_tests_integration_comparacao_local_test_importar",
-      "label": "importar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "integration/comparacao-local.test.js",
-      "file_type": "code",
-      "norm_label": "importar()",
-      "source_file": "backend/tests/integration/comparacao-local.test.js",
-      "source_location": "L26"
-    },
-    {
-      "id": "backend_tests_integration_concentracao_test_importar",
-      "label": "importar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 81,
-      "community_name": "integration/concentracao.test.js",
-      "file_type": "code",
-      "norm_label": "importar()",
-      "source_file": "backend/tests/integration/concentracao.test.js",
-      "source_location": "L26"
-    },
-    {
       "id": "backend_tests_integration_versoes_test_importar",
       "label": "importar()",
       "_callable": true,
@@ -5361,30 +5409,6 @@
       "norm_label": "importar()",
       "source_file": "backend/tests/integration/versoes.test.js",
       "source_location": "L26"
-    },
-    {
-      "id": "frontend_src_lib_status_motivosecao",
-      "label": "motivoSecao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 83,
-      "community_name": "motivoSecao",
-      "file_type": "code",
-      "norm_label": "motivosecao()",
-      "source_file": "frontend/src/lib/status.js",
-      "source_location": "L48"
-    },
-    {
-      "id": "frontend_src_lib_status_statussecao",
-      "label": "statusSecao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "statusSecao",
-      "file_type": "code",
-      "norm_label": "statussecao()",
-      "source_file": "frontend/src/lib/status.js",
-      "source_location": "L38"
     },
     {
       "id": "backend_src_lib_erros",
@@ -5585,28 +5609,6 @@
       "source_location": "L18"
     },
     {
-      "id": "backend_tests_integration_totais_test",
-      "label": "totais.test.js",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "routes/index.js",
-      "file_type": "code",
-      "norm_label": "totais.test.js",
-      "source_file": "backend/tests/integration/totais.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_totais_test_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "routes/index.js",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "backend/tests/integration/totais.test.js",
-      "source_location": "L16"
-    },
-    {
       "id": "backend_tests_unit_analise_consistencia_test",
       "label": "analise/consistencia.test.js",
       "_origin": "ast",
@@ -5770,6 +5772,17 @@
       "norm_label": "leiautes",
       "source_file": "backend/src/modules/importacao/bweb/campos.js",
       "source_location": "L186"
+    },
+    {
+      "id": "backend_src_modules_importacao_bweb_campos_tipos",
+      "label": "TIPOS",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "ler-arquivo.js",
+      "file_type": "code",
+      "norm_label": "tipos",
+      "source_file": "backend/src/modules/importacao/bweb/campos.js",
+      "source_location": "L128"
     },
     {
       "id": "backend_src_modules_importacao_bweb_detectar_leiaute",
@@ -6272,28 +6285,6 @@
       "source_location": "L129"
     },
     {
-      "id": "frontend_src_api_client",
-      "label": "client.js",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "BiometriaView.vue",
-      "file_type": "code",
-      "norm_label": "client.js",
-      "source_file": "frontend/src/api/client.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_api_client_api",
-      "label": "api",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "BiometriaView.vue",
-      "file_type": "code",
-      "norm_label": "api",
-      "source_file": "frontend/src/api/client.js",
-      "source_location": "L40"
-    },
-    {
       "id": "frontend_src_views_biometriaview",
       "label": "BiometriaView.vue",
       "_origin": "ast",
@@ -6646,94 +6637,6 @@
       "source_location": "L21"
     },
     {
-      "id": "frontend_src_views_analiseview",
-      "label": "AnaliseView.vue",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "analiseview.vue",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_views_analiseview_analisequery",
-      "label": "analiseQuery",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "analisequery",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L16"
-    },
-    {
-      "id": "frontend_src_views_analiseview_anomaliasquery",
-      "label": "anomaliasQuery",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "anomaliasquery",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L17"
-    },
-    {
-      "id": "frontend_src_views_analiseview_comparacaolocalquery",
-      "label": "comparacaoLocalQuery",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "comparacaolocalquery",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L19"
-    },
-    {
-      "id": "frontend_src_views_analiseview_concentracaoquery",
-      "label": "concentracaoQuery",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "concentracaoquery",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L20"
-    },
-    {
-      "id": "frontend_src_views_analiseview_consistenciaquery",
-      "label": "consistenciaQuery",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "consistenciaquery",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L18"
-    },
-    {
-      "id": "frontend_src_views_analiseview_ordenacao",
-      "label": "ordenacao",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "ordenacao",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L15"
-    },
-    {
-      "id": "frontend_src_views_analiseview_store_aocandidato_eleicoesdisponiveis",
-      "label": "{ store, aoCandidato, eleicoesDisponiveis }",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "queries.js",
-      "file_type": "code",
-      "norm_label": "{ store, aocandidato, eleicoesdisponiveis }",
-      "source_file": "frontend/src/views/AnaliseView.vue",
-      "source_location": "L13"
-    },
-    {
       "id": "frontend_tests_store_test",
       "label": "store.test.js",
       "_origin": "ast",
@@ -6932,58 +6835,91 @@
       "source_location": "L83"
     },
     {
-      "id": "backend_src_modules_importacao_bweb_campos_tipos",
-      "label": "TIPOS",
+      "id": "backend_src_env",
+      "label": "env.js",
       "_origin": "ast",
       "community": 16,
-      "community_name": "validacoes.js",
+      "community_name": "env.js",
       "file_type": "code",
-      "norm_label": "tipos",
-      "source_file": "backend/src/modules/importacao/bweb/campos.js",
-      "source_location": "L128"
-    },
-    {
-      "id": "backend_src_modules_importacao_validacoes",
-      "label": "validacoes.js",
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "validacoes.js",
-      "file_type": "code",
-      "norm_label": "validacoes.js",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "norm_label": "env.js",
+      "source_file": "backend/src/env.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_src_modules_importacao_validacoes_cargos_em_escopo",
-      "label": "CARGOS_EM_ESCOPO",
+      "id": "backend_src_env_apischema",
+      "label": "apiSchema",
       "_origin": "ast",
       "community": 16,
-      "community_name": "validacoes.js",
+      "community_name": "env.js",
       "file_type": "code",
-      "norm_label": "cargos_em_escopo",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
-      "source_location": "L17"
+      "norm_label": "apischema",
+      "source_file": "backend/src/env.js",
+      "source_location": "L7"
     },
     {
-      "id": "backend_src_modules_importacao_validacoes_chave_natural",
-      "label": "CHAVE_NATURAL",
+      "id": "backend_src_env_booleanenv",
+      "label": "booleanEnv",
       "_origin": "ast",
       "community": 16,
-      "community_name": "validacoes.js",
+      "community_name": "env.js",
       "file_type": "code",
-      "norm_label": "chave_natural",
-      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "norm_label": "booleanenv",
+      "source_file": "backend/src/env.js",
+      "source_location": "L5"
+    },
+    {
+      "id": "backend_src_env_loglevel",
+      "label": "logLevel",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "env.js",
+      "file_type": "code",
+      "norm_label": "loglevel",
+      "source_file": "backend/src/env.js",
+      "source_location": "L4"
+    },
+    {
+      "id": "backend_src_env_migrateschema",
+      "label": "migrateSchema",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "env.js",
+      "file_type": "code",
+      "norm_label": "migrateschema",
+      "source_file": "backend/src/env.js",
+      "source_location": "L38"
+    },
+    {
+      "id": "backend_src_env_nodeenv",
+      "label": "nodeEnv",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "env.js",
+      "file_type": "code",
+      "norm_label": "nodeenv",
+      "source_file": "backend/src/env.js",
       "source_location": "L3"
     },
     {
-      "id": "backend_tests_unit_validacoes_test",
-      "label": "validacoes.test.js",
+      "id": "backend_src_env_workerschema",
+      "label": "workerSchema",
       "_origin": "ast",
       "community": 16,
-      "community_name": "validacoes.js",
+      "community_name": "env.js",
       "file_type": "code",
-      "norm_label": "validacoes.test.js",
-      "source_file": "backend/tests/unit/validacoes.test.js",
+      "norm_label": "workerschema",
+      "source_file": "backend/src/env.js",
+      "source_location": "L28"
+    },
+    {
+      "id": "backend_src_scripts_migrate",
+      "label": "migrate.js",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "env.js",
+      "file_type": "code",
+      "norm_label": "migrate.js",
+      "source_file": "backend/src/scripts/migrate.js",
       "source_location": "L1"
     },
     {
@@ -6991,7 +6927,7 @@
       "label": "current-plan.md",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "page",
       "norm_label": "current-plan.md",
@@ -7003,7 +6939,7 @@
       "label": "Arquivos",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "arquivos",
@@ -7011,35 +6947,23 @@
       "source_location": "L18"
     },
     {
-      "id": "docs_current_plan_arquivos_afetados",
-      "label": "Arquivos afetados",
+      "id": "docs_current_plan_contexto_confirmado_no_c\u00f3digo",
+      "label": "Contexto confirmado no c\u00f3digo",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "arquivos afetados",
+      "norm_label": "contexto confirmado no codigo",
       "source_file": "docs/current-plan.md",
-      "source_location": "L79"
-    },
-    {
-      "id": "docs_current_plan_crit\u00e9rios_de_aceite",
-      "label": "Crit\u00e9rios de aceite",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "criterios de aceite",
-      "source_file": "docs/current-plan.md",
-      "source_location": "L92"
+      "source_location": "L44"
     },
     {
       "id": "docs_current_plan_desenho",
       "label": "Desenho",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "desenho",
@@ -7047,23 +6971,11 @@
       "source_location": "L7"
     },
     {
-      "id": "docs_current_plan_diagn\u00f3stico_atual",
-      "label": "Diagn\u00f3stico atual",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "diagnostico atual",
-      "source_file": "docs/current-plan.md",
-      "source_location": "L44"
-    },
-    {
       "id": "docs_current_plan_estado",
       "label": "Estado",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "estado",
@@ -7071,71 +6983,71 @@
       "source_location": "L34"
     },
     {
-      "id": "docs_current_plan_fase_1_materialized_views_maior_ganho",
-      "label": "Fase 1 \u2014 Materialized views (maior ganho)",
+      "id": "docs_current_plan_fase_0_linha_de_base_e_observabilidade",
+      "label": "Fase 0 \u2014 Linha de base e observabilidade",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "fase 1 \u2014 materialized views (maior ganho)",
+      "norm_label": "fase 0 \u2014 linha de base e observabilidade",
       "source_file": "docs/current-plan.md",
-      "source_location": "L58"
+      "source_location": "L59"
     },
     {
-      "id": "docs_current_plan_fase_2_cache_de_sub_consultas",
-      "label": "Fase 2 \u2014 Cache de sub-consultas",
+      "id": "docs_current_plan_fase_1_reduzir_trabalho_por_requisi\u00e7\u00e3o",
+      "label": "Fase 1 \u2014 Reduzir trabalho por requisi\u00e7\u00e3o",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "fase 2 \u2014 cache de sub-consultas",
-      "source_file": "docs/current-plan.md",
-      "source_location": "L64"
-    },
-    {
-      "id": "docs_current_plan_fase_3_redu\u00e7\u00e3o_de_volume_em_mem\u00f3ria",
-      "label": "Fase 3 \u2014 Redu\u00e7\u00e3o de volume em mem\u00f3ria",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "fase 3 \u2014 reducao de volume em memoria",
+      "norm_label": "fase 1 \u2014 reduzir trabalho por requisicao",
       "source_file": "docs/current-plan.md",
       "source_location": "L69"
     },
     {
-      "id": "docs_current_plan_fase_4_tuning_de_infraestrutura_32_gb",
-      "label": "Fase 4 \u2014 Tuning de infraestrutura (32 GB)",
+      "id": "docs_current_plan_fase_2_concorr\u00eancia_cache_e_payload",
+      "label": "Fase 2 \u2014 Concorr\u00eancia, cache e payload",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "fase 4 \u2014 tuning de infraestrutura (32 gb)",
+      "norm_label": "fase 2 \u2014 concorrencia, cache e payload",
       "source_file": "docs/current-plan.md",
-      "source_location": "L74"
+      "source_location": "L78"
     },
     {
-      "id": "docs_current_plan_fases",
-      "label": "Fases",
+      "id": "docs_current_plan_fase_3_teste_controlado_e_ado\u00e7\u00e3o",
+      "label": "Fase 3 \u2014 Teste controlado e ado\u00e7\u00e3o",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "fases",
+      "norm_label": "fase 3 \u2014 teste controlado e adocao",
       "source_file": "docs/current-plan.md",
-      "source_location": "L56"
+      "source_location": "L86"
+    },
+    {
+      "id": "docs_current_plan_fase_4_configura\u00e7\u00e3o_de_infraestrutura",
+      "label": "Fase 4 \u2014 Configura\u00e7\u00e3o de infraestrutura",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "fase 4 \u2014 configuracao de infraestrutura",
+      "source_file": "docs/current-plan.md",
+      "source_location": "L93"
     },
     {
       "id": "docs_current_plan_fora_de_escopo",
       "label": "Fora de escopo",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "fora de escopo",
@@ -7143,35 +7055,35 @@
       "source_location": "L28"
     },
     {
-      "id": "docs_current_plan_fora_de_escopo_87",
-      "label": "Fora de escopo",
+      "id": "docs_current_plan_fora_de_escopo_nesta_etapa",
+      "label": "Fora de escopo nesta etapa",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "fora de escopo",
+      "norm_label": "fora de escopo nesta etapa",
       "source_file": "docs/current-plan.md",
-      "source_location": "L87"
+      "source_location": "L97"
     },
     {
-      "id": "docs_current_plan_objetivo",
-      "label": "Objetivo",
+      "id": "docs_current_plan_objetivo_e_limites",
+      "label": "Objetivo e limites",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "objetivo",
+      "norm_label": "objetivo e limites",
       "source_file": "docs/current-plan.md",
-      "source_location": "L52"
+      "source_location": "L55"
     },
     {
       "id": "docs_current_plan_plano_atual_abas_barra_de_comando_fixa_e_menos_densidade",
       "label": "Plano atual \u2014 abas, barra de comando fixa e menos densidade",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "plano atual \u2014 abas, barra de comando fixa e menos densidade",
@@ -7179,14 +7091,14 @@
       "source_location": "L1"
     },
     {
-      "id": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
-      "label": "Plano \u2014 Performance de banco e cache Redis",
+      "id": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "label": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "plano \u2014 performance de banco e cache redis",
+      "norm_label": "plano \u2014 performance de banco e logica de requisicoes",
       "source_file": "docs/current-plan.md",
       "source_location": "L42"
     },
@@ -7195,7 +7107,7 @@
       "label": "Problema",
       "_origin": "ast",
       "community": 17,
-      "community_name": "Plano \u2014 Performance de banco e cache Redis",
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "problema",
@@ -7203,91 +7115,26 @@
       "source_location": "L3"
     },
     {
-      "id": "backend_src_env",
-      "label": "env.js",
+      "id": "docs_current_plan_pr\u00f3xima_decis\u00e3o",
+      "label": "Pr\u00f3xima decis\u00e3o",
       "_origin": "ast",
-      "community": 18,
-      "community_name": "env.js",
-      "file_type": "code",
-      "norm_label": "env.js",
-      "source_file": "backend/src/env.js",
-      "source_location": "L1"
+      "community": 17,
+      "community_name": "Plano \u2014 Performance de banco e l\u00f3gica de requisi\u00e7\u00f5es",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "proxima decisao",
+      "source_file": "docs/current-plan.md",
+      "source_location": "L103"
     },
     {
-      "id": "backend_src_env_apischema",
-      "label": "apiSchema",
+      "id": "backend_src_db_index",
+      "label": "db/index.js",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
-      "norm_label": "apischema",
-      "source_file": "backend/src/env.js",
-      "source_location": "L7"
-    },
-    {
-      "id": "backend_src_env_booleanenv",
-      "label": "booleanEnv",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "env.js",
-      "file_type": "code",
-      "norm_label": "booleanenv",
-      "source_file": "backend/src/env.js",
-      "source_location": "L5"
-    },
-    {
-      "id": "backend_src_env_loglevel",
-      "label": "logLevel",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "env.js",
-      "file_type": "code",
-      "norm_label": "loglevel",
-      "source_file": "backend/src/env.js",
-      "source_location": "L4"
-    },
-    {
-      "id": "backend_src_env_migrateschema",
-      "label": "migrateSchema",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "env.js",
-      "file_type": "code",
-      "norm_label": "migrateschema",
-      "source_file": "backend/src/env.js",
-      "source_location": "L38"
-    },
-    {
-      "id": "backend_src_env_nodeenv",
-      "label": "nodeEnv",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "env.js",
-      "file_type": "code",
-      "norm_label": "nodeenv",
-      "source_file": "backend/src/env.js",
-      "source_location": "L3"
-    },
-    {
-      "id": "backend_src_env_workerschema",
-      "label": "workerSchema",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "env.js",
-      "file_type": "code",
-      "norm_label": "workerschema",
-      "source_file": "backend/src/env.js",
-      "source_location": "L28"
-    },
-    {
-      "id": "backend_src_scripts_carregar_pasta",
-      "label": "scripts/carregar-pasta.js",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "env.js",
-      "file_type": "code",
-      "norm_label": "scripts/carregar-pasta.js",
-      "source_file": "backend/src/scripts/carregar-pasta.js",
+      "norm_label": "db/index.js",
+      "source_file": "backend/src/db/index.js",
       "source_location": "L1"
     },
     {
@@ -7295,7 +7142,7 @@
       "label": "cores-pendentes.js",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "cores-pendentes.js",
       "source_file": "backend/src/scripts/cores-pendentes.js",
@@ -7306,7 +7153,7 @@
       "label": "db",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "db",
       "source_file": "backend/src/scripts/cores-pendentes.js",
@@ -7317,18 +7164,29 @@
       "label": "env",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "env",
       "source_file": "backend/src/scripts/cores-pendentes.js",
       "source_location": "L5"
     },
     {
+      "id": "backend_src_scripts_purge_originais",
+      "label": "purge-originais.js",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "criarDb",
+      "file_type": "code",
+      "norm_label": "purge-originais.js",
+      "source_file": "backend/src/scripts/purge-originais.js",
+      "source_location": "L1"
+    },
+    {
       "id": "backend_src_scripts_seed_cores",
       "label": "seed-cores.js",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "seed-cores.js",
       "source_file": "backend/src/scripts/seed-cores.js",
@@ -7339,7 +7197,7 @@
       "label": "cores",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "cores",
       "source_file": "backend/src/scripts/seed-cores.js",
@@ -7350,7 +7208,7 @@
       "label": "db",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "db",
       "source_file": "backend/src/scripts/seed-cores.js",
@@ -7361,33 +7219,44 @@
       "label": "env",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
       "norm_label": "env",
       "source_file": "backend/src/scripts/seed-cores.js",
       "source_location": "L5"
     },
     {
-      "id": "backend_tests_unit_env_test",
-      "label": "env.test.js",
+      "id": "backend_tests_integration_db_roles_test",
+      "label": "db-roles.test.js",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
-      "norm_label": "env.test.js",
-      "source_file": "backend/tests/unit/env.test.js",
+      "norm_label": "db-roles.test.js",
+      "source_file": "backend/tests/integration/db-roles.test.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_unit_env_test_ambientevalido",
-      "label": "ambienteValido",
+      "id": "backend_tests_integration_regressao_apuracao_test",
+      "label": "regressao-apuracao.test.js",
       "_origin": "ast",
       "community": 18,
-      "community_name": "env.js",
+      "community_name": "criarDb",
       "file_type": "code",
-      "norm_label": "ambientevalido",
-      "source_file": "backend/tests/unit/env.test.js",
-      "source_location": "L4"
+      "norm_label": "regressao-apuracao.test.js",
+      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_integration_regressao_apuracao_test_db",
+      "label": "db",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "criarDb",
+      "file_type": "code",
+      "norm_label": "db",
+      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
+      "source_location": "L17"
     },
     {
       "id": "backend_src_modules_importacao_importar_arquivo",
@@ -7410,6 +7279,39 @@
       "norm_label": "lote.js",
       "source_file": "backend/src/modules/importacao/lote.js",
       "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_integration_concentracao_test",
+      "label": "integration/concentracao.test.js",
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "importarArquivo",
+      "file_type": "code",
+      "norm_label": "integration/concentracao.test.js",
+      "source_file": "backend/tests/integration/concentracao.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_integration_concentracao_test_app",
+      "label": "app",
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "importarArquivo",
+      "file_type": "code",
+      "norm_label": "app",
+      "source_file": "backend/tests/integration/concentracao.test.js",
+      "source_location": "L16"
+    },
+    {
+      "id": "backend_tests_integration_concentracao_test_db",
+      "label": "db",
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "importarArquivo",
+      "file_type": "code",
+      "norm_label": "db",
+      "source_file": "backend/tests/integration/concentracao.test.js",
+      "source_location": "L15"
     },
     {
       "id": "backend_tests_integration_progresso_test",
@@ -8252,127 +8154,6 @@
       "source_location": "L7"
     },
     {
-      "id": "frontend_src_components_biometriapanel",
-      "label": "BiometriaPanel.vue",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "biometriapanel.vue",
-      "source_file": "frontend/src/components/BiometriaPanel.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_biometriapanel_biometria",
-      "label": "biometria",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "biometria",
-      "source_file": "frontend/src/components/BiometriaPanel.vue",
-      "source_location": "L11"
-    },
-    {
-      "id": "frontend_src_components_biometriapanel_fatias",
-      "label": "fatias",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "fatias",
-      "source_file": "frontend/src/components/BiometriaPanel.vue",
-      "source_location": "L13"
-    },
-    {
-      "id": "frontend_src_components_biometriapanel_participacao",
-      "label": "participacao",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "participacao",
-      "source_file": "frontend/src/components/BiometriaPanel.vue",
-      "source_location": "L35"
-    },
-    {
-      "id": "frontend_src_components_biometriapanel_props",
-      "label": "props",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "frontend/src/components/BiometriaPanel.vue",
-      "source_location": "L5"
-    },
-    {
-      "id": "frontend_src_components_kpicards",
-      "label": "KpiCards.vue",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "kpicards.vue",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_kpicards_participacao",
-      "label": "participacao",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "participacao",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L26"
-    },
-    {
-      "id": "frontend_src_components_kpicards_percentualdocandidato",
-      "label": "percentualDoCandidato",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "percentualdocandidato",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L21"
-    },
-    {
-      "id": "frontend_src_components_kpicards_props",
-      "label": "props",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L6"
-    },
-    {
-      "id": "frontend_src_components_kpicards_validos",
-      "label": "validos",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "validos",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L11"
-    },
-    {
-      "id": "frontend_src_components_kpicards_votosdocandidato",
-      "label": "votosDoCandidato",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "format.js",
-      "file_type": "code",
-      "norm_label": "votosdocandidato",
-      "source_file": "frontend/src/components/KpiCards.vue",
-      "source_location": "L13"
-    },
-    {
       "id": "frontend_src_lib_format",
       "label": "format.js",
       "_origin": "ast",
@@ -8538,25 +8319,14 @@
       "source_location": "L16"
     },
     {
-      "id": "backend_src_modules_importacao_carregar_pasta",
-      "label": "importacao/carregar-pasta.js",
+      "id": "backend_tests_helpers_db_teste",
+      "label": "db-teste.js",
       "_origin": "ast",
       "community": 25,
       "community_name": "fixtures.js",
       "file_type": "code",
-      "norm_label": "importacao/carregar-pasta.js",
-      "source_file": "backend/src/modules/importacao/carregar-pasta.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_modules_importacao_relatorio",
-      "label": "relatorio.js",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "fixtures.js",
-      "file_type": "code",
-      "norm_label": "relatorio.js",
-      "source_file": "backend/src/modules/importacao/relatorio.js",
+      "norm_label": "db-teste.js",
+      "source_file": "backend/tests/helpers/db-teste.js",
       "source_location": "L1"
     },
     {
@@ -8637,6 +8407,61 @@
       "source_location": "L14"
     },
     {
+      "id": "backend_tests_integration_fixtures_import_test",
+      "label": "fixtures-import.test.js",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "fixtures.js",
+      "file_type": "code",
+      "norm_label": "fixtures-import.test.js",
+      "source_file": "backend/tests/integration/fixtures-import.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_integration_fixtures_import_test_db",
+      "label": "db",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "fixtures.js",
+      "file_type": "code",
+      "norm_label": "db",
+      "source_file": "backend/tests/integration/fixtures-import.test.js",
+      "source_location": "L13"
+    },
+    {
+      "id": "backend_tests_integration_importacao_fora_de_ordem_test",
+      "label": "importacao-fora-de-ordem.test.js",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "fixtures.js",
+      "file_type": "code",
+      "norm_label": "importacao-fora-de-ordem.test.js",
+      "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_integration_importacao_fora_de_ordem_test_db",
+      "label": "db",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "fixtures.js",
+      "file_type": "code",
+      "norm_label": "db",
+      "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
+      "source_location": "L14"
+    },
+    {
+      "id": "backend_tests_integration_importacao_fora_de_ordem_test_fixture",
+      "label": "fixture",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "fixtures.js",
+      "file_type": "code",
+      "norm_label": "fixture",
+      "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
+      "source_location": "L15"
+    },
+    {
       "id": "backend_tests_integration_importacao_gzip_test",
       "label": "importacao-gzip.test.js",
       "_origin": "ast",
@@ -8659,77 +8484,11 @@
       "source_location": "L14"
     },
     {
-      "id": "backend_src_db_index",
-      "label": "db/index.js",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "db/index.js",
-      "source_file": "backend/src/db/index.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_scripts_purge_originais",
-      "label": "purge-originais.js",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "purge-originais.js",
-      "source_file": "backend/src/scripts/purge-originais.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_db_roles_test",
-      "label": "db-roles.test.js",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "db-roles.test.js",
-      "source_file": "backend/tests/integration/db-roles.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_importacao_fora_de_ordem_test",
-      "label": "importacao-fora-de-ordem.test.js",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "importacao-fora-de-ordem.test.js",
-      "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_importacao_fora_de_ordem_test_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
-      "source_location": "L14"
-    },
-    {
-      "id": "backend_tests_integration_importacao_fora_de_ordem_test_fixture",
-      "label": "fixture",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
-      "file_type": "code",
-      "norm_label": "fixture",
-      "source_file": "backend/tests/integration/importacao-fora-de-ordem.test.js",
-      "source_location": "L15"
-    },
-    {
       "id": "backend_tests_integration_resultado_colunas_test",
       "label": "resultado-colunas.test.js",
       "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
+      "community": 25,
+      "community_name": "fixtures.js",
       "file_type": "code",
       "norm_label": "resultado-colunas.test.js",
       "source_file": "backend/tests/integration/resultado-colunas.test.js",
@@ -8739,44 +8498,66 @@
       "id": "backend_tests_integration_resultado_colunas_test_db",
       "label": "db",
       "_origin": "ast",
-      "community": 26,
-      "community_name": "criarDb",
+      "community": 25,
+      "community_name": "fixtures.js",
       "file_type": "code",
       "norm_label": "db",
       "source_file": "backend/tests/integration/resultado-colunas.test.js",
       "source_location": "L14"
     },
     {
-      "id": "backend_tests_integration_consistencia_test",
-      "label": "integration/consistencia.test.js",
+      "id": "frontend_src_api_client",
+      "label": "client.js",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "client.js",
+      "file_type": "code",
+      "norm_label": "client.js",
+      "source_file": "frontend/src/api/client.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_api_client_api",
+      "label": "api",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "client.js",
+      "file_type": "code",
+      "norm_label": "api",
+      "source_file": "frontend/src/api/client.js",
+      "source_location": "L40"
+    },
+    {
+      "id": "backend_tests_integration_comparacao_local_test",
+      "label": "integration/comparacao-local.test.js",
       "_origin": "ast",
       "community": 27,
       "community_name": "caminhoFixture",
       "file_type": "code",
-      "norm_label": "integration/consistencia.test.js",
-      "source_file": "backend/tests/integration/consistencia.test.js",
+      "norm_label": "integration/comparacao-local.test.js",
+      "source_file": "backend/tests/integration/comparacao-local.test.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_integration_consistencia_test_app",
+      "id": "backend_tests_integration_comparacao_local_test_app",
       "label": "app",
       "_origin": "ast",
       "community": 27,
       "community_name": "caminhoFixture",
       "file_type": "code",
       "norm_label": "app",
-      "source_file": "backend/tests/integration/consistencia.test.js",
+      "source_file": "backend/tests/integration/comparacao-local.test.js",
       "source_location": "L16"
     },
     {
-      "id": "backend_tests_integration_consistencia_test_db",
+      "id": "backend_tests_integration_comparacao_local_test_db",
       "label": "db",
       "_origin": "ast",
       "community": 27,
       "community_name": "caminhoFixture",
       "file_type": "code",
       "norm_label": "db",
-      "source_file": "backend/tests/integration/consistencia.test.js",
+      "source_file": "backend/tests/integration/comparacao-local.test.js",
       "source_location": "L15"
     },
     {
@@ -8802,15 +8583,70 @@
       "source_location": "L15"
     },
     {
-      "id": "frontend_src_components_placarranking_candidatos",
+      "id": "backend_tests_integration_totais_test",
+      "label": "totais.test.js",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "caminhoFixture",
+      "file_type": "code",
+      "norm_label": "totais.test.js",
+      "source_file": "backend/tests/integration/totais.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_integration_totais_test_db",
+      "label": "db",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "caminhoFixture",
+      "file_type": "code",
+      "norm_label": "db",
+      "source_file": "backend/tests/integration/totais.test.js",
+      "source_location": "L16"
+    },
+    {
+      "id": "frontend_src_app",
+      "label": "App.vue",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "app.vue",
+      "source_file": "frontend/src/App.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_app_candidatos",
       "label": "candidatos",
       "_origin": "ast",
       "community": 28,
       "community_name": "PainelView.vue",
       "file_type": "code",
       "norm_label": "candidatos",
-      "source_file": "frontend/src/components/PlacarRanking.vue",
-      "source_location": "L16"
+      "source_file": "frontend/src/App.vue",
+      "source_location": "L30"
+    },
+    {
+      "id": "frontend_src_app_eleicoesquery_eleicoesdisponiveis_cargos_anos_turnos_filtros_aocargo_aoano_aoturno_aocandidato_aocorte_aouf_limparmunicipio_limpar",
+      "label": "{\n  eleicoesQuery,\n  eleicoesDisponiveis,\n  cargos,\n  anos,\n  turnos,\n  filtros,\n  aoCargo,\n  aoAno,\n  aoTurno,\n  aoCandidato,\n  aoCorte,\n  aoUf,\n  limparMunicipio,\n  limpar,\n}",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "{\n  eleicoesquery,\n  eleicoesdisponiveis,\n  cargos,\n  anos,\n  turnos,\n  filtros,\n  aocargo,\n  aoano,\n  aoturno,\n  aocandidato,\n  aocorte,\n  aouf,\n  limparmunicipio,\n  limpar,\n}",
+      "source_file": "frontend/src/App.vue",
+      "source_location": "L11"
+    },
+    {
+      "id": "frontend_src_app_resumoquery",
+      "label": "resumoQuery",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "resumoquery",
+      "source_file": "frontend/src/App.vue",
+      "source_location": "L28"
     },
     {
       "id": "frontend_src_components_ufpanel_votosuf",
@@ -8822,6 +8658,83 @@
       "norm_label": "votosuf",
       "source_file": "frontend/src/components/UfPanel.vue",
       "source_location": "L103"
+    },
+    {
+      "id": "frontend_src_i18n_index",
+      "label": "i18n/index.js",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "i18n/index.js",
+      "source_file": "frontend/src/i18n/index.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_i18n_index_i18n",
+      "label": "i18n",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "i18n",
+      "source_file": "frontend/src/i18n/index.js",
+      "source_location": "L18"
+    },
+    {
+      "id": "frontend_src_i18n_index_suportados",
+      "label": "SUPORTADOS",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "suportados",
+      "source_file": "frontend/src/i18n/index.js",
+      "source_location": "L7"
+    },
+    {
+      "id": "frontend_src_main",
+      "label": "main.js",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "main.js",
+      "source_file": "frontend/src/main.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_main_queryclient",
+      "label": "queryClient",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "queryclient",
+      "source_file": "frontend/src/main.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "frontend_src_router",
+      "label": "router.js",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "router.js",
+      "source_file": "frontend/src/router.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_router_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "frontend/src/router.js",
+      "source_location": "L3"
     },
     {
       "id": "frontend_src_views_mapaview_candidatos",
@@ -8954,6 +8867,17 @@
       "norm_label": "votosdocandidato",
       "source_file": "frontend/src/views/PainelView.vue",
       "source_location": "L68"
+    },
+    {
+      "id": "frontend_tests_setup",
+      "label": "setup.js",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "PainelView.vue",
+      "file_type": "code",
+      "norm_label": "setup.js",
+      "source_file": "frontend/tests/setup.js",
+      "source_location": "L1"
     },
     {
       "id": "docs_api",
@@ -9565,165 +9489,44 @@
       "source_location": "L25"
     },
     {
-      "id": "frontend_src_app",
-      "label": "App.vue",
+      "id": "backend_tests_integration_estatisticas_test",
+      "label": "estatisticas.test.js",
       "_origin": "ast",
       "community": 30,
-      "community_name": "App.vue",
+      "community_name": "estatisticas.test.js",
       "file_type": "code",
-      "norm_label": "app.vue",
-      "source_file": "frontend/src/App.vue",
+      "norm_label": "estatisticas.test.js",
+      "source_file": "backend/tests/integration/estatisticas.test.js",
       "source_location": "L1"
     },
     {
-      "id": "frontend_src_app_candidatos",
-      "label": "candidatos",
+      "id": "backend_tests_integration_estatisticas_test_app",
+      "label": "app",
       "_origin": "ast",
       "community": 30,
-      "community_name": "App.vue",
+      "community_name": "estatisticas.test.js",
       "file_type": "code",
-      "norm_label": "candidatos",
-      "source_file": "frontend/src/App.vue",
-      "source_location": "L30"
+      "norm_label": "app",
+      "source_file": "backend/tests/integration/estatisticas.test.js",
+      "source_location": "L16"
     },
     {
-      "id": "frontend_src_app_eleicoesquery_eleicoesdisponiveis_cargos_anos_turnos_filtros_aocargo_aoano_aoturno_aocandidato_aocorte_aouf_limparmunicipio_limpar",
-      "label": "{\n  eleicoesQuery,\n  eleicoesDisponiveis,\n  cargos,\n  anos,\n  turnos,\n  filtros,\n  aoCargo,\n  aoAno,\n  aoTurno,\n  aoCandidato,\n  aoCorte,\n  aoUf,\n  limparMunicipio,\n  limpar,\n}",
+      "id": "backend_tests_integration_estatisticas_test_db",
+      "label": "db",
       "_origin": "ast",
       "community": 30,
-      "community_name": "App.vue",
+      "community_name": "estatisticas.test.js",
       "file_type": "code",
-      "norm_label": "{\n  eleicoesquery,\n  eleicoesdisponiveis,\n  cargos,\n  anos,\n  turnos,\n  filtros,\n  aocargo,\n  aoano,\n  aoturno,\n  aocandidato,\n  aocorte,\n  aouf,\n  limparmunicipio,\n  limpar,\n}",
-      "source_file": "frontend/src/App.vue",
-      "source_location": "L11"
-    },
-    {
-      "id": "frontend_src_app_resumoquery",
-      "label": "resumoQuery",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "resumoquery",
-      "source_file": "frontend/src/App.vue",
-      "source_location": "L28"
-    },
-    {
-      "id": "frontend_src_i18n_index",
-      "label": "i18n/index.js",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "i18n/index.js",
-      "source_file": "frontend/src/i18n/index.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_i18n_index_i18n",
-      "label": "i18n",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "i18n",
-      "source_file": "frontend/src/i18n/index.js",
-      "source_location": "L18"
-    },
-    {
-      "id": "frontend_src_i18n_index_suportados",
-      "label": "SUPORTADOS",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "suportados",
-      "source_file": "frontend/src/i18n/index.js",
-      "source_location": "L7"
-    },
-    {
-      "id": "frontend_src_main",
-      "label": "main.js",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "main.js",
-      "source_file": "frontend/src/main.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_main_queryclient",
-      "label": "queryClient",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "queryclient",
-      "source_file": "frontend/src/main.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "frontend_src_router",
-      "label": "router.js",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "router.js",
-      "source_file": "frontend/src/router.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_router_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "frontend/src/router.js",
-      "source_location": "L3"
-    },
-    {
-      "id": "frontend_tests_setup",
-      "label": "setup.js",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "App.vue",
-      "file_type": "code",
-      "norm_label": "setup.js",
-      "source_file": "frontend/tests/setup.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_analisesection",
-      "label": "AnaliseSection.vue",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "StateBlock.vue",
-      "file_type": "code",
-      "norm_label": "analisesection.vue",
-      "source_file": "frontend/src/components/AnaliseSection.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_analisesection_emit",
-      "label": "emit",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "StateBlock.vue",
-      "file_type": "code",
-      "norm_label": "emit",
-      "source_file": "frontend/src/components/AnaliseSection.vue",
-      "source_location": "L18"
+      "norm_label": "db",
+      "source_file": "backend/tests/integration/estatisticas.test.js",
+      "source_location": "L15"
     },
     {
       "id": "frontend_src_components_benfordniveispanel",
       "label": "BenfordNiveisPanel.vue",
       "_origin": "ast",
       "community": 31,
-      "community_name": "StateBlock.vue",
+      "community_name": "BenfordNiveisPanel.vue",
       "file_type": "code",
       "norm_label": "benfordniveispanel.vue",
       "source_file": "frontend/src/components/BenfordNiveisPanel.vue",
@@ -9734,7 +9537,7 @@
       "label": "candidatos",
       "_origin": "ast",
       "community": 31,
-      "community_name": "StateBlock.vue",
+      "community_name": "BenfordNiveisPanel.vue",
       "file_type": "code",
       "norm_label": "candidatos",
       "source_file": "frontend/src/components/BenfordNiveisPanel.vue",
@@ -9745,22 +9548,11 @@
       "label": "props",
       "_origin": "ast",
       "community": 31,
-      "community_name": "StateBlock.vue",
+      "community_name": "BenfordNiveisPanel.vue",
       "file_type": "code",
       "norm_label": "props",
       "source_file": "frontend/src/components/BenfordNiveisPanel.vue",
       "source_location": "L4"
-    },
-    {
-      "id": "frontend_src_components_stateblock",
-      "label": "StateBlock.vue",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "StateBlock.vue",
-      "file_type": "code",
-      "norm_label": "stateblock.vue",
-      "source_file": "frontend/src/components/StateBlock.vue",
-      "source_location": "L1"
     },
     {
       "id": "frontend_src_components_biometriaufpanel",
@@ -10201,6 +9993,17 @@
       "norm_label": "status_secao",
       "source_file": "frontend/src/lib/status.js",
       "source_location": "L14"
+    },
+    {
+      "id": "frontend_src_views_secaoview_statusinfo",
+      "label": "statusInfo",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "status.js",
+      "file_type": "code",
+      "norm_label": "statusinfo",
+      "source_file": "frontend/src/views/SecaoView.vue",
+      "source_location": "L59"
     },
     {
       "id": "frontend_src_components_ufpanel",
@@ -10864,17 +10667,6 @@
       "source_location": "L5"
     },
     {
-      "id": "backend_src_scripts_migrate",
-      "label": "migrate.js",
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "schema.test.js",
-      "file_type": "code",
-      "norm_label": "migrate.js",
-      "source_file": "backend/src/scripts/migrate.js",
-      "source_location": "L1"
-    },
-    {
       "id": "backend_tests_integration_schema_test",
       "label": "schema.test.js",
       "_origin": "ast",
@@ -11095,11 +10887,143 @@
       "source_location": "L1"
     },
     {
+      "id": "frontend_src_components_analisesection",
+      "label": "AnaliseSection.vue",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "analisesection.vue",
+      "source_file": "frontend/src/components/AnaliseSection.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_analisesection_emit",
+      "label": "emit",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "emit",
+      "source_file": "frontend/src/components/AnaliseSection.vue",
+      "source_location": "L18"
+    },
+    {
+      "id": "frontend_src_components_coberturablock",
+      "label": "CoberturaBlock.vue",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "coberturablock.vue",
+      "source_file": "frontend/src/components/CoberturaBlock.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_coberturablock_coberturaefetiva",
+      "label": "coberturaEfetiva",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "coberturaefetiva",
+      "source_file": "frontend/src/components/CoberturaBlock.vue",
+      "source_location": "L10"
+    },
+    {
+      "id": "frontend_src_components_coberturablock_entradas",
+      "label": "entradas",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "entradas",
+      "source_file": "frontend/src/components/CoberturaBlock.vue",
+      "source_location": "L19"
+    },
+    {
+      "id": "frontend_src_components_coberturablock_limitacoesefetivas",
+      "label": "limitacoesEfetivas",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "limitacoesefetivas",
+      "source_file": "frontend/src/components/CoberturaBlock.vue",
+      "source_location": "L14"
+    },
+    {
+      "id": "frontend_src_components_coberturablock_props",
+      "label": "props",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "frontend/src/components/CoberturaBlock.vue",
+      "source_location": "L4"
+    },
+    {
+      "id": "frontend_src_components_comparacaolocalpanel",
+      "label": "ComparacaoLocalPanel.vue",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "comparacaolocalpanel.vue",
+      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_comparacaolocalpanel_cobertura",
+      "label": "cobertura",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "cobertura",
+      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
+      "source_location": "L15"
+    },
+    {
+      "id": "frontend_src_components_comparacaolocalpanel_emit",
+      "label": "emit",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "emit",
+      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
+      "source_location": "L12"
+    },
+    {
+      "id": "frontend_src_components_comparacaolocalpanel_grupos",
+      "label": "grupos",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "grupos",
+      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
+      "source_location": "L14"
+    },
+    {
+      "id": "frontend_src_components_comparacaolocalpanel_props",
+      "label": "props",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
+      "source_location": "L6"
+    },
+    {
       "id": "frontend_src_components_concentracaopanel",
       "label": "ConcentracaoPanel.vue",
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "concentracaopanel.vue",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -11110,7 +11034,7 @@
       "label": "cobertura",
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "cobertura",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -11121,7 +11045,7 @@
       "label": "emit",
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "emit",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -11132,7 +11056,7 @@
       "label": "props",
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "props",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -11143,7 +11067,7 @@
       "label": "topMargem",
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "topmargem",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
@@ -11154,11 +11078,110 @@
       "label": "topShare",
       "_origin": "ast",
       "community": 44,
-      "community_name": "ConcentracaoPanel.vue",
+      "community_name": "AnaliseView.vue",
       "file_type": "code",
       "norm_label": "topshare",
       "source_file": "frontend/src/components/ConcentracaoPanel.vue",
       "source_location": "L14"
+    },
+    {
+      "id": "frontend_src_components_stateblock",
+      "label": "StateBlock.vue",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "stateblock.vue",
+      "source_file": "frontend/src/components/StateBlock.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_views_analiseview",
+      "label": "AnaliseView.vue",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "analiseview.vue",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_views_analiseview_analisequery",
+      "label": "analiseQuery",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "analisequery",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L16"
+    },
+    {
+      "id": "frontend_src_views_analiseview_anomaliasquery",
+      "label": "anomaliasQuery",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "anomaliasquery",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L17"
+    },
+    {
+      "id": "frontend_src_views_analiseview_comparacaolocalquery",
+      "label": "comparacaoLocalQuery",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "comparacaolocalquery",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L19"
+    },
+    {
+      "id": "frontend_src_views_analiseview_concentracaoquery",
+      "label": "concentracaoQuery",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "concentracaoquery",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L20"
+    },
+    {
+      "id": "frontend_src_views_analiseview_consistenciaquery",
+      "label": "consistenciaQuery",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "consistenciaquery",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L18"
+    },
+    {
+      "id": "frontend_src_views_analiseview_ordenacao",
+      "label": "ordenacao",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "ordenacao",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L15"
+    },
+    {
+      "id": "frontend_src_views_analiseview_store_aocandidato_eleicoesdisponiveis",
+      "label": "{ store, aoCandidato, eleicoesDisponiveis }",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "AnaliseView.vue",
+      "file_type": "code",
+      "norm_label": "{ store, aocandidato, eleicoesdisponiveis }",
+      "source_file": "frontend/src/views/AnaliseView.vue",
+      "source_location": "L13"
     },
     {
       "id": "backend_src_modules_apuracao_status_secao",
@@ -11194,6 +11217,17 @@
       "source_location": "L1"
     },
     {
+      "id": "backend_src_composition_root",
+      "label": "composition-root.js",
+      "_origin": "ast",
+      "community": 46,
+      "community_name": "criarCache",
+      "file_type": "code",
+      "norm_label": "composition-root.js",
+      "source_file": "backend/src/composition-root.js",
+      "source_location": "L1"
+    },
+    {
       "id": "backend_src_lib_cache",
       "label": "cache.js",
       "_origin": "ast",
@@ -11202,6 +11236,17 @@
       "file_type": "code",
       "norm_label": "cache.js",
       "source_file": "backend/src/lib/cache.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_lib_logger",
+      "label": "logger.js",
+      "_origin": "ast",
+      "community": 46,
+      "community_name": "criarCache",
+      "file_type": "code",
+      "norm_label": "logger.js",
+      "source_file": "backend/src/lib/logger.js",
       "source_location": "L1"
     },
     {
@@ -11480,6 +11525,61 @@
       "source_location": "L5"
     },
     {
+      "id": "frontend_src_components_biometriapanel",
+      "label": "BiometriaPanel.vue",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "components.test.js",
+      "file_type": "code",
+      "norm_label": "biometriapanel.vue",
+      "source_file": "frontend/src/components/BiometriaPanel.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_biometriapanel_biometria",
+      "label": "biometria",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "components.test.js",
+      "file_type": "code",
+      "norm_label": "biometria",
+      "source_file": "frontend/src/components/BiometriaPanel.vue",
+      "source_location": "L11"
+    },
+    {
+      "id": "frontend_src_components_biometriapanel_fatias",
+      "label": "fatias",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "components.test.js",
+      "file_type": "code",
+      "norm_label": "fatias",
+      "source_file": "frontend/src/components/BiometriaPanel.vue",
+      "source_location": "L13"
+    },
+    {
+      "id": "frontend_src_components_biometriapanel_participacao",
+      "label": "participacao",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "components.test.js",
+      "file_type": "code",
+      "norm_label": "participacao",
+      "source_file": "frontend/src/components/BiometriaPanel.vue",
+      "source_location": "L35"
+    },
+    {
+      "id": "frontend_src_components_biometriapanel_props",
+      "label": "props",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "components.test.js",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "frontend/src/components/BiometriaPanel.vue",
+      "source_location": "L5"
+    },
+    {
       "id": "frontend_src_components_filterbar",
       "label": "FilterBar.vue",
       "_origin": "ast",
@@ -11579,6 +11679,72 @@
       "source_location": "L93"
     },
     {
+      "id": "frontend_src_components_kpicards",
+      "label": "KpiCards.vue",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "kpicards.vue",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_kpicards_participacao",
+      "label": "participacao",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "participacao",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L26"
+    },
+    {
+      "id": "frontend_src_components_kpicards_percentualdocandidato",
+      "label": "percentualDoCandidato",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "percentualdocandidato",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L21"
+    },
+    {
+      "id": "frontend_src_components_kpicards_props",
+      "label": "props",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L6"
+    },
+    {
+      "id": "frontend_src_components_kpicards_validos",
+      "label": "validos",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "validos",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L11"
+    },
+    {
+      "id": "frontend_src_components_kpicards_votosdocandidato",
+      "label": "votosDoCandidato",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "votosdocandidato",
+      "source_file": "frontend/src/components/KpiCards.vue",
+      "source_location": "L13"
+    },
+    {
       "id": "frontend_src_components_placarranking",
       "label": "PlacarRanking.vue",
       "_origin": "ast",
@@ -11588,6 +11754,17 @@
       "norm_label": "placarranking.vue",
       "source_file": "frontend/src/components/PlacarRanking.vue",
       "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_placarranking_candidatos",
+      "label": "candidatos",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "candidatos",
+      "source_file": "frontend/src/components/PlacarRanking.vue",
+      "source_location": "L16"
     },
     {
       "id": "frontend_src_components_placarranking_deltas",
@@ -11656,6 +11833,17 @@
       "source_location": "L25"
     },
     {
+      "id": "frontend_src_components_plotdia_rotulo",
+      "label": "rotulo",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "PlacarRanking.vue",
+      "file_type": "code",
+      "norm_label": "rotulo",
+      "source_file": "frontend/src/components/PlotDia.vue",
+      "source_location": "L73"
+    },
+    {
       "id": "backend_src_app",
       "label": "app.js",
       "_origin": "ast",
@@ -11711,36 +11899,36 @@
       "source_location": "L15"
     },
     {
-      "id": "backend_tests_integration_estatisticas_test",
-      "label": "estatisticas.test.js",
+      "id": "backend_tests_integration_consistencia_test",
+      "label": "integration/consistencia.test.js",
       "_origin": "ast",
       "community": 51,
       "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "estatisticas.test.js",
-      "source_file": "backend/tests/integration/estatisticas.test.js",
+      "norm_label": "integration/consistencia.test.js",
+      "source_file": "backend/tests/integration/consistencia.test.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_integration_estatisticas_test_app",
+      "id": "backend_tests_integration_consistencia_test_app",
       "label": "app",
       "_origin": "ast",
       "community": 51,
       "community_name": "app.js",
       "file_type": "code",
       "norm_label": "app",
-      "source_file": "backend/tests/integration/estatisticas.test.js",
+      "source_file": "backend/tests/integration/consistencia.test.js",
       "source_location": "L16"
     },
     {
-      "id": "backend_tests_integration_estatisticas_test_db",
+      "id": "backend_tests_integration_consistencia_test_db",
       "label": "db",
       "_origin": "ast",
       "community": 51,
       "community_name": "app.js",
       "file_type": "code",
       "norm_label": "db",
-      "source_file": "backend/tests/integration/estatisticas.test.js",
+      "source_file": "backend/tests/integration/consistencia.test.js",
       "source_location": "L15"
     },
     {
@@ -11755,28 +11943,6 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_composition_root",
-      "label": "composition-root.js",
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "server.js",
-      "file_type": "code",
-      "norm_label": "composition-root.js",
-      "source_file": "backend/src/composition-root.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_lib_logger",
-      "label": "logger.js",
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "server.js",
-      "file_type": "code",
-      "norm_label": "logger.js",
-      "source_file": "backend/src/lib/logger.js",
-      "source_location": "L1"
-    },
-    {
       "id": "backend_src_server",
       "label": "server.js",
       "_origin": "ast",
@@ -11788,44 +11954,33 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_helpers_db_teste",
-      "label": "db-teste.js",
+      "id": "backend_tests_unit_env_test",
+      "label": "env.test.js",
       "_origin": "ast",
-      "community": 53,
-      "community_name": "db-teste.js",
+      "community": 52,
+      "community_name": "server.js",
       "file_type": "code",
-      "norm_label": "db-teste.js",
-      "source_file": "backend/tests/helpers/db-teste.js",
+      "norm_label": "env.test.js",
+      "source_file": "backend/tests/unit/env.test.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_integration_fixtures_import_test",
-      "label": "fixtures-import.test.js",
+      "id": "backend_tests_unit_env_test_ambientevalido",
+      "label": "ambienteValido",
       "_origin": "ast",
-      "community": 53,
-      "community_name": "db-teste.js",
+      "community": 52,
+      "community_name": "server.js",
       "file_type": "code",
-      "norm_label": "fixtures-import.test.js",
-      "source_file": "backend/tests/integration/fixtures-import.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_fixtures_import_test_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "db-teste.js",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "backend/tests/integration/fixtures-import.test.js",
-      "source_location": "L13"
+      "norm_label": "ambientevalido",
+      "source_file": "backend/tests/unit/env.test.js",
+      "source_location": "L4"
     },
     {
       "id": "backend_tests_integration_partido_cor_test",
       "label": "partido-cor.test.js",
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "partido-cor.test.js",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -11836,7 +11991,7 @@
       "label": "backendDir",
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "backenddir",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -11847,7 +12002,7 @@
       "label": "cores",
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "cores",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -11858,7 +12013,7 @@
       "label": "db",
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "db",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -11869,7 +12024,7 @@
       "label": "execFileAsync",
       "_origin": "ast",
       "community": 53,
-      "community_name": "db-teste.js",
+      "community_name": "partido-cor.test.js",
       "file_type": "code",
       "norm_label": "execfileasync",
       "source_file": "backend/tests/integration/partido-cor.test.js",
@@ -11896,6 +12051,39 @@
       "norm_label": "db",
       "source_file": "backend/tests/integration/corte.test.js",
       "source_location": "L14"
+    },
+    {
+      "id": "backend_src_modules_importacao_carregar_pasta",
+      "label": "importacao/carregar-pasta.js",
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "lote.test.js",
+      "file_type": "code",
+      "norm_label": "importacao/carregar-pasta.js",
+      "source_file": "backend/src/modules/importacao/carregar-pasta.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_modules_importacao_relatorio",
+      "label": "relatorio.js",
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "lote.test.js",
+      "file_type": "code",
+      "norm_label": "relatorio.js",
+      "source_file": "backend/src/modules/importacao/relatorio.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_scripts_carregar_pasta",
+      "label": "scripts/carregar-pasta.js",
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "lote.test.js",
+      "file_type": "code",
+      "norm_label": "scripts/carregar-pasta.js",
+      "source_file": "backend/src/scripts/carregar-pasta.js",
+      "source_location": "L1"
     },
     {
       "id": "backend_tests_integration_lote_test",
@@ -11931,26 +12119,15 @@
       "source_location": "L16"
     },
     {
-      "id": "backend_tests_integration_regressao_apuracao_test",
-      "label": "regressao-apuracao.test.js",
+      "id": "backend_src_migrations_0006_mv_votos_final_splits",
+      "label": "0006_mv_votos_final_splits.js",
       "_origin": "ast",
       "community": 57,
-      "community_name": "regressao-apuracao.test.js",
+      "community_name": "0006_mv_votos_final_splits.js",
       "file_type": "code",
-      "norm_label": "regressao-apuracao.test.js",
-      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
+      "norm_label": "0006_mv_votos_final_splits.js",
+      "source_file": "backend/src/migrations/0006_mv_votos_final_splits.js",
       "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_regressao_apuracao_test_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 57,
-      "community_name": "regressao-apuracao.test.js",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "backend/tests/integration/regressao-apuracao.test.js",
-      "source_location": "L17"
     },
     {
       "id": "frontend_src_components_versoesbupanel",
@@ -12085,6 +12262,17 @@
       "source_location": "L56"
     },
     {
+      "id": "frontend_src_views_secaoview_motivo",
+      "label": "motivo",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "SecaoView.vue",
+      "file_type": "code",
+      "norm_label": "motivo",
+      "source_file": "frontend/src/views/SecaoView.vue",
+      "source_location": "L60"
+    },
+    {
       "id": "frontend_src_views_secaoview_props",
       "label": "props",
       "_origin": "ast",
@@ -12215,61 +12403,6 @@
       "norm_label": "colunas",
       "source_file": "backend/src/migrations/0002_resultado_votavel_colunas.js",
       "source_location": "L3"
-    },
-    {
-      "id": "frontend_src_components_comparacaolocalpanel",
-      "label": "ComparacaoLocalPanel.vue",
-      "_origin": "ast",
-      "community": 61,
-      "community_name": "ComparacaoLocalPanel.vue",
-      "file_type": "code",
-      "norm_label": "comparacaolocalpanel.vue",
-      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_comparacaolocalpanel_cobertura",
-      "label": "cobertura",
-      "_origin": "ast",
-      "community": 61,
-      "community_name": "ComparacaoLocalPanel.vue",
-      "file_type": "code",
-      "norm_label": "cobertura",
-      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
-      "source_location": "L15"
-    },
-    {
-      "id": "frontend_src_components_comparacaolocalpanel_emit",
-      "label": "emit",
-      "_origin": "ast",
-      "community": 61,
-      "community_name": "ComparacaoLocalPanel.vue",
-      "file_type": "code",
-      "norm_label": "emit",
-      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
-      "source_location": "L12"
-    },
-    {
-      "id": "frontend_src_components_comparacaolocalpanel_grupos",
-      "label": "grupos",
-      "_origin": "ast",
-      "community": 61,
-      "community_name": "ComparacaoLocalPanel.vue",
-      "file_type": "code",
-      "norm_label": "grupos",
-      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
-      "source_location": "L14"
-    },
-    {
-      "id": "frontend_src_components_comparacaolocalpanel_props",
-      "label": "props",
-      "_origin": "ast",
-      "community": 61,
-      "community_name": "ComparacaoLocalPanel.vue",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "frontend/src/components/ComparacaoLocalPanel.vue",
-      "source_location": "L6"
     },
     {
       "id": "backend_tests_integration_migracoes_test",
@@ -12447,7 +12580,7 @@
       "label": "datas.js",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "datas.js",
       "source_file": "backend/src/lib/datas.js",
@@ -12458,7 +12591,7 @@
       "label": "FUSO_ORIGEM_BWEB",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "fuso_origem_bweb",
       "source_file": "backend/src/lib/datas.js",
@@ -12469,7 +12602,7 @@
       "label": "categoria-votavel.js",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "categoria-votavel.js",
       "source_file": "backend/src/modules/apuracao/categoria-votavel.js",
@@ -12480,7 +12613,7 @@
       "label": "conteudo-bu.js",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "conteudo-bu.js",
       "source_file": "backend/src/modules/importacao/conteudo-bu.js",
@@ -12491,18 +12624,51 @@
       "label": "persistir-bus.js",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "persistir-bus.js",
       "source_file": "backend/src/modules/importacao/persistir-bus.js",
       "source_location": "L1"
     },
     {
+      "id": "backend_src_modules_importacao_validacoes",
+      "label": "validacoes.js",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "validacoes.js",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_cargos_em_escopo",
+      "label": "CARGOS_EM_ESCOPO",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "cargos_em_escopo",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L17"
+    },
+    {
+      "id": "backend_src_modules_importacao_validacoes_chave_natural",
+      "label": "CHAVE_NATURAL",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "chave_natural",
+      "source_file": "backend/src/modules/importacao/validacoes.js",
+      "source_location": "L3"
+    },
+    {
       "id": "backend_tests_unit_categoria_votavel_test",
       "label": "categoria-votavel.test.js",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "categoria-votavel.test.js",
       "source_file": "backend/tests/unit/categoria-votavel.test.js",
@@ -12513,7 +12679,7 @@
       "label": "conteudo-bu.test.js",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "conteudo-bu.test.js",
       "source_file": "backend/tests/unit/conteudo-bu.test.js",
@@ -12524,7 +12690,7 @@
       "label": "valores",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "valores",
       "source_file": "backend/tests/unit/conteudo-bu.test.js",
@@ -12535,11 +12701,22 @@
       "label": "votaveis",
       "_origin": "ast",
       "community": 7,
-      "community_name": "persistir-bus.js",
+      "community_name": "validacoes.js",
       "file_type": "code",
       "norm_label": "votaveis",
       "source_file": "backend/tests/unit/conteudo-bu.test.js",
       "source_location": "L16"
+    },
+    {
+      "id": "backend_tests_unit_validacoes_test",
+      "label": "validacoes.test.js",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "validacoes.js",
+      "file_type": "code",
+      "norm_label": "validacoes.test.js",
+      "source_file": "backend/tests/unit/validacoes.test.js",
+      "source_location": "L1"
     },
     {
       "id": "docs_buweb_2022",
@@ -12711,7 +12888,7 @@
       "node_kind": "heading",
       "norm_label": "fluxo de analise",
       "source_file": "docs/architecture.md",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "docs_architecture_frontend",
@@ -12723,7 +12900,7 @@
       "node_kind": "heading",
       "norm_label": "frontend",
       "source_file": "docs/architecture.md",
-      "source_location": "L11"
+      "source_location": "L12"
     },
     {
       "id": "frontend_vite_config",
@@ -12795,61 +12972,6 @@
       "norm_label": "limitacoes conhecidas",
       "source_file": "docs/blueprint.md",
       "source_location": "L22"
-    },
-    {
-      "id": "frontend_src_components_coberturablock",
-      "label": "CoberturaBlock.vue",
-      "_origin": "ast",
-      "community": 78,
-      "community_name": "CoberturaBlock.vue",
-      "file_type": "code",
-      "norm_label": "coberturablock.vue",
-      "source_file": "frontend/src/components/CoberturaBlock.vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_coberturablock_coberturaefetiva",
-      "label": "coberturaEfetiva",
-      "_origin": "ast",
-      "community": 78,
-      "community_name": "CoberturaBlock.vue",
-      "file_type": "code",
-      "norm_label": "coberturaefetiva",
-      "source_file": "frontend/src/components/CoberturaBlock.vue",
-      "source_location": "L10"
-    },
-    {
-      "id": "frontend_src_components_coberturablock_entradas",
-      "label": "entradas",
-      "_origin": "ast",
-      "community": 78,
-      "community_name": "CoberturaBlock.vue",
-      "file_type": "code",
-      "norm_label": "entradas",
-      "source_file": "frontend/src/components/CoberturaBlock.vue",
-      "source_location": "L19"
-    },
-    {
-      "id": "frontend_src_components_coberturablock_limitacoesefetivas",
-      "label": "limitacoesEfetivas",
-      "_origin": "ast",
-      "community": 78,
-      "community_name": "CoberturaBlock.vue",
-      "file_type": "code",
-      "norm_label": "limitacoesefetivas",
-      "source_file": "frontend/src/components/CoberturaBlock.vue",
-      "source_location": "L14"
-    },
-    {
-      "id": "frontend_src_components_coberturablock_props",
-      "label": "props",
-      "_origin": "ast",
-      "community": 78,
-      "community_name": "CoberturaBlock.vue",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "frontend/src/components/CoberturaBlock.vue",
-      "source_location": "L4"
     },
     {
       "id": "frontend_src_components_duplicacaopanel",
@@ -12995,17 +13117,6 @@
       "source_location": "L10"
     },
     {
-      "id": "frontend_src_components_plotdia_rotulo",
-      "label": "rotulo",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PlotDia.vue",
-      "file_type": "code",
-      "norm_label": "rotulo",
-      "source_file": "frontend/src/components/PlotDia.vue",
-      "source_location": "L73"
-    },
-    {
       "id": "frontend_src_components_plotdia_tempocorte",
       "label": "tempoCorte",
       "_origin": "ast",
@@ -13026,72 +13137,6 @@
       "norm_label": "tempos",
       "source_file": "frontend/src/components/PlotDia.vue",
       "source_location": "L26"
-    },
-    {
-      "id": "backend_tests_integration_comparacao_local_test",
-      "label": "integration/comparacao-local.test.js",
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "integration/comparacao-local.test.js",
-      "file_type": "code",
-      "norm_label": "integration/comparacao-local.test.js",
-      "source_file": "backend/tests/integration/comparacao-local.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_comparacao_local_test_app",
-      "label": "app",
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "integration/comparacao-local.test.js",
-      "file_type": "code",
-      "norm_label": "app",
-      "source_file": "backend/tests/integration/comparacao-local.test.js",
-      "source_location": "L16"
-    },
-    {
-      "id": "backend_tests_integration_comparacao_local_test_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "integration/comparacao-local.test.js",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "backend/tests/integration/comparacao-local.test.js",
-      "source_location": "L15"
-    },
-    {
-      "id": "backend_tests_integration_concentracao_test",
-      "label": "integration/concentracao.test.js",
-      "_origin": "ast",
-      "community": 81,
-      "community_name": "integration/concentracao.test.js",
-      "file_type": "code",
-      "norm_label": "integration/concentracao.test.js",
-      "source_file": "backend/tests/integration/concentracao.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_integration_concentracao_test_app",
-      "label": "app",
-      "_origin": "ast",
-      "community": 81,
-      "community_name": "integration/concentracao.test.js",
-      "file_type": "code",
-      "norm_label": "app",
-      "source_file": "backend/tests/integration/concentracao.test.js",
-      "source_location": "L16"
-    },
-    {
-      "id": "backend_tests_integration_concentracao_test_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 81,
-      "community_name": "integration/concentracao.test.js",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "backend/tests/integration/concentracao.test.js",
-      "source_location": "L15"
     },
     {
       "id": "backend_tests_integration_versoes_test",
@@ -13125,28 +13170,6 @@
       "norm_label": "db",
       "source_file": "backend/tests/integration/versoes.test.js",
       "source_location": "L15"
-    },
-    {
-      "id": "frontend_src_views_secaoview_motivo",
-      "label": "motivo",
-      "_origin": "ast",
-      "community": 83,
-      "community_name": "motivoSecao",
-      "file_type": "code",
-      "norm_label": "motivo",
-      "source_file": "frontend/src/views/SecaoView.vue",
-      "source_location": "L60"
-    },
-    {
-      "id": "frontend_src_views_secaoview_statusinfo",
-      "label": "statusInfo",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "statusSecao",
-      "file_type": "code",
-      "norm_label": "statusinfo",
-      "source_file": "frontend/src/views/SecaoView.vue",
-      "source_location": "L59"
     },
     {
       "id": "readme",
@@ -13447,7 +13470,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/app.js",
-      "source_location": "L58",
+      "source_location": "L72",
       "weight": 1.0
     },
     {
@@ -13459,7 +13482,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/app.js",
-      "source_location": "L68",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -13471,7 +13494,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/app.js",
-      "source_location": "L78",
+      "source_location": "L92",
       "weight": 1.0
     },
     {
@@ -14599,7 +14622,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L68",
+      "source_location": "L100",
       "weight": 1.0
     },
     {
@@ -14611,7 +14634,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L37",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -14623,7 +14646,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L93",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -15684,6 +15707,18 @@
     },
     {
       "source": "backend_src_routes_index_registrarrotas",
+      "target": "backend_src_routes_index_itemsecao",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "backend/src/routes/index.js",
+      "source_location": "L1032",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_routes_index_registrarrotas",
       "target": "backend_src_lib_erros_apperror",
       "relation": "calls",
       "_origin": "ast",
@@ -15691,7 +15726,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1027",
+      "source_location": "L1094",
       "weight": 1.0
     },
     {
@@ -15703,7 +15738,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1067",
+      "source_location": "L1134",
       "weight": 1.0
     },
     {
@@ -15715,7 +15750,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1080",
+      "source_location": "L1147",
       "weight": 1.0
     },
     {
@@ -15728,18 +15763,6 @@
       "context": "call",
       "source_file": "backend/src/routes/index.js",
       "source_location": "L117",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_routes_index_registrarrotas",
-      "target": "backend_src_modules_analise_versoes_bu_compararversoes",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "backend/src/routes/index.js",
-      "source_location": "L1172",
       "weight": 1.0
     },
     {
@@ -15768,18 +15791,6 @@
     },
     {
       "source": "backend_src_routes_index_registrarrotas",
-      "target": "backend_src_modules_analise_comparacao_local_comparacaolocal",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "backend/src/routes/index.js",
-      "source_location": "L1194",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_routes_index_registrarrotas",
       "target": "backend_src_modules_apuracao_totais_somarvotos",
       "relation": "calls",
       "_origin": "ast",
@@ -15792,14 +15803,26 @@
     },
     {
       "source": "backend_src_routes_index_registrarrotas",
-      "target": "backend_src_modules_analise_concentracao_concentracao",
+      "target": "backend_src_modules_analise_versoes_bu_compararversoes",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L1254",
+      "source_location": "L1239",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_routes_index_registrarrotas",
+      "target": "backend_src_modules_analise_comparacao_local_comparacaolocal",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "backend/src/routes/index.js",
+      "source_location": "L1261",
       "weight": 1.0
     },
     {
@@ -15812,6 +15835,18 @@
       "context": "call",
       "source_file": "backend/src/routes/index.js",
       "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_routes_index_registrarrotas",
+      "target": "backend_src_modules_analise_concentracao_concentracao",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "backend/src/routes/index.js",
+      "source_location": "L1321",
       "weight": 1.0
     },
     {
@@ -16051,19 +16086,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/routes/index.js",
-      "source_location": "L841",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_routes_index_registrarrotas",
-      "target": "backend_src_routes_index_itemsecao",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "backend/src/routes/index.js",
-      "source_location": "L971",
+      "source_location": "L892",
       "weight": 1.0
     },
     {
@@ -28507,6 +28530,28 @@
       "weight": 1.0
     },
     {
+      "source": "backend_src_migrations_0006_mv_votos_final_splits",
+      "target": "backend_src_migrations_0006_mv_votos_final_splits_up",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/src/migrations/0006_mv_votos_final_splits.js",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_migrations_0006_mv_votos_final_splits",
+      "target": "backend_src_migrations_0006_mv_votos_final_splits_down",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/src/migrations/0006_mv_votos_final_splits.js",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
       "source": "backend_src_modules_analise_benford",
       "target": "backend_src_modules_analise_benford_digitos",
       "relation": "contains",
@@ -29663,6 +29708,17 @@
     },
     {
       "source": "backend_src_modules_apuracao_totais",
+      "target": "backend_src_modules_apuracao_totais_totaisporarea",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/src/modules/apuracao/totais.js",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_modules_apuracao_totais",
       "target": "backend_src_modules_apuracao_totais_somarvotos",
       "relation": "contains",
       "_origin": "ast",
@@ -29691,18 +29747,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L67",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_modules_apuracao_totais",
-      "target": "backend_src_modules_apuracao_totais_totaisporarea",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/src/modules/apuracao/totais.js",
-      "source_location": "L91",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -32551,7 +32596,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/architecture.md",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -32562,7 +32607,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/architecture.md",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -32721,57 +32766,13 @@
     },
     {
       "source": "docs_current_plan",
-      "target": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
+      "target": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
       "source_location": "L42",
-      "weight": 1.0
-    },
-    {
-      "source": "docs_current_plan_fases",
-      "target": "docs_current_plan_fase_1_materialized_views_maior_ganho",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/current-plan.md",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "docs_current_plan_fases",
-      "target": "docs_current_plan_fase_2_cache_de_sub_consultas",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/current-plan.md",
-      "source_location": "L64",
-      "weight": 1.0
-    },
-    {
-      "source": "docs_current_plan_fases",
-      "target": "docs_current_plan_fase_3_redu\u00e7\u00e3o_de_volume_em_mem\u00f3ria",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/current-plan.md",
-      "source_location": "L69",
-      "weight": 1.0
-    },
-    {
-      "source": "docs_current_plan_fases",
-      "target": "docs_current_plan_fase_4_tuning_de_infraestrutura_32_gb",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/current-plan.md",
-      "source_location": "L74",
       "weight": 1.0
     },
     {
@@ -32830,8 +32831,19 @@
       "weight": 1.0
     },
     {
-      "source": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
-      "target": "docs_current_plan_diagn\u00f3stico_atual",
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_pr\u00f3xima_decis\u00e3o",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/current-plan.md",
+      "source_location": "L103",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_contexto_confirmado_no_c\u00f3digo",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -32841,58 +32853,80 @@
       "weight": 1.0
     },
     {
-      "source": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
-      "target": "docs_current_plan_objetivo",
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_objetivo_e_limites",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
-      "source_location": "L52",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
-      "source": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
-      "target": "docs_current_plan_fases",
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_fase_0_linha_de_base_e_observabilidade",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
-      "source_location": "L56",
+      "source_location": "L59",
       "weight": 1.0
     },
     {
-      "source": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
-      "target": "docs_current_plan_arquivos_afetados",
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_fase_1_reduzir_trabalho_por_requisi\u00e7\u00e3o",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
-      "source_location": "L79",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
-      "source": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
-      "target": "docs_current_plan_fora_de_escopo_87",
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_fase_2_concorr\u00eancia_cache_e_payload",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
-      "source_location": "L87",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
-      "source": "docs_current_plan_plano_performance_de_banco_e_cache_redis",
-      "target": "docs_current_plan_crit\u00e9rios_de_aceite",
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_fase_3_teste_controlado_e_ado\u00e7\u00e3o",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/current-plan.md",
-      "source_location": "L92",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_fase_4_configura\u00e7\u00e3o_de_infraestrutura",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/current-plan.md",
+      "source_location": "L93",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_current_plan_plano_performance_de_banco_e_l\u00f3gica_de_requisi\u00e7\u00f5es",
+      "target": "docs_current_plan_fora_de_escopo_nesta_etapa",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/current-plan.md",
+      "source_location": "L97",
       "weight": 1.0
     },
     {
@@ -38406,7 +38440,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "backend/src/lib/cache.js",
-      "source_location": "L99",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -38418,7 +38452,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "backend/src/lib/cache.js",
-      "source_location": "L99",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -38430,7 +38464,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "backend/src/lib/cache.js",
-      "source_location": "L99",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -38615,5 +38649,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "ef508afa3f79f8edc4dd37acaae80d3a33395481"
+  "built_at_commit": "5dbc5b222fd9fd077deea3667e244d4c916c188b"
 }
