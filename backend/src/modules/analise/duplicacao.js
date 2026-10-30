@@ -1,5 +1,6 @@
 import { sql } from 'kysely'
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js'
+import { ordenarLista } from '../../lib/ordenacao.js'
 
 function chaveZona(secao) {
   return `${secao.sg_uf}|${secao.cd_municipio_tse}|${secao.nr_zona}`
@@ -9,7 +10,16 @@ function chaveMunicipio(secao) {
   return `${secao.sg_uf}|${secao.cd_municipio_tse}`
 }
 
-export function agruparAssinaturas(secoes = [], limite = 50) {
+export const COLUNAS_DUPLICACAO = {
+  secoes: (g) => g.secoes.length,
+  sg_uf: (g) => g.secoes[0].sg_uf,
+  nm_municipio: (g) => g.secoes[0].nm_municipio,
+  nr_local_votacao: (g) => g.secoes[0].nr_local_votacao,
+  votaveis: (g) => g.votaveis,
+  candidato: (g) => g.vencedor_comum?.nm_votavel,
+}
+
+export function agruparAssinaturas(secoes = [], limite = 50, ordenacao = null) {
   const mapa = new Map()
 
   for (const secao of secoes) {
@@ -80,7 +90,7 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
   grupos.sort((a, b) => b.secoes.length - a.secoes.length)
 
   const totalSecoesGrupos = grupos.reduce((total, grupo) => total + grupo.secoes.length, 0)
-  const limitados = grupos.slice(0, limite)
+  const limitados = ordenarLista(grupos, COLUNAS_DUPLICACAO, ordenacao).slice(0, limite)
   return {
     grupos: limitados,
     total_grupos: grupos.length,
@@ -99,7 +109,7 @@ export function agruparAssinaturas(secoes = [], limite = 50) {
 
 export async function duplicacaoPorAssinatura(
   db,
-  { eleicaoId, cargo, corte, escopo = {}, limite = 50 },
+  { eleicaoId, cargo, corte, escopo = {}, limite = 50, ordenacao = null },
 ) {
   let consulta = db
     .selectFrom('boletim_versao as bv')
@@ -242,5 +252,6 @@ export async function duplicacaoPorAssinatura(
   return agruparAssinaturas(
     linhasAjustadas.map((linha) => ({ ...linha, votaveis: Number(linha.votaveis) })),
     limite,
+    ordenacao,
   )
 }

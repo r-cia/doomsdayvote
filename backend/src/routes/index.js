@@ -14,6 +14,169 @@ import { compararVersoes } from '../modules/analise/versoes-bu.js';
 import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
 import { concentracao } from '../modules/analise/concentracao.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
+import { COLUNAS_CONCENTRACAO } from '../modules/analise/concentracao.js';
+import { COLUNAS_DUPLICACAO } from '../modules/analise/duplicacao.js';
+import { lerOrdenacao, ordenacaoSchema, ordenarLista, ordenarSql } from '../lib/ordenacao.js';
+
+const COLUNAS_VOTOS = {
+  nm_votavel: (v) => v.nm_votavel,
+  sg_partido: (v) => v.sg_partido,
+  qt_votos: (v) => v.qt_votos,
+  percentual: (v) => v.percentual,
+};
+
+const COLUNAS_MAPA = {
+  sg_uf: (a) => a.sg_uf,
+  nm_municipio: (a) => a.nm_municipio,
+  total_votos: (a) => a.total_votos,
+  votos_validos: (a) => a.votos_validos,
+  lider_percentual: (a) => a.lider?.percentual,
+  lider_nome: (a) => a.lider_nome,
+  candidato_votos: (a) => a.candidato_votos,
+  candidato_percentual: (a) => a.candidato_percentual,
+};
+
+const COLUNAS_BENFORD = {
+  nm_votavel: (c) => c.nm_votavel,
+  n: (c) => c.n,
+  mad: (c) => c.mad,
+};
+
+const COLUNAS_BENFORD_NIVEIS = {
+  nm_votavel: (c) => c.nm_votavel,
+  secao_n: (c) => c.niveis.secao.n,
+  secao_mad: (c) => c.niveis.secao.mad,
+  zona_n: (c) => c.niveis.zona.n,
+  zona_mad: (c) => c.niveis.zona.mad,
+  municipio_n: (c) => c.niveis.municipio.n,
+  municipio_mad: (c) => c.niveis.municipio.mad,
+};
+
+const COLUNAS_BIOMETRIA_UF = {
+  sg_uf: (u) => u.sg_uf,
+  qt_habilitados_por_biometria: (u) => u.qt_habilitados_por_biometria,
+  percentual_habilitada: (u) => u.percentual_habilitada,
+  qt_biometria_nao_habilitada: (u) => u.qt_biometria_nao_habilitada,
+  percentual_nao_habilitada: (u) => u.percentual_nao_habilitada,
+};
+
+const COLUNAS_OUTLIERS = {
+  sg_uf: (s) => s.sg_uf,
+  nm_municipio: (s) => s.nm_municipio,
+  nr_zona: (s) => s.nr_zona,
+  nr_secao: (s) => s.nr_secao,
+  score_if: (s) => s.score_if,
+  score_lof: (s) => s.score_lof,
+  candidato: (s) => s.vencedor?.nm_votavel,
+};
+
+const COLUNAS_ESTATISTICAS = {
+  nm_votavel: (c) => c.nm_votavel,
+  sg_partido: (c) => c.sg_partido,
+  secoes: (c) => c.secoes,
+  secoes_zero: null,
+  media: (c) => c.media,
+  mediana: (c) => c.mediana,
+  desvio: (c) => c.desvio,
+};
+
+const COLUNAS_CONSISTENCIA = {
+  sg_uf: (i) => i.secao.sg_uf,
+  nm_municipio: (i) => i.secao.nm_municipio,
+  nr_zona: (i) => i.secao.nr_zona,
+  nr_secao: (i) => i.secao.nr_secao,
+  regra: (i) => i.regra,
+  diferenca: (i) => i.diferenca,
+};
+
+const COLUNAS_COMPARACAO_LOCAL = {
+  sg_uf: (i) => i.secao.sg_uf,
+  nm_municipio: (i) => i.secao.nm_municipio,
+  nr_zona: (i) => i.secao.nr_zona,
+  nr_secao: (i) => i.secao.nr_secao,
+  participacao: (i) => i.metricas?.participacao,
+  abstencao: (i) => i.metricas?.abstencao,
+  participacao_pp: (i) => i.distancia_pp?.participacao_pp,
+  abstencao_pp: (i) => i.distancia_pp?.abstencao_pp,
+};
+
+const COLUNAS_RELATORIO = {
+  referencia: (r) => r.ano_eleicao * 10 + r.nr_turno,
+  bus: (r) => r.bus,
+  participacao_pct: (r) => r.participacao_pct,
+  diferenca_participacao: (r) => r.participacao_pct,
+  abstencao_pct: (r) => r.abstencao_pct,
+  diferenca_abstencao: (r) => r.abstencao_pct,
+  data_hora: (r) => r.recebimento.data_hora,
+  somente_data: (r) => r.recebimento.somente_data,
+  ausente: (r) => r.recebimento.ausente,
+  outra_precisao: (r) => r.recebimento.outra_precisao,
+  sem_encerramento: (r) => r.recebimento.sem_encerramento,
+  antes_encerramento: (r) => r.recebimento.antes_encerramento,
+  antes_emissao: (r) => r.recebimento.antes_emissao,
+  mediana_atraso_min: (r) => r.recebimento.mediana_atraso_min,
+  p90_atraso_min: (r) => r.recebimento.p90_atraso_min,
+};
+
+const COLUNAS_RESULTADOS = {
+  cd_tipo_votavel: (r) => r.cd_tipo_votavel,
+  nr_votavel: (r) => r.nr_votavel,
+  nm_votavel: (r) => r.nm_votavel,
+  sg_partido: (r) => r.sg_partido,
+  categoria: (r) => r.categoria,
+  qt_votos: (r) => (r.qt_votos === null || r.qt_votos === undefined ? null : Number(r.qt_votos)),
+  percentual: (r) =>
+    (r.categoria === 'nominal' || r.categoria === 'legenda') && r.qt_votos !== null && r.qt_votos !== undefined
+      ? Number(r.qt_votos)
+      : null,
+};
+
+const COLUNAS_CAMPOS_ALTERADOS = {
+  campo: (c) => c.campo,
+  anterior: (c) => c.anterior,
+  atual: (c) => c.atual,
+  diferenca: (c) => c.diferenca,
+};
+
+const COLUNAS_VOTAVEIS_ALTERADOS = {
+  nr_votavel: (v) => v.nr_votavel,
+  nm_votavel: (v) => v.nm_votavel,
+  anterior: (v) => v.anterior,
+  atual: (v) => v.atual,
+  diferenca: (v) => v.diferenca,
+};
+
+const COLUNAS_ENCERRAMENTO_URNAS = {
+  sg_uf: (u) => u.sg_uf,
+  total: (u) => u.total,
+  ate_1715: (u) => u.ate_1715,
+  pct_1715: (u) => u.pct_1715,
+  ate_1915: (u) => u.ate_1915,
+  pct_1915: (u) => u.pct_1915,
+  apos_1915: (u) => u.apos_1915,
+  pct_apos_1915: (u) => u.pct_apos_1915,
+};
+
+const DERIVADAS_PARTIDO = {
+  partido: (l) => l.partido,
+  votos: (l) => l.votos,
+  pct_votos: (l) => l.pct_votos,
+};
+
+const CHAVES_ENCERRAMENTO_MUNICIPIOS = ['nm_municipio', 'total', 'apos_1715', 'pct_apos_1715', ...Object.keys(DERIVADAS_PARTIDO)];
+const CHAVES_ENCERRAMENTO_SECOES = ['nr_zona', 'nr_secao', 'dt_encerramento', ...Object.keys(DERIVADAS_PARTIDO)];
+const CHAVES_BIOMETRIA_MUNICIPIOS = ['nm_municipio', 'qt_comparecimento', 'qt_nao_habilitada', 'percentual_nao_habilitada'];
+const CHAVES_BIOMETRIA_SECOES = ['nr_zona', 'nr_secao', 'qt_comparecimento', 'qt_nao_habilitada', 'percentual_nao_habilitada'];
+
+const COLUNAS_SECOES = {
+  sg_uf: sql.ref('s.sg_uf'),
+  nm_municipio: sql.ref('l.nm_municipio'),
+  nr_zona: sql.ref('s.nr_zona'),
+  nr_secao: sql.ref('s.nr_secao'),
+  nr_local_votacao: sql.ref('s.nr_local_votacao'),
+  status: null,
+  bu_recebido: sql`coalesce(bv.dt_bu_recebido_ts, bv.dt_bu_recebido_data::timestamptz)`,
+};
 
 const corteSchema = {
   as_of: z.string().optional(),
@@ -175,7 +338,7 @@ export async function registrarRotas(app) {
     };
   }));
 
-  app.get('/api/summary', cacheado('summary', 60, baseSchema, async (query) => {
+  app.get('/api/summary', cacheado('summary', 60, baseSchema.extend(ordenacaoSchema(Object.keys(COLUNAS_VOTOS))), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query), dataPleito: eleicao.dt_pleito };
@@ -212,7 +375,7 @@ export async function registrarRotas(app) {
       ...metadados,
       avisos,
       secoes_com_bu: secoes,
-      votos,
+      votos: ordenarLista(votos, COLUNAS_VOTOS, lerOrdenacao(query)),
       metricas,
     };
   }));
@@ -322,7 +485,10 @@ export async function registrarRotas(app) {
     };
   }));
 
-  app.get('/api/analysis', cacheado('analysis', 300, baseSchema, async (query) => {
+  app.get('/api/analysis', cacheado('analysis', 300, baseSchema.extend({
+    ...ordenacaoSchema(Object.keys(COLUNAS_BENFORD)),
+    ...ordenacaoSchema(Object.keys(COLUNAS_BIOMETRIA_UF), '_biometria_uf'),
+  }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const escopo = {
@@ -352,13 +518,17 @@ export async function registrarRotas(app) {
       ...metadados,
       avisos,
       biometria,
-      biometria_uf: biometriaUf,
+      biometria_uf: ordenarLista(biometriaUf, COLUNAS_BIOMETRIA_UF, lerOrdenacao(query, '_biometria_uf')),
       benford: {
         minimo_votos: benford.minimo_votos,
-        candidatos: benford.candidatos.map(({ niveis, ...candidato }) => ({
-          ...candidato,
-          ...niveis.secao,
-        })),
+        candidatos: ordenarLista(
+          benford.candidatos.map(({ niveis, ...candidato }) => ({
+            ...candidato,
+            ...niveis.secao,
+          })),
+          COLUNAS_BENFORD,
+          lerOrdenacao(query),
+        ),
         status_metodologico: benford.status_metodologico ?? 'em_validacao',
         observacao:
           benford.observacao ??
@@ -380,7 +550,9 @@ export async function registrarRotas(app) {
   }));
 
   app.get('/api/anomalies', cacheado('anomalies', 600, baseSchema.extend({
-    ordenar_por: z.enum(['if', 'lof']).default('if'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_OUTLIERS)),
+    ...ordenacaoSchema(Object.keys(COLUNAS_DUPLICACAO), '_duplicacao'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_BENFORD_NIVEIS), '_benford'),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -393,12 +565,16 @@ export async function registrarRotas(app) {
 
     const [linhas, duplicacao, metadados, avisos] = await Promise.all([
       baseSecaoCandidato(db, escopo),
-      duplicacaoPorAssinatura(db, escopo),
+      duplicacaoPorAssinatura(db, { ...escopo, ordenacao: lerOrdenacao(query, '_duplicacao') }),
       cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
       cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
     ]);
 
-    const benford = benfordDosNiveis(linhas);
+    const benfordBase = benfordDosNiveis(linhas);
+    const benford = {
+      ...benfordBase,
+      candidatos: ordenarLista(benfordBase.candidatos, COLUNAS_BENFORD_NIVEIS, lerOrdenacao(query, '_benford')),
+    };
     const secoes = featuresDasSecoes(linhas);
     const matriz = secoes.map((secao) =>
       FEATURES.map((feature) => secao[feature]),
@@ -445,27 +621,22 @@ export async function registrarRotas(app) {
         })
       }
     }
-    const ranking = secoes
-      .map((secao, indice) => {
-        const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`
-        const vencedor = vencedorCidade.get(chave) ?? null
-        return {
-          ...secao,
-          score_if: isolamento.scores[indice],
-          score_lof: scoreLof.get(indice) ?? null,
-          vencedor,
-        }
-      })
-      .sort((a, b) => {
-        if (query.ordenar_por === 'lof') {
-          const la = a.score_lof ?? -Infinity;
-          const lb = b.score_lof ?? -Infinity;
-          if (lb !== la) return lb - la;
-          return b.score_if - a.score_if;
-        }
-        return b.score_if - a.score_if;
-      })
-      .slice(0, 20);
+    const ranking = ordenarLista(
+      secoes
+        .map((secao, indice) => {
+          const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`
+          const vencedor = vencedorCidade.get(chave) ?? null
+          return {
+            ...secao,
+            score_if: isolamento.scores[indice],
+            score_lof: scoreLof.get(indice) ?? null,
+            vencedor,
+          }
+        })
+        .sort((a, b) => b.score_if - a.score_if),
+      COLUNAS_OUTLIERS,
+      lerOrdenacao(query),
+    ).slice(0, 20);
 
     const limitacoesAnomalias = [
       'Benford por nível é leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
@@ -518,6 +689,7 @@ export async function registrarRotas(app) {
 
   app.get('/api/estatisticas', cacheado('estatisticas', 300, baseSchema.extend({
     escopo: z.enum(['turno', 'ano']).default('turno'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_ESTATISTICAS)),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -527,7 +699,12 @@ export async function registrarRotas(app) {
 
     const blocos = [];
     for (const alvo of alvos) {
-      blocos.push(await estatisticasDaEleicao(db, { eleicao: alvo, ...recorte }));
+      const bloco = await estatisticasDaEleicao(db, { eleicao: alvo, ...recorte });
+      const colunas = {
+        ...COLUNAS_ESTATISTICAS,
+        secoes_zero: (c) => bloco.comparecimento.secoes - (c.secoes_com_voto ?? 0),
+      };
+      blocos.push({ ...bloco, candidatos: ordenarLista(bloco.candidatos, colunas, lerOrdenacao(query)) });
     }
 
     const secoesConsideradas = blocos.reduce(
@@ -558,6 +735,7 @@ export async function registrarRotas(app) {
     level: z.enum(['uf', 'municipio']).default('uf'),
     candidatos: z.string().optional(),
     as_of_anterior: z.string().optional(),
+    ...ordenacaoSchema(Object.keys(COLUNAS_MAPA)),
   }), async (query) => {
     const corte = resolverCorte(query);
     const corteAnterior = query.as_of_anterior ? resolverCorte({ as_of: query.as_of_anterior }) : null;
@@ -570,7 +748,7 @@ export async function registrarRotas(app) {
       : [];
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
 
-    const [areas, areasAnteriores, metadados, avisos] = await Promise.all([
+    const [areas, areasAnteriores, metadados, avisos, votosCandidatos] = await Promise.all([
       totaisPorArea(db, {
         eleicaoId: eleicao.id,
         cargo: query.cargo,
@@ -591,7 +769,11 @@ export async function registrarRotas(app) {
         : Promise.resolve(null),
       cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
       cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
+      somarVotos(db, { ...escopo, dataPleito: eleicao.dt_pleito }),
     ]);
+
+    const nomePorNumero = new Map(votosCandidatos.map((v) => [Number(v.nr_votavel), v.nm_votavel]));
+    const candidatoSelecionado = candidatos[0];
 
     const anterioresPorChave = new Map();
     if (areasAnteriores) {
@@ -613,7 +795,14 @@ export async function registrarRotas(app) {
           : Number(c.qt_votos ?? 0);
         return { ...c, qt_votos_delta: delta };
       });
-      return { ...area, candidatos: candidatosComDelta };
+      const selecionado = candidatosComDelta.find((c) => Number(c.nr_votavel) === candidatoSelecionado);
+      return {
+        ...area,
+        lider_nome: area.lider ? (nomePorNumero.get(Number(area.lider.nr_votavel)) ?? null) : null,
+        candidato_votos: selecionado?.qt_votos ?? null,
+        candidato_percentual: selecionado?.percentual ?? null,
+        candidatos: candidatosComDelta,
+      };
     });
 
     return {
@@ -621,13 +810,13 @@ export async function registrarRotas(app) {
       corte: corteResposta(corte),
       ...metadados,
       avisos,
-      areas: areasComDelta,
+      areas: ordenarLista(areasComDelta, COLUNAS_MAPA, lerOrdenacao(query)),
     };
   }));
 
   app.get('/api/biometria/municipios', cacheado('biometria-municipios', 300, baseSchema.extend({
     uf: z.string().length(2),
-    ordenar_por: z.enum(['nao_habilitada', 'percentual', 'comparecimento']).default('nao_habilitada'),
+    ...ordenacaoSchema(CHAVES_BIOMETRIA_MUNICIPIOS),
     limit: z.coerce.number().int().min(1).max(100).default(20),
   }), async (query) => {
     const corte = resolverCorte(query);
@@ -645,21 +834,25 @@ export async function registrarRotas(app) {
     qb = aplicarFiltroCorte(qb, corte);
     qb = qb.where('s.sg_uf', '=', query.uf);
 
-    const linhas = await qb
-      .select([
-        's.cd_municipio_tse',
-        sql`max(l.nm_municipio)`.as('nm_municipio'),
-        sql`coalesce(sum(bv.qt_comparecimento), 0)`.as('qt_comparecimento'),
-        sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
-      ])
-      .groupBy(['s.cd_municipio_tse', 's.sg_uf'])
-      .orderBy(
-        query.ordenar_por === 'percentual'
-          ? sql`(coalesce(sum(bv.qt_elei_biom_sem_habilitacao),0)::float / nullif(sum(bv.qt_comparecimento),0)) desc nulls last`
-          : query.ordenar_por === 'comparecimento'
-            ? sql`coalesce(sum(bv.qt_comparecimento),0) desc`
-            : sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao),0) desc`,
-      )
+    const colunas = {
+      nm_municipio: sql`max(l.nm_municipio)`,
+      qt_comparecimento: sql`coalesce(sum(bv.qt_comparecimento), 0)`,
+      qt_nao_habilitada: sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`,
+      percentual_nao_habilitada: sql`(coalesce(sum(bv.qt_elei_biom_sem_habilitacao),0)::float / nullif(sum(bv.qt_comparecimento),0))`,
+    };
+    const linhas = await ordenarSql(
+      qb
+        .select([
+          's.cd_municipio_tse',
+          sql`max(l.nm_municipio)`.as('nm_municipio'),
+          sql`coalesce(sum(bv.qt_comparecimento), 0)`.as('qt_comparecimento'),
+          sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
+        ])
+        .groupBy(['s.cd_municipio_tse', 's.sg_uf']),
+      colunas,
+      lerOrdenacao(query, '', { ordem: 'qt_nao_habilitada', direcao: 'desc' }),
+      ['s.cd_municipio_tse'],
+    )
       .limit(query.limit)
       .execute();
 
@@ -683,7 +876,7 @@ export async function registrarRotas(app) {
   app.get('/api/biometria/secoes', cacheado('biometria-secoes', 300, baseSchema.extend({
     uf: z.string().length(2),
     municipio: z.coerce.number().int(),
-    ordenar_por: z.enum(['percentual', 'nao_habilitada', 'comparecimento']).default('percentual'),
+    ...ordenacaoSchema(CHAVES_BIOMETRIA_SECOES),
     limit: z.coerce.number().int().min(1).max(100).default(20),
   }), async (query) => {
     const corte = resolverCorte(query);
@@ -697,21 +890,25 @@ export async function registrarRotas(app) {
     qb = aplicarFiltroCorte(qb, corte);
     qb = qb.where('s.sg_uf', '=', query.uf).where('s.cd_municipio_tse', '=', query.municipio);
 
-    const linhas = await qb
-      .select([
+    const colunas = {
+      nr_zona: sql.ref('s.nr_zona'),
+      nr_secao: sql.ref('s.nr_secao'),
+      qt_comparecimento: sql`coalesce(bv.qt_comparecimento, 0)`,
+      qt_nao_habilitada: sql`coalesce(bv.qt_elei_biom_sem_habilitacao, 0)`,
+      percentual_nao_habilitada: sql`(coalesce(bv.qt_elei_biom_sem_habilitacao,0)::float / nullif(bv.qt_comparecimento,0))`,
+    };
+    const linhas = await ordenarSql(
+      qb.select([
         's.id',
         's.nr_zona',
         's.nr_secao',
         sql`bv.qt_comparecimento`.as('qt_comparecimento'),
         sql`bv.qt_elei_biom_sem_habilitacao`.as('qt_nao_habilitada'),
-      ])
-      .orderBy(
-        query.ordenar_por === 'nao_habilitada'
-          ? sql`coalesce(bv.qt_elei_biom_sem_habilitacao,0) desc`
-          : query.ordenar_por === 'comparecimento'
-            ? sql`coalesce(bv.qt_comparecimento,0) desc`
-            : sql`(coalesce(bv.qt_elei_biom_sem_habilitacao,0)::float / nullif(bv.qt_comparecimento,0)) desc nulls last`,
-      )
+      ]),
+      colunas,
+      lerOrdenacao(query, '', { ordem: 'percentual_nao_habilitada', direcao: 'desc' }),
+      ['s.id'],
+    )
       .limit(query.limit)
       .execute();
 
@@ -733,7 +930,7 @@ export async function registrarRotas(app) {
     };
   }));
 
-  app.get('/api/encerramento/urnas', cacheado('encerramento-urnas', 300, baseSchema, async (query) => {
+  app.get('/api/encerramento/urnas', cacheado('encerramento-urnas', 300, baseSchema.extend(ordenacaoSchema(Object.keys(COLUNAS_ENCERRAMENTO_URNAS))), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const corte1715 = `${eleicao.dt_pleito} 17:15:00-03`;
@@ -760,28 +957,32 @@ export async function registrarRotas(app) {
 
     return {
       corte: corteResposta(corte),
-      ufs: linhas.map((l) => {
-        const total = Number(l.total);
-        const a1715 = Number(l.ate_1715);
-        const a1915 = Number(l.ate_1915);
-        const apos = Number(l.apos_1915);
-        return {
-          sg_uf: l.sg_uf,
-          total,
-          ate_1715: a1715,
-          pct_1715: total > 0 ? (a1715 / total) * 100 : null,
-          ate_1915: a1915,
-          pct_1915: total > 0 ? (a1915 / total) * 100 : null,
-          apos_1915: apos,
-          pct_apos_1915: total > 0 ? (apos / total) * 100 : null,
-        };
-      }),
+      ufs: ordenarLista(
+        linhas.map((l) => {
+          const total = Number(l.total);
+          const a1715 = Number(l.ate_1715);
+          const a1915 = Number(l.ate_1915);
+          const apos = Number(l.apos_1915);
+          return {
+            sg_uf: l.sg_uf,
+            total,
+            ate_1715: a1715,
+            pct_1715: total > 0 ? (a1715 / total) * 100 : null,
+            ate_1915: a1915,
+            pct_1915: total > 0 ? (a1915 / total) * 100 : null,
+            apos_1915: apos,
+            pct_apos_1915: total > 0 ? (apos / total) * 100 : null,
+          };
+        }),
+        COLUNAS_ENCERRAMENTO_URNAS,
+        lerOrdenacao(query),
+      ),
     };
   }));
 
   app.get('/api/encerramento/municipios', cacheado('encerramento-municipios', 300, baseSchema.extend({
     uf: z.string().length(2),
-    ordenar_por: z.enum(['apos_1715', 'apos_1915', 'total']).default('apos_1715'),
+    ...ordenacaoSchema(CHAVES_ENCERRAMENTO_MUNICIPIOS),
     limit: z.coerce.number().int().min(1).max(100).default(20),
   }), async (query) => {
     const corte = resolverCorte(query);
@@ -799,21 +1000,29 @@ export async function registrarRotas(app) {
     qb = aplicarFiltroCorte(qb, corte);
     qb = qb.where('s.sg_uf', '=', query.uf);
 
-    const linhas = await qb
-      .select([
-        's.cd_municipio_tse',
-        sql`max(l.nm_municipio)`.as('nm_municipio'),
-        sql`count(*)::int`.as('total'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz)::int`.as('apos_1715'),
-      ])
-      .groupBy(['s.cd_municipio_tse', 's.sg_uf'])
-      .orderBy(
-        query.ordenar_por === 'total'
-          ? sql`count(*) desc`
-          : sql`(count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz))::float / nullif(count(*),0) desc nulls last`,
-      )
-      .limit(query.limit)
-      .execute();
+    const aposExpr = sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz)`;
+    const colunasSql = {
+      nm_municipio: sql`max(l.nm_municipio)`,
+      total: sql`count(*)`,
+      apos_1715: aposExpr,
+      pct_apos_1715: sql`(${aposExpr})::float / nullif(count(*),0)`,
+    };
+    const ordenacao = lerOrdenacao(query, '', { ordem: 'pct_apos_1715', direcao: 'desc' });
+    const derivada = ordenacao.ordem in DERIVADAS_PARTIDO;
+    const consultaMunicipios = ordenarSql(
+      qb
+        .select([
+          's.cd_municipio_tse',
+          sql`max(l.nm_municipio)`.as('nm_municipio'),
+          sql`count(*)::int`.as('total'),
+          sql`${aposExpr}::int`.as('apos_1715'),
+        ])
+        .groupBy(['s.cd_municipio_tse', 's.sg_uf']),
+      colunasSql,
+      derivada ? { ordem: 'pct_apos_1715', direcao: 'desc' } : ordenacao,
+      ['s.cd_municipio_tse'],
+    );
+    const linhas = await (derivada ? consultaMunicipios : consultaMunicipios.limit(query.limit)).execute();
 
     let qbPartidos = db
       .selectFrom('boletim_versao as bv')
@@ -866,31 +1075,35 @@ export async function registrarRotas(app) {
 
     return {
       corte: corteResposta(corte),
-      municipios: linhas.map((l) => {
-        const total = Number(l.total);
-        const apos = Number(l.apos_1715);
-        const resumo = resumoPorMunicipio.get(l.cd_municipio_tse) ?? {
-          partido: null,
-          votos: 0,
-          total: 0,
-        };
-        return {
-          cd_municipio_tse: l.cd_municipio_tse,
-          nm_municipio: l.nm_municipio,
-          total,
-          apos_1715: apos,
-          pct_apos_1715: total > 0 ? (apos / total) * 100 : null,
-          partido: resumo.partido,
-          votos: resumo.votos,
-          pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
-        };
-      }),
+      municipios: (() => {
+        const itens = linhas.map((l) => {
+          const total = Number(l.total);
+          const apos = Number(l.apos_1715);
+          const resumo = resumoPorMunicipio.get(l.cd_municipio_tse) ?? {
+            partido: null,
+            votos: 0,
+            total: 0,
+          };
+          return {
+            cd_municipio_tse: l.cd_municipio_tse,
+            nm_municipio: l.nm_municipio,
+            total,
+            apos_1715: apos,
+            pct_apos_1715: total > 0 ? (apos / total) * 100 : null,
+            partido: resumo.partido,
+            votos: resumo.votos,
+            pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
+          };
+        });
+        return derivada ? ordenarLista(itens, DERIVADAS_PARTIDO, ordenacao).slice(0, query.limit) : itens;
+      })(),
     };
   }));
 
   app.get('/api/encerramento/secoes', cacheado('encerramento-secoes', 300, baseSchema.extend({
     uf: z.string().length(2),
     municipio: z.coerce.number().int(),
+    ...ordenacaoSchema(CHAVES_ENCERRAMENTO_SECOES),
     limit: z.coerce.number().int().min(1).max(100).default(20),
   }), async (query) => {
     const corte = resolverCorte(query);
@@ -905,18 +1118,30 @@ export async function registrarRotas(app) {
     qb = aplicarFiltroCorte(qb, corte);
     qb = qb.where('s.sg_uf', '=', query.uf).where('s.cd_municipio_tse', '=', query.municipio);
 
-    const linhas = await qb
-      .select([
-        's.id',
-        sql`bv.id`.as('bu_id'),
-        's.nr_zona',
-        's.nr_secao',
-        sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`.as('dt_encerramento'),
-        sql`case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then true else false end`.as('apos_1715'),
-      ])
-      .orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`)
-      .limit(query.limit)
-      .execute();
+    const ordenacao = lerOrdenacao(query);
+    const derivada = ordenacao !== null && ordenacao.ordem in DERIVADAS_PARTIDO;
+    const consultaSecoes = qb.select([
+      's.id',
+      sql`bv.id`.as('bu_id'),
+      's.nr_zona',
+      's.nr_secao',
+      sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`.as('dt_encerramento'),
+      sql`case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then true else false end`.as('apos_1715'),
+    ]);
+    const ordenada =
+      ordenacao && !derivada
+        ? ordenarSql(
+            consultaSecoes,
+            {
+              nr_zona: sql.ref('s.nr_zona'),
+              nr_secao: sql.ref('s.nr_secao'),
+              dt_encerramento: sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`,
+            },
+            ordenacao,
+            ['s.id'],
+          )
+        : consultaSecoes.orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`);
+    const linhas = await (derivada ? ordenada : ordenada.limit(query.limit)).execute();
 
     const ids = linhas.map((linha) => linha.bu_id).filter(Boolean);
     const resumoPorBu = new Map();
@@ -964,19 +1189,22 @@ export async function registrarRotas(app) {
 
     return {
       corte: corteResposta(corte),
-      secoes: linhas.map((l) => {
-        const resumo = resumoPorBu.get(l.bu_id) ?? { partido: null, votos: 0, total: 0 };
-        return {
-          id: l.id,
-          nr_zona: l.nr_zona,
-          nr_secao: l.nr_secao,
-          dt_encerramento: l.dt_encerramento,
-          apos_1715: Boolean(l.apos_1715),
-          partido: resumo.partido,
-          votos: resumo.votos,
-          pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
-        };
-      }),
+      secoes: (() => {
+        const itens = linhas.map((l) => {
+          const resumo = resumoPorBu.get(l.bu_id) ?? { partido: null, votos: 0, total: 0 };
+          return {
+            id: l.id,
+            nr_zona: l.nr_zona,
+            nr_secao: l.nr_secao,
+            dt_encerramento: l.dt_encerramento,
+            apos_1715: Boolean(l.apos_1715),
+            partido: resumo.partido,
+            votos: resumo.votos,
+            pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
+          };
+        });
+        return derivada ? ordenarLista(itens, DERIVADAS_PARTIDO, ordenacao).slice(0, query.limit) : itens;
+      })(),
     };
   }));
 
@@ -989,6 +1217,7 @@ export async function registrarRotas(app) {
     ]).optional(),
     page: z.coerce.number().int().min(1).default(1),
     page_size: z.coerce.number().int().min(1).optional(),
+    ...ordenacaoSchema(Object.keys(COLUNAS_CONSISTENCIA)),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -1010,12 +1239,12 @@ export async function registrarRotas(app) {
       'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
     ];
 
-    const divergencias = [];
+    const divergenciasBase = [];
     for (const item of resultado.secoes) {
       for (const regra of item.regras) {
         if (regra.status !== 'divergente') continue;
         if (query.regra && regra.regra !== query.regra) continue;
-        divergencias.push({
+        divergenciasBase.push({
           secao: item.secao,
           regra: regra.regra,
           diferenca: regra.diferenca,
@@ -1025,6 +1254,7 @@ export async function registrarRotas(app) {
         });
       }
     }
+    const divergencias = ordenarLista(divergenciasBase, COLUNAS_CONSISTENCIA, lerOrdenacao(query));
 
     const [metadados, avisos] = await Promise.all([
       cacheDeCorte(cache, 'metadados', query, () =>
@@ -1050,7 +1280,7 @@ export async function registrarRotas(app) {
     };
   }));
 
-  app.get('/api/relatorio', cacheado('relatorio', 300, baseSchema, async (query) => {
+  app.get('/api/relatorio', cacheado('relatorio', 300, baseSchema.extend(ordenacaoSchema(Object.keys(COLUNAS_RELATORIO))), async (query) => {
     const eleicao = await buscarEleicao(db, query.election_id);
     const corte = resolverCorte(query);
     const agregadosRelatorio = () => [
@@ -1162,15 +1392,19 @@ export async function registrarRotas(app) {
         ...metricas(resumoAtual),
       },
       comparacao_final_disponivel: corte.tipo === 'final',
-      referencias: referencias.map((referencia) => ({
-        election_id: referencia.election_id,
-        ano_eleicao: referencia.ano_eleicao,
-        nr_turno: referencia.nr_turno,
-        cd_eleicao: referencia.cd_eleicao,
-        cd_pleito: referencia.cd_pleito,
-        ds_eleicao: referencia.ds_eleicao,
-        ...metricas(referencia),
-      })),
+      referencias: ordenarLista(
+        referencias.map((referencia) => ({
+          election_id: referencia.election_id,
+          ano_eleicao: referencia.ano_eleicao,
+          nr_turno: referencia.nr_turno,
+          cd_eleicao: referencia.cd_eleicao,
+          cd_pleito: referencia.cd_pleito,
+          ds_eleicao: referencia.ds_eleicao,
+          ...metricas(referencia),
+        })),
+        COLUNAS_RELATORIO,
+        lerOrdenacao(query),
+      ),
     };
   }));
 
@@ -1182,6 +1416,7 @@ export async function registrarRotas(app) {
     status: z.string().optional(),
     page: z.coerce.number().int().min(1).default(1),
     page_size: z.coerce.number().int().min(1).optional(),
+    ...ordenacaoSchema(Object.keys(COLUNAS_SECOES)),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -1224,11 +1459,12 @@ export async function registrarRotas(app) {
       ])
       .where('s.ano_eleicao', '=', eleicao.ano_eleicao)
       .where('s.cd_pleito', '=', eleicao.cd_pleito)
-      .where('s.nr_turno', '=', eleicao.nr_turno)
-      .orderBy('s.sg_uf')
-      .orderBy('s.cd_municipio_tse')
-      .orderBy('s.nr_zona')
-      .orderBy('s.nr_secao');
+      .where('s.nr_turno', '=', eleicao.nr_turno);
+
+    const ordenacao = lerOrdenacao(query);
+    consulta = ordenacao
+      ? ordenarSql(consulta, { ...COLUNAS_SECOES, status: statusSql(corte) }, ordenacao, ['s.sg_uf', 's.cd_municipio_tse', 's.nr_zona', 's.nr_secao', 's.id'])
+      : consulta.orderBy('s.sg_uf').orderBy('s.cd_municipio_tse').orderBy('s.nr_zona').orderBy('s.nr_secao');
 
     if (query.uf) consulta = consulta.where('s.sg_uf', '=', query.uf);
     if (query.municipio) consulta = consulta.where('s.cd_municipio_tse', '=', query.municipio);
@@ -1284,6 +1520,7 @@ export async function registrarRotas(app) {
     election_id: z.string().uuid(),
     cargo: z.coerce.number().int(),
     ...corteSchema,
+    ...ordenacaoSchema(Object.keys(COLUNAS_RESULTADOS)),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -1358,7 +1595,7 @@ export async function registrarRotas(app) {
       secao,
       status: classificarStatusSecao(boletim, corte),
       boletim,
-      resultados,
+      resultados: ordenarLista(resultados, COLUNAS_RESULTADOS, lerOrdenacao(query)),
       lote,
       versoes_anteriores: Number(anteriores.total),
       consistencia,
@@ -1371,6 +1608,8 @@ export async function registrarRotas(app) {
     cargo: z.coerce.number().int(),
     comparar_com: z.coerce.number().int().optional(),
     ...corteSchema,
+    ...ordenacaoSchema(Object.keys(COLUNAS_CAMPOS_ALTERADOS), '_campos'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_VOTAVEIS_ALTERADOS), '_votaveis'),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -1444,11 +1683,14 @@ export async function registrarRotas(app) {
         anterior = candidatos.sort((x, y) => y.versao - x.versao)[0] ?? null;
       }
     }
-    const comparacao = anterior && atual
+    const diferencas = anterior && atual ? compararVersoes(anterior, atual) : null;
+    const comparacao = diferencas
       ? {
           anterior: anterior.versao,
           atual: atual.versao,
-          ...compararVersoes(anterior, atual),
+          ...diferencas,
+          campos_alterados: ordenarLista(diferencas.campos_alterados, COLUNAS_CAMPOS_ALTERADOS, lerOrdenacao(query, '_campos')),
+          votaveis_alterados: ordenarLista(diferencas.votaveis_alterados, COLUNAS_VOTAVEIS_ALTERADOS, lerOrdenacao(query, '_votaveis')),
         }
       : null;
 
@@ -1463,6 +1705,7 @@ export async function registrarRotas(app) {
   app.get('/api/comparacao-local', cacheado('comparacao-local', 300, baseSchema.extend({
     page: z.coerce.number().int().min(1).default(1),
     page_size: z.coerce.number().int().min(1).optional(),
+    ...ordenacaoSchema(Object.keys(COLUNAS_COMPARACAO_LOCAL)),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -1505,7 +1748,9 @@ export async function registrarRotas(app) {
       page: query.page,
       page_size: pageSize,
       total: grupos.length,
-      grupos: grupos.slice(inicio, inicio + pageSize),
+      grupos: grupos
+        .slice(inicio, inicio + pageSize)
+        .map((grupo) => ({ ...grupo, secoes: ordenarLista(grupo.secoes, COLUNAS_COMPARACAO_LOCAL, lerOrdenacao(query)) })),
     };
   }));
 
@@ -1517,6 +1762,8 @@ export async function registrarRotas(app) {
     page_size: z.coerce.number().int().min(1).optional(),
     top: z.coerce.number().int().min(1).max(100).optional(),
     top_n: z.coerce.number().int().min(1).max(100).optional(),
+    ...ordenacaoSchema(Object.keys(COLUNAS_CONCENTRACAO), '_share'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_CONCENTRACAO), '_margem'),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -1532,6 +1779,8 @@ export async function registrarRotas(app) {
       corte,
       escopo: escopoDe(query),
       limite,
+      ordenacaoShare: lerOrdenacao(query, '_share'),
+      ordenacaoMargem: lerOrdenacao(query, '_margem'),
     });
 
     const [metadados, avisos] = await Promise.all([

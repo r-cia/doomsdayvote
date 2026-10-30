@@ -6,6 +6,35 @@ Parâmetros comuns: `election_id` (uuid, obrigatório), `cargo` (inteiro, obriga
 
 As leituras passam por cache Redis com chave pelo recorte exato. O cabeçalho `x-cache` indica `hit` (veio do Redis), `miss` (foi ao banco e gravou) ou `off` (Redis ausente ou indisponível). A conclusão de uma carga invalida o cache inteiro.
 
+## Ordenação
+
+Toda rota que alimenta uma tabela aceita `ordem` (coluna) e `direcao` (`asc` ou `desc`, padrão `asc` quando há `ordem`). A ordenação ocorre no servidor, sobre todo o conjunto, antes de limite, top-N ou paginação; valores nulos ficam por último nas duas direções e o desempate é estável. `ordem` fora da lista da rota ou `direcao` inválida retorna 400 `VALIDATION`. Sem `ordem`, a ordem é a padrão de cada rota. `ordem` e `direcao` entram na chave de cache. Rotas com mais de uma tabela usam um sufixo (`ordem_<sufixo>`, `direcao_<sufixo>`).
+
+| Rota | Parâmetro | Colunas permitidas | Padrão sem `ordem` |
+| :-- | :-- | :-- | :-- |
+| `/api/sections` | `ordem` | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `nr_local_votacao`, `status`, `bu_recebido` | `sg_uf`, `cd_municipio_tse`, `nr_zona`, `nr_secao` |
+| `/api/summary` (`votos`) | `ordem` | `nm_votavel`, `sg_partido`, `qt_votos`, `percentual` | `qt_votos` desc |
+| `/api/map` (`areas`) | `ordem` | `sg_uf`, `nm_municipio`, `total_votos`, `votos_validos`, `lider_percentual`, `lider_nome`, `candidato_votos`, `candidato_percentual` | ordem de cálculo das áreas |
+| `/api/analysis` | `ordem` (`benford.candidatos`) | `nm_votavel`, `n`, `mad` | `total_votos` desc |
+| `/api/analysis` | `ordem_biometria_uf` (`biometria_uf`) | `sg_uf`, `qt_habilitados_por_biometria`, `percentual_habilitada`, `qt_biometria_nao_habilitada`, `percentual_nao_habilitada` | `sg_uf` |
+| `/api/anomalies` | `ordem` (`outliers.secoes`, top 20 depois de ordenar) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `score_if`, `score_lof`, `candidato` | `score_if` desc |
+| `/api/anomalies` | `ordem_duplicacao` (`duplicacao.grupos`, top 50 depois de ordenar) | `secoes`, `sg_uf`, `nm_municipio`, `nr_local_votacao`, `votaveis`, `candidato` | quantidade de seções desc |
+| `/api/anomalies` | `ordem_benford` (`benford_niveis.candidatos`) | `nm_votavel`, `secao_n`, `secao_mad`, `zona_n`, `zona_mad`, `municipio_n`, `municipio_mad` | `total_votos` desc |
+| `/api/consistencia` | `ordem` (antes da paginação) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `regra`, `diferenca` | ordem de cálculo |
+| `/api/estatisticas` | `ordem` (`candidatos` de cada bloco) | `nm_votavel`, `sg_partido`, `secoes`, `secoes_zero`, `media`, `mediana`, `desvio` | `media` desc |
+| `/api/comparacao-local` | `ordem` (`secoes` dentro de cada grupo; a ordem dos grupos não muda) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `participacao`, `abstencao`, `participacao_pp`, `abstencao_pp` | ordem de cálculo |
+| `/api/concentracao` | `ordem_share` (`top_share`), `ordem_margem` (`top_margem`); top-N escolhido depois de ordenar todas as seções | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `share_lider`, `margem_absoluta`, `margem_pp`, `share_lider_percentil` | `share_lider` desc / `margem_absoluta` desc |
+| `/api/encerramento/urnas` | `ordem` | `sg_uf`, `total`, `ate_1715`, `pct_1715`, `ate_1915`, `pct_1915`, `apos_1915`, `pct_apos_1915` | `sg_uf` |
+| `/api/encerramento/municipios` | `ordem` (antes de `limit`) | `nm_municipio`, `total`, `apos_1715`, `pct_apos_1715`, `partido`, `votos`, `pct_votos` | `pct_apos_1715` desc |
+| `/api/encerramento/secoes` | `ordem` (antes de `limit`) | `nr_zona`, `nr_secao`, `dt_encerramento`, `partido`, `votos`, `pct_votos` | após 17:15 primeiro, depois `dt_encerramento` desc |
+| `/api/biometria/municipios` | `ordem` (antes de `limit`) | `nm_municipio`, `qt_comparecimento`, `qt_nao_habilitada`, `percentual_nao_habilitada` | `qt_nao_habilitada` desc |
+| `/api/biometria/secoes` | `ordem` (antes de `limit`) | `nr_zona`, `nr_secao`, `qt_comparecimento`, `qt_nao_habilitada`, `percentual_nao_habilitada` | `percentual_nao_habilitada` desc |
+| `/api/sections/:id` | `ordem` (`resultados`) | `cd_tipo_votavel`, `nr_votavel`, `nm_votavel`, `sg_partido`, `categoria`, `qt_votos`, `percentual` | `qt_votos` desc |
+| `/api/sections/:id/versions` | `ordem_campos` (`comparacao.campos_alterados`), `ordem_votaveis` (`comparacao.votaveis_alterados`) | `campo`, `anterior`, `atual`, `diferenca` / `nr_votavel`, `nm_votavel`, `anterior`, `atual`, `diferenca` | ordem de cálculo |
+| `/api/relatorio` | `ordem` (`referencias`; `alvo` não participa) | `referencia`, `bus`, `participacao_pct`, `diferenca_participacao`, `abstencao_pct`, `diferenca_abstencao`, `data_hora`, `somente_data`, `ausente`, `outra_precisao`, `sem_encerramento`, `antes_encerramento`, `antes_emissao`, `mediana_atraso_min`, `p90_atraso_min` | `ano_eleicao` desc, `nr_turno` desc |
+
+`/api/anomalies` deixou de aceitar `ordenar_por` (`if`/`lof`): use `ordem=score_if` ou `ordem=score_lof` com `direcao=desc`. `/api/biometria/*` e `/api/encerramento/municipios` deixaram de aceitar `ordenar_por`; use `ordem` e `direcao`.
+
 ## `GET /api/elections`
 
 Lista as eleições e os cargos com BU importado. Só devolve cargos `Presidente` e `Governador`.
@@ -45,7 +74,7 @@ O traçado usa o dia inteiro, independentemente do corte; o corte é desenhado c
 
 ## `GET /api/map`
 
-Totais por área. `level=uf|municipio`; `candidatos` é uma lista de números separados por vírgula para incluir no detalhe da área. Cada área traz `geom_id` (código IBGE) quando a malha foi carregada.
+Totais por área. `level=uf|municipio`; `candidatos` é uma lista de números separados por vírgula para incluir no detalhe da área. Cada área traz `geom_id` (código IBGE) quando a malha foi carregada, `lider_nome` (nome do líder, de `somarVotos`) e, quando `candidatos` é informado, `candidato_votos` e `candidato_percentual` do primeiro número da lista (nulos caso contrário ou se a área não o tem).
 
 ```json
 { "level": "uf", "areas": [{ "sg_uf": "AM", "geom_id": "13", "total_votos": 0, "votos_validos": 0, "lider": { "nr_votavel": 13, "qt_votos": 0, "percentual": 0 }, "candidatos": [] }] }

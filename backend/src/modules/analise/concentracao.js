@@ -1,6 +1,18 @@
 import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 import { agruparSecoes } from './comparacao-local.js';
+import { ordenarLista } from '../../lib/ordenacao.js';
+
+export const COLUNAS_CONCENTRACAO = {
+  sg_uf: (i) => i.secao?.sg_uf,
+  nm_municipio: (i) => i.secao?.nm_municipio,
+  nr_zona: (i) => i.secao?.nr_zona,
+  nr_secao: (i) => i.secao?.nr_secao,
+  share_lider: (i) => i.share_lider,
+  margem_absoluta: (i) => i.margem_absoluta,
+  margem_pp: (i) => i.margem_pp,
+  share_lider_percentil: (i) => i.contexto?.share_lider_percentil,
+};
 
 function toNumberOrNull(valor) {
   if (valor === null || valor === undefined) return null;
@@ -341,19 +353,25 @@ export function concentracaoPura(entrada, opcoes = {}) {
 
   const secoesFinais = metricas.map((m) => enriquecidosPorId.get(m.secao.id));
 
-  const topShare = [...secoesFinais]
-    .filter((s) => s.share_lider !== null)
-    .sort((a, b) => {
-      const diff = (b.share_lider ?? 0) - (a.share_lider ?? 0);
-      if (diff !== 0) return diff;
-      return (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0);
-    })
-    .slice(0, topN);
+  const topShare = ordenarLista(
+    [...secoesFinais]
+      .filter((s) => s.share_lider !== null)
+      .sort((a, b) => {
+        const diff = (b.share_lider ?? 0) - (a.share_lider ?? 0);
+        if (diff !== 0) return diff;
+        return (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0);
+      }),
+    COLUNAS_CONCENTRACAO,
+    opts.ordenacaoShare,
+  ).slice(0, topN);
 
-  const topMargem = [...secoesFinais]
-    .filter((s) => s.margem_absoluta !== null)
-    .sort((a, b) => (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0))
-    .slice(0, topN);
+  const topMargem = ordenarLista(
+    [...secoesFinais]
+      .filter((s) => s.margem_absoluta !== null)
+      .sort((a, b) => (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0)),
+    COLUNAS_CONCENTRACAO,
+    opts.ordenacaoMargem,
+  ).slice(0, topN);
 
   const comContexto = secoesFinais.filter((s) => s.contexto?.estado === 'ok').length;
 
