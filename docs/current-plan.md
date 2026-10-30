@@ -1,115 +1,151 @@
-# Plano atual
+# Plano — Correções de UX + Code review completo
 
-## Proposta: aba Relatório
+## Contexto
+O usuário relatou três problemas de UX: a ordenação mistura combobox e clique no cabeçalho, as colunas mudam de largura conforme os nomes de municípios e o clique no mapa não funciona com o cargo Governador. Pediu também o primeiro code review completo do código.
 
-### Objetivo
+Decisões do usuário:
+- **Ordenação:** todas as tabelas ordenam por clique na coluna e **sempre no servidor**, sobre todos os dados (não só sobre as linhas exibidas).
+- **Larguras:** eu proponho os % de cada tabela (abaixo) e o usuário aprova.
+- **Code review:** cada achado vira Technical Debt no board Jiraya; só será corrigido o que o usuário aprovar.
 
-Adicionar a aba “Relatório” após “Encerramento”, reunindo evidências disponíveis para avaliar consistência dos dados da votação selecionada. O resultado deve mostrar achados rastreáveis e uma nota de 0,0% a 100,0%, com método, cobertura e limitações explícitos. A nota será um índice descritivo, não probabilidade de fraude nem prova de legitimidade.
+Regras do AGENTS.md que serão seguidas na execução:
+- Copiar este plano para `docs/current-plan.md`.
+- Implementação delegada a 1 subagente Sonnet.
+- Executar `graphify update .` após editar o código.
+- Atualizar `docs/API.md`, `docs/architecture.md` e `docs/design-system/*.md`.
+- Fazer commit ao fim de cada tarefa.
+- Antes de mexer no frontend, aplicar as skills `ui-ux-pro-max` → `impeccable` → `frontend-design`.
 
-### Escopo proposto
+---
 
-1. Analisar uma eleição por vez, identificada por ano e turno; não combinar anos ou turnos no universo avaliado nem na nota. Inventariar tabelas, campos, cargas, versões de boletim, metadados e análises existentes, registrando fonte, período, escopo eleitoral/geográfico, corte e cobertura de cada dado utilizado.
-2. Reaproveitar os módulos existentes de consistência aritmética, duplicação, valores atípicos, Benford, estatísticas descritivas, comparação local, concentração, biometria, participação e encerramento; identificar lacunas sem duplicar cálculos já disponíveis.
-3. Separar verificações determinísticas (totais, categorias, chaves, duplicidades e integridade referencial) de sinais estatísticos exploratórios. Analisar também `DT_BU_RECEBIDO` (“Recebimento” do TSE): cobertura e precisão temporal, atraso em relação ao encerramento e recebimentos anteriores ao encerramento. Exibir divergências, consistências esperadas, tamanho da base, denominador, limiar, resultado e limitações por achado.
-4. Calcular a nota como `BUs avaliados sem divergência / BUs avaliados × 100`, arredondada a uma casa decimal. Cada BU elegível conta uma vez, sem pesos por regra; campos ausentes não pontuam e aparecem na cobertura. Atraso de recebimento e sinais exploratórios ficam fora da nota. Não contar evidências correlacionadas duas vezes.
-5. Quando evidência insuficiente impedir avaliação, mostrar “inconclusivo” e cobertura; não converter ausência de dados em nota neutra ou ruim sem regra aprovada.
-6. Implementar endpoint de relatório usando os filtros compartilhados de eleição, ano, turno, cargo, corte e geografia, com consultas agregadas no Postgres, cache compatível com invalidação pós-carga e respostas paginadas quando necessário.
-7. Permitir comparar explicitamente com outros anos e turnos para contextualizar mudanças comportamentais. Exibir cada período de referência separado e identificado; seus dados não entram nos denominadores, achados ou nota do recorte avaliado.
-8. Criar view e rota após `/encerramento`, traduzir rótulos em pt-BR, en-US e es-ES, e documentar contrato e regras em `docs/API.md`, `docs/blueprint.md` e `docs/architecture.md`.
+## Tarefa 1 — Mapa com Governador (bug)
+**Causa raiz** (`frontend/src/components/MapPanel.vue:498`, `aoClicar`):
+- O clique só é tratado quando `areaDaFeicao()` encontra dados da área.
+- Com Governador sem UF, todas as queries ficam desabilitadas (`queries.js`, `!(cargo===3 && !uf)`). Por isso `areas = []` e o clique é ignorado.
+- Com uma UF já escolhida, a query `/api/map` devolve apenas aquela UF. As outras UFs não têm `area`, então o clique nelas também é ignorado.
 
-### Evidências da auditoria somente leitura
+**Correção:** em `aoClicar`, no nível `uf`, usar `area?.sg_uf ?? ufDaFeicao(feature.properties)` (o helper já existe no arquivo). O resto do fluxo não muda: `selecionarNoMapa` em `MapaView.vue` já troca a UF e o nível. O cursor de `pointer` no hover deve seguir a mesma regra.
+**Teste:** caso em `frontend/tests/components.test.js` — clicar numa feição sem área no nível UF emite `select` com a UF da feição.
 
-- O banco `doomsdayvote` contém registros das eleições de 2014, 2018, 2022 e 2026: 12 combinações de ano, turno e cargo, com cerca de 3,2 milhões de BUs ativos. Cada relatório e linha histórica deve manter seu `election_id` separado.
-- Os BUs ativos de Presidente/Governador e urna apurada têm `qt_aptos`, `qt_comparecimento` e `qt_abstencoes` preenchidos. Não foram encontrados valores negativos, comparecimento acima de aptos nem divergência em `aptos = comparecimento + abstencoes`. `dt_encerramento` está ausente em 28.554 BUs de 2014, 2 de 2018, 180 de 2022 e 59 de 2026; em 2014 o conjunto não fornece esse horário.
-- Os 112 lotes estão concluídos e registram 20.051.413 linhas importadas, 2 erros e 2.528 alertas: 244 campos `DT_ENCERRAMENTO` ausentes e 2.284 ocorrências de horários considerados impossíveis. Os dois erros são `CHAVE_INCOMPLETA`.
-- `DT_BU_RECEBIDO` tem precisão apenas de data em 2014, está ausente em 2018 e tem data/hora em 2022 e 2026. Entre BUs com os dois horários exatos, 2.046 têm recebimento anterior ao encerramento; a mediana do atraso por eleição/cargo varia aproximadamente de 87 a 207 minutos. Esses registros exigem contextualização por fonte e precisão, não entram na nota aritmética.
-- `mv_votos_final` e `mv_secao_candidato_final` atendem apenas urnas do tipo 1 e cargos presidente/governador; não cobrem sozinhas todas as categorias e cargos do banco. Uma consulta exploratória que agrupava resultados brutos de todas as eleições excedeu 30 segundos; o relatório deve agregar no banco, limitar cada análise ao recorte solicitado e medir o custo antes de habilitar análises completas.
-- Essas contagens não são uma validação integral: o teste de divergência de aptos só se aplica a linhas com os três campos preenchidos, e sinais de horário/importação precisam ser avaliados segundo precisão e regra de cada fonte. Em 2014, o encerramento está ausente em todos os BUs observados, então não há atraso calculável; em 2018, o recebimento está ausente.
+## Tarefa 2 — Ordenação padronizada no servidor
+**Backend** (`backend/src/routes/index.js`):
+- Criar um helper único para os parâmetros `ordem` (lista branca de colunas por endpoint, validada pelo zod) e `direcao` (`asc|desc`).
+- O helper aplica `orderBy` com `nulls last` e um desempate estável (id/chave).
+- Nos endpoints que calculam em JS (anomalies, concentracao, comparacao-local, estatisticas, analysis/benford), a ordenação acontece **antes** do corte de top-N/limit.
+- `/api/sections` deixa de ter a ordem fixa (linhas 1228–1231). Também incluir `ordem`/`direcao` na chave de cache.
+- O parâmetro atual `ordenacao=if|lof` de `/api/anomalies` passa a ser `ordem=score_if|score_lof`, mais as outras colunas.
 
-### Critérios de aceitação
+**Endpoints × tabelas:**
 
-- Cada afirmação do relatório aponta para método reproduzível, fonte, cobertura, limiar e limitações.
-- Dados ausentes, qualidade/cobertura insuficientes e sinais exploratórios são distinguidos de inconsistências aritméticas confirmadas.
-- A nota é determinística para o mesmo recorte e versão de dados, justificável pelos achados e limitada a 0,0%–100,0%.
-- O universo da nota contém somente um ano e turno; períodos de referência são apresentados separadamente e nunca agregados ao resultado avaliado.
-- Cada BU conta uma vez, sem pesos por regra. Sinais estatísticos e de atraso aparecem separados da nota aritmética, que não é descrita como probabilidade ou conclusão sobre fraude.
-- A navegação, filtros e traduções mantêm o comportamento das demais abas.
+| Endpoint | Tabelas |
+|---|---|
+| `/api/sections` | SectionsTable |
+| `/api/map` | MapTable, UfPanel (UF), VotosPorEstadoPanel |
+| `/api/summary` | UfPanel (candidatos) |
+| `/api/anomalies` | OutliersPanel, DuplicacaoPanel |
+| `/api/consistencia` | ConsistenciaPanel |
+| `/api/comparacao-local` | ComparacaoLocalPanel |
+| `/api/concentracao` | ConcentracaoPanel (2 tabelas, com ordenação independente) |
+| `/api/estatisticas` | EstatisticaPanel (2 tabelas) |
+| `/api/analysis` | BenfordPanel, BenfordNiveisPanel |
+| `/api/encerramento/*` | EncerramentoView (3 tabelas) |
+| `/api/biometria/*` | BiometriaView (2), BiometriaUfPanel |
+| `/api/sections/:id` e `/versions` | SecaoView, VersoesBuPanel (2) |
+| `/api/relatorio` | RelatorioView (2) |
 
-### Decisões aprovadas
+**Frontend:**
+- Novo composable `useOrdenacao()` em `frontend/src/composables/` com estado `{coluna, direcao}`, `alternar`, `ariaSort`. Ele substitui as 5 cópias de `alternar`/`seta`/`sort` (MapTable, VotosPorEstadoPanel, UfPanel, EncerramentoView, BiometriaUfPanel).
+- O estado de ordenação entra na `queryKey`/params das queries em `queries.js` e nas chamadas diretas da API nas views.
+- Cabeçalho ordenável: `<th :aria-sort>` com um `<button>` dentro, para funcionar pelo teclado. Mantém a seta ↑/↓ e a classe `.ordenavel`.
+- Remover o `<select>` "Ordenar por" do `OutliersPanel.vue` e a prop/emit `ordenacao` em `AnaliseSection.vue` e `AnaliseView.vue`.
+- O estado inicial de cada tabela fica igual à ordem atual do servidor, sem coluna nova marcada.
 
-- A nota é índice descritivo da consistência aritmética observada, não probabilidade.
-- O recorte avaliado usa um `election_id` por vez; comparações são linhas históricas separadas por eleição/ano/turno e não entram na nota.
-- Recebimento do TSE é analisado com a precisão disponível; atrasos e ordem cronológica não pontuam sem limiar validado.
+**Testes:**
+- Integração: o helper/endpoints aceitam colunas da lista branca, rejeitam (400) colunas fora dela, e a ordem vale antes do limit.
+- Componente: clicar no cabeçalho alterna a direção e muda os params.
 
-### Validação proposta
+## Tarefa 3 — Larguras fixas das colunas
+- Regra global em `styles.css`: `table { table-layout: fixed; width: 100% }`.
+- Colunas de texto com `overflow:hidden; text-overflow:ellipsis; white-space:nowrap` e `title` com o texto completo.
+- Cada tabela recebe um `<colgroup>` com os % abaixo, **para aprovação**:
 
-- Testes unitários para invariantes aritméticas, limites da nota, dados ausentes, correlação/duplicidade de evidências e reprodutibilidade.
-- Testes de integração da agregação e do endpoint com bancos falsos; revisão de consultas e cobertura em dados reais somente leitura.
-- Comparar casos sintéticos conhecidos e recortes históricos, registrar limites e análise de sensibilidade antes de aprovar a escala.
+| Tabela | Proporções (%) |
+|---|---|
+| SectionsTable | UF 6 · Município 26 · Zona 8 · Seção 8 · Local 8 · Status 16 · BU recebido 20 · Ação 8 |
+| MapTable (sem candidato) | Rótulo 28 · Votos 14 · Válidos 14 · Líder 26 · % líder 10 · Ação 8 |
+| MapTable (com candidato) | Rótulo 22 · Votos 10 · Válidos 10 · Líder 20 · % líder 9 · Votos cand. 11 · % cand. 10 · Ação 8 |
+| OutliersPanel | UF 6 · Município 30 · Zona 9 · Seção 9 · IF 11 · LOF 11 · Candidato 24 |
+| ConsistenciaPanel | UF 6 · Município 28 · Zona 9 · Seção 9 · Regra 28 · Diferença 12 · Ação 8 |
+| ComparacaoLocalPanel | UF 6 · Município 26 · Zona 8 · Seção 8 · Part. 12 · Abst. 12 · ΔPart. 14 · ΔAbst. 14 |
+| ConcentracaoPanel (ambas) | Pos. 7 · UF 6 · Município 27 · Zona 9 · Seção 9 · 3 métricas 14 cada |
+| DuplicacaoPanel | Seções 7 · UF 5 · Município 18 · Local 8 · Zonas 8 · Números 10 · Votáveis 8 · Aptos 8 · Sinalizadores 14 · Candidato 14 |
+| BenfordPanel | Candidato 60 · n 20 · MAD 20 |
+| BenfordNiveisPanel | Candidato 28 · 6 numéricas 12 cada |
+| EstatisticaPanel (1) | Variável 36 · 4 numéricas 16 cada |
+| EstatisticaPanel (2) | Candidato 28 · Partido 12 · 5 numéricas 12 cada |
+| UfPanel candidatos | Candidato 44 · Partido 20 · Votos 18 · % válidos 18 |
+| UfPanel UF (2 tabelas) | UF 14 · Votos 24 · Líder 36 · % líder 16 · Ações 10 |
+| VotosPorEstadoPanel | 29 colunas: larguras fixas em rem — Candidato 16rem · cada UF 6rem · Total 8rem (com scroll horizontal) |
+| EncerramentoView UF | UF 9 · 7 numéricas 13 cada |
+| EncerramentoView municípios | Município 28 · Total 12 · Após 17:15 12 · % 10 · Partido 14 · Votos 12 · % Votos 12 |
+| EncerramentoView seções | Zona 10 · Seção 10 · Encerramento 20 · Partido 18 · Votos 14 · % Votos 14 · Detalhe 14 |
+| BiometriaUfPanel | 5 colunas, 20 cada |
+| BiometriaView municípios | Município 60 · Não habilitada 20 · % 20 |
+| BiometriaView seções | Zona 18 · Seção 18 · Não habilitada 24 · % 20 · Detalhe 20 |
+| SecaoView | Tipo 12 · Número 10 · Votável 30 · Partido 14 · Categoria 12 · Votos 11 · % válidos 11 |
+| VersoesBuPanel (1) | Campo 34 · Anterior 22 · Atual 22 · Diferença 22 |
+| VersoesBuPanel (2) | Número 12 · Votável 34 · Anterior 18 · Atual 18 · Diferença 18 |
+| RelatorioView (1) | Referência 25 · 5 numéricas 15 cada |
+| RelatorioView (2) | Referência 19 · 9 numéricas 9 cada |
 
-## Objetivo
+- Documentar a regra em `docs/design-system/` (no arquivo de tabelas/módulo correspondente).
 
-Corrigir os estados de carregamento dos gráficos e painéis, fazer os textos e formatos localizados acompanharem o idioma selecionado e preservar a agregação correta de percentuais no mapa por UF.
+## Tarefa 4 — Code review completo (somente leitura → board)
+- **Escopo:** `backend/src/**`, `frontend/src/**` e os testes (verificar se há cobertura falsa).
+- **Categorias:** dead code, code smells, indícios de bugs, código duplicado, anti-patterns.
+- **Já observado** (entra no review):
+  - O predicado `!(Number(store.cargo) === 3 && !store.uf)` está repetido 13× em `queries.js`, e o número 3 é mágico.
+  - Há 5 implementações duplicadas de ordenação no cliente.
+  - `/api/concentracao` aceita 4 aliases para o mesmo limite (`limit/limite/top/top_n`).
+  - `routes/index.js` tem 1575 linhas com SQL inline (god file).
+  - O handler `@update:level` está inline em `MapaView.vue`.
+  - `OutliersPanel.vue` tem uma função `score` com linhas em branco sobrando.
+- **Método:**
+  - Ler módulo por módulo.
+  - Rodar `npm run lint` (se existir) e as suítes `npm test` do backend e do frontend.
+  - Usar `graphify` para achar símbolos não referenciados.
+- **Saída:** cada achado vira uma Technical Debt no board via skill `plan-to-board`/`jiraya-board`, com arquivo:linha, categoria, severidade, evidência e correção sugerida. **Nada é corrigido** sem aprovação item a item.
+- Os itens que se sobrepõem às Tarefas 2 e 3 (duplicação da ordenação) são resolvidos por elas e marcados assim no card.
 
-## Alterações
+## Tarefa 5 — Backtrace de features não rastreadas + documentação
+- **Levantamento:**
+  - Ler os cards existentes do board (skill `jiraya-board`) e o `git log` completo (mensagens e diffs, incluindo `changes.md`).
+  - Montar a lista de features entregues que não têm card correspondente.
+- **Cards:** criar uma Task por feature, já com status **Done**, contendo:
+  - título e descrição;
+  - commits de referência (hash);
+  - arquivos principais.
+- Não serão inventados critérios nem regras: os cards descrevem só o que o código e os commits mostram. Se não der para identificar uma feature com segurança, ela vira Question no board.
+- **Documentação** (no final, depois das Tarefas 1–4), sincronizada com o código atual, incluindo as mudanças deste plano:
+  - `docs/API.md`, `docs/architecture.md`, `docs/blueprint.md` e `docs/design-system/*.md`;
+  - documentos no board (Workflow tool);
+  - `README.md`.
+- Onde a documentação diverge do código, o código é a referência. Se a divergência for de regra de negócio, ela vira Question no board e não é corrigida por inferência.
 
-1. Diferenciar o carregamento inicial da ausência real de dados no gráfico temporal e nos painéis analíticos.
-2. Centralizar o estado de carregamento na área de conteúdo dos painéis, ocultar contagens sem dados enquanto carrega e evitar indicadores duplicados no mapa.
-3. Animar o spinner compartilhado, respeitando a preferência do sistema por movimento reduzido.
-4. Adicionar traduções para estados e rótulos dos painéis analíticos em português, inglês e espanhol.
-5. Fazer formatadores compartilhados e os formatadores do gráfico e da análise usarem o idioma ativo.
-6. Reagregar os totais da view materializada por UF e candidato antes de selecionar o líder e calcular percentuais.
-7. Substituir os metadados brutos sob Benford por um resumo localizado da base, ausências e amostras abaixo do mínimo.
+## Ordem de execução
+1. Copiar o plano para `docs/current-plan.md` e registrar as Tarefas 1–5 no board.
+2. Tarefa 1 → commit.
+3. Tarefa 2 (backend → frontend → docs/API.md) → commit.
+4. Tarefa 3 → commit.
+5. Tarefa 4 → cards no board.
+6. Tarefa 5: cards de backtrace → atualizar a documentação → commit.
+7. `graphify update .` → push ao final.
 
-## Validação
-
-- Conferir consistência das chaves dos três catálogos e revisar o diff.
-- A suíte e o build não foram executados.
-
-## Plano de otimização de banco e cache
-
-### Evidências
-
-- `/api/sections?status=...` consulta todas as seções correspondentes, classifica e filtra em JavaScript, e só então pagina. Isso aumenta transferência, memória e tempo conforme cresce a base.
-- As rotas chamam `metadadosCorte` e `avisosCorte` com o objeto de query inteiro como chave de cache. Parâmetros de paginação e filtros que não alteram esses resultados fragmentam o Redis.
-- `criarCache().obter` executa a função sem deduplicação local quando Redis falha; várias requisições simultâneas podem repetir consultas caras no banco.
-- O pool usa `max: 40` e `work_mem=256MB` fixos. Mesmo com uma instância Postgres de 32 GB, o consumo depende das consultas simultâneas e de quantas operações de sort/hash cada consulta usa; não há configuração por ambiente.
-- Os dados são consultados sem alterações operacionais, tornando pré-agregações e cache de longa duração mais adequados. O carregador ainda existe e atualiza as materialized views e a versão do cache após uma carga.
-- O orçamento máximo pretendido para Postgres é 24 GB numa máquina de 32 GB; os 8 GB restantes ficam reservados ao sistema e aos demais serviços.
-
-### Etapas propostas
-
-1. Traduzir os estados de `classificarStatusSecao` em filtros SQL equivalentes, preservando regras de corte, motivo e fuso horário; filtrar e paginar no Postgres antes de transferir as linhas.
-2. Criar uma chave de cache canônica para metadados e avisos, limitada a eleição, cargo, escopo geográfico e corte, compartilhada por todas as rotas.
-3. Manter deduplicação de consultas em voo também no caminho de falha do Redis, evitando rajadas duplicadas contra o banco.
-4. Avaliar materialized views para as agregações caras ainda executadas sobre tabelas brutas, aproveitando que os dados não mudam durante a consulta. Atualizá-las após a carga oficial.
-5. Rever TTLs das respostas de dados estáveis. Manter invalidação por versão após carga e limitar cache de consultas altamente variáveis para não crescer sem controle.
-6. Ajustar pool, `work_mem`, `maintenance_work_mem` e parâmetros do servidor para caber no orçamento de 24 GB do Postgres, reservando 8 GB para o sistema e os demais serviços. Distinguir parâmetros de planejamento de memória realmente alocada e não tratar `work_mem` como limite global.
-7. Revisar consultas e índices existentes contra os planos de execução disponíveis; propor novos índices apenas quando sustentados pelos filtros e joins observados.
-
-### Limites
-
-- Não executar migrações nem alterar dados reais. Migrações, se justificadas, ficam no fluxo oficial do projeto.
-- Não elevar indefinidamente o TTL para páginas e buscas de alta cardinalidade; cache sem expiração pode consumir memória Redis mesmo com dados imutáveis.
-- Um teto rígido de 24 GB precisa de limite no serviço ou contêiner do Postgres; parâmetros internos e pool reduzem o risco de pico, mas não impõem sozinhos um limite global de RSS.
-- Preservar as alterações locais preexistentes em `backend/src/migrations/0007_mv_totais_area.js` e em `graphify-out/`.
-
-### Implementação
-
-- O filtro de status e a paginação agora são aplicados no Postgres; o total usa contagem SQL também quando a página solicitada está vazia.
-- Chaves de metadados/avisos ignoram paginação e filtros irrelevantes; TTL de 24 horas é invalidado por versão após carga.
-- Falhas do Redis deduplicam consultas simultâneas localmente.
-- `mv_secao_candidato_final` atende à base seção-candidato no corte final e é atualizada após a carga.
-- Pool padrão reduzido de 40 para 20; `DB_POOL_MAX` (máximo 32) e `DB_WORK_MEM_MB` (máximo 64) são configuráveis. `maintenance_work_mem` deixa de ser elevado por conexão.
-- A migração `0008_mv_secao_candidato_final.js` foi criada, mas não aplicada.
-- `graphify update .` executado. Testes/build não executados; o teto global do Postgres depende de instalar o drop-in no host.
-- O host expõe `postgresql@16-main.service`; `MemoryMax` e `MemoryHigh` estão sem limite, com cerca de 15,7 GiB no cgroup durante a inspeção. O drop-in de 24 GB está em `ops/systemd/`, mas não foi instalado.
-- API e carga podem usar heap Node de até 16 GiB por processo. Não reduzi esses limites sem medir o pico das análises e importações, pois isso pode causar OOM; os processos iniciados manualmente também não têm um limite agregado configurado.
-
-## Plano aprovado: aba Comparações
-
-- Criar rota e aba “Comparações” entre “Estatística” e “Biometria”.
-- Mover `ComparacaoLocalPanel` e sua consulta de `AnaliseView` para a nova view.
-- Traduzir o nome da aba em pt-BR, en-US e es-ES.
-- Atualizar a documentação de arquitetura.
-- Aumentar para 224 px a altura do gráfico Benford na aba Estatística.
+## Verificação
+- `cd backend && npm test` (unit + integration com o banco de teste do projeto) e `cd frontend && npm test`, além do `npm run build` no frontend.
+- Checagem manual com `npm run dev`:
+  - Governador sem UF: clicar num estado seleciona o estado.
+  - Com uma UF selecionada (nível UF): clicar noutro estado troca a seleção.
+  - Clicar em cada cabeçalho reordena e a nova ordem vem do servidor (ver a request na aba Network).
+  - As larguras não mudam ao trocar de UF/município.
+- Limite de chamadas de ferramenta: a execução completa passa de 30 (são 4 tarefas e cerca de 25 arquivos). Cada tarefa será tratada como uma task separada, dentro do limite.

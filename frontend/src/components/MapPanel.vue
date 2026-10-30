@@ -486,7 +486,9 @@ function aoMover(evento) {
   tooltip.y = evento.point.y
   tooltip.titulo = titulo
   tooltip.linhas = linhasTooltip(area, feature)
-  mapa.value.getCanvas().style.cursor = area ? 'pointer' : 'default'
+  const clicavel =
+    area || (props.nivel === 'uf' && ufDaFeicao(feature.properties))
+  mapa.value.getCanvas().style.cursor = clicavel ? 'pointer' : 'default'
 }
 
 function esconderTooltip() {
@@ -501,10 +503,11 @@ function aoClicar(evento) {
   })
   if (encontrados.length === 0) return
   const area = areaDaFeicao(encontrados[0])
-  if (!area) return
   if (props.nivel === 'uf') {
-    emit('select', { tipo: 'uf', valor: area.sg_uf })
+    const valor = area?.sg_uf ?? ufDaFeicao(encontrados[0].properties)
+    if (valor) emit('select', { tipo: 'uf', valor })
   } else {
+    if (!area) return
     emit('select', {
       tipo: 'municipio',
       valor: area.cd_municipio_tse,

@@ -27,7 +27,11 @@ vi.mock('maplibre-gl', () => {
 
     addControl() {}
 
-    on() {}
+    on(evento, handler) {
+      this.handlers ??= {}
+      this.handlers[evento] = handler
+      MapaFalso.ultimo = this
+    }
 
     getSource() {
       return null
@@ -38,7 +42,7 @@ vi.mock('maplibre-gl', () => {
     addLayer() {}
 
     getLayer() {
-      return null
+      return this.features ? {} : null
     }
 
     fitBounds() {}
@@ -48,7 +52,7 @@ vi.mock('maplibre-gl', () => {
     remove() {}
 
     queryRenderedFeatures() {
-      return []
+      return this.features ?? []
     }
 
     getCanvas() {
@@ -583,5 +587,37 @@ describe('MapPanel', () => {
 
     expect(wrapper.text()).toContain('não encontrado')
     expect(wrapper.text()).toContain('SP')
+  })
+
+  it('emite select com a UF da feição quando não há área correspondente', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          features: [
+            { type: 'Feature', properties: { SIGLA_UF: 'SP' }, geometry: null },
+          ],
+        }),
+      }),
+    )
+
+    const wrapper = mount(MapPanel, {
+      props: {
+        areas: [],
+        nivel: 'uf',
+        modo: 'lider',
+        candidato: null,
+        candidatos,
+      },
+    })
+    await flushPromises()
+
+    const { Map: MapaFalso } = await import('maplibre-gl')
+    const mapa = MapaFalso.ultimo
+    mapa.features = [{ properties: { SIGLA_UF: 'SP' } }]
+    mapa.handlers.click({ point: { x: 1, y: 1 } })
+
+    expect(wrapper.emitted('select')[0][0]).toEqual({ tipo: 'uf', valor: 'SP' })
   })
 })
