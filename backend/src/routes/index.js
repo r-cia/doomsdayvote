@@ -485,6 +485,7 @@ export async function registrarRotas(app) {
 
   app.get('/api/biometria/municipios', cacheado('biometria-municipios', 300, baseSchema.extend({
     uf: z.string().length(2),
+    ordenar_por: z.enum(['nao_habilitada', 'percentual', 'comparecimento']).default('nao_habilitada'),
     limit: z.coerce.number().int().min(1).max(100).default(20),
   }), async (query) => {
     const corte = resolverCorte(query);
@@ -510,7 +511,13 @@ export async function registrarRotas(app) {
         sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
       ])
       .groupBy(['s.cd_municipio_tse'])
-      .orderBy(sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0) desc`)
+      .orderBy(
+        query.ordenar_por === 'percentual'
+          ? sql`(coalesce(sum(bv.qt_elei_biom_sem_habilitacao),0)::float / nullif(sum(bv.qt_comparecimento),0)) desc nulls last`
+          : query.ordenar_por === 'comparecimento'
+            ? sql`coalesce(sum(bv.qt_comparecimento),0) desc`
+            : sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao),0) desc`,
+      )
       .limit(query.limit)
       .execute();
 
@@ -534,6 +541,7 @@ export async function registrarRotas(app) {
   app.get('/api/biometria/secoes', cacheado('biometria-secoes', 300, baseSchema.extend({
     uf: z.string().length(2),
     municipio: z.coerce.number().int(),
+    ordenar_por: z.enum(['percentual', 'nao_habilitada', 'comparecimento']).default('percentual'),
     limit: z.coerce.number().int().min(1).max(100).default(20),
   }), async (query) => {
     const corte = resolverCorte(query);
@@ -555,7 +563,13 @@ export async function registrarRotas(app) {
         sql`bv.qt_comparecimento`.as('qt_comparecimento'),
         sql`bv.qt_elei_biom_sem_habilitacao`.as('qt_nao_habilitada'),
       ])
-      .orderBy(sql`(coalesce(bv.qt_elei_biom_sem_habilitacao,0)::float / nullif(bv.qt_comparecimento,0)) desc nulls last`)
+      .orderBy(
+        query.ordenar_por === 'nao_habilitada'
+          ? sql`coalesce(bv.qt_elei_biom_sem_habilitacao,0) desc`
+          : query.ordenar_por === 'comparecimento'
+            ? sql`coalesce(bv.qt_comparecimento,0) desc`
+            : sql`(coalesce(bv.qt_elei_biom_sem_habilitacao,0)::float / nullif(bv.qt_comparecimento,0)) desc nulls last`,
+      )
       .limit(query.limit)
       .execute();
 
