@@ -90,6 +90,17 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
 }
 
 async function consultarBaseSecaoCandidato(db, { eleicaoId, cargo, corte, escopo = {} }) {
+  if (corte.tipo === 'final') {
+    let consulta = db
+      .selectFrom('mv_secao_candidato_final')
+      .selectAll()
+      .where('eleicao_id', '=', eleicaoId)
+      .where('cargo', '=', cargo);
+    if (escopo.sgUf) consulta = consulta.where('sg_uf', '=', escopo.sgUf);
+    if (escopo.cdMunicipio) consulta = consulta.where('cd_municipio_tse', '=', escopo.cdMunicipio);
+    return consulta.execute();
+  }
+
   return base(db, { eleicaoId, cargo, corte, escopo })
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
     .leftJoin('localidade as l', (join) =>

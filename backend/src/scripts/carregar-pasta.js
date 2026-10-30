@@ -26,7 +26,12 @@ async function main() {
   }
 
   // Lote offline: COPY de arquivos grandes passa dos 60s do limite padrão.
-  const db = criarDb({ connectionString: env.DATABASE_URL, statementTimeout: 0 });
+  const db = criarDb({
+    connectionString: env.DATABASE_URL,
+    statementTimeout: 0,
+    poolMax: env.DB_POOL_MAX,
+    workMemMb: env.DB_WORK_MEM_MB,
+  });
   const cache = criarCache({ url: env.REDIS_URL });
 
   try {
@@ -46,6 +51,9 @@ async function main() {
     await cliente
       .query('refresh materialized view concurrently mv_totais_area')
       .catch(() => cliente.query('refresh materialized view mv_totais_area'));
+    await cliente
+      .query('refresh materialized view concurrently mv_secao_candidato_final')
+      .catch(() => cliente.query('refresh materialized view mv_secao_candidato_final'));
     await cache.invalidar();
     await cache.fechar();
     await db.destroy();
