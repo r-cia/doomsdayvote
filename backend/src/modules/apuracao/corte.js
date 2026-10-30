@@ -162,14 +162,22 @@ export async function metadadosCorte(db, escopo, corte) {
     .selectFrom('boletim_versao as bv')
     .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
     .innerJoin('lote_importacao as l', 'l.id', 'bv.lote_id')
-    .select(['l.id', 'l.nome_arquivo', 'l.sha256', 'l.dt_geracao_arquivo', 'l.captured_at'])
+    .select([
+      'l.id',
+      'l.nome_arquivo',
+      'l.sha256',
+      sql`max(l.dt_geracao_arquivo)`.as('dt_geracao_arquivo'),
+      sql`max(l.captured_at)`.as('captured_at'),
+    ])
     .where('bv.eleicao_id', '=', escopo.eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', escopo.cargo);
 
   qb = aplicarFiltroCorte(qb, corte);
   qb = aplicarEscopo(qb, escopo.escopo ?? {});
 
-  const linhas = await qb.execute();
+  const linhas = await qb
+    .groupBy(['l.id', 'l.nome_arquivo', 'l.sha256'])
+    .execute();
   const lotes = new Map();
   let source = null;
   let captured = null;
