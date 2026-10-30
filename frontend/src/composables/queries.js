@@ -181,13 +181,6 @@ export function useMapa(nivel = null, opcoes = {}) {
   const municipioDoMapa = computed(() =>
     opcoes.ignorarMunicipio ? null : store.municipio,
   )
-  const asOfEfetivo = computed(() =>
-    opcoes.asOfOverride?.value !== undefined
-      ? opcoes.asOfOverride.value
-      : opcoes.asOfOverride !== undefined && opcoes.asOfOverride !== null
-        ? opcoes.asOfOverride
-        : store.asOf,
-  )
   const candidatosMapa = computed(() => {
     if (!opcoes.incluirTodosCandidatos) return store.candidato
     if (typeof opcoes.candidatos === 'function') return opcoes.candidatos()
@@ -200,7 +193,7 @@ export function useMapa(nivel = null, opcoes = {}) {
       'mapa',
       store.electionId,
       store.cargo,
-      asOfEfetivo.value,
+      store.asOf,
       ufDoMapa.value,
       municipioDoMapa.value,
       nivelEfetivo.value,
@@ -211,7 +204,7 @@ export function useMapa(nivel = null, opcoes = {}) {
         {
           election_id: store.electionId,
           cargo: store.cargo,
-          as_of: asOfEfetivo.value,
+          as_of: store.asOf,
           uf: ufDoMapa.value,
           municipio: municipioDoMapa.value,
           level: nivelEfetivo.value,

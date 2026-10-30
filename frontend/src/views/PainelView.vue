@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import AvisoBanner from '../components/AvisoBanner.vue'
 import BiometriaPanel from '../components/BiometriaPanel.vue'
 import KpiCards from '../components/KpiCards.vue'
@@ -24,34 +24,6 @@ const mapaUfQuery = useMapa('uf', {
   ignorarMunicipio: true,
   ignorarUf: true,
   incluirTodosCandidatos: true,
-  candidatos: computed(() => {
-    const lista = candidatosNominais(resumoQuery.data.value?.votos ?? [])
-      .map((c) => c.nr_votavel)
-      .filter((n) => n !== null && n !== undefined)
-    return lista.join(',')
-  }),
-})
-
-const corteAnterior = computed(() => {
-  const pontos = timelineQuery.data.value?.pontos ?? []
-  if (pontos.length === 0) return null
-  const alvo = store.asOf ? new Date(store.asOf).getTime() : Infinity
-  // previous point: last point with t < alvo
-  let anterior = null
-  for (const p of pontos) {
-    const t = new Date(p.t).getTime()
-    if (t < alvo) anterior = p.t
-    else break
-  }
-  if (!anterior && pontos.length > 1) anterior = pontos[pontos.length - 2]?.t
-  return anterior
-})
-
-const mapaUfAnteriorQuery = useMapa('uf', {
-  ignorarMunicipio: true,
-  ignorarUf: true,
-  incluirTodosCandidatos: true,
-  asOfOverride: corteAnterior,
   candidatos: computed(() => {
     const lista = candidatosNominais(resumoQuery.data.value?.votos ?? [])
       .map((c) => c.nr_votavel)
@@ -156,7 +128,6 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <VotosPorEstadoPanel
     :key="`${store.asOf ?? 'final'}-${store.cargo}-${store.electionId}-${(candidatos || []).map(c=>c.nr_votavel).join(',')}`"
     :areas="mapaUfQuery.data.value?.areas ?? []"
-    :areas-anteriores="mapaUfAnteriorQuery.data.value?.areas ?? []"
     :candidatos="resumoQuery.data.value?.votos ?? []"
   />
 </template>
