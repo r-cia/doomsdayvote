@@ -40,6 +40,7 @@ export const useFiltersStore = defineStore('filters', {
 
   getters: {
     asOf: (state) => deInputSaoPaulo(state.asOfInput),
+    governadorSemUf: (state) => Number(state.cargo) === 3 && !state.uf,
   },
 
   actions: {
