@@ -154,17 +154,17 @@ function navegarLinhas(evento) {
       <StateBlock
         v-if="error"
         estado="erro"
-        titulo="Não foi possível carregar as seções"
+        :titulo="$t('comum.erro')"
         :descricao="error"
-        acao="Tentar novamente"
+        :acao="$t('comum.tentarNovamente')"
         @acao="emit('retry')"
       />
       <StateBlock
         v-else-if="loading && !data"
         estado="carregando"
-        titulo="Carregando seções"
+        :titulo="$t('comum.carregando')"
       />
-      <p v-else-if="itens.length === 0" class="vazio">Nenhuma seção encontrada.</p>
+      <p v-else-if="itens.length === 0" class="vazio">{{ $t('comum.semDados') }}</p>
 
       <template v-else>
         <p v-if="loading" class="secoes__atualizando" role="status">
@@ -214,7 +214,7 @@ function navegarLinhas(evento) {
                     data-secao-btn
                     @click="emit('select', item)"
                   >
-                    Detalhe
+                    {{ $t('comum.detalhe') }}
                   </button>
                 </td>
               </tr>

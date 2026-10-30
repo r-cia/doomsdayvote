@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StateBlock from '../components/StateBlock.vue'
+import VersoesBuPanel from '../components/VersoesBuPanel.vue'
 
 const props = defineProps({
   modal: { type: Boolean, default: false },
@@ -14,7 +15,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
-import { useSecao } from '../composables/queries'
+import { useSecao, useSecaoVersoes } from '../composables/queries'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import {
   formatarData,
@@ -47,6 +48,8 @@ if (props.modal) {
 
 const id = computed(() => (props.modal ? String(props.idProp) : String(rota.params.id)))
 const consulta = useSecao(id)
+const versoesConsulta = useSecaoVersoes(id)
+const versoesDados = computed(() => versoesConsulta.data.value ?? null)
 const dados = computed(() => consulta.data.value ?? null)
 const secao = computed(() => dados.value?.secao ?? null)
 const boletim = computed(() => dados.value?.boletim ?? null)
@@ -118,24 +121,24 @@ function voltar() { fechar() }
           class="button button--ghost"
           @click="voltar"
         >
-          ← Voltar ao painel
+          ← {{ $t('comum.voltar') }}
         </button>
         <button
           v-else
           type="button"
           class="button button--ghost secao-modal__fechar"
-          aria-label="Fechar"
+          :aria-label="$t('comum.fechar')"
           @click="fechar"
         >
           ✕
         </button>
-        <p>Extrato de teletipo · boletim de urna</p>
+        <p>{{ $t('secao.extrato') || 'Extrato de teletipo · boletim de urna' }}</p>
       </div>
 
     <StateBlock
       v-if="!habilitado"
       estado="vazio"
-      titulo="Filtros não informados"
+      :titulo="$t('comum.filtrosNaoInformados') || 'Filtros não informados'"
       descricao="Volte ao painel, selecione uma eleição e um cargo e abra o detalhe pela tabela de seções."
       acao="Ir ao painel"
       @acao="voltar"
@@ -143,14 +146,14 @@ function voltar() { fechar() }
     <StateBlock
       v-else-if="consulta.isLoading.value"
       estado="carregando"
-      titulo="Carregando detalhe da seção"
+      :titulo="$t('comum.carregando')"
     />
     <StateBlock
       v-else-if="consulta.error.value"
       estado="erro"
-      titulo="Não foi possível carregar a seção"
+      :titulo="$t('comum.erro')"
       :descricao="consulta.error.value.message"
-      acao="Voltar ao painel"
+      :acao="$t('comum.voltar')"
       @acao="voltar"
     />
 
@@ -200,7 +203,7 @@ function voltar() { fechar() }
           <StateBlock
             v-if="!boletim"
             estado="vazio"
-            titulo="Sem BU no corte atual"
+            :titulo="$t('comum.semDados')"
             descricao="Não há boletim de urna considerado para esta seção."
           />
           <dl v-else class="dados">
@@ -244,7 +247,7 @@ function voltar() { fechar() }
         <StateBlock
           v-if="resultados.length === 0"
           estado="vazio"
-          titulo="Sem resultados para esta seção"
+          :titulo="$t('comum.semDados')"
         />
         <div v-else class="tabela-scroll">
           <table>
@@ -287,6 +290,8 @@ function voltar() { fechar() }
         </div>
       </section>
     </template>
+
+      <VersoesBuPanel :dados="versoesDados" :loading="versoesConsulta.isLoading.value" :error="versoesConsulta.error.value?.message" />
     </div>
   </div>
   </Teleport>

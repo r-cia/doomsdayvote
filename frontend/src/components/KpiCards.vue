@@ -33,31 +33,31 @@ const participacao = computed(() => {
 <template>
   <section class="kpis" aria-label="Série do corte">
     <div>
-      <span class="kpis__rotulo">Comparecimento</span>
+      <span class="kpis__rotulo">{{ $t('painel.kpi.comparecimento') }}</span>
       <strong class="kpis__valor">{{ formatarNumero(resumo.metricas?.qt_comparecimento) }}</strong>
       <span class="kpis__nota">{{ formatarPercentual(participacao) }} dos aptos</span>
     </div>
     <div>
-      <span class="kpis__rotulo">Seções com BU</span>
+      <span class="kpis__rotulo">{{ $t('painel.kpi.secoesComBu') }}</span>
       <strong class="kpis__valor">{{ formatarNumero(resumo.secoes_com_bu) }}</strong>
       <span class="kpis__nota">{{ formatarNumero(resumo.metricas?.bus_considerados) }} BUs no corte</span>
     </div>
     <div>
-      <span class="kpis__rotulo">Votos válidos</span>
+      <span class="kpis__rotulo">{{ $t('painel.kpi.votosValidos') }}</span>
       <strong class="kpis__valor">{{ formatarNumero(validos) }}</strong>
       <span class="kpis__nota">nominais e de legenda</span>
     </div>
     <div>
-      <span class="kpis__rotulo">Última carga</span>
+      <span class="kpis__rotulo">{{ $t('painel.kpi.ultimaCarga') }}</span>
       <strong class="kpis__valor kpis__valor--hora">{{ formatarDataHora(resumo.captured_at) }}</strong>
     </div>
     <div>
-      <span class="kpis__rotulo">{{ candidato ? candidato.nm_votavel : 'Candidato' }}</span>
+      <span class="kpis__rotulo">{{ candidato ? candidato.nm_votavel : $t('filtros.candidato') }}</span>
       <strong class="kpis__valor">
         {{ candidato ? formatarPercentual(percentualDoCandidato) : '—' }}
       </strong>
       <span class="kpis__nota">
-        {{ candidato ? `${formatarNumero(votosDoCandidato)} votos` : '' }}
+        {{ candidato ? `${formatarNumero(votosDoCandidato)} ${$t('comum.votos')}` : '' }}
       </span>
     </div>
   </section>

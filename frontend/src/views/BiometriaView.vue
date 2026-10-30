@@ -81,6 +81,7 @@ function abrirSecao(item) {
 <template>
   <BiometriaUfPanel
     :dados="analiseQuery.data.value?.biometria_uf ?? []"
+    :loading="analiseQuery.isLoading.value"
     @select="carregarMunicipios"
   />
 
@@ -97,9 +98,9 @@ function abrirSecao(item) {
         </div>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
-      <div v-if="!ufSelecionada" class="vazio">Clique em um estado na tabela acima.</div>
-      <div v-else-if="carregandoMunicipios" class="vazio">Carregando…</div>
-      <div v-else-if="municipios.length === 0" class="vazio">Sem dados.</div>
+      <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
+      <div v-else-if="carregandoMunicipios" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
@@ -139,9 +140,9 @@ function abrirSecao(item) {
           {{ nomeMunicipio(municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}) }}
         </p>
       </div>
-      <div v-if="!municipioSelecionado" class="vazio">Clique em um município.</div>
-      <div v-else-if="carregandoSecoes" class="vazio">Carregando…</div>
-      <div v-else-if="secoes.length === 0" class="vazio">Sem dados.</div>
+      <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') || 'Clique em um município.' }}</div>
+      <div v-else-if="carregandoSecoes" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
@@ -150,7 +151,7 @@ function abrirSecao(item) {
               <th scope="col">Seção</th>
               <th scope="col" class="num">Não habilitada</th>
               <th scope="col" class="num">%</th>
-              <th scope="col"><span class="sr-only">Detalhe</span></th>
+              <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -165,7 +166,7 @@ function abrirSecao(item) {
                   class="button button--ghost button--compacto"
                   @click="abrirSecao(s)"
                 >
-                  Detalhe
+                  {{ $t('comum.detalhe') }}
                 </button>
               </td>
             </tr>

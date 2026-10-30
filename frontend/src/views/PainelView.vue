@@ -102,18 +102,26 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <AvisoBanner v-if="avisos.length > 0" :avisos="avisos" />
 
   <StateBlock
+    v-if="store.governadorSemUf"
+    estado="vazio"
+    titulo="Selecione um estado"
+    descricao="Resultados de governador são específicos por estado."
+  />
+
+  <StateBlock
     v-if="resumoQuery.error.value"
     estado="erro"
-    titulo="Não foi possível carregar o resumo"
+    :titulo="$t('comum.erro')"
     :descricao="resumoQuery.error.value.message"
-    acao="Tentar novamente"
+    :acao="$t('comum.tentarNovamente')"
     @acao="resumoQuery.refetch()"
   />
 
-  <section class="mesa" aria-label="Mesa de plotagem e placar">
+  <section class="mesa" :aria-label="$t('painel.mesa')">
     <PlotDia
       :series="timelineQuery.data.value?.series ?? []"
       :pontos="timelineQuery.data.value?.pontos ?? []"
+      :loading="timelineQuery.isLoading.value"
       :corte="store.asOf"
       :candidato="store.candidato"
       :candidatos="candidatos"
@@ -130,9 +138,10 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     />
   </section>
 
-  <section class="leituras" aria-label="Composição do recorte">
+  <section class="leituras" :aria-label="$t('painel.composicao')">
     <BiometriaPanel
       :dados="analiseQuery.data.value?.biometria ?? null"
+      :loading="analiseQuery.isLoading.value"
       :votos-candidato="votosDoCandidato"
       :nome-candidato="candidatoSelecionado?.nm_votavel ?? ''"
     />
@@ -142,5 +151,6 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     :key="`${store.asOf ?? 'final'}-${store.cargo}-${store.electionId}-${(candidatos || []).map(c=>c.nr_votavel).join(',')}`"
     :areas="mapaUfQuery.data.value?.areas ?? []"
     :candidatos="resumoQuery.data.value?.votos ?? []"
+    :loading="mapaUfQuery.isLoading.value || resumoQuery.isLoading.value"
   />
 </template>

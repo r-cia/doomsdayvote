@@ -59,7 +59,7 @@ function escolher(candidato) {
 <template>
   <section class="painel placar" aria-labelledby="placar-titulo">
     <header class="painel__cabecalho">
-      <h2 id="placar-titulo">Placar</h2>
+      <h2 id="placar-titulo">{{ $t('painel.placar') }}</h2>
       <p class="painel__meta">
         <b>{{ candidatos.length }}</b> candidatos<br />
         {{ formatarNumero(validos) }} votos válidos

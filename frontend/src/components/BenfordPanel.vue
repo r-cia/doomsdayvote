@@ -1,10 +1,12 @@
 <script setup>
 import { computed } from 'vue'
-import { formatarNumero } from '../lib/format'
+import { formatarDecimal, formatarNumero } from '../lib/format'
+import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
   selecionado: { type: Number, default: null },
+  loading: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['select'])
@@ -25,34 +27,24 @@ function altura(valor) {
 }
 
 function formatarMad(valor) {
-  if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR', {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  })
+  return formatarDecimal(valor, 4, 4)
 }
 
-function tom(classificacao) {
-  if (!classificacao) return ''
-  if (classificacao === 'conformidade próxima') return 'chip--ok'
-  if (classificacao === 'conformidade marginal') return 'chip--warn'
-  if (classificacao === 'não conformidade') return 'chip--alert'
-  return ''
-}
 </script>
 
 <template>
   <section class="painel" aria-labelledby="benford-titulo">
     <header class="painel__cabecalho">
-      <h2 id="benford-titulo">Benford · todos os candidatos</h2>
-      <p class="painel__meta">
+      <h2 id="benford-titulo">{{ $t('estatistica.benford') }}</h2>
+      <p v-if="!loading && dados" class="painel__meta">
         primeiro dígito<br />
         <b>{{ formatarNumero(ativo?.n) }}</b> seções
       </p>
     </header>
 
-    <div v-if="!dados || candidatos.length === 0" class="vazio">
-      Nenhuma seção com {{ minimo }} votos ou mais no corte atual.
+    <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
+    <div v-else-if="!dados || candidatos.length === 0" class="vazio">
+      {{ $t("comum.semDados") }}
     </div>
 
     <template v-else>
@@ -90,10 +82,9 @@ function tom(classificacao) {
             </caption>
             <thead>
               <tr>
-                <th scope="col">Candidato</th>
+                <th scope="col">{{ $t('estatistica.candidato') }}</th>
                 <th scope="col" class="num">n</th>
                 <th scope="col" class="num">MAD</th>
-                <th scope="col">Leitura</th>
               </tr>
             </thead>
             <tbody>
@@ -113,11 +104,6 @@ function tom(classificacao) {
                 </td>
                 <td class="num">{{ formatarNumero(candidato.n) }}</td>
                 <td class="num">{{ formatarMad(candidato.mad) }}</td>
-                <td>
-                  <span class="chip" :class="tom(candidato.classificacao)">
-                    {{ candidato.classificacao ?? 'sem dados' }}
-                  </span>
-                </td>
               </tr>
             </tbody>
           </table>

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { formatarDecimal } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -9,31 +10,19 @@ const props = defineProps({
 const emit = defineEmits(['update:ordenacao'])
 
 const secoes = computed(() => props.dados?.secoes ?? [])
-const limiarIf = computed(() => props.dados?.isolamento?.limiar ?? 0.6)
-const limiarLof = computed(() => props.dados?.lof?.limiar ?? 2)
+const parametros = computed(() => props.dados?.parametros ?? {})
 
 function score(valor) {
-  if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR', {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3,
-  })
+  return formatarDecimal(valor, 3, 3)
 }
 
-function tomIf(valor) {
-  return Number(valor) >= limiarIf.value ? 'chip--alert' : ''
-}
 
-function tomLof(valor) {
-  if (valor === null || valor === undefined) return ''
-  return Number(valor) >= limiarLof.value ? 'chip--alert' : ''
-}
 </script>
 
 <template>
   <section class="painel" aria-labelledby="outliers-titulo">
     <header class="painel__cabecalho">
-      <h2 id="outliers-titulo">Isolamento e LOF</h2>
+      <h2 id="outliers-titulo">{{ $t('estatistica.isolamento') }}</h2>
       <div class="estatistica-controle">
         <label class="campo campo--curto">
           <span class="campo__rotulo">Ordenar por</span>
@@ -47,14 +36,16 @@ function tomLof(valor) {
         </label>
       </div>
       <p class="painel__meta">
-        <b>{{ dados?.total_secoes ?? 0 }}</b> seções · IF ≥ {{ limiarIf }}<br />
-        LOF ≥ {{ limiarLof }} · amostra {{ dados?.lof?.amostra ?? 0 }}
-        <template v-if="dados?.lof?.limitado"> (limitada)</template>
+        <b>{{ dados?.total_secoes ?? 0 }}</b> seções · amostra LOF {{ parametros.lof?.amostra ?? dados?.lof?.amostra ?? 0 }}
+        <template v-if="parametros.lof?.limitado ?? dados?.lof?.limitado"> (limitada)</template>
+      </p>
+      <p class="painel__meta">
+        Features: {{ (dados?.features ?? []).join(', ') }}
       </p>
     </header>
 
     <div v-if="secoes.length === 0" class="vazio">
-      Sem seções suficientes para o cálculo no recorte.
+      {{ $t('comum.semSecoes') }}
     </div>
 
     <div v-else class="tabela-scroll">
@@ -80,14 +71,10 @@ function tomLof(valor) {
             <td class="num">{{ secao.nr_zona }}</td>
             <td class="num">{{ secao.nr_secao }}</td>
             <td class="num">
-              <span class="chip" :class="tomIf(secao.score_if)">
-                {{ score(secao.score_if) }}
-              </span>
+              {{ score(secao.score_if) }}
             </td>
             <td class="num">
-              <span class="chip" :class="tomLof(secao.score_lof)">
-                {{ score(secao.score_lof) }}
-              </span>
+              {{ score(secao.score_lof) }}
             </td>
             <td>
               <span v-if="secao.vencedor">

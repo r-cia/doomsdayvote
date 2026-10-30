@@ -2,10 +2,12 @@
 import { computed, ref, watch } from 'vue'
 import { formatarNumero } from '../lib/format'
 import { candidatosNominais } from '../lib/agregacoes'
+import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   areas: { type: Array, default: () => [] },
   candidatos: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
 })
 
 const ordenacao = ref({ coluna: 'nm_votavel', direcao: 'asc' })
@@ -79,20 +81,21 @@ function seta(coluna) {
   <section class="painel" aria-labelledby="votos-estado-titulo">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Distribuição</p>
-        <h2 id="votos-estado-titulo">Votos por estado</h2>
+        <p class="painel__etiqueta">{{ $t('mapa.votosPorEstado') }}</p>
+        <h2 id="votos-estado-titulo">{{ $t('mapa.votosPorEstado') }}</h2>
       </div>
     </header>
 
-    <div v-if="ufs.length === 0 || listaCandidatos.length === 0" class="vazio">
-      Sem dados por estado para o corte atual.
+    <StateBlock v-if="loading && (ufs.length === 0 || listaCandidatos.length === 0)" estado="carregando" :titulo="$t('comum.carregando')" />
+    <div v-else-if="ufs.length === 0 || listaCandidatos.length === 0" class="vazio">
+      {{ $t('mapa.semDadosEstado') }}
     </div>
 
     <div v-else class="tabela-scroll">
       <table class="tabela-votos-estado">
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">Candidato{{ seta('nm_votavel') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">{{ $t('filtros.candidato') }}{{ seta('nm_votavel') }}</th>
             <th v-for="area in ufs" :key="area.sg_uf" scope="col" class="num">
               {{ area.sg_uf }}
             </th>

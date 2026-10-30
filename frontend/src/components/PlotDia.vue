@@ -1,5 +1,8 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import i18n from '../i18n'
+import StateBlock from './StateBlock.vue'
 import { corPartido } from '../lib/colors'
 import {
   formatarHora,
@@ -10,12 +13,14 @@ import {
 const props = defineProps({
   series: { type: Array, default: () => [] },
   pontos: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
   corte: { type: String, default: null },
   candidato: { type: Number, default: null },
   candidatos: { type: Array, default: () => [] },
   avisos: { type: Array, default: () => [] },
 })
 
+const { t: $t, locale } = useI18n()
 const emit = defineEmits(['update:corte'])
 
 const canvas = ref(null)
@@ -71,29 +76,26 @@ const partidoPorNumero = computed(() => {
 })
 
 const rotulo = computed(() => {
-  if (props.pontos.length === 0) return 'Linha do tempo indisponível'
+  if (props.loading) return $t('comum.carregando')
+  if (props.pontos.length === 0) return $t('comum.semDados')
   const primeiro = props.pontos[0]
   const ultimo = props.pontos.at(-1)
-  return `Traçado do dia de ${formatarHora(primeiro.t)} a ${formatarHora(ultimo.t)}, com o corte em ${formatarHora(new Date(tempoCorte.value).toISOString())}. ${formatarNumero(ultimo.votos_acumulados)} votos acumulados em ${formatarNumero(ultimo.secoes_com_bu_acumuladas)} seções com BU.`
+  return `${formatarHora(primeiro.t)} → ${formatarHora(ultimo.t)} · ${formatarHora(new Date(tempoCorte.value).toISOString())} · ${formatarNumero(ultimo.votos_acumulados)} · ${formatarNumero(ultimo.secoes_com_bu_acumuladas)}`
 })
 
 function formatarEixo(valor, divisor, sufixo) {
   if (valor === 0) return '0'
   const numero = valor / divisor
-  return `${numero.toLocaleString('pt-BR', {
+  return `${numero.toLocaleString(locale.value, {
     maximumFractionDigits: numero < 10 ? 1 : 0,
   })}${sufixo}`
 }
 
-const formatadorDia = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: '2-digit',
-  timeZone: 'America/Sao_Paulo',
-})
-
 function rotuloHora(iso, comData) {
   const hora = formatarHora(iso)
-  return comData ? `${formatadorDia.format(new Date(iso))} ${hora}` : hora
+  return comData
+    ? `${new Intl.DateTimeFormat(i18n.global.locale.value, { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))} ${hora}`
+    : hora
 }
 
 function pontosDaSerie(serie) {
@@ -340,18 +342,19 @@ watch(
 <template>
   <section class="painel tracado" aria-labelledby="tracado-titulo">
     <header class="painel__cabecalho">
-      <h2 id="tracado-titulo">Traçado do dia</h2>
-      <p class="painel__meta">
-        <b>{{ formatarHora(pontoAtual?.t) }}</b> · corte<br />
-        {{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }} seções ·
-        {{ formatarNumero(pontoAtual?.votos_acumulados) }} votos
+      <h2 id="tracado-titulo">{{ $t('painel.plotDia') }}</h2>
+      <p v-if="!loading && pontos.length > 0" class="painel__meta">
+        <b>{{ formatarHora(pontoAtual?.t) }}</b> · {{ $t('filtros.corte') }}<br />
+        {{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }} {{ $t('mapa.secoes') }} ·
+        {{ formatarNumero(pontoAtual?.votos_acumulados) }} {{ $t('comum.votos') }}
       </p>
     </header>
 
-    <div v-if="pontos.length === 0" class="tracado__vazio">
-      <strong>Linha do tempo indisponível</strong>
+    <StateBlock v-if="loading" estado="carregando" :titulo="$t('comum.carregando')" class="tracado__estado" />
+    <div v-else-if="pontos.length === 0" class="tracado__vazio">
+      <strong>{{ $t('painel.linhaTempoIndisponivel') }}</strong>
       <p>
-        {{ avisos[0]?.mensagem ?? 'A fonte deste ano não permite linha do tempo por horário.' }}
+        {{ $t('painel.fonteSemLinhaTempo') }}
       </p>
     </div>
 
@@ -370,7 +373,7 @@ watch(
       </div>
 
       <div class="curso">
-        <label class="sr-only" for="curso-corte">Corte do dia</label>
+        <label class="sr-only" for="curso-corte">{{ $t('filtros.corte') }}</label>
         <input
           id="curso-corte"
           type="range"
@@ -378,13 +381,13 @@ watch(
           :max="Math.max(0, pontos.length - 1)"
           step="1"
           :value="indiceCorte"
-          :aria-valuetext="`Corte às ${formatarHora(pontoAtual?.t)}`"
+          :aria-valuetext="$t('painel.corteAs', { time: formatarHora(pontoAtual?.t) })"
           @input="aoIndice"
         />
         <p class="curso__leitura">
-          <span>corte <b>{{ formatarHora(pontoAtual?.t) }}</b></span>
-          <span>seções <b>{{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }}</b></span>
-          <span>votos <b>{{ formatarNumero(pontoAtual?.votos_acumulados) }}</b></span>
+          <span>{{ $t('filtros.corte') }} <b>{{ formatarHora(pontoAtual?.t) }}</b></span>
+          <span>{{ $t('mapa.secoes') }} <b>{{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }}</b></span>
+          <span>{{ $t('comum.votos') }} <b>{{ formatarNumero(pontoAtual?.votos_acumulados) }}</b></span>
         </p>
       </div>
     </template>

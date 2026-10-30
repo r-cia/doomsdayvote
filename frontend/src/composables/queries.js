@@ -44,7 +44,7 @@ export function useResumo() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -72,7 +72,7 @@ export function useTimeline() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -99,7 +99,7 @@ export function useAnalise() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -137,7 +137,7 @@ export function useAnomalias(habilitado = null, ordenarPor = null) {
       ),
     enabled: computed(
       () =>
-        Boolean(store.electionId && store.cargo) &&
+        Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)) &&
         (habilitado ? habilitado.value : true),
     ),
     placeholderData: keepPreviousData,
@@ -169,7 +169,7 @@ export function useEstatisticas(escopo) {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -226,7 +226,7 @@ export function useMapa(nivel = null, opcoes = {}) {
       ),
     enabled: computed(
       () =>
-        Boolean(store.electionId && store.cargo) &&
+        Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)) &&
         (nivelEfetivo.value !== 'municipio' || Boolean(ufDoMapa.value)),
     ),
     placeholderData: keepPreviousData,
@@ -268,8 +268,94 @@ export function useSecoes() {
         signal,
       ),
     enabled: computed(() =>
-      Boolean(store.electionId && store.cargo && store.municipio),
+      Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf) && store.municipio),
     ),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useConsistencia(regra = null) {
+  const store = useFiltersStore()
+  const regraEfetiva = computed(() =>
+    typeof regra === 'function' ? regra() : regra?.value !== undefined ? regra.value : regra,
+  )
+  return useQuery({
+    queryKey: computed(() => [
+      'consistencia',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+      regraEfetiva.value ?? null,
+    ]),
+    queryFn: ({ signal }) =>
+      api.consistencia(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
+          regra: regraEfetiva.value ?? undefined,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useComparacaoLocal() {
+  const store = useFiltersStore()
+  return useQuery({
+    queryKey: computed(() => [
+      'comparacao-local',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+    ]),
+    queryFn: ({ signal }) =>
+      api.comparacaoLocal(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useConcentracao() {
+  const store = useFiltersStore()
+  return useQuery({
+    queryKey: computed(() => [
+      'concentracao',
+      store.electionId,
+      store.cargo,
+      store.asOf,
+      store.uf,
+      store.municipio,
+    ]),
+    queryFn: ({ signal }) =>
+      api.concentracao(
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+          uf: store.uf,
+          municipio: store.municipio,
+        },
+        signal,
+      ),
+    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
     placeholderData: keepPreviousData,
   })
 }
@@ -299,7 +385,38 @@ export function useSecao(id) {
         signal,
       ),
     enabled: computed(() =>
-      Boolean(idEfetivo.value && store.electionId && store.cargo),
+      Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
+    ),
+  })
+}
+
+
+export function useSecaoVersoes(id) {
+  const store = useFiltersStore()
+  const idEfetivo = computed(() => {
+    const valor = isRef(id) ? id.value : id
+    return valor ? String(valor) : null
+  })
+  return useQuery({
+    queryKey: computed(() => [
+      'secao-versoes',
+      idEfetivo.value,
+      store.electionId,
+      store.cargo,
+      store.asOf,
+    ]),
+    queryFn: ({ signal }) =>
+      api.secaoVersoes(
+        idEfetivo.value,
+        {
+          election_id: store.electionId,
+          cargo: store.cargo,
+          as_of: store.asOf,
+        },
+        signal,
+      ),
+    enabled: computed(() =>
+      Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
     ),
   })
 }

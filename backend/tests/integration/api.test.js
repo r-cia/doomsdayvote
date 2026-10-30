@@ -202,7 +202,7 @@ describe('API de leitura', () => {
       expect(corpo.duplicacao.total_grupos).toBeGreaterThanOrEqual(0);
       expect(Array.isArray(corpo.duplicacao.grupos)).toBe(true);
 
-      expect(corpo.outliers.features).toHaveLength(7);
+      expect(corpo.outliers.features).toHaveLength(6);
       expect(corpo.outliers.total_secoes).toBeGreaterThan(0);
       expect(corpo.outliers.secoes.length).toBeGreaterThan(0);
       expect(corpo.outliers.secoes[0].score_if).toBeGreaterThanOrEqual(0);

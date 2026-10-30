@@ -9,6 +9,10 @@ import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apurac
 import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
 import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
+import { consistenciaPorSecao, validarConsistenciaBu } from '../modules/analise/consistencia.js';
+import { compararVersoes } from '../modules/analise/versoes-bu.js';
+import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
+import { concentracao } from '../modules/analise/concentracao.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
 
 const corteSchema = {
@@ -121,7 +125,10 @@ export async function registrarRotas(app) {
         ? sql`select qt_aptos, qt_comparecimento, qt_abstencoes, bus_considerados from mv_metricas_final where eleicao_id = ${eleicao.id} and cargo = ${query.cargo}`
             .execute(db)
             .then((r) => {
-              const linha = r.rows[0] ?? {};
+              const linha = r.rows[0];
+              if (!linha) {
+                return somarMetricasSecao(db, escopo);
+              }
               return {
                 qt_aptos: Number(linha.qt_aptos ?? 0),
                 qt_comparecimento: Number(linha.qt_comparecimento ?? 0),
@@ -271,6 +278,13 @@ export async function registrarRotas(app) {
       cache.obter('avisos', query, 300, () => avisosCorte(db, escopo, corte)).then((r) => r.valor),
     ]);
 
+    const limitacoesAnalise = [
+      'Biometria agregada por seção, sem vínculo individual.',
+      'Benford é leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
+      'Campos ausentes não são tratados como zero.',
+      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
+    ];
+
     return {
       corte: corteResposta(corte),
       ...metadados,
@@ -283,7 +297,23 @@ export async function registrarRotas(app) {
           ...candidato,
           ...niveis.secao,
         })),
+        status_metodologico: benford.status_metodologico ?? 'em_validacao',
+        observacao:
+          benford.observacao ??
+          'Leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
       },
+      cobertura: {
+        consideradas: biometria.secoes,
+        bus_sem_aptos: biometria.bus_sem_aptos,
+        bus_sem_comparecimento: biometria.bus_sem_comparecimento,
+        bus_sem_abstencoes: biometria.bus_sem_abstencoes,
+        bus_sem_biometria: biometria.bus_sem_biometria,
+        secoes_abaixo_minimo_benford: benford.candidatos.reduce(
+          (total, candidato) => total + (candidato.secoes_abaixo_minimo ?? 0),
+          0,
+        ),
+      },
+      limitacoes: limitacoesAnalise,
     };
   }));
 
@@ -375,6 +405,14 @@ export async function registrarRotas(app) {
       })
       .slice(0, 20);
 
+    const limitacoesAnomalias = [
+      'Benford por nível é leitura exploratória, sem rótulo de conformidade; metodologia em validação.',
+      'Duplicação busca vetores idênticos; frequência esperada cresce com a escala do escopo.',
+      'Isolation Forest e LOF são ordenação exploratória, sem limiares de alerta.',
+      'Campos ausentes não são tratados como zero.',
+      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
+    ];
+
     return {
       corte: corteResposta(corte),
       ...metadados,
@@ -383,20 +421,36 @@ export async function registrarRotas(app) {
       duplicacao,
       outliers: {
         features: FEATURES,
-        isolamento: {
-          arvores: isolamento.arvores,
-          amostra: isolamento.amostra,
-          limiar: isolamento.limiar,
-        },
-        lof: {
-          k: lof.k,
-          amostra: indices.length,
-          limitado: secoes.length > indices.length,
-          limiar: lof.limiar,
+        parametros: {
+          isolamento: {
+            arvores: isolamento.arvores,
+            amostra: isolamento.amostra,
+          },
+          lof: {
+            k: lof.k,
+            amostra: indices.length,
+            limitado: secoes.length > indices.length,
+          },
         },
         total_secoes: secoes.length,
         secoes: ranking,
       },
+      cobertura: {
+        consideradas: secoes.length,
+        benford_abaixo_minimo: benford.candidatos.reduce(
+          (total, candidato) =>
+            total +
+            (candidato.niveis?.secao?.secoes_abaixo_minimo ??
+              candidato.secoes_abaixo_minimo ??
+              0),
+          0,
+        ),
+        duplicacao_grupos: duplicacao.total_grupos ?? 0,
+        duplicacao_secoes: duplicacao.total_secoes ?? 0,
+        duplicacao_secoes_escopo: duplicacao.total_secoes_escopo ?? 0,
+        outliers_limitado: secoes.length > indices.length,
+      },
+      limitacoes: limitacoesAnomalias,
     };
   }));
 
@@ -414,11 +468,27 @@ export async function registrarRotas(app) {
       blocos.push(await estatisticasDaEleicao(db, { eleicao: alvo, ...recorte }));
     }
 
+    const secoesConsideradas = blocos.reduce(
+      (total, bloco) => total + Number(bloco.comparecimento?.secoes ?? 0),
+      0,
+    );
+
+    const limitacoesEstatisticas = [
+      'Estatísticas descritivas agregadas por seção, sem vínculo individual.',
+      'Campos ausentes não são tratados como zero.',
+      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
+    ];
+
     return {
       corte: corteResposta(corte),
       escopo: query.escopo,
       turnos_disponiveis: irmaos.map((irmao) => irmao.nr_turno),
       blocos,
+      cobertura: {
+        consideradas: secoesConsideradas,
+        blocos: blocos.length,
+      },
+      limitacoes: limitacoesEstatisticas,
     };
   }));
 
@@ -673,9 +743,6 @@ export async function registrarRotas(app) {
         sql`max(l.nm_municipio)`.as('nm_municipio'),
         sql`count(*)::int`.as('total'),
         sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz)::int`.as('apos_1715'),
-        sql`(select rv.sg_partido from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null group by rv.sg_partido order by sum(rv.qt_votos) desc limit 1)`.as('partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null and rv.sg_partido = (select rv2.sg_partido from resultado_votavel rv2 join boletim_versao bv3 on bv3.id = rv2.boletim_versao_id join secao_eleitoral s3 on s3.id = bv3.secao_id where s3.cd_municipio_tse = s.cd_municipio_tse and s3.sg_uf = s.sg_uf and bv3.eleicao_id = ${eleicao.id} and bv3.cd_cargo_pergunta = ${query.cargo} and bv3.ativo = true and rv2.categoria in ('nominal','legenda') and rv2.qt_votos is not null group by rv2.sg_partido order by sum(rv2.qt_votos) desc limit 1))`.as('votos_partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv join boletim_versao bv2 on bv2.id = rv.boletim_versao_id join secao_eleitoral s2 on s2.id = bv2.secao_id where s2.cd_municipio_tse = s.cd_municipio_tse and s2.sg_uf = s.sg_uf and bv2.eleicao_id = ${eleicao.id} and bv2.cd_cargo_pergunta = ${query.cargo} and bv2.ativo = true and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null)`.as('total_validos'),
       ])
       .groupBy(['s.cd_municipio_tse', 's.sg_uf'])
       .orderBy(
@@ -686,20 +753,74 @@ export async function registrarRotas(app) {
       .limit(query.limit)
       .execute();
 
+    let qbPartidos = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
+      .where('bv.eleicao_id', '=', eleicao.id)
+      .where('bv.cd_cargo_pergunta', '=', query.cargo)
+      .where('s.sg_uf', '=', query.uf)
+      .where('rv.categoria', 'in', ['nominal', 'legenda'])
+      .where('rv.qt_votos', 'is not', null);
+    qbPartidos = aplicarFiltroCorte(qbPartidos, corte);
+
+    const linhasPartidos = await qbPartidos
+      .select([
+        's.cd_municipio_tse',
+        'rv.sg_partido',
+        sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('votos'),
+      ])
+      .groupBy(['s.cd_municipio_tse', 'rv.sg_partido'])
+      .execute();
+
+    const totaisPorMunicipio = new Map();
+    for (const linha of linhasPartidos) {
+      const cd = linha.cd_municipio_tse;
+      if (!totaisPorMunicipio.has(cd)) {
+        totaisPorMunicipio.set(cd, { total: 0, partidos: new Map() });
+      }
+      const acumulado = totaisPorMunicipio.get(cd);
+      const votos = Number(linha.votos);
+      acumulado.total += votos;
+      const atual = acumulado.partidos.get(linha.sg_partido) ?? 0;
+      acumulado.partidos.set(linha.sg_partido, atual + votos);
+    }
+    const resumoPorMunicipio = new Map();
+    for (const [cd, acumulado] of totaisPorMunicipio) {
+      let partido = null;
+      let votosPartido = 0;
+      for (const [nome, votos] of acumulado.partidos) {
+        if (votos > votosPartido) {
+          votosPartido = votos;
+          partido = nome;
+        }
+      }
+      resumoPorMunicipio.set(cd, {
+        partido,
+        votos: votosPartido,
+        total: acumulado.total,
+      });
+    }
+
     return {
       corte: corteResposta(corte),
       municipios: linhas.map((l) => {
         const total = Number(l.total);
         const apos = Number(l.apos_1715);
+        const resumo = resumoPorMunicipio.get(l.cd_municipio_tse) ?? {
+          partido: null,
+          votos: 0,
+          total: 0,
+        };
         return {
           cd_municipio_tse: l.cd_municipio_tse,
           nm_municipio: l.nm_municipio,
           total,
           apos_1715: apos,
           pct_apos_1715: total > 0 ? (apos / total) * 100 : null,
-          partido: l.partido,
-          votos: Number(l.votos_partido ?? 0),
-          pct_votos: Number(l.total_validos) > 0 ? (Number(l.votos_partido) / Number(l.total_validos)) * 100 : null,
+          partido: resumo.partido,
+          votos: resumo.votos,
+          pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
         };
       }),
     };
@@ -725,30 +846,148 @@ export async function registrarRotas(app) {
     const linhas = await qb
       .select([
         's.id',
+        sql`bv.id`.as('bu_id'),
         's.nr_zona',
         's.nr_secao',
         sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`.as('dt_encerramento'),
         sql`case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then true else false end`.as('apos_1715'),
-        sql`(select rv.sg_partido from resultado_votavel rv where rv.boletim_versao_id = bv.id and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null group by rv.sg_partido order by sum(rv.qt_votos) desc limit 1)`.as('partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv where rv.boletim_versao_id = bv.id and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null and rv.sg_partido = (select rv2.sg_partido from resultado_votavel rv2 where rv2.boletim_versao_id = bv.id and rv2.categoria in ('nominal','legenda') and rv2.qt_votos is not null group by rv2.sg_partido order by sum(rv2.qt_votos) desc limit 1))`.as('votos_partido'),
-        sql`(select coalesce(sum(rv.qt_votos),0) from resultado_votavel rv where rv.boletim_versao_id = bv.id and rv.categoria in ('nominal','legenda') and rv.qt_votos is not null)`.as('total_validos'),
       ])
       .orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`)
       .limit(query.limit)
       .execute();
 
+    const ids = linhas.map((linha) => linha.bu_id).filter(Boolean);
+    const resumoPorBu = new Map();
+    if (ids.length > 0) {
+      const linhasPartidos = await db
+        .selectFrom('resultado_votavel as rv')
+        .select([
+          'rv.boletim_versao_id',
+          'rv.sg_partido',
+          sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('votos'),
+        ])
+        .where('rv.boletim_versao_id', 'in', ids)
+        .where('rv.categoria', 'in', ['nominal', 'legenda'])
+        .where('rv.qt_votos', 'is not', null)
+        .groupBy(['rv.boletim_versao_id', 'rv.sg_partido'])
+        .execute();
+
+      const acumuladoPorBu = new Map();
+      for (const linha of linhasPartidos) {
+        if (!acumuladoPorBu.has(linha.boletim_versao_id)) {
+          acumuladoPorBu.set(linha.boletim_versao_id, { total: 0, partidos: new Map() });
+        }
+        const acumulado = acumuladoPorBu.get(linha.boletim_versao_id);
+        const votos = Number(linha.votos);
+        acumulado.total += votos;
+        const atual = acumulado.partidos.get(linha.sg_partido) ?? 0;
+        acumulado.partidos.set(linha.sg_partido, atual + votos);
+      }
+      for (const [buId, acumulado] of acumuladoPorBu) {
+        let partido = null;
+        let votosPartido = 0;
+        for (const [nome, votos] of acumulado.partidos) {
+          if (votos > votosPartido) {
+            votosPartido = votos;
+            partido = nome;
+          }
+        }
+        resumoPorBu.set(buId, {
+          partido,
+          votos: votosPartido,
+          total: acumulado.total,
+        });
+      }
+    }
+
     return {
       corte: corteResposta(corte),
-      secoes: linhas.map((l) => ({
-        id: l.id,
-        nr_zona: l.nr_zona,
-        nr_secao: l.nr_secao,
-        dt_encerramento: l.dt_encerramento,
-        apos_1715: Boolean(l.apos_1715),
-        partido: l.partido,
-        votos: Number(l.votos_partido ?? 0),
-        pct_votos: Number(l.total_validos) > 0 ? (Number(l.votos_partido) / Number(l.total_validos)) * 100 : null,
-      })),
+      secoes: linhas.map((l) => {
+        const resumo = resumoPorBu.get(l.bu_id) ?? { partido: null, votos: 0, total: 0 };
+        return {
+          id: l.id,
+          nr_zona: l.nr_zona,
+          nr_secao: l.nr_secao,
+          dt_encerramento: l.dt_encerramento,
+          apos_1715: Boolean(l.apos_1715),
+          partido: resumo.partido,
+          votos: resumo.votos,
+          pct_votos: resumo.total > 0 ? (resumo.votos / resumo.total) * 100 : null,
+        };
+      }),
+    };
+  }));
+
+  app.get('/api/consistencia', cacheado('consistencia', 300, baseSchema.extend({
+    regra: z.enum([
+      'comparecimento_vs_votos',
+      'aptos_vs_comparecimento_abstencao',
+      'comparecimento_vs_aptos',
+      'biometria_vs_comparecimento',
+    ]).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
+    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
+    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+
+    const resultado = await consistenciaPorSecao(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    });
+
+    const limitacoes = [
+      'Consistência aritmética calculada a partir do BU ativo no corte selecionado.',
+      'Campos ausentes (nulos) não são tratados como zero e não geram divergência.',
+      'Biometria é agregada por seção, sem vínculo individual.',
+      'A ferramenta não conclui fraude; sinaliza desvios para revisão.',
+    ];
+
+    const divergencias = [];
+    for (const item of resultado.secoes) {
+      for (const regra of item.regras) {
+        if (regra.status !== 'divergente') continue;
+        if (query.regra && regra.regra !== query.regra) continue;
+        divergencias.push({
+          secao: item.secao,
+          regra: regra.regra,
+          diferenca: regra.diferenca,
+          campos: regra.campos,
+          valores: regra.valores,
+          bu: item.bu,
+        });
+      }
+    }
+
+    const [metadados, avisos] = await Promise.all([
+      cache
+        .obter('metadados', query, 300, () =>
+          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+      cache
+        .obter('avisos', query, 300, () =>
+          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+    ]);
+
+    const inicio = (query.page - 1) * pageSize;
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      limitacoes,
+      page: query.page,
+      page_size: pageSize,
+      total: divergencias.length,
+      itens: divergencias.slice(inicio, inicio + pageSize),
     };
   }));
 
@@ -798,6 +1037,7 @@ export async function registrarRotas(app) {
         'bv.dt_emissao_bu',
         'bv.dt_bu_recebido_ts',
         'bv.dt_bu_recebido_data',
+        ...(query.status ? [] : [sql`count(*) over()`.as('total_count')]),
       ])
       .where('s.ano_eleicao', '=', eleicao.ano_eleicao)
       .where('s.cd_pleito', '=', eleicao.cd_pleito)
@@ -823,12 +1063,27 @@ export async function registrarRotas(app) {
       )`);
     }
 
-    const linhas = await consulta.execute();
-    const itens = linhas
-      .map((linha) => itemSecao(linha, corte))
-      .filter((item) => (query.status ? item.status === query.status : true));
+    if (!query.status) {
+      consulta = consulta
+        .limit(pageSize)
+        .offset((query.page - 1) * pageSize);
+    }
 
-    const inicio = (query.page - 1) * pageSize;
+    const linhas = await consulta.execute();
+    let itens;
+    let total;
+    if (query.status) {
+      const todos = linhas
+        .map((linha) => itemSecao(linha, corte))
+        .filter((item) => item.status === query.status);
+      total = todos.length;
+      const inicio = (query.page - 1) * pageSize;
+      itens = todos.slice(inicio, inicio + pageSize);
+    } else {
+      total = Number(linhas[0]?.total_count ?? 0);
+      itens = linhas.map((linha) => itemSecao(linha, corte));
+    }
+
     const [metadados, avisos] = await Promise.all([
       cache
         .obter('metadados', query, 300, () =>
@@ -848,8 +1103,8 @@ export async function registrarRotas(app) {
       avisos,
       page: query.page,
       page_size: pageSize,
-      total: itens.length,
-      items: itens.slice(inicio, inicio + pageSize),
+      total,
+      items: itens,
     };
   }));
 
@@ -892,33 +1147,41 @@ export async function registrarRotas(app) {
       .where('ativo', '=', true)
       .executeTakeFirst();
 
-    const resultados = boletim
-      ? await db
-          .selectFrom('resultado_votavel')
-          .selectAll()
-          .where('boletim_versao_id', '=', boletim.id)
-          .orderBy('qt_votos', 'desc')
-          .execute()
+    const [resultados, lote, anteriores] = boletim
+      ? await Promise.all([
+          db
+            .selectFrom('resultado_votavel')
+            .selectAll()
+            .where('boletim_versao_id', '=', boletim.id)
+            .orderBy('qt_votos', 'desc')
+            .execute(),
+          db
+            .selectFrom('lote_importacao')
+            .select(['id', 'nome_arquivo', 'sha256'])
+            .where('id', '=', boletim.lote_id)
+            .executeTakeFirst(),
+          db
+            .selectFrom('boletim_versao')
+            .select(({ fn }) => fn.countAll().as('total'))
+            .where('secao_id', '=', query.id)
+            .where('eleicao_id', '=', eleicao.id)
+            .where('cd_cargo_pergunta', '=', query.cargo)
+            .where('versao', '<', boletim.versao)
+            .executeTakeFirstOrThrow(),
+        ])
+      : [[], null, { total: 0 }];
+
+    const consistencia = boletim
+      ? validarConsistenciaBu(
+          {
+            qt_aptos: boletim.qt_aptos,
+            qt_comparecimento: boletim.qt_comparecimento,
+            qt_abstencoes: boletim.qt_abstencoes,
+            qt_elei_biom_sem_habilitacao: boletim.qt_elei_biom_sem_habilitacao,
+          },
+          resultados,
+        )
       : [];
-
-    const lote = boletim
-      ? await db
-          .selectFrom('lote_importacao')
-          .select(['id', 'nome_arquivo', 'sha256'])
-          .where('id', '=', boletim.lote_id)
-          .executeTakeFirst()
-      : null;
-
-    const anteriores = boletim
-      ? await db
-          .selectFrom('boletim_versao')
-          .select(({ fn }) => fn.countAll().as('total'))
-          .where('secao_id', '=', query.id)
-          .where('eleicao_id', '=', eleicao.id)
-          .where('cd_cargo_pergunta', '=', query.cargo)
-          .where('versao', '<', boletim.versao)
-          .executeTakeFirstOrThrow()
-      : { total: 0 };
 
     return {
       secao,
@@ -927,6 +1190,223 @@ export async function registrarRotas(app) {
       resultados,
       lote,
       versoes_anteriores: Number(anteriores.total),
+      consistencia,
+    };
+  }));
+
+  app.get('/api/sections/:id/versions', cacheado('section-versions', 300, z.object({
+    id: z.string().uuid(),
+    election_id: z.string().uuid(),
+    cargo: z.coerce.number().int(),
+    comparar_com: z.coerce.number().int().optional(),
+    ...corteSchema,
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+
+    const secao = await db
+      .selectFrom('secao_eleitoral as s')
+      .innerJoin('localidade as l', (join) =>
+        join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+      )
+      .select(['s.id','s.sg_uf','s.cd_municipio_tse','s.nr_zona','s.nr_secao','s.nr_local_votacao','l.nm_municipio'])
+      .where('s.id', '=', query.id)
+      .executeTakeFirst();
+    if (!secao) throw new AppError('NOT_FOUND', 404, 'Seção não encontrada');
+
+    const versoesRows = await db
+      .selectFrom('boletim_versao')
+      .selectAll()
+      .where('secao_id', '=', query.id)
+      .where('eleicao_id', '=', eleicao.id)
+      .where('cd_cargo_pergunta', '=', query.cargo)
+      .orderBy('versao', 'asc')
+      .execute();
+
+    const ids = versoesRows.map((v) => v.id);
+    const resultados = ids.length
+      ? await db.selectFrom('resultado_votavel').selectAll().where('boletim_versao_id', 'in', ids).execute()
+      : [];
+    const porBu = new Map();
+    for (const r of resultados) {
+      if (!porBu.has(r.boletim_versao_id)) porBu.set(r.boletim_versao_id, []);
+      porBu.get(r.boletim_versao_id).push(r);
+    }
+    const loteIds = [...new Set(versoesRows.map((v) => v.lote_id))];
+    const lotes = loteIds.length
+      ? await db.selectFrom('lote_importacao').select(['id','nome_arquivo','sha256']).where('id', 'in', loteIds).execute()
+      : [];
+    const loteMap = new Map(lotes.map((l) => [l.id, l]));
+
+    const versoes = versoesRows.map((bv) => ({
+      id: bv.id,
+      versao: bv.versao,
+      ativo: bv.ativo,
+      substitui_versao_id: bv.substitui_versao_id,
+      dt_geracao: bv.dt_geracao,
+      dt_abertura: bv.dt_abertura,
+      dt_encerramento: bv.dt_encerramento,
+      dt_emissao_bu: bv.dt_emissao_bu,
+      dt_bu_recebido_ts: bv.dt_bu_recebido_ts,
+      dt_bu_recebido_data: bv.dt_bu_recebido_data,
+      precisao: bv.precisao_dt_bu_recebido,
+      precisao_dt_bu_recebido: bv.precisao_dt_bu_recebido,
+      qt_aptos: bv.qt_aptos,
+      qt_comparecimento: bv.qt_comparecimento,
+      qt_abstencoes: bv.qt_abstencoes,
+      qt_elei_biom_sem_habilitacao: bv.qt_elei_biom_sem_habilitacao,
+      cd_tipo_urna: bv.cd_tipo_urna,
+      ds_tipo_urna: bv.ds_tipo_urna,
+      lote: loteMap.get(bv.lote_id) ? { id: loteMap.get(bv.lote_id).id, nome_arquivo: loteMap.get(bv.lote_id).nome_arquivo, sha256: loteMap.get(bv.lote_id).sha256 } : null,
+      conteudo_sha256: bv.conteudo_sha256,
+      imported_at: bv.imported_at,
+      resultados: (porBu.get(bv.id) ?? []).sort((x, y) => Number(y.qt_votos ?? 0) - Number(x.qt_votos ?? 0)),
+    }));
+
+    const atual = versoes.find((v) => v.ativo) ?? versoes[versoes.length - 1] ?? null;
+    let anterior = null;
+    if (atual) {
+      if (query.comparar_com !== undefined) {
+        anterior = versoes.find((v) => v.versao === query.comparar_com) ?? null;
+      } else {
+        const candidatos = versoes.filter((v) => v.versao < atual.versao);
+        anterior = candidatos.sort((x, y) => y.versao - x.versao)[0] ?? null;
+      }
+    }
+    const comparacao = anterior && atual
+      ? {
+          anterior: anterior.versao,
+          atual: atual.versao,
+          ...compararVersoes(anterior, atual),
+        }
+      : null;
+
+    return {
+      corte: corteResposta(corte),
+      secao,
+      versoes,
+      comparacao,
+    };
+  }));
+
+  app.get('/api/comparacao-local', cacheado('comparacao-local', 300, baseSchema.extend({
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
+    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
+    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+
+    const resultado = await comparacaoLocal(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    });
+
+    const [metadados, avisos] = await Promise.all([
+      cache
+        .obter('metadados', query, 300, () =>
+          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+      cache
+        .obter('avisos', query, 300, () =>
+          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+    ]);
+
+    const grupos = resultado.grupos ?? [];
+    const inicio = (query.page - 1) * pageSize;
+    const limitacoes = [
+      'Grupos formados por local de votação, com fallback para zona e município quando a amostra for insuficiente.',
+      'Controle de escala por aptos (±50% da mediana do grupo).',
+      'Métricas relativas: participação, abstenção e share por candidato.',
+      'Ausência de campo não é tratada como zero.',
+      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
+    ];
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      limitacoes,
+      page: query.page,
+      page_size: pageSize,
+      total: grupos.length,
+      grupos: grupos.slice(inicio, inicio + pageSize),
+    };
+  }));
+
+  app.get('/api/concentracao', cacheado('concentracao', 300, baseSchema.extend({
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+    limite: z.coerce.number().int().min(1).max(100).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    pagina: z.coerce.number().int().min(1).optional(),
+    page_size: z.coerce.number().int().min(1).optional(),
+    top: z.coerce.number().int().min(1).max(100).optional(),
+    top_n: z.coerce.number().int().min(1).max(100).optional(),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
+    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
+    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+    const limite = query.limit ?? query.limite ?? query.top ?? query.top_n ?? 20;
+    const pagina = query.pagina ?? query.page ?? 1;
+
+    const resultado = await concentracao(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+      limite,
+    });
+
+    const [metadados, avisos] = await Promise.all([
+      cache
+        .obter('metadados', query, 300, () =>
+          metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+      cache
+        .obter('avisos', query, 300, () =>
+          avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
+        )
+        .then((r) => r.valor),
+    ]);
+
+    const topShare = resultado.top_share ?? [];
+    const topMargem = resultado.top_margem ?? [];
+    const inicioShare = (pagina - 1) * pageSize;
+    const inicioMargem = (pagina - 1) * pageSize;
+
+    const limitacoes = resultado.limitacoes ?? [
+      'Concentração calculada a partir do BU ativo no corte selecionado.',
+      'A ferramenta não define limiares de alerta; os resultados são descritivos.',
+    ];
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      limitacoes,
+      page: pagina,
+      page_size: pageSize,
+      total: topShare.length,
+      total_share: topShare.length,
+      total_margem: topMargem.length,
+      top_share: topShare.slice(inicioShare, inicioShare + pageSize),
+      top_margem: topMargem.slice(inicioMargem, inicioMargem + pageSize),
+      top_por_share: topShare.slice(inicioShare, inicioShare + pageSize),
+      top_por_margem: topMargem.slice(inicioMargem, inicioMargem + pageSize),
+      secoes: resultado.secoes ?? [],
+      grupos: resultado.grupos ?? [],
     };
   }));
 }

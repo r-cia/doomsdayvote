@@ -133,13 +133,13 @@ function aoClicarLinha(linha) {
   <section class="card tabela-mapa" aria-labelledby="tabela-mapa-titulo">
     <div class="card__cabecalho">
       <div>
-        <h2 id="tabela-mapa-titulo">Detalhes</h2>
+        <h2 id="tabela-mapa-titulo">{{ $t("comum.detalhe") }}</h2>
       </div>
       <span class="contador">{{ linhas.length }} áreas</span>
     </div>
 
     <p v-if="linhas.length === 0" class="vazio">
-      Nenhuma área com dados para os filtros atuais.
+      {{ $t('comum.semDados') }}
     </p>
 
     <div v-else class="tabela-scroll">

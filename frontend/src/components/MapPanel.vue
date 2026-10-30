@@ -8,6 +8,7 @@ import {
   ref,
   watch,
 } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   LngLatBounds,
   Map as MapaLibre,
@@ -50,6 +51,8 @@ const emit = defineEmits([
   'select',
   'retry',
 ])
+
+const { t } = useI18n()
 
 const container = ref(null)
 const mapa = ref(null)
@@ -243,7 +246,7 @@ async function carregarMalha(nivel) {
     malhaMensagem.value =
       erro instanceof Error
         ? erro.message
-        : `Não foi possível carregar /geo/${arquivoMalha(nivel)}.`
+        : t('comum.erro')
   }
 }
 
@@ -428,7 +431,7 @@ function areaDaFeicao(feature) {
 function linhasTooltip(area, feature) {
   const linhas = []
   if (!area) {
-    linhas.push({ rotulo: 'Situação', valor: 'Sem dados no corte atual' })
+    linhas.push({ rotulo: 'Situação', valor: t('comum.semDados') })
     return linhas
   }
   linhas.push({
@@ -446,7 +449,7 @@ function linhasTooltip(area, feature) {
       valor: `${candidato?.nm_votavel ?? `Candidato ${area.lider.nr_votavel}`} (${candidato?.sg_partido ?? '—'}) · ${formatarPercentual(area.lider.percentual)}`,
     })
   } else {
-    linhas.push({ rotulo: 'Líder', valor: 'Sem líder identificado' })
+    linhas.push({ rotulo: 'Líder', valor: t('comum.semDados') })
   }
   const candidatoArea = candidatoDaArea(area, props.candidato)
   if (props.candidato && candidatoArea) {
@@ -536,7 +539,7 @@ const legenda = computed(() => {
   for (const area of props.areas) {
     if (!area.lider) continue
     const candidato = partidoPorNumero.value.get(area.lider.nr_votavel)
-    const sigla = candidato?.sg_partido ?? 'Sem partido'
+    const sigla = candidato?.sg_partido ?? t('comum.semPartido')
     const atual = porPartido.get(sigla) ?? {
       sigla,
       cor: corPartido(candidato?.sg_partido),
@@ -612,11 +615,11 @@ onBeforeUnmount(() => {
   <section class="card mapa-card" aria-labelledby="mapa-titulo">
     <div class="card__cabecalho mapa-card__cabecalho">
       <div>
-        <h2 id="mapa-titulo">Mapa</h2>
-        <p>Malha IBGE local.</p>
+        <h2 id="mapa-titulo">{{ $t('mapa.titulo') }}</h2>
+        <p>{{ $t('mapa.malhaLocal') }}</p>
       </div>
       <div class="mapa-controles">
-        <div class="segmented" role="group" aria-label="Nível do mapa">
+        <div class="segmented" role="group" :aria-label="$t('mapa.nivel')">
           <button
             type="button"
             :aria-pressed="nivel === 'uf'"
@@ -630,20 +633,20 @@ onBeforeUnmount(() => {
             :aria-pressed="nivel === 'municipio'"
             :class="{ ativo: nivel === 'municipio' }"
             :disabled="!uf"
-            :title="!uf ? 'Selecione uma UF para ver municípios' : undefined"
+            :title="!uf ? $t('mapa.selecioneUfMunicipios') : undefined"
             @click="$emit('update:level', 'municipio')"
           >
-            Municípios
+            {{ $t('mapa.municipios') }}
           </button>
         </div>
-        <div class="segmented" role="group" aria-label="Modo de cor do mapa">
+        <div class="segmented" role="group" :aria-label="$t('mapa.modoCor')">
           <button
             type="button"
             :aria-pressed="modo === 'lider'"
             :class="{ ativo: modo === 'lider' }"
             @click="$emit('update:mode', 'lider')"
           >
-            Líder
+            {{ $t('mapa.lider') }}
           </button>
           <button
             type="button"
@@ -651,7 +654,7 @@ onBeforeUnmount(() => {
             :class="{ ativo: modo === 'percentual' }"
             @click="$emit('update:mode', 'percentual')"
           >
-            Percentual
+            {{ $t('mapa.percentual') }}
           </button>
         </div>
       </div>
@@ -660,33 +663,29 @@ onBeforeUnmount(() => {
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível carregar o mapa"
+      :titulo="$t('comum.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="$emit('retry')"
     />
 
-    <div v-if="loading && !error" class="mapa-status" role="status">
-      Carregando dados do mapa…
-    </div>
-
     <StateBlock
-      v-if="malhaEstado === 'carregando'"
+      v-if="(loading || malhaEstado === 'carregando') && !error"
       estado="carregando"
-      titulo="Carregando malha"
-      :descricao="`Lendo /geo/${arquivoMalha(nivel)}.`"
+      :titulo="$t('comum.carregandoDadosMapa')"
+      :descricao="malhaEstado === 'carregando' ? $t('comum.carregandoMalha') : ''"
     />
 
     <div v-if="malhaEstado === 'ausente'" class="mapa-ausente">
       <StateBlock
         estado="vazio"
-        titulo="Malha não carregada"
+        :titulo="$t('comum.semDados')"
         :descricao="`${malhaMensagem} Adicione o arquivo em frontend/public/geo/${arquivoMalha(nivel)}.`"
-        acao="Tentar novamente"
+        :acao="$t('comum.tentarNovamente')"
         @acao="tentarMalhaNovamente"
       />
       <p>
-        Nenhuma geografia foi inventada. A tabela alternativa abaixo continua
+        {{ $t('comum.semDados') }}
         disponível com os dados da API.
       </p>
     </div>
@@ -740,10 +739,10 @@ onBeforeUnmount(() => {
             :style="{ backgroundColor: COR_SEM_DADOS }"
             aria-hidden="true"
           ></span>
-          Sem dados
+          {{ $t('comum.semDados') }}
         </li>
       </ul>
-      <p v-if="legenda.itens.length === 0">Sem líder identificado no corte atual.</p>
+      <p v-if="legenda.itens.length === 0">{{ $t('comum.semDados') }}</p>
     </div>
 
     <MapTable

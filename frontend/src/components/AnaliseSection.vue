@@ -1,12 +1,14 @@
 <script setup>
 import BenfordNiveisPanel from './BenfordNiveisPanel.vue'
 import BenfordPanel from './BenfordPanel.vue'
+import CoberturaBlock from './CoberturaBlock.vue'
 import DuplicacaoPanel from './DuplicacaoPanel.vue'
 import OutliersPanel from './OutliersPanel.vue'
 import StateBlock from './StateBlock.vue'
 
 defineProps({
   benford: { type: Object, default: null },
+  benfordLoading: { type: Boolean, default: false },
   anomalias: { type: Object, default: null },
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
@@ -26,9 +28,9 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível calcular as análises"
+      :titulo="$t('comum.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="emit('retry')"
     />
 
@@ -36,6 +38,7 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
       <BenfordPanel
         :dados="benford"
         :selecionado="selecionado"
+        :loading="benfordLoading"
         @select="emit('select', $event)"
       />
 
@@ -51,10 +54,11 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
         </div>
       </template>
 
+      <CoberturaBlock v-if="anomalias" :dados="anomalias" />
       <StateBlock
         v-else-if="loading"
         estado="carregando"
-        titulo="Calculando anomalias"
+        :titulo="$t('comum.carregando')"
       />
     </template>
   </section>

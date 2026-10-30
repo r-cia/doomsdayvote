@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../api/client'
 import { useSelecaoEleicao } from '../composables/selecao'
-import { formatarNumero, formatarPercentual } from '../lib/format'
+import { formatarHora, formatarNumero, formatarPercentual } from '../lib/format'
 import SecaoView from './SecaoView.vue'
 
 const { store } = useSelecaoEleicao()
@@ -125,13 +125,13 @@ watch(() => store.cargo, carregarUrnas)
   <section class="painel" aria-labelledby="urnas-titulo">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Encerramento</p>
-        <h2 id="urnas-titulo">Urnas</h2>
+        <p class="painel__etiqueta">{{ $t('encerramento.titulo') }}</p>
+        <h2 id="urnas-titulo">{{ $t('encerramento.urnas') }}</h2>
       </div>
     </header>
 
-    <div v-if="carregandoUrnas" class="vazio">Carregando…</div>
-    <div v-else-if="urnas.length === 0" class="vazio">Sem dados.</div>
+    <div v-if="carregandoUrnas" class="vazio">{{ $t('comum.carregando') }}</div>
+    <div v-else-if="urnas.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
 
     <div v-else class="tabela-scroll">
       <table class="tabela">
@@ -169,9 +169,9 @@ watch(() => store.cargo, carregarUrnas)
         <h2>Municípios com maior % após 17:15</h2>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
-      <div v-if="!ufSelecionada" class="vazio">Clique em um estado na tabela acima.</div>
-      <div v-else-if="carregandoMunicipios" class="vazio">Carregando…</div>
-      <div v-else-if="municipios.length === 0" class="vazio">Sem dados.</div>
+      <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
+      <div v-else-if="carregandoMunicipios" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
@@ -212,9 +212,9 @@ watch(() => store.cargo, carregarUrnas)
           {{ (municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}).nm_municipio }}
         </p>
       </div>
-      <div v-if="!municipioSelecionado" class="vazio">Clique em um município.</div>
-      <div v-else-if="carregandoSecoes" class="vazio">Carregando…</div>
-      <div v-else-if="secoes.length === 0" class="vazio">Sem dados.</div>
+      <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') }}</div>
+      <div v-else-if="carregandoSecoes" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
@@ -225,19 +225,19 @@ watch(() => store.cargo, carregarUrnas)
               <th scope="col">Partido</th>
               <th scope="col" class="num">Votos</th>
               <th scope="col" class="num">% Votos</th>
-              <th scope="col"><span class="sr-only">Detalhe</span></th>
+              <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="s in secoes" :key="s.id">
               <td>{{ s.nr_zona }}</td>
               <td>{{ s.nr_secao }}</td>
-              <td class="num">{{ s.dt_encerramento ? new Date(s.dt_encerramento).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—' }}</td>
+              <td class="num">{{ formatarHora(s.dt_encerramento) }}</td>
               <td>{{ s.partido ?? '—' }}</td>
               <td class="num">{{ formatarNumero(s.votos) }}</td>
               <td class="num">{{ formatarPercentual(s.pct_votos) }}</td>
               <td>
-                <button type="button" class="button button--ghost button--compacto" @click="abrirSecao(s)">Detalhe</button>
+                <button type="button" class="button button--ghost button--compacto" @click="abrirSecao(s)">{{ $t('comum.detalhe') }}</button>
               </td>
             </tr>
           </tbody>

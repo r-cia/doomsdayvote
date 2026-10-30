@@ -1,9 +1,11 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import StateBlock from './StateBlock.vue'
 
 const props = defineProps({
   dados: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['select'])
@@ -100,37 +102,38 @@ function seta(coluna) {
   <section class="painel" aria-labelledby="biometria-uf-titulo">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Biometria</p>
-        <h2 id="biometria-uf-titulo">Biometria por estado</h2>
+        <p class="painel__etiqueta">{{ $t('biometria.titulo') }}</p>
+        <h2 id="biometria-uf-titulo">{{ $t('biometria.porEstado') }}</h2>
       </div>
       <div class="estatistica-controle">
         <select v-model="agrupar" class="uf-ordenacao">
-          <option value="nenhum">Sem agrupamento</option>
-          <option value="regiao">Por região</option>
+          <option value="nenhum">{{ $t("biometria.semAgrupamento") }}</option>
+          <option value="regiao">{{ $t("biometria.porRegiao") }}</option>
         </select>
       </div>
     </header>
 
-    <div v-if="linhas.length === 0" class="vazio">Sem dados de biometria.</div>
+    <StateBlock v-if="loading && linhas.length === 0" estado="carregando" :titulo="$t('comum.carregando')" />
+    <div v-else-if="linhas.length === 0" class="vazio">{{ $t('comum.semDadosBiometria') }}</div>
 
     <div v-else class="tabela-scroll">
       <table class="tabela">
         <thead>
           <tr>
             <th scope="col" class="ordenavel" @click="alternar('sg_uf')">
-              {{ agruparRegiao ? 'Região' : 'UF' }}{{ seta('sg_uf') }}
+              {{ agruparRegiao ? $t('biometria.regiao') : $t('biometria.uf') }}{{ seta('sg_uf') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_habilitados_por_biometria')">
-              Votos com biometria{{ seta('qt_habilitados_por_biometria') }}
+              {{ $t('biometria.votosComBiometria') }}{{ seta('qt_habilitados_por_biometria') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_habilitada')">
-              % com biometria{{ seta('percentual_habilitada') }}
+              {{ $t('biometria.pctComBiometria') }}{{ seta('percentual_habilitada') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_biometria_nao_habilitada')">
-              Votos biometria não habilitada{{ seta('qt_biometria_nao_habilitada') }}
+              {{ $t('biometria.votosNaoHabilitada') }}{{ seta('qt_biometria_nao_habilitada') }}
             </th>
             <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_nao_habilitada')">
-              % não habilitada{{ seta('percentual_nao_habilitada') }}
+              {{ $t('biometria.pctNaoHabilitada') }}{{ seta('percentual_nao_habilitada') }}
             </th>
           </tr>
         </thead>

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import CoberturaBlock from './CoberturaBlock.vue'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -27,16 +28,18 @@ function numeros(grupo) {
 <template>
   <section class="painel" aria-labelledby="duplicacao-titulo">
     <header class="painel__cabecalho">
-      <h2 id="duplicacao-titulo">Duplicação e proximidade</h2>
+      <h2 id="duplicacao-titulo">{{ $t('estatistica.duplicacao') }}</h2>
       <p class="painel__meta">
         vetor de votos idêntico<br />
         <b>{{ dados?.total_grupos ?? 0 }}</b> grupos ·
-        {{ dados?.total_secoes ?? 0 }} seções
+        {{ dados?.total_secoes ?? 0 }} seções ·
+        escopo {{ dados?.total_secoes_escopo ?? 0 }}
       </p>
+      <p class="nota" v-if="dados?.observacao">{{ dados.observacao }}</p>
     </header>
 
     <div v-if="grupos.length === 0" class="vazio">
-      Nenhum vetor de votos repetido no recorte.
+      {{ $t('comum.semDados') }}
     </div>
 
     <div v-else class="tabela-scroll">
@@ -49,8 +52,11 @@ function numeros(grupo) {
             <th scope="col" class="num">Seções</th>
             <th scope="col">UF</th>
             <th scope="col">Município</th>
+            <th scope="col">Local</th>
             <th scope="col">Zonas</th>
             <th scope="col">Números</th>
+            <th scope="col" class="num">Votáveis</th>
+            <th scope="col" class="num">Aptos</th>
             <th scope="col">Sinalizadores</th>
             <th scope="col">Candidato</th>
           </tr>
@@ -60,14 +66,20 @@ function numeros(grupo) {
             <td class="num">{{ grupo.secoes.length }}</td>
             <td>{{ grupo.secoes[0].sg_uf }}</td>
             <td>{{ grupo.secoes[0].nm_municipio || grupo.secoes[0].cd_municipio_tse }}</td>
+            <td>{{ grupo.secoes[0].nr_local_votacao ?? '—' }}</td>
             <td>{{ zonas(grupo) }}</td>
             <td>{{ numeros(grupo) }}</td>
+            <td class="num">{{ grupo.votaveis }}</td>
+            <td class="num">
+              {{ grupo.secoes.map((s) => s.qt_aptos ?? '—').join(', ') }}
+            </td>
             <td>
               <span v-if="grupo.mesma_zona" class="chip chip--warn">mesma zona</span>
               <span v-if="grupo.secoes_consecutivas" class="chip chip--alert">
                 consecutivas
               </span>
               <span v-if="grupo.mesmo_municipio" class="chip chip--warn">mesmo município</span>
+              <span v-if="grupo.mesmo_local" class="chip chip--warn">mesmo local</span>
               <template v-if="!grupo.mesma_zona && !grupo.secoes_consecutivas && !grupo.mesmo_municipio">
                 <span
                   v-if="
@@ -93,5 +105,6 @@ function numeros(grupo) {
         </tbody>
       </table>
     </div>
+    <CoberturaBlock :dados="dados" />
   </section>
 </template>
