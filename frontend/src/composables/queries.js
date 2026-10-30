@@ -56,7 +56,6 @@ export function useTimeline() {
       'timeline',
       store.electionId,
       store.cargo,
-      store.asOf,
       store.uf,
       store.municipio,
       store.timelineGranularity,
@@ -66,7 +65,6 @@ export function useTimeline() {
         {
           election_id: store.electionId,
           cargo: store.cargo,
-          as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
           granularity: store.timelineGranularity,
@@ -174,6 +172,13 @@ export function useMapa(nivel = null, opcoes = {}) {
   const municipioDoMapa = computed(() =>
     opcoes.ignorarMunicipio ? null : store.municipio,
   )
+  const candidatosMapa = computed(() => {
+    if (!opcoes.incluirTodosCandidatos) return store.candidato
+    if (typeof opcoes.candidatos === 'function') return opcoes.candidatos()
+    if (opcoes.candidatos?.value !== undefined) return opcoes.candidatos.value
+    return opcoes.candidatos
+  })
+
   return useQuery({
     queryKey: computed(() => [
       'mapa',
@@ -183,7 +188,7 @@ export function useMapa(nivel = null, opcoes = {}) {
       ufDoMapa.value,
       municipioDoMapa.value,
       nivelEfetivo.value,
-      store.candidato,
+      opcoes.incluirTodosCandidatos ? candidatosMapa.value : store.candidato,
     ]),
     queryFn: ({ signal }) =>
       api.mapa(
@@ -194,7 +199,7 @@ export function useMapa(nivel = null, opcoes = {}) {
           uf: ufDoMapa.value,
           municipio: municipioDoMapa.value,
           level: nivelEfetivo.value,
-          candidatos: store.candidato,
+          candidatos: candidatosMapa.value,
         },
         signal,
       ),

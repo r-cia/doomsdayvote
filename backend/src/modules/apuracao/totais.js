@@ -115,7 +115,7 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
     if (linha.categoria === 'nominal' && (!area.lider || votos > area.lider.qt_votos)) {
       area.lider = { nr_votavel: linha.nr_votavel, qt_votos: votos, cor_hex: linha.cor_hex };
     }
-    if (candidatos.includes(linha.nr_votavel)) {
+    if (Array.isArray(candidatos) && candidatos.length > 0 && candidatos.includes(Number(linha.nr_votavel))) {
       area.candidatos.push({ nr_votavel: linha.nr_votavel, qt_votos: votos, cor_hex: linha.cor_hex });
     }
   }

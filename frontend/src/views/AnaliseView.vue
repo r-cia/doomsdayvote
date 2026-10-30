@@ -3,11 +3,20 @@ import AnaliseSection from '../components/AnaliseSection.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import { useAnalise, useAnomalias } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
+import { watch } from 'vue'
 
 const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
 
 const analiseQuery = useAnalise()
 const anomaliasQuery = useAnomalias()
+
+watch(
+  () => store.asOf,
+  () => {
+    analiseQuery.refetch()
+    anomaliasQuery.refetch()
+  },
+)
 </script>
 
 <template>
