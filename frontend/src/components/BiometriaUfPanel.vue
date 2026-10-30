@@ -105,8 +105,8 @@ function seta(coluna) {
       </div>
       <div class="estatistica-controle">
         <select v-model="agrupar" class="uf-ordenacao">
-          <option value="nenhum">Sem agrupamento</option>
-          <option value="regiao">Por região</option>
+          <option value="nenhum">{{ $t("biometria.semAgrupamento") }}</option>
+          <option value="regiao">{{ $t("biometria.porRegiao") }}</option>
         </select>
       </div>
     </header>
