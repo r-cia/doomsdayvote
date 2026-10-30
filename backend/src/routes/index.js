@@ -591,6 +591,140 @@ export async function registrarRotas(app) {
     };
   }));
 
+  app.get('/api/encerramento/urnas', cacheado('encerramento-urnas', 300, baseSchema, async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+
+    let qb = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .where('bv.eleicao_id', '=', eleicao.id)
+      .where('bv.cd_cargo_pergunta', '=', query.cargo);
+    qb = aplicarFiltroCorte(qb, corte);
+
+    const linhas = await qb
+      .select([
+        's.sg_uf',
+        sql`count(*)::int`.as('total'),
+        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento <= timestamptz '2026-10-04 20:15:00-03')::int`.as('ate_1715'),
+        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento <= timestamptz '2026-10-04 22:15:00-03')::int`.as('ate_1915'),
+        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 22:15:00-03')::int`.as('apos_1915'),
+      ])
+      .groupBy('s.sg_uf')
+      .orderBy('s.sg_uf')
+      .execute();
+
+    return {
+      corte: corteResposta(corte),
+      ufs: linhas.map((l) => {
+        const total = Number(l.total);
+        const a1715 = Number(l.ate_1715);
+        const a1915 = Number(l.ate_1915);
+        const apos = Number(l.apos_1915);
+        return {
+          sg_uf: l.sg_uf,
+          total,
+          ate_1715: a1715,
+          pct_1715: total > 0 ? (a1715 / total) * 100 : null,
+          ate_1915: a1915,
+          pct_1915: total > 0 ? (a1915 / total) * 100 : null,
+          apos_1915: apos,
+          pct_apos_1915: total > 0 ? (apos / total) * 100 : null,
+        };
+      }),
+    };
+  }));
+
+  app.get('/api/encerramento/municipios', cacheado('encerramento-municipios', 300, baseSchema.extend({
+    uf: z.string().length(2),
+    ordenar_por: z.enum(['apos_1715', 'apos_1915', 'total']).default('apos_1715'),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+
+    let qb = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .leftJoin('localidade as l', (join) =>
+        join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
+      )
+      .where('bv.eleicao_id', '=', eleicao.id)
+      .where('bv.cd_cargo_pergunta', '=', query.cargo);
+    qb = aplicarFiltroCorte(qb, corte);
+    qb = qb.where('s.sg_uf', '=', query.uf);
+
+    const linhas = await qb
+      .select([
+        's.cd_municipio_tse',
+        sql`max(l.nm_municipio)`.as('nm_municipio'),
+        sql`count(*)::int`.as('total'),
+        sql`count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03')::int`.as('apos_1715'),
+      ])
+      .groupBy(['s.cd_municipio_tse'])
+      .orderBy(
+        query.ordenar_por === 'total'
+          ? sql`count(*) desc`
+          : sql`(count(*) filter (where bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03'))::float / nullif(count(*),0) desc nulls last`,
+      )
+      .limit(query.limit)
+      .execute();
+
+    return {
+      corte: corteResposta(corte),
+      municipios: linhas.map((l) => {
+        const total = Number(l.total);
+        const apos = Number(l.apos_1715);
+        return {
+          cd_municipio_tse: l.cd_municipio_tse,
+          nm_municipio: l.nm_municipio,
+          total,
+          apos_1715: apos,
+          pct_apos_1715: total > 0 ? (apos / total) * 100 : null,
+        };
+      }),
+    };
+  }));
+
+  app.get('/api/encerramento/secoes', cacheado('encerramento-secoes', 300, baseSchema.extend({
+    uf: z.string().length(2),
+    municipio: z.coerce.number().int(),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+
+    let qb = db
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+      .where('bv.eleicao_id', '=', eleicao.id)
+      .where('bv.cd_cargo_pergunta', '=', query.cargo);
+    qb = aplicarFiltroCorte(qb, corte);
+    qb = qb.where('s.sg_uf', '=', query.uf).where('s.cd_municipio_tse', '=', query.municipio);
+
+    const linhas = await qb
+      .select([
+        's.id',
+        's.nr_zona',
+        's.nr_secao',
+        sql`bv.dt_encerramento`.as('dt_encerramento'),
+      ])
+      .orderBy(sql`(case when bv.dt_encerramento is not null and bv.dt_encerramento > timestamptz '2026-10-04 20:15:00-03' then 1 else 0 end) desc, bv.dt_encerramento desc nulls last`)
+      .limit(query.limit)
+      .execute();
+
+    return {
+      corte: corteResposta(corte),
+      secoes: linhas.map((l) => ({
+        id: l.id,
+        nr_zona: l.nr_zona,
+        nr_secao: l.nr_secao,
+        dt_encerramento: l.dt_encerramento,
+        apos_1715: l.dt_encerramento ? new Date(l.dt_encerramento) > new Date('2026-10-04T20:15:00-03:00') : false,
+      })),
+    };
+  }));
+
   app.get('/api/sections', cacheado('sections', 60, baseSchema.extend({
     zona: z.coerce.number().int().optional(),
     secao: z.coerce.number().int().optional(),
