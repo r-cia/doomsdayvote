@@ -290,3 +290,41 @@ Em corte final, `referencias` lista cada outra eleição compatível com cargo, 
   }]
 }
 ```
+
+## `GET /api/comparacao-anos`
+
+Compara, entre eleições, a evolução da apuração de Presidente pelo horário de encerramento do BU. Ignora o corte (`as_of`): usa sempre a apuração completa. Não aceita ordenação.
+
+Parâmetros: `anos` (obrigatório; dois ou mais anos separados por vírgula, ex.: `2018,2022`) e `uf` (opcional, 2 letras; sem `uf`, Brasil).
+
+Filtros: Presidente (`cd_cargo_pergunta = 1`), `ativo`, `cd_tipo_urna = 1`, BUs com `dt_encerramento` (os demais ficam fora das curvas). Votos do candidato = categoria `nominal`; votos válidos = `nominal` + `legenda`. Candidatos por turno: os dois mais votados do turno em `mv_votos_final` (total nacional), por posição.
+
+Resposta:
+
+```json
+{
+  "anos": [{
+    "ano": 2022,
+    "turnos": [{
+      "turno": 1,
+      "candidatos": [{ "posicao": 1, "nr_votavel": 13, "nm_votavel": "…", "sg_partido": "PT", "votos": 57259504, "vencedor": true }],
+      "pontos": [{
+        "minuto": 1020,
+        "candidatos": [{ "votos": 120345, "pct_acumulada": 43.1 }]
+      }]
+    }]
+  }],
+  "pares": [{
+    "ano_a": 2018, "ano_b": 2022, "turno": 1, "posicao": 1,
+    "votos_intervalo": { "r": 0.91, "p_valor": 0.0001 },
+    "pct_acumulada": { "r": 0.97, "p_valor": 0.0001 }
+  }],
+  "avisos": [{ "ano": 2014, "codigo": "SEM_HORARIO" }]
+}
+```
+
+- `pontos[].minuto`: início do intervalo de 5 minutos, em minutos desde 00:00 do dia do pleito no fuso fixo -03 (valores acima de 1440 caem no dia seguinte). `pontos[].candidatos` segue a ordem de `candidatos` (índice = `posicao - 1`).
+- `votos`: votos nominais do candidato no intervalo (sem acumular). `pct_acumulada`: votos acumulados do candidato sobre os votos válidos acumulados, em %, só com BUs com encerramento.
+- `vencedor`: candidato vencedor da eleição (primeiro colocado do último turno carregado do ano).
+- `pares`: um item por par de anos, turno e posição presentes nos dois anos. Pareamento por posição (no 2º turno, 1 = vencedor e 2 = derrotado). `r` é a correlação de Pearson sobre os intervalos presentes nos dois anos; `p_valor` é o p-valor unilateral por permutação em blocos de 6 intervalos, com 10.000 permutações e semente fixa. `r` e `p_valor` são `null` quando não há como calcular.
+- `avisos`: ano sem horário de encerramento (sem `dt_pleito` ou sem BUs com `dt_encerramento`, como 2014); o ano fica fora de `anos` e `pares`.

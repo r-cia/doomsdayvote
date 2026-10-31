@@ -107,3 +107,60 @@ As constantes `COLUNAS_*` ficam junto da rota que as usa. Os contratos de API n�
   4. `docs/architecture.md`: refresh ao fim da carga roda com o papel dono.
 - Validação: `npm test`, `npm run test:integration`.
 - Passo final: rodar `npm run carga` para atualizar as views (autorizado pelo usuário, executado pelo orquestrador).
+
+## Plano — Aba "Entre anos" (comparação entre eleições) (2026-10-31)
+
+### Decisões do usuário
+| Tema | Decisão |
+|---|---|
+| Seleção | O usuário seleciona dois ou mais anos. |
+| Candidatos | Em cada ano: os dois mais votados no 1º turno e o vencedor da eleição. |
+| Cargo/escopo | Só Presidente. Brasil, com filtro opcional de UF. |
+| Eixo do crescimento | Ao longo da apuração, pelo horário de **encerramento** do BU em todos os anos. 2014 fica indisponível porque não tem horário. |
+| Curvas comparadas | (a) votos por intervalo, sem acumular; (b) % acumulada do candidato nos votos válidos ao longo do tempo. |
+| Intervalo | 5 min. Eixo: horário de encerramento em -03 no dia do pleito. |
+| Semelhança | Correlação de Pearson entre as curvas de cada par de anos. |
+| Probabilidade | Só a "chance de ser acaso": p-valor por permutação em blocos. Não haverá "chance de dados manipulados". |
+| Padrões e suspeita | Só mostrar as métricas. Nada é marcado como suspeito e não há limites. |
+| Aba | Nova aba "Entre anos". A aba "Comparações" atual (comparação local) continua como está. |
+
+### Decisões da segunda rodada
+| Tema | Decisão |
+|---|---|
+| Pareamento | Por posição. 1º turno: 1º colocado com 1º, 2º com 2º. 2º turno: vencedor com vencedor, derrotado com derrotado. |
+| Intervalos | A correlação usa só os intervalos de 5 min que têm dados nos dois anos (interseção). |
+| Permutação | Blocos de 6 intervalos (30 min) e 10.000 permutações. |
+| Corte `as_of` | A aba ignora o corte e usa sempre a apuração completa. |
+| 2014 | Aparece na seleção, mas desabilitado. |
+| Vencedor | É exibido e define o pareamento do 2º turno. Nenhum cálculo extra. |
+| BUs sem `dt_encerramento` | Ficam fora das curvas. A % acumulada usa só os BUs com encerramento. `dt_encerramento` tem hora completa em 2018, 2022 e 2026. |
+
+### Implementação proposta
+**Backend**
+- `backend/src/modules/comparacao-anos/`:
+  - `curvas.js`: SQL por eleição com `date_bin('5 minutes', bv.dt_encerramento)` no horário do dia em -03, votos nominais por candidato e válidos por intervalo. Filtros: Presidente, `ativo`, `cd_tipo_urna = 1` e UF opcional.
+  - `estatistica.js`: funções puras para Pearson e para o p-valor por permutação em blocos, com RNG semeado para que o resultado seja reprodutível e possa ir para o cache.
+  - Seleção dos candidatos: os 2 mais votados no 1º turno, a partir de `mv_votos_final`, e o vencedor do 2º turno.
+- `backend/src/routes/comparacao-anos.js`: `GET /api/comparacao-anos?anos=2018,2022[&uf=XX]` via `cacheado`. Resposta:
+  - candidatos por ano;
+  - curvas (a) e (b) do 1º e do 2º turno;
+  - matriz de pares de anos com `r` e `p_valor` para cada curva e turno;
+  - avisos para ano sem horário (2014).
+- Testes unitários de `estatistica.js`, com valores conhecidos de Pearson e uma permutação determinística com semente fixa.
+- Teste de integração da rota com fixtures existentes.
+
+**Frontend**
+- `EntreAnosView.vue`, rota `/entre-anos` em `router.js`, link em `App.vue` e chave `app.abas.entreAnos` nos 3 locales.
+- Seleção de 2 ou mais anos, gráficos das curvas (a) e (b) por turno e tabela da matriz `r`/p-valor.
+- Skills em ordem: `ui-ux-pro-max` → `impeccable` → `frontend-design`. Nenhum texto explicativo de método na UI.
+
+**Documentação**
+- `docs/API.md`: nova rota.
+- `docs/blueprint.md`: regras acima.
+- `docs/architecture.md`: novo módulo.
+- `docs/design-system/entre-anos.md`.
+
+**Fluxo**
+- Implementação pelo subagente Sonnet.
+- Validação com `npm test` no backend e no frontend e com `npm run test:integration`.
+- `graphify update .`, um commit por etapa (backend, frontend, docs) e push no fim.

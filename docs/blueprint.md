@@ -25,6 +25,19 @@
 - `/api/concentracao`: top por participação e margem.
 - `/api/relatorio`: métricas do recorte selecionado e referências históricas separadas, além de cobertura e precisão dos horários de recebimento.
 
+## Entre anos
+
+- Aba "Entre anos" (`/api/comparacao-anos`): só Presidente, Brasil com filtro opcional de UF. A aba "Comparações" (comparação local) permanece inalterada.
+- O usuário seleciona dois ou mais anos. 2014 aparece na seleção, mas desabilitada, porque não tem horário de encerramento.
+- Em cada ano e turno: os dois candidatos mais votados. O vencedor da eleição é exibido e define o pareamento do 2º turno.
+- Pareamento por posição: 1º turno, 1º colocado com 1º e 2º com 2º; 2º turno, vencedor com vencedor e derrotado com derrotado.
+- Eixo: horário de encerramento do BU (`dt_encerramento`) em -03 fixo, em intervalos de 5 minutos, no dia do pleito. BUs sem `dt_encerramento` ficam fora das curvas, inclusive da % acumulada.
+- Curvas comparadas: (a) votos por intervalo, sem acumular; (b) % acumulada do candidato nos votos válidos ao longo do tempo.
+- Semelhança: correlação de Pearson entre as curvas de cada par de anos, usando só os intervalos de 5 minutos com dados nos dois anos.
+- Probabilidade: apenas a chance de ser acaso, por p-valor de permutação em blocos de 6 intervalos (30 min), 10.000 permutações e semente fixa. Não há "chance de dados manipulados".
+- A aba só mostra as métricas: nada é marcado como suspeito e não há limites.
+- A aba ignora o corte (`as_of`) e usa sempre a apuração completa.
+
 ## Limitações conhecidas
 
 - Biometria é agregada por seção, sem vínculo individual.
