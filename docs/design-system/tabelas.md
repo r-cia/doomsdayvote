@@ -4,6 +4,10 @@
 
 Toda tabela fica dentro de `TabelaScroll` (`frontend/src/components/TabelaScroll.vue`). Com linhas já exibidas e consulta em andamento (`isFetching`, ou o ref de carregamento nas views que chamam a API direto), `atualizando` escurece as linhas, centraliza o spinner de `StateBlock` carregando sobre a tabela e define `aria-busy="true"`, com `role="status"` oculto (`comum.carregando`). Sem linhas, vale o `StateBlock` carregando. O overlay some ao chegar a resposta ou o erro.
 
+## Valor nulo
+
+Valor nulo ou ausente em célula ou painel é exibido como travessão (`—`) em todas as telas. Use os formatadores de `frontend/src/lib/format.js` (`formatarNumero`, `formatarDecimal`, `formatarPercentual`, etc.), que já devolvem `—` para nulo, indefinido, vazio ou não numérico; painéis não definem helper próprio com outra regra. Zero é exibido como `0`.
+
 ## Cabeçalho ordenável
 
 Toda tabela ordena clicando no cabeçalho da coluna. A ordenação é feita no servidor (`ordem`/`direcao`, ver `docs/API.md`, seção "Ordenação"); o cliente nunca reordena as linhas.
