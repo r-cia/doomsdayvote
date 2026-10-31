@@ -119,6 +119,7 @@ function atualizarMapa() {
   mapaQuery.refetch()
   mapaTabelaQuery.refetch()
   mapaUfQuery.refetch()
+  resumoUfQuery.refetch()
 }
 
 function atualizarSecoes() {
@@ -148,7 +149,9 @@ function atualizarSecoes() {
       :uf="store.uf"
       :loading="mapaQuery.isLoading.value"
       :atualizando="mapaTabelaQuery.isFetching.value"
+      :carregando-tabela="mapaTabelaQuery.isLoading.value"
       :error="mapaQuery.error.value?.message ?? ''"
+      :error-tabela="mapaTabelaQuery.error.value?.message ?? ''"
       altura="630px"
       @update:level="alterarNivel"
       @update:mode="store.definirModo"
@@ -164,7 +167,7 @@ function atualizarSecoes() {
       :ordenacao-votos="ordemVotosUf"
       :loading="mapaUfQuery.isLoading.value"
       :atualizando="mapaUfQuery.isFetching.value || resumoUfQuery.isFetching.value"
-      :error="mapaUfQuery.error.value?.message ?? ''"
+      :error="mapaUfQuery.error.value?.message ?? resumoUfQuery.error.value?.message ?? ''"
       :uf-selecionada="store.uf"
       @select="selecionarUf"
       @municipios="verMunicipios"

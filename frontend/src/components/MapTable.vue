@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
+import StateBlock from './StateBlock.vue'
 import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
 import { candidatoDaArea, linhasMapa } from '../lib/agregacoes'
@@ -14,10 +15,12 @@ const props = defineProps({
   candidatos: { type: Array, default: () => [] },
   uf: { type: String, default: null },
   atualizando: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false },
+  error: { type: String, default: '' },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'retry'])
 
 const tabela = ref(null)
 const pagina = ref(1)
@@ -123,7 +126,20 @@ function aoClicarLinha(linha) {
       <span class="contador">{{ linhas.length }} áreas</span>
     </div>
 
-    <p v-if="linhas.length === 0" class="vazio">
+    <StateBlock
+      v-if="error"
+      estado="erro"
+      :titulo="$t('comum.erro')"
+      :descricao="error"
+      :acao="$t('comum.tentarNovamente')"
+      @acao="emit('retry')"
+    />
+    <StateBlock
+      v-else-if="loading && linhas.length === 0"
+      estado="carregando"
+      :titulo="$t('comum.carregando')"
+    />
+    <p v-else-if="linhas.length === 0" class="vazio">
       {{ $t('comum.semDados') }}
     </p>
 

@@ -12,13 +12,14 @@ defineProps({
   anomalias: { type: Object, default: null },
   selecionado: { type: Number, default: null },
   benfordAtualizando: { type: Boolean, default: false },
+  benfordError: { type: String, default: '' },
   loading: { type: Boolean, default: false },
   atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ordenacoes: { type: Object, default: () => ({}) },
 })
 
-const emit = defineEmits(['retry', 'select'])
+const emit = defineEmits(['retry', 'retry-benford', 'select'])
 </script>
 
 <template>
@@ -42,8 +43,10 @@ const emit = defineEmits(['retry', 'select'])
         :selecionado="selecionado"
         :loading="benfordLoading"
         :atualizando="benfordAtualizando"
+        :error="benfordError"
         :ordenacao="ordenacoes.benford"
         @select="emit('select', $event)"
+        @retry="emit('retry-benford')"
       />
 
       <template v-if="anomalias">

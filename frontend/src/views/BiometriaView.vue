@@ -7,6 +7,7 @@ import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
+import StateBlock from '../components/StateBlock.vue'
 import TabelaScroll from '../components/TabelaScroll.vue'
 
 const secaoModalId = ref(null)
@@ -23,11 +24,15 @@ const municipios = ref([])
 const secoes = ref([])
 const carregandoMunicipios = ref(false)
 const carregandoSecoes = ref(false)
+const erroMunicipios = ref('')
+const erroSecoes = ref('')
 
 async function carregarMunicipios(uf) {
   ufSelecionada.value = uf
   municipioSelecionado.value = null
   secoes.value = []
+  erroSecoes.value = ''
+  erroMunicipios.value = ''
   carregandoMunicipios.value = true
   try {
     const r = await api.biometriaMunicipios({
@@ -40,6 +45,7 @@ async function carregarMunicipios(uf) {
     municipios.value = r.municipios ?? []
   } catch (e) {
     municipios.value = []
+    erroMunicipios.value = e.message
   } finally {
     carregandoMunicipios.value = false
   }
@@ -47,6 +53,7 @@ async function carregarMunicipios(uf) {
 
 async function carregarSecoes(municipio) {
   municipioSelecionado.value = municipio
+  erroSecoes.value = ''
   carregandoSecoes.value = true
   try {
     const r = await api.biometriaSecoes({
@@ -60,6 +67,7 @@ async function carregarSecoes(municipio) {
     secoes.value = r.secoes ?? []
   } catch (e) {
     secoes.value = []
+    erroSecoes.value = e.message
   } finally {
     carregandoSecoes.value = false
   }
@@ -86,8 +94,10 @@ function abrirSecao(item) {
     :dados="analiseQuery.data.value?.biometria_uf ?? []"
     :loading="analiseQuery.isLoading.value"
     :atualizando="analiseQuery.isFetching.value"
+    :error="analiseQuery.error.value?.message ?? ''"
     :ordenacao="ordemUf"
     @select="carregarMunicipios"
+    @retry="analiseQuery.refetch()"
   />
 
   <div class="mesa">
@@ -98,6 +108,14 @@ function abrirSecao(item) {
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
       <div v-else-if="carregandoMunicipios && municipios.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
+      <StateBlock
+        v-else-if="erroMunicipios"
+        estado="erro"
+        :titulo="$t('comum.erro')"
+        :descricao="erroMunicipios"
+        :acao="$t('comum.tentarNovamente')"
+        @acao="carregarMunicipios(ufSelecionada)"
+      />
       <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <TabelaScroll v-else :atualizando="carregandoMunicipios">
         <table>
@@ -133,6 +151,14 @@ function abrirSecao(item) {
       </div>
       <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') || 'Clique em um município.' }}</div>
       <div v-else-if="carregandoSecoes && secoes.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
+      <StateBlock
+        v-else-if="erroSecoes"
+        estado="erro"
+        :titulo="$t('comum.erro')"
+        :descricao="erroSecoes"
+        :acao="$t('comum.tentarNovamente')"
+        @acao="carregarSecoes(municipioSelecionado)"
+      />
       <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <TabelaScroll v-else :atualizando="carregandoSecoes">
         <table>

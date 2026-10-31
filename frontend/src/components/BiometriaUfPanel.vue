@@ -9,10 +9,11 @@ const props = defineProps({
   dados: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
   atualizando: { type: Boolean, default: false },
+  error: { type: String, default: '' },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'retry'])
 
 const REGIAO = {
   AC: 'Norte', AM: 'Norte', AP: 'Norte', PA: 'Norte', RO: 'Norte', RR: 'Norte', TO: 'Norte',
@@ -79,6 +80,14 @@ const linhas = agregado
     </header>
 
     <StateBlock v-if="loading && linhas.length === 0" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock
+      v-else-if="error"
+      estado="erro"
+      :titulo="$t('comum.erro')"
+      :descricao="error"
+      :acao="$t('comum.tentarNovamente')"
+      @acao="emit('retry')"
+    />
     <div v-else-if="linhas.length === 0" class="vazio">{{ $t('comum.semDadosBiometria') }}</div>
 
     <TabelaScroll v-else :atualizando="atualizando">

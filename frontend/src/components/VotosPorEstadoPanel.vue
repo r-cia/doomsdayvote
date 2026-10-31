@@ -11,8 +11,11 @@ const props = defineProps({
   candidatos: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
   atualizando: { type: Boolean, default: false },
+  error: { type: String, default: '' },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
+
+const emit = defineEmits(['retry'])
 
 const { alternar, ariaSort, seta } = props.ordenacao
 
@@ -59,6 +62,14 @@ function deltaTotal(nrVotavel) {
     </header>
 
     <StateBlock v-if="loading && (ufs.length === 0 || listaCandidatos.length === 0)" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock
+      v-else-if="error"
+      estado="erro"
+      :titulo="$t('comum.erro')"
+      :descricao="error"
+      :acao="$t('comum.tentarNovamente')"
+      @acao="emit('retry')"
+    />
     <div v-else-if="ufs.length === 0 || listaCandidatos.length === 0" class="vazio">
       {{ $t('mapa.semDadosEstado') }}
     </div>

@@ -18,10 +18,11 @@ const props = defineProps({
   candidato: { type: Number, default: null },
   candidatos: { type: Array, default: () => [] },
   avisos: { type: Array, default: () => [] },
+  error: { type: String, default: '' },
 })
 
 const { t: $t, locale } = useI18n()
-const emit = defineEmits(['update:corte'])
+const emit = defineEmits(['update:corte', 'retry'])
 
 const canvas = ref(null)
 const area = ref(null)
@@ -343,7 +344,7 @@ watch(
   <section class="painel tracado" aria-labelledby="tracado-titulo">
     <header class="painel__cabecalho">
       <h2 id="tracado-titulo">{{ $t('painel.plotDia') }}</h2>
-      <p v-if="!loading && pontos.length > 0" class="painel__meta">
+      <p v-if="!loading && !error && pontos.length > 0" class="painel__meta">
         <b>{{ formatarHora(pontoAtual?.t) }}</b> · {{ $t('filtros.corte') }}<br />
         {{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }} {{ $t('mapa.secoes') }} ·
         {{ formatarNumero(pontoAtual?.votos_acumulados) }} {{ $t('comum.votos') }}
@@ -351,6 +352,15 @@ watch(
     </header>
 
     <StateBlock v-if="loading" estado="carregando" :titulo="$t('comum.carregando')" class="tracado__estado" />
+    <StateBlock
+      v-else-if="error"
+      estado="erro"
+      :titulo="$t('comum.erro')"
+      :descricao="error"
+      :acao="$t('comum.tentarNovamente')"
+      class="tracado__estado"
+      @acao="emit('retry')"
+    />
     <div v-else-if="pontos.length === 0" class="tracado__vazio">
       <strong>{{ $t('comum.linhaTempoIndisponivel') }}</strong>
     </div>

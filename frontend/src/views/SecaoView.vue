@@ -161,8 +161,8 @@ function voltar() { fechar() }
       estado="erro"
       :titulo="$t('comum.erro')"
       :descricao="consulta.error.value.message"
-      :acao="$t('comum.voltar')"
-      @acao="voltar"
+      :acao="$t('comum.tentarNovamente')"
+      @acao="consulta.refetch()"
     />
 
     <template v-else-if="dados">
@@ -305,6 +305,7 @@ function voltar() { fechar() }
         :error="versoesConsulta.error.value?.message"
         :ordenacao-campos="ordemCampos"
         :ordenacao-votaveis="ordemVotaveis"
+        @retry="versoesConsulta.refetch()"
       />
     </div>
   </div>

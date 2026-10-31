@@ -5,6 +5,7 @@ import { api } from '../api/client'
 import { useOrdenacao } from '../composables/ordenacao'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarHora, formatarNumero, formatarPercentual } from '../lib/format'
+import StateBlock from '../components/StateBlock.vue'
 import TabelaScroll from '../components/TabelaScroll.vue'
 import SecaoView from './SecaoView.vue'
 
@@ -20,12 +21,16 @@ const municipios = ref([])
 const secoes = ref([])
 const carregandoMunicipios = ref(false)
 const carregandoSecoes = ref(false)
+const erroUrnas = ref('')
+const erroMunicipios = ref('')
+const erroSecoes = ref('')
 
 const ordemUrnas = useOrdenacao()
 const ordemMunicipios = useOrdenacao()
 const ordemSecoes = useOrdenacao()
 
 async function carregarUrnas() {
+  erroUrnas.value = ''
   carregandoUrnas.value = true
   try {
     const r = await api.encerramentoUrnas({
@@ -37,6 +42,7 @@ async function carregarUrnas() {
     urnas.value = r.ufs ?? []
   } catch (e) {
     urnas.value = []
+    erroUrnas.value = e.message
   } finally {
     carregandoUrnas.value = false
   }
@@ -46,6 +52,8 @@ async function carregarMunicipios(uf) {
   ufSelecionada.value = uf
   municipioSelecionado.value = null
   secoes.value = []
+  erroSecoes.value = ''
+  erroMunicipios.value = ''
   carregandoMunicipios.value = true
   try {
     const r = await api.encerramentoMunicipios({
@@ -58,6 +66,7 @@ async function carregarMunicipios(uf) {
     municipios.value = r.municipios ?? []
   } catch (e) {
     municipios.value = []
+    erroMunicipios.value = e.message
   } finally {
     carregandoMunicipios.value = false
   }
@@ -65,6 +74,7 @@ async function carregarMunicipios(uf) {
 
 async function carregarSecoes(municipio) {
   municipioSelecionado.value = municipio
+  erroSecoes.value = ''
   carregandoSecoes.value = true
   try {
     const r = await api.encerramentoSecoes({
@@ -78,6 +88,7 @@ async function carregarSecoes(municipio) {
     secoes.value = r.secoes ?? []
   } catch (e) {
     secoes.value = []
+    erroSecoes.value = e.message
   } finally {
     carregandoSecoes.value = false
   }
@@ -115,6 +126,14 @@ watch(ordemSecoes.params, () => {
     </header>
 
     <div v-if="carregandoUrnas && urnas.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
+    <StateBlock
+      v-else-if="erroUrnas"
+      estado="erro"
+      :titulo="$t('comum.erro')"
+      :descricao="erroUrnas"
+      :acao="$t('comum.tentarNovamente')"
+      @acao="carregarUrnas"
+    />
     <div v-else-if="urnas.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
 
     <TabelaScroll v-else :atualizando="carregandoUrnas">
@@ -155,6 +174,14 @@ watch(ordemSecoes.params, () => {
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
       <div v-else-if="carregandoMunicipios && municipios.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
+      <StateBlock
+        v-else-if="erroMunicipios"
+        estado="erro"
+        :titulo="$t('comum.erro')"
+        :descricao="erroMunicipios"
+        :acao="$t('comum.tentarNovamente')"
+        @acao="carregarMunicipios(ufSelecionada)"
+      />
       <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <TabelaScroll v-else :atualizando="carregandoMunicipios">
         <table>
@@ -198,6 +225,14 @@ watch(ordemSecoes.params, () => {
       </div>
       <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') }}</div>
       <div v-else-if="carregandoSecoes && secoes.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
+      <StateBlock
+        v-else-if="erroSecoes"
+        estado="erro"
+        :titulo="$t('comum.erro')"
+        :descricao="erroSecoes"
+        :acao="$t('comum.tentarNovamente')"
+        @acao="carregarSecoes(municipioSelecionado)"
+      />
       <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}</div>
       <TabelaScroll v-else :atualizando="carregandoSecoes">
         <table>

@@ -46,6 +46,8 @@ const props = defineProps({
   error: { type: String, default: '' },
   altura: { type: String, default: '440px' },
   areasTabela: { type: Array, default: null },
+  carregandoTabela: { type: Boolean, default: false },
+  errorTabela: { type: String, default: '' },
   ordenacao: Object,
 })
 
@@ -694,8 +696,8 @@ onBeforeUnmount(() => {
 
     <div v-if="malhaEstado === 'ausente'" class="mapa-ausente">
       <StateBlock
-        estado="vazio"
-        :titulo="$t('comum.semDados')"
+        estado="erro"
+        :titulo="$t('comum.erro')"
         :descricao="malhaMensagem"
         :acao="$t('comum.tentarNovamente')"
         @acao="tentarMalhaNovamente"
@@ -703,7 +705,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div
-      v-show="malhaEstado === 'ok'"
+      v-show="malhaEstado === 'ok' && !error"
       class="mapa-wrap"
       :style="{ height: altura }"
     >
@@ -770,7 +772,7 @@ onBeforeUnmount(() => {
           {{ $t('comum.semDados') }}
         </li>
       </ul>
-      <p v-if="legenda.itens.length === 0">{{ $t('comum.semDados') }}</p>
+      <p v-if="legenda.itens.length === 0 && !error && !loading">{{ $t('comum.semDados') }}</p>
     </div>
 
     <MapTable
@@ -782,7 +784,10 @@ onBeforeUnmount(() => {
       :candidatos="candidatos"
       :uf="uf"
       :atualizando="atualizando"
+      :loading="carregandoTabela"
+      :error="errorTabela"
       @select="$emit('select', $event)"
+      @retry="$emit('retry')"
     />
   </section>
 </template>

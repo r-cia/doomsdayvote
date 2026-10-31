@@ -69,7 +69,7 @@ function identificador(linha) {
       :titulo="$t('comum.carregandoDados')"
     />
 
-    <template v-if="alvo">
+    <template v-if="alvo && !relatorio.isError.value">
       <section class="relatorio__indice">
         <dl v-if="cobertura" class="relatorio__medidas">
           <div>

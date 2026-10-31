@@ -10,12 +10,13 @@ const props = defineProps({
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
   atualizando: { type: Boolean, default: false },
+  error: { type: String, default: '' },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
 const { alternar, ariaSort, seta } = props.ordenacao
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'retry'])
 
 const minimo = computed(() => props.dados?.minimo_votos ?? 10)
 const candidatos = computed(() => props.dados?.candidatos ?? [])
@@ -42,12 +43,20 @@ function formatarMad(valor) {
   <section class="painel" aria-labelledby="benford-titulo">
     <header class="painel__cabecalho">
       <h2 id="benford-titulo">{{ $t('estatistica.benford') }}</h2>
-      <p v-if="!loading && dados" class="painel__meta">
+      <p v-if="!loading && !error && dados" class="painel__meta">
         <b>{{ formatarNumero(ativo?.n) }}</b> seções
       </p>
     </header>
 
     <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock
+      v-else-if="error"
+      estado="erro"
+      :titulo="$t('comum.erro')"
+      :descricao="error"
+      :acao="$t('comum.tentarNovamente')"
+      @acao="emit('retry')"
+    />
     <div v-else-if="!dados || candidatos.length === 0" class="vazio">
       {{ $t("comum.semDados") }}
     </div>

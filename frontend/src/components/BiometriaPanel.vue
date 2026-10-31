@@ -7,9 +7,12 @@ import StateBlock from './StateBlock.vue'
 const props = defineProps({
   dados: { type: Object, default: null },
   loading: { type: Boolean, default: false },
+  error: { type: String, default: '' },
   votosCandidato: { type: Number, default: null },
   nomeCandidato: { type: String, default: '' },
 })
+
+const emit = defineEmits(['retry'])
 
 const { t } = useI18n()
 const biometria = computed(() => props.dados ?? null)
@@ -47,13 +50,21 @@ const participacao = computed(() => {
   <section class="painel biometria" aria-labelledby="biometria-titulo">
     <header class="painel__cabecalho">
       <h2 id="biometria-titulo">{{ $t('painel.biometria.titulo') }}</h2>
-      <p v-if="!loading && biometria" class="painel__meta">
+      <p v-if="!loading && !error && biometria" class="painel__meta">
         {{ $t('painel.biometria.titulo') }}<br />
         <b>{{ formatarNumero(biometria?.secoes) }}</b> {{ $t('painel.biometria.secoes') }}
       </p>
     </header>
 
     <StateBlock v-if="loading && !biometria" estado="carregando" :titulo="$t('comum.carregando')" />
+    <StateBlock
+      v-else-if="error"
+      estado="erro"
+      :titulo="$t('comum.erro')"
+      :descricao="error"
+      :acao="$t('comum.tentarNovamente')"
+      @acao="emit('retry')"
+    />
     <div v-else-if="!biometria" class="vazio">{{ $t('painel.biometria.semComposicao') }}</div>
 
     <div v-else class="biometria__corpo">

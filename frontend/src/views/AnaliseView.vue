@@ -66,6 +66,7 @@ watch(
     :benford="analiseQuery.data.value?.benford ?? null"
     :benford-loading="analiseQuery.isLoading.value"
     :benford-atualizando="analiseQuery.isFetching.value"
+    :benford-error="analiseQuery.error.value?.message ?? ''"
     :anomalias="anomaliasQuery.data.value ?? null"
     :selecionado="store.candidato"
     :loading="anomaliasQuery.isLoading.value"
@@ -73,10 +74,12 @@ watch(
     :error="anomaliasQuery.error.value?.message ?? ''"
     :ordenacoes="ordenacoes"
     @retry="anomaliasQuery.refetch()"
+    @retry-benford="analiseQuery.refetch()"
     @select="aoCandidato"
   />
 
   <AnaliseCobertura
+    v-if="!analiseQuery.error.value"
     :cobertura="analiseQuery.data.value?.cobertura ?? null"
     :minimo-benford="analiseQuery.data.value?.benford?.minimo_votos ?? 10"
   />

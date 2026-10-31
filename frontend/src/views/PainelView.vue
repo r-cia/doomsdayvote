@@ -125,11 +125,13 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
       :series="timelineQuery.data.value?.series ?? []"
       :pontos="timelineQuery.data.value?.pontos ?? []"
       :loading="timelineQuery.isLoading.value"
+      :error="timelineQuery.error.value?.message ?? ''"
       :corte="store.asOf"
       :candidato="store.candidato"
       :candidatos="candidatos"
       :avisos="timelineAvisos"
       @update:corte="aoCorte"
+      @retry="timelineQuery.refetch()"
     />
 
     <PlacarRanking
@@ -145,8 +147,10 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     <BiometriaPanel
       :dados="analiseQuery.data.value?.biometria ?? null"
       :loading="analiseQuery.isLoading.value"
+      :error="analiseQuery.error.value?.message ?? ''"
       :votos-candidato="votosDoCandidato"
       :nome-candidato="candidatoSelecionado?.nm_votavel ?? ''"
+      @retry="analiseQuery.refetch()"
     />
   </section>
 
@@ -157,5 +161,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     :ordenacao="ordemVotosEstado"
     :loading="mapaUfQuery.isLoading.value || resumoTabelaQuery.isLoading.value"
     :atualizando="mapaUfQuery.isFetching.value || resumoTabelaQuery.isFetching.value"
+    :error="mapaUfQuery.error.value?.message ?? resumoTabelaQuery.error.value?.message ?? ''"
+    @retry="mapaUfQuery.refetch(); resumoTabelaQuery.refetch()"
   />
 </template>

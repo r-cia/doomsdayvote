@@ -14,6 +14,8 @@ const props = defineProps({
   ordenacaoVotaveis: { type: Object, default: () => useOrdenacao('votaveis') },
 })
 
+const emit = defineEmits(['retry'])
+
 const { alternar: alternarCampos, ariaSort: ariaSortCampos, seta: setaCampos } = props.ordenacaoCampos
 const { alternar: alternarVotaveis, ariaSort: ariaSortVotaveis, seta: setaVotaveis } = props.ordenacaoVotaveis
 
@@ -30,7 +32,7 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
     </header>
 
     <StateBlock v-if="loading && !dados" estado="carregando" :titulo="$t('comum.carregando')" />
-    <StateBlock v-else-if="error" estado="erro" :titulo="$t('comum.erro')" :descricao="error" />
+    <StateBlock v-else-if="error" estado="erro" :titulo="$t('comum.erro')" :descricao="error" :acao="$t('comum.tentarNovamente')" @acao="emit('retry')" />
     <div v-else-if="versoes.length === 0" class="vazio">
       {{ $t('comum.semVersoesRegistradas') }}
     </div>
