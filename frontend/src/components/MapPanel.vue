@@ -30,6 +30,7 @@ import {
   corDaArea,
   corPartido,
   corTextoContraste,
+  gradientePartido,
 } from '../lib/colors'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
@@ -527,17 +528,18 @@ async function tentarMalhaNovamente() {
   mapa.value?.resize()
 }
 
+const itensGradiente = (sigla) =>
+  gradientePartido(sigla).map((faixa) => ({
+    rotulo: faixa.rotulo,
+    cor: faixa.cor,
+    texto: corTextoContraste(faixa.cor),
+  }))
+
 const legenda = computed(() => {
-  if (props.modo === 'percentual') {
+  if (props.modo === 'percentual' && candidatoSelecionado.value) {
     return {
-      titulo: candidatoSelecionado.value
-        ? `Participação de ${candidatoSelecionado.value.nm_votavel}`
-        : 'Participação do líder',
-      itens: FAIXAS_PERCENTUAL.map((faixa) => ({
-        rotulo: faixa.rotulo,
-        cor: faixa.cor,
-        texto: corTextoContraste(faixa.cor),
-      })),
+      titulo: `Participação de ${candidatoSelecionado.value.nm_votavel}`,
+      itens: itensGradiente(partidoPorNumero.value.get(props.candidato)?.sg_partido),
     }
   }
 
@@ -548,22 +550,31 @@ const legenda = computed(() => {
     const sigla = candidato?.sg_partido ?? t('comum.semPartido')
     const atual = porPartido.get(sigla) ?? {
       sigla,
+      siglaCor: candidato?.sg_partido,
       cor: corPartido(candidato?.sg_partido),
       total: 0,
     }
     atual.total += 1
     porPartido.set(sigla, atual)
   }
+  const lideres = [...porPartido.values()].sort((a, b) => b.total - a.total).slice(0, 10)
+
+  if (props.modo === 'percentual') {
+    return {
+      titulo: 'Participação do líder',
+      faixas: FAIXAS_PERCENTUAL.map((faixa) => faixa.rotulo),
+      gradientes: lideres.map((item) => ({ sigla: item.sigla, itens: itensGradiente(item.siglaCor) })),
+      itens: lideres,
+    }
+  }
+
   return {
     titulo: 'Líder por área',
-    itens: [...porPartido.values()]
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 10)
-      .map((item) => ({
-        rotulo: `${item.sigla} (${item.total})`,
-        cor: item.cor,
-        texto: corTextoContraste(item.cor),
-      })),
+    itens: lideres.map((item) => ({
+      rotulo: `${item.sigla} (${item.total})`,
+      cor: item.cor,
+      texto: corTextoContraste(item.cor),
+    })),
   }
 })
 
@@ -725,8 +736,24 @@ onBeforeUnmount(() => {
     <div class="legenda" role="group" aria-label="Legenda do mapa">
       <strong>{{ legenda.titulo }}</strong>
       <span class="legenda__meta">{{ feicoesNaMalha }} feições</span>
+      <ul v-if="legenda.gradientes" class="legenda__gradientes">
+        <li class="legenda__faixas">
+          <span></span>
+          <span v-for="rotulo in legenda.faixas" :key="rotulo">{{ rotulo }}</span>
+        </li>
+        <li v-for="linha in legenda.gradientes" :key="linha.sigla">
+          <b>{{ linha.sigla }}</b>
+          <span
+            v-for="item in linha.itens"
+            :key="item.rotulo"
+            class="legenda__degrau"
+            :style="{ backgroundColor: item.cor }"
+            :title="`${linha.sigla} ${item.rotulo}`"
+          ></span>
+        </li>
+      </ul>
       <ul>
-        <li v-for="item in legenda.itens" :key="item.rotulo">
+        <li v-for="item in legenda.gradientes ? [] : legenda.itens" :key="item.rotulo">
           <span
             class="legenda__cor"
             :style="{ backgroundColor: item.cor }"

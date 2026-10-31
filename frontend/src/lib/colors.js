@@ -89,17 +89,38 @@ export function siglaTemCor(sigla) {
 }
 
 export const FAIXAS_PERCENTUAL = Object.freeze([
-  { min: 0, max: 10, rotulo: '0–10%', cor: '#4a3a16' },
-  { min: 10, max: 20, rotulo: '10–20%', cor: '#5d4a17' },
-  { min: 20, max: 30, rotulo: '20–30%', cor: '#725a19' },
-  { min: 30, max: 40, rotulo: '30–40%', cor: '#886b1c' },
-  { min: 40, max: 50, rotulo: '40–50%', cor: '#9e7d1f' },
-  { min: 50, max: 60, rotulo: '50–60%', cor: '#b58f23' },
-  { min: 60, max: 70, rotulo: '60–70%', cor: '#cca228' },
-  { min: 70, max: 80, rotulo: '70–80%', cor: '#e0b52e' },
-  { min: 80, max: 90, rotulo: '80–90%', cor: '#f2c637' },
-  { min: 90, max: 100, rotulo: '90–100%', cor: '#ffd45e' },
+  { min: 0, max: 10, rotulo: '0–10%' },
+  { min: 10, max: 20, rotulo: '10–20%' },
+  { min: 20, max: 30, rotulo: '20–30%' },
+  { min: 30, max: 40, rotulo: '30–40%' },
+  { min: 40, max: 50, rotulo: '40–50%' },
+  { min: 50, max: 60, rotulo: '50–60%' },
+  { min: 60, max: 70, rotulo: '60–70%' },
+  { min: 70, max: 80, rotulo: '70–80%' },
+  { min: 80, max: 90, rotulo: '80–90%' },
+  { min: 90, max: 100, rotulo: '90–100%' },
 ])
+
+const BASE_ESCURA = '#0a0d0a'
+// Abaixo disso a faixa mais baixa se confunde com COR_SEM_DADOS.
+const MISTURA_MINIMA = 0.55
+
+function misturar(de, para, fator) {
+  const canais = [1, 3, 5].map((inicio) => {
+    const origem = parseInt(de.slice(inicio, inicio + 2), 16)
+    const destino = parseInt(para.slice(inicio, inicio + 2), 16)
+    return Math.round(origem + (destino - origem) * fator)
+  })
+  return `#${canais.map((canal) => canal.toString(16).padStart(2, '0')).join('')}`
+}
+
+export function gradientePartido(sigla) {
+  const cor = corPartido(sigla)
+  return FAIXAS_PERCENTUAL.map((faixa, indice) => ({
+    ...faixa,
+    cor: misturar(BASE_ESCURA, cor, MISTURA_MINIMA + ((1 - MISTURA_MINIMA) * indice) / (FAIXAS_PERCENTUAL.length - 1)),
+  }))
+}
 
 export function faixaPercentual(valor) {
   if (valor === null || valor === undefined || valor === '') return null
@@ -110,8 +131,10 @@ export function faixaPercentual(valor) {
   return FAIXAS_PERCENTUAL[indice]
 }
 
-export function corPercentual(valor) {
-  return faixaPercentual(valor)?.cor ?? COR_NEUTRA
+export function corPercentual(valor, sigla) {
+  const faixa = faixaPercentual(valor)
+  if (!faixa) return COR_NEUTRA
+  return gradientePartido(sigla)[FAIXAS_PERCENTUAL.indexOf(faixa)].cor
 }
 
 function luminanciaRelativa(hex) {
@@ -140,7 +163,8 @@ export function corDaArea(area, modo, candidato, partidoPorNumero) {
     const percentual = candidato
       ? area.candidatos?.find((item) => item.nr_votavel === candidato)?.percentual
       : area.lider?.percentual
-    return corPercentual(percentual)
+    const nrPartido = candidato ?? area.lider?.nr_votavel
+    return corPercentual(percentual, partidoPorNumero?.get?.(nrPartido)?.sg_partido)
   }
   return corDoLider(area, partidoPorNumero)
 }

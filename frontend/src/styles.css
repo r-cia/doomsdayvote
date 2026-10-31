@@ -1746,6 +1746,34 @@ tbody tr[data-ativo='true'] {
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
+.legenda ul.legenda__gradientes {
+  display: grid;
+  flex-basis: 100%;
+  gap: 4px 0;
+}
+
+.legenda__gradientes li {
+  display: grid;
+  grid-template-columns: 96px repeat(10, minmax(36px, 1fr));
+  align-items: center;
+  gap: 0;
+}
+
+.legenda__gradientes b {
+  font-weight: 400;
+  color: var(--ink-dim);
+}
+
+.legenda__faixas span {
+  text-align: center;
+  font-size: 8px;
+}
+
+.legenda__degrau {
+  height: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
 .legenda__cor--vazia {
   background: repeating-linear-gradient(
     45deg,

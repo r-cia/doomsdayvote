@@ -19,7 +19,9 @@ import {
   corDaArea,
   corPartido,
   corTextoContraste,
+  COR_SEM_DADOS,
   faixaPercentual,
+  gradientePartido,
   siglaTemCor,
 } from '../src/lib/colors'
 import {
@@ -149,6 +151,61 @@ describe('cores', () => {
     expect(corPartido('PSDB')).not.toBe(COR_NEUTRA)
   })
 
+  describe('gradiente do modo percentual', () => {
+    const luminancia = (hex) => {
+      const [r, g, b] = [1, 3, 5].map((i) => {
+        const canal = parseInt(hex.slice(i, i + 2), 16) / 255
+        return canal <= 0.03928 ? canal / 12.92 : ((canal + 0.055) / 1.055) ** 2.4
+      })
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+
+    it('cresce em luminância da faixa mais baixa até a cor do partido', () => {
+      for (const sigla of ['PT', 'PL', 'PRD', 'PC do B', 'XYZ']) {
+        const cores = gradientePartido(sigla).map((faixa) => luminancia(faixa.cor))
+        expect(cores).toHaveLength(10)
+        for (let i = 1; i < cores.length; i += 1) expect(cores[i]).toBeGreaterThan(cores[i - 1])
+      }
+    })
+
+    it('a faixa mais alta é exatamente corPartido e a mais baixa se distingue de sem dados', () => {
+      for (const sigla of ['PT', 'PL', 'PRD', 'XYZ']) {
+        const gradiente = gradientePartido(sigla)
+        expect(gradiente.at(-1).cor).toBe(corPartido(sigla))
+        const razao =
+          (luminancia(gradiente[0].cor) + 0.05) / (luminancia(COR_SEM_DADOS) + 0.05)
+        expect(razao).toBeGreaterThanOrEqual(1.3)
+      }
+    })
+
+    it('partido sem cor na paleta usa o gradiente sobre a cor neutra', () => {
+      expect(gradientePartido('XYZ').at(-1).cor).toBe(COR_NEUTRA)
+      expect(gradientePartido(undefined).at(-1).cor).toBe(COR_NEUTRA)
+    })
+
+    it('mantém as faixas e os rótulos', () => {
+      expect(gradientePartido('PT').map((faixa) => faixa.rotulo)).toEqual(
+        FAIXAS_PERCENTUAL.map((faixa) => faixa.rotulo),
+      )
+    })
+
+    it('usa o partido do candidato selecionado, ou o do líder de cada área', () => {
+      const partidos = new Map([
+        [13, { sg_partido: 'PT' }],
+        [22, { sg_partido: 'PL' }],
+      ])
+      const areaA = { lider: { nr_votavel: 13, percentual: 95 }, candidatos: [{ nr_votavel: 22, percentual: 95 }] }
+      const areaB = { lider: { nr_votavel: 22, percentual: 95 }, candidatos: [] }
+
+      expect(corDaArea(areaA, 'percentual', null, partidos)).toBe(gradientePartido('PT').at(-1).cor)
+      expect(corDaArea(areaB, 'percentual', null, partidos)).toBe(gradientePartido('PL').at(-1).cor)
+      expect(corDaArea(areaA, 'percentual', 22, partidos)).toBe(gradientePartido('PL').at(-1).cor)
+      expect(corDaArea({ lider: { nr_votavel: 99, percentual: 5 }, candidatos: [] }, 'percentual', null, partidos)).toBe(
+        gradientePartido(undefined)[0].cor,
+      )
+    })
+  })
+
   it('distribui percentual em dez faixas de dez pontos', () => {
     expect(FAIXAS_PERCENTUAL).toHaveLength(10)
     expect(faixaPercentual(0).rotulo).toBe('0–10%')
@@ -173,7 +230,7 @@ describe('cores', () => {
         null,
         partidos,
       ),
-    ).toBe('#b58f23')
+    ).toBe(gradientePartido(undefined)[5].cor)
   })
 })
 
