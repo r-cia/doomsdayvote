@@ -2,6 +2,7 @@ import { validar } from '../lib/validar.js';
 import { registrarAnalise } from './analise.js';
 import { registrarApuracao } from './apuracao.js';
 import { registrarBiometria } from './biometria.js';
+import { registrarComparacaoAnos } from './comparacao-anos.js';
 import { registrarEncerramento } from './encerramento.js';
 import { registrarRelatorio } from './relatorio.js';
 import { registrarSecoes } from './secoes.js';
@@ -23,6 +24,7 @@ export async function registrarRotas(app) {
   registrarApuracao(contexto);
   registrarAnalise(contexto);
   registrarBiometria(contexto);
+  registrarComparacaoAnos(contexto);
   registrarEncerramento(contexto);
   registrarRelatorio(contexto);
   registrarSecoes(contexto);
