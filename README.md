@@ -326,7 +326,7 @@ O corte final e sem recorte temporal (o caso mais comum) lê agregados prontos e
 
 Cortes parciais (`as_of`, `as_of_date`) continuam lendo as tabelas.
 
-As views são atualizadas no fim de `npm run carga`, com o papel dono (`DATABASE_MIGRATION_URL`), porque `REFRESH MATERIALIZED VIEW` exige o dono da view. Quando um dado é corrigido por migration, a própria migration faz o refresh (por exemplo, a `0011`). Se a carga for interrompida antes do fim, rode `npm run carga` de novo: os arquivos já importados são ignorados e as views são atualizadas.
+As views são atualizadas no fim de `npm run carga`, com o papel dono (`DATABASE_MIGRATION_URL`), porque `REFRESH MATERIALIZED VIEW` exige o dono da view. A migration `0011` recria as views `mv_votos_final`, `mv_totais_area` e `mv_secao_candidato_final` lendo a sigla do partido como `coalesce(sg_partido, nm_partido)` (os dados de 2014 já importados mantêm `sg_partido` nulo). Se a carga for interrompida antes do fim, rode `npm run carga` de novo: os arquivos já importados são ignorados e as views são atualizadas.
 
 ### 14.6 Cache
 
