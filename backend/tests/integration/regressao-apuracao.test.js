@@ -8,7 +8,7 @@ import { contarSecoesComBu } from '../../src/modules/apuracao/progresso.js';
 import { somarMetricasSecao, somarVotos } from '../../src/modules/apuracao/totais.js';
 import { dividirLinhaBweb } from '../../src/modules/importacao/bweb/leitor.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
-import { limparBanco } from '../helpers/db-teste.js';
+import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
 import { caminhoFixture } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
@@ -22,7 +22,9 @@ function juntar(campos) {
 }
 
 async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  await atualizarViews(db);
+  return resultado;
 }
 
 async function alvoCargo(nome) {
@@ -96,6 +98,7 @@ describe('regressão da apuração', () => {
       const destino = path.join(storageDir, 'bweb-1t_ac_2026-versao.csv');
       await writeFile(destino, `${linhas[0]}\n${corpo.join('\n')}\n`, 'latin1');
       await importarArquivo({ db, caminho: destino, nomeArquivo: path.basename(destino), storageDir });
+      await atualizarViews(db);
 
       const votosDepois = await somarVotos(db, { eleicaoId, cargo, corte: final });
       const totalAntes = votosAntes.reduce((total, item) => total + item.qt_votos, 0);
