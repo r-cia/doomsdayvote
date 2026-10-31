@@ -751,10 +751,9 @@ export async function registrarRotas(app) {
     const areasComDelta = areas.map((area) => {
       const chave = query.level === 'uf' ? area.sg_uf : area.cd_municipio_tse;
       const anterior = anterioresPorChave.get(chave);
+      const anteriorPorCandidato = new Map((anterior?.candidatos ?? []).map((x) => [Number(x.nr_votavel), x]));
       const candidatosComDelta = (area.candidatos ?? []).map((c) => {
-        const ant = anterior?.candidatos?.find(
-          (x) => Number(x.nr_votavel) === Number(c.nr_votavel),
-        );
+        const ant = anteriorPorCandidato.get(Number(c.nr_votavel));
         const delta = ant
           ? Math.max(0, Number(c.qt_votos ?? 0) - Number(ant.qt_votos ?? 0))
           : Number(c.qt_votos ?? 0);

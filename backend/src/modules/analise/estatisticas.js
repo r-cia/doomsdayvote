@@ -270,7 +270,7 @@ export function featuresDasSecoes(linhas) {
 
   return secoes.map((secao) => {
     const total = secao.votos.reduce((soma, votos) => soma + votos, 0)
-    const maior = Math.max(...secao.votos)
+    const maior = secao.votos.reduce((max, votos) => (votos > max ? votos : max), -Infinity)
     const concentracao =
       total > 0
         ? secao.votos.reduce((soma, votos) => soma + (votos / total) ** 2, 0)
