@@ -185,7 +185,9 @@ function agruparPorFaixaAptos(lista, { bandas, minimoGrupo }) {
 function faixaChave(banda) {
   const aptos = banda.map((s) => s.aptos).filter((v) => v !== null);
   if (aptos.length === 0) return 'sem_aptos';
-  return `aptos ${Math.min(...aptos)}-${Math.max(...aptos)}`;
+  const minimo = aptos.reduce((min, v) => Math.min(min, v), Infinity);
+  const maximo = aptos.reduce((max, v) => Math.max(max, v), -Infinity);
+  return `aptos ${minimo}-${maximo}`;
 }
 
 export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4, ordenacaoShare, ordenacaoMargem } = {}) {
@@ -233,9 +235,8 @@ export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4
   const fallbackMetricas = metricas.filter((m) => !enriquecidosPorId.has(m.secao.id));
   let faixasUtilizadas = 0;
   if (fallbackMetricas.length > 0) {
-    const fallbackNormalizadas = fallbackMetricas.map((m) =>
-      normalizadas.find((n) => n.id === m.secao.id),
-    );
+    const normalizadasPorId = new Map(normalizadas.map((n) => [n.id, n]));
+    const fallbackNormalizadas = fallbackMetricas.map((m) => normalizadasPorId.get(m.secao.id));
     const bandasAgrupadas = agruparPorFaixaAptos(fallbackNormalizadas, { bandas, minimoGrupo });
     faixasUtilizadas = bandasAgrupadas.length;
     for (const banda of bandasAgrupadas) {

@@ -86,8 +86,8 @@ function criarGrupo(secoes, nivel, chave, minimoGrupo) {
   const medianaAbstencao = mediana(abstencoesArr);
 
   const aptosValidos = aptosArr.filter((v) => v !== null);
-  const minAptos = aptosValidos.length ? Math.min(...aptosValidos) : null;
-  const maxAptos = aptosValidos.length ? Math.max(...aptosValidos) : null;
+  const minAptos = aptosValidos.length ? aptosValidos.reduce((min, v) => Math.min(min, v), Infinity) : null;
+  const maxAptos = aptosValidos.length ? aptosValidos.reduce((max, v) => Math.max(max, v), -Infinity) : null;
 
   const candidatosUnicos = [
     ...new Map(
