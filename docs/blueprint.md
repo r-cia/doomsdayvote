@@ -11,6 +11,7 @@
 - Benford, duplicação, outliers, concentração e comparações comportamentais são informativos e não pontuam sem calibração validada. A literatura documenta limites de Benford em contagens eleitorais: [Mebane, 2006](https://authors.library.caltech.edu/records/5jbtk-8wn05).
 - O relatório avalia um `election_id` por vez. Cada referência histórica é exibida por eleição, ano e turno, no mesmo cargo e escopo; referências não são somadas. Comparações históricas ficam indisponíveis quando o alvo usa corte parcial.
 - Atraso entre `DT_ENCERRAMENTO` e `DT_BU_RECEBIDO` só é calculado quando ambos têm hora precisa. Precisão apenas de data e ausência são contabilizadas separadamente. Recebimento anterior ao encerramento/emissão é um achado cronológico para revisão.
+- As faixas de encerramento 17:15 e 19:15 usam -03 (horário de Brasília) para todas as UFs e anos.
 - Comparação local exige mínimo de 5 seções por grupo.
 - Concentração e margem são contextualizadas por grupo comparável ou faixa de aptos.
 
