@@ -19,6 +19,8 @@
     "titulo": "Between years",
     "anos": "Years",
     "turno": "Round {n}",
+    "diferenca": "Difference",
+    "pctDoTotal": "% of the year's total",
     "turnoCurto": "Round",
     "colocado": "Rank {n}",
     "vencedor": "Winner",

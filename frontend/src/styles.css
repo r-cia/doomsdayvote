@@ -1554,10 +1554,56 @@ tbody tr[data-ativo='true'] {
   text-transform: uppercase;
 }
 
+.entre-anos__abas {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.entre-anos__abas button {
+  height: 32px;
+  padding: 0 calc(var(--passo) * 2);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-dim);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.entre-anos__abas button:hover {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+
+.entre-anos__abas button[aria-selected='true'] {
+  border-bottom-color: var(--amber);
+  color: var(--amber);
+}
+
+.entre-anos__abas button:focus-visible {
+  outline: 1px solid var(--amber);
+  outline-offset: -2px;
+}
+
 .entre-anos__graficos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: calc(var(--passo) * 2);
+}
+
+.entre-anos__coluna {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--passo) * 2);
+  min-width: 0;
+}
+
+.curvas__zero {
+  stroke: var(--ink-faint);
+  stroke-width: 1;
 }
 
 .curvas {

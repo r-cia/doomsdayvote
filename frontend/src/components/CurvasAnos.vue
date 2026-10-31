@@ -1,36 +1,70 @@
 <script setup>
 import { computed } from 'vue'
+import { dominioLog, margemEsquerda } from '../lib/entre-anos'
 import { formatarDecimal, formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
   titulo: { type: String, required: true },
   series: { type: Array, default: () => [] },
   formato: { type: String, default: 'numero' },
+  escala: { type: String, default: 'linear' },
 })
 
 const LARGURA = 640
 const ALTURA = 220
-const MARGEM = { esq: 56, dir: 12, topo: 10, base: 26 }
+const MARGEM = { dir: 12, topo: 10, base: 26 }
 
 const CORES = ['#ffb52e', '#7ec8ff', '#74e08c', '#ff6b57', '#c79bff', '#e6e6a0']
 const TRACOS = [null, '6 3', '2 3', '10 3 2 3', '4 4', '1 3']
 
-const pontos = computed(() => props.series.flatMap((serie) => serie.pontos))
+const log = computed(() => props.escala === 'log')
+
+const valores = computed(() =>
+  props.series.flatMap((serie) => serie.pontos.map((ponto) => ponto.valor)).filter((valor) => valor !== null),
+)
+
+const dominioY = computed(() => {
+  if (log.value) {
+    const dominio = dominioLog(valores.value)
+    return { min: dominio.min, max: dominio.max, marcas: dominio.marcas }
+  }
+  const minimo = Math.min(0, ...valores.value)
+  const maximo = Math.max(minimo + 1, ...valores.value)
+  return {
+    min: minimo,
+    max: maximo,
+    marcas: [0, 1, 2, 3].map((i) => minimo + ((maximo - minimo) / 3) * i),
+  }
+})
+
+function formatarY(valor) {
+  if (props.formato === 'percentual') return formatarPercentual(valor, 0)
+  if (props.formato === 'pontos') return formatarDecimal(valor, 2)
+  return formatarNumero(Math.round(valor))
+}
+
+const margemEsq = computed(() => margemEsquerda(dominioY.value.marcas.map(formatarY)))
 
 const limitesX = computed(() => {
-  const minutos = pontos.value.map((ponto) => ponto.minuto)
+  const minutos = props.series.flatMap((serie) => serie.pontos.map((ponto) => ponto.minuto))
   if (minutos.length === 0) return { min: 0, max: 1 }
   return { min: Math.min(...minutos), max: Math.max(...minutos) }
 })
 
-const maxY = computed(() => Math.max(1, ...pontos.value.map((ponto) => ponto.valor ?? 0)))
-
 const x = (minuto) =>
-  MARGEM.esq +
+  margemEsq.value +
   ((minuto - limitesX.value.min) / Math.max(1, limitesX.value.max - limitesX.value.min)) *
-    (LARGURA - MARGEM.esq - MARGEM.dir)
-const y = (valor) =>
-  ALTURA - MARGEM.base - (valor / maxY.value) * (ALTURA - MARGEM.topo - MARGEM.base)
+    (LARGURA - margemEsq.value - MARGEM.dir)
+
+function y(valor) {
+  const { min, max } = dominioY.value
+  const fracao = log.value
+    ? (Math.log10(valor) - Math.log10(min)) / (Math.log10(max) - Math.log10(min))
+    : (valor - min) / (max - min)
+  return ALTURA - MARGEM.base - fracao * (ALTURA - MARGEM.topo - MARGEM.base)
+}
+
+const desenhavel = (valor) => valor !== null && (!log.value || valor > 0)
 
 const horaDe = (minuto) => {
   const dia = ((minuto % 1440) + 1440) % 1440
@@ -45,10 +79,25 @@ const marcasX = computed(() => {
   return marcas
 })
 
-const marcasY = computed(() => [0, 1, 2, 3].map((i) => (maxY.value / 3) * i))
+const linhaZero = computed(
+  () => !log.value && dominioY.value.min < 0 && dominioY.value.max > 0,
+)
 
-const formatarY = (valor) =>
-  props.formato === 'percentual' ? formatarPercentual(valor, 0) : formatarNumero(Math.round(valor))
+function caminhoDe(pontos) {
+  let anterior = false
+  return pontos
+    .map((ponto) => {
+      if (!desenhavel(ponto.valor)) {
+        anterior = false
+        return ''
+      }
+      const comando = anterior ? 'L' : 'M'
+      anterior = true
+      return `${comando}${x(ponto.minuto).toFixed(1)} ${y(ponto.valor).toFixed(1)}`
+    })
+    .filter(Boolean)
+    .join(' ')
+}
 
 const tracos = computed(() =>
   props.series.map((serie, indice) => ({
@@ -56,10 +105,7 @@ const tracos = computed(() =>
     rotulo: serie.rotulo,
     cor: CORES[indice % CORES.length],
     tracejado: TRACOS[indice % TRACOS.length],
-    caminho: serie.pontos
-      .filter((ponto) => ponto.valor !== null)
-      .map((ponto, i) => `${i === 0 ? 'M' : 'L'}${x(ponto.minuto).toFixed(1)} ${y(ponto.valor).toFixed(1)}`)
-      .join(' '),
+    caminho: caminhoDe(serie.pontos),
   })),
 )
 
@@ -67,9 +113,7 @@ const resumo = computed(() =>
   props.series
     .map((serie) => {
       const ultimo = [...serie.pontos].reverse().find((ponto) => ponto.valor !== null)
-      const valor =
-        props.formato === 'percentual' ? formatarPercentual(ultimo?.valor) : formatarDecimal(ultimo?.valor)
-      return `${serie.rotulo}: ${valor}`
+      return `${serie.rotulo}: ${formatarY(ultimo?.valor)}`
     })
     .join(' · '),
 )
@@ -85,9 +129,9 @@ const resumo = computed(() =>
       :aria-label="`${titulo}. ${resumo}`"
     >
       <g class="curvas__grade">
-        <template v-for="valor in marcasY" :key="`y${valor}`">
-          <line :x1="MARGEM.esq" :x2="LARGURA - MARGEM.dir" :y1="y(valor)" :y2="y(valor)" />
-          <text :x="MARGEM.esq - 8" :y="y(valor)" text-anchor="end" dominant-baseline="middle">
+        <template v-for="valor in dominioY.marcas" :key="`y${valor}`">
+          <line :x1="margemEsq" :x2="LARGURA - MARGEM.dir" :y1="y(valor)" :y2="y(valor)" />
+          <text :x="margemEsq - 8" :y="y(valor)" text-anchor="end" dominant-baseline="middle">
             {{ formatarY(valor) }}
           </text>
         </template>
@@ -101,6 +145,14 @@ const resumo = computed(() =>
           {{ horaDe(minuto) }}
         </text>
       </g>
+      <line
+        v-if="linhaZero"
+        class="curvas__zero"
+        :x1="margemEsq"
+        :x2="LARGURA - MARGEM.dir"
+        :y1="y(0)"
+        :y2="y(0)"
+      />
       <path
         v-for="traco in tracos"
         :key="traco.chave"

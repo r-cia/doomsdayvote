@@ -18,7 +18,9 @@
   "entreAnos": {
     "titulo": "Entre años",
     "anos": "Años",
-    "turno": "Vuelta {n}",
+    "turno": "{n}.ª vuelta",
+    "diferenca": "Diferencia",
+    "pctDoTotal": "% del total del año",
     "turnoCurto": "Vuelta",
     "colocado": "{n}.º lugar",
     "vencedor": "Ganador",

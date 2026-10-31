@@ -6,6 +6,7 @@ import StateBlock from '../components/StateBlock.vue'
 import TabelaScroll from '../components/TabelaScroll.vue'
 import { useComparacaoAnos } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
+import { diferencasEntrePares, percentualDoTotal } from '../lib/entre-anos'
 import { formatarDecimal } from '../lib/format'
 
 const CARGO_PRESIDENTE = 1
@@ -42,6 +43,38 @@ const turnos = computed(() => {
   return [...numeros].sort((a, b) => a - b)
 })
 
+const escolhido = ref(null)
+const turnoAtivo = computed(() =>
+  turnos.value.includes(escolhido.value) ? escolhido.value : (turnos.value[0] ?? null),
+)
+
+function aoTeclar(evento) {
+  const indice = turnos.value.indexOf(turnoAtivo.value)
+  const alvos = {
+    ArrowRight: (indice + 1) % turnos.value.length,
+    ArrowLeft: (indice - 1 + turnos.value.length) % turnos.value.length,
+    Home: 0,
+    End: turnos.value.length - 1,
+  }
+  if (!(evento.key in alvos)) return
+  evento.preventDefault()
+  escolhido.value = turnos.value[alvos[evento.key]]
+  document.getElementById(`entre-anos-aba-${escolhido.value}`)?.focus()
+}
+
+function graficosDe(turno, posicao) {
+  const votos = seriesDe(turno, posicao, 'votos')
+  return {
+    votos,
+    difVotos: diferencasEntrePares(votos),
+    difPctDoTotal: diferencasEntrePares(
+      votos.map((serie) => ({ ...serie, pontos: percentualDoTotal(serie.pontos) })),
+    ),
+    pct: seriesDe(turno, posicao, 'pct_acumulada'),
+    difPct: diferencasEntrePares(seriesDe(turno, posicao, 'pct_acumulada')),
+  }
+}
+
 function rotuloPosicao(turno, posicao) {
   if (turno === 2) return t(posicao === 1 ? 'entreAnos.vencedor' : 'entreAnos.derrotado')
   return t('entreAnos.colocado', { n: posicao })
@@ -56,6 +89,7 @@ function seriesDe(turno, posicao, campo) {
     const partido = candidato.sg_partido ? ` (${candidato.sg_partido})` : ''
     series.push({
       chave: `${ano.ano}-${turno}-${posicao}`,
+      ano: ano.ano,
       rotulo: `${ano.ano} · ${candidato.nm_votavel ?? candidato.nr_votavel}${partido}`,
       pontos: doTurno.pontos.map((ponto) => ({
         minuto: ponto.minuto,
@@ -100,24 +134,58 @@ function seriesDe(turno, posicao, campo) {
   <StateBlock v-else-if="query.isLoading.value" estado="carregando" :titulo="$t('comum.carregando')" />
 
   <template v-else-if="dados">
-    <section v-for="turno in turnos" :key="turno" class="painel" :aria-labelledby="`entre-anos-turno-${turno}`">
-      <header class="painel__cabecalho">
-        <h2 :id="`entre-anos-turno-${turno}`">{{ $t('entreAnos.turno', { n: turno }) }}</h2>
-      </header>
-      <div v-for="posicao in POSICOES" :key="posicao" class="entre-anos__posicao">
-        <h3>{{ rotuloPosicao(turno, posicao) }}</h3>
-        <div class="entre-anos__graficos">
-          <CurvasAnos
-            :titulo="$t('entreAnos.votosIntervalo')"
-            :series="seriesDe(turno, posicao, 'votos')"
-          />
-          <CurvasAnos
-            :titulo="$t('entreAnos.pctAcumulada')"
-            formato="percentual"
-            :series="seriesDe(turno, posicao, 'pct_acumulada')"
-          />
-        </div>
+    <section v-if="turnos.length > 0" class="painel">
+      <div class="entre-anos__abas" role="tablist" :aria-label="$t('entreAnos.turnoCurto')" @keydown="aoTeclar">
+        <button
+          v-for="turno in turnos"
+          :id="`entre-anos-aba-${turno}`"
+          :key="turno"
+          type="button"
+          role="tab"
+          :aria-selected="turno === turnoAtivo"
+          :aria-controls="`entre-anos-painel-${turno}`"
+          :tabindex="turno === turnoAtivo ? 0 : -1"
+          @click="escolhido = turno"
+        >
+          {{ $t('entreAnos.turno', { n: turno }) }}
+        </button>
       </div>
+      <template v-for="turno in turnos" :key="turno">
+        <div
+          v-if="turno === turnoAtivo"
+          :id="`entre-anos-painel-${turno}`"
+          role="tabpanel"
+          :aria-labelledby="`entre-anos-aba-${turno}`"
+        >
+          <div v-for="posicao in POSICOES" :key="posicao" class="entre-anos__posicao">
+            <h3>{{ rotuloPosicao(turno, posicao) }}</h3>
+            <div class="entre-anos__graficos">
+              <template v-for="g in [graficosDe(turno, posicao)]" :key="posicao">
+                <div class="entre-anos__coluna">
+                  <CurvasAnos :titulo="$t('entreAnos.votosIntervalo')" escala="log" :series="g.votos" />
+                  <CurvasAnos
+                    :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.votosIntervalo')}`"
+                    :series="g.difVotos"
+                  />
+                  <CurvasAnos
+                    :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.pctDoTotal')}`"
+                    formato="pontos"
+                    :series="g.difPctDoTotal"
+                  />
+                </div>
+                <div class="entre-anos__coluna">
+                  <CurvasAnos :titulo="$t('entreAnos.pctAcumulada')" formato="percentual" :series="g.pct" />
+                  <CurvasAnos
+                    :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.pctAcumulada')}`"
+                    formato="pontos"
+                    :series="g.difPct"
+                  />
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </template>
     </section>
 
     <section v-if="dados.pares.length > 0" class="painel" aria-labelledby="entre-anos-pares">
