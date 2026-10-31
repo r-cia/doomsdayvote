@@ -6,7 +6,7 @@ import { buildApp } from '../../src/app.js';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
-import { limparBanco } from '../helpers/db-teste.js';
+import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
 import { caminhoFixture } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
@@ -42,6 +42,7 @@ describe('ordenação no servidor', () => {
     await limparBanco(db);
     const nome = 'bweb_1t_AC_101020181938.csv';
     await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+    await atualizarViews();
     const linha = await db
       .selectFrom('boletim_versao as bv')
       .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')

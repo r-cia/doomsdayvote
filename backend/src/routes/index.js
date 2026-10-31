@@ -1665,9 +1665,32 @@ export async function registrarRotas(app) {
       page: query.page,
       page_size: pageSize,
       total: grupos.length,
-      grupos: grupos
-        .slice(inicio, inicio + pageSize)
-        .map((grupo) => ({ ...grupo, secoes: ordenarLista(grupo.secoes, COLUNAS_COMPARACAO_LOCAL, lerOrdenacao(query)) })),
+      grupos: grupos.slice(inicio, inicio + pageSize).map(({ secoes, ...grupo }) => grupo),
+    };
+  }));
+
+  app.get('/api/comparacao-local/secoes', cacheado('comparacao-local-secoes', 300, baseSchema.extend({
+    chave: z.string().regex(/^(local|zona|municipio):[A-Z]{2}\|\d+(\|\d+)?$/),
+    ...ordenacaoSchema(Object.keys(COLUNAS_COMPARACAO_LOCAL)),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const [, uf, municipio] = /^\w+:([A-Z]{2})\|(\d+)/.exec(query.chave);
+
+    const resultado = await comparacaoLocal(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: { sgUf: uf, cdMunicipio: Number(municipio) },
+    });
+
+    const grupo = (resultado.grupos ?? []).find((item) => item.chave === query.chave);
+    if (!grupo) throw new AppError('NOT_FOUND', 404, 'Grupo não encontrado');
+
+    return {
+      corte: corteResposta(corte),
+      chave: grupo.chave,
+      secoes: ordenarLista(grupo.secoes, COLUNAS_COMPARACAO_LOCAL, lerOrdenacao(query)),
     };
   }));
 

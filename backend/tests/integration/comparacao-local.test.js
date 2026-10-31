@@ -6,7 +6,7 @@ import { buildApp } from '../../src/app.js';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
-import { limparBanco } from '../helpers/db-teste.js';
+import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
 import { caminhoFixture } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
@@ -24,7 +24,9 @@ let cargo;
 let eleicao;
 
 async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  await atualizarViews();
+  return resultado;
 }
 
 describe('comparação local', () => {
@@ -63,5 +65,28 @@ describe('comparação local', () => {
     expect(Array.isArray(corpo.grupos)).toBe(true);
     expect(corpo.cobertura).toBeDefined();
     expect(typeof corpo.total).toBe('number');
+    expect(corpo.grupos.length).toBeGreaterThan(0);
+    for (const grupo of corpo.grupos) expect(grupo).not.toHaveProperty('secoes');
+  });
+
+  it('devolve as seções de um grupo pela chave, ordenadas pela coluna pedida', async () => {
+    const lista = (
+      await app.inject({ method: 'GET', url: `/api/comparacao-local?election_id=${eleicao}&cargo=${cargo}` })
+    ).json();
+    const grupo = lista.grupos[0];
+    const base = `/api/comparacao-local/secoes?election_id=${eleicao}&cargo=${cargo}&chave=${encodeURIComponent(grupo.chave)}`;
+
+    const resposta = await app.inject({ method: 'GET', url: `${base}&ordem=nr_secao&direcao=desc` });
+    expect(resposta.statusCode).toBe(200);
+    const { secoes } = resposta.json();
+    expect(secoes).toHaveLength(grupo.tamanho);
+    const numeros = secoes.map((item) => item.secao.nr_secao);
+    expect(numeros).toEqual([...numeros].sort((a, b) => b - a));
+
+    const inexistente = await app.inject({
+      method: 'GET',
+      url: `/api/comparacao-local/secoes?election_id=${eleicao}&cargo=${cargo}&chave=zona:AC%7C1%7C999`,
+    });
+    expect(inexistente.statusCode).toBe(404);
   });
 });

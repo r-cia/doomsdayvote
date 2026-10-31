@@ -7,7 +7,7 @@ import { useSelecaoEleicao } from '../composables/selecao'
 
 const { store } = useSelecaoEleicao()
 const ordenacao = useOrdenacao()
-const comparacaoLocalQuery = useComparacaoLocal(ordenacao.params)
+const comparacaoLocalQuery = useComparacaoLocal()
 </script>
 
 <template>
@@ -21,7 +21,6 @@ const comparacaoLocalQuery = useComparacaoLocal(ordenacao.params)
   <ComparacaoLocalPanel
     :dados="comparacaoLocalQuery.data.value ?? null"
     :loading="comparacaoLocalQuery.isLoading.value"
-    :atualizando="comparacaoLocalQuery.isFetching.value"
     :error="comparacaoLocalQuery.error.value?.message ?? ''"
     :ordenacao="ordenacao"
     @retry="comparacaoLocalQuery.refetch()"

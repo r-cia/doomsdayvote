@@ -1330,6 +1330,26 @@ select {
   letter-spacing: 0.08em;
 }
 
+.grupo__alternar {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.grupo__alternar:hover {
+  color: var(--ink);
+}
+
+.grupo__alternar:focus-visible {
+  outline: 1px solid var(--amber);
+  outline-offset: 2px;
+}
+
 .concentracao-grade {
   display: grid;
   gap: 12px;
