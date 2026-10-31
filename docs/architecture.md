@@ -8,7 +8,7 @@
 - Cache Redis via `backend/src/lib/cache.js`.
 - Banco Postgres via Kysely. O pool da aplicação usa 20 conexões e `work_mem` de 64 MB por operação, configuráveis por `DB_POOL_MAX` e `DB_WORK_MEM_MB`; esses limites reduzem picos das consultas da aplicação, mas não limitam a memória total do servidor Postgres.
 - O mapa usa `mv_totais_area` no corte final; ao exibir por UF, soma primeiro os totais pré-agregados de cada município por candidato antes de calcular líder e percentuais.
-- A análise no corte final consulta `mv_secao_candidato_final`, pré-agregada por seção e candidato. A view é atualizada após a carga oficial junto às demais views materializadas.
+- A análise no corte final (estatísticas, concentração, comparação local e duplicação) consulta `mv_secao_candidato_final`, pré-agregada por seção e votável (todas as categorias), com local de votação, votos válidos (nominal + legenda), assinatura e contagem de votáveis por seção; cortes parciais leem as tabelas. A view é atualizada após a carga oficial junto às demais views materializadas.
 - Metadados e avisos usam chaves de cache por eleição, cargo, escopo e corte, com validade de 24 horas e invalidação por versão após cargas.
 - A listagem de seções aplica filtro de status e paginação no Postgres antes de transferir os resultados.
 - O orçamento de 24 GB para o Postgres requer também um limite no serviço ou contêiner do banco; a configuração de pool da aplicação não estabelece esse teto global.
