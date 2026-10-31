@@ -1,0 +1,1178 @@
+{
+  ".impeccable/design.json": {
+    "mtime": 1793288940.3260875,
+    "seen": 1793360126.8217692,
+    "ast_hash": "e6bdfea924cda4299e332c694adc9498",
+    "semantic_hash": ""
+  },
+  "backend/data/partido-cores.json": {
+    "mtime": 1793280079.034992,
+    "seen": 1793360126.8217752,
+    "ast_hash": "b768f62ab8ca9fa003d608334443c0a6",
+    "semantic_hash": ""
+  },
+  "backend/package.json": {
+    "mtime": 1793334267.0,
+    "seen": 1793360126.8217776,
+    "ast_hash": "3d3e00b2eb59188a6d697ea58061dfa7",
+    "semantic_hash": ""
+  },
+  "backend/src/app.js": {
+    "mtime": 1793370328.6473458,
+    "seen": 1793371590.7601209,
+    "ast_hash": "9222dafbad56d866cf31aad7f5de9461",
+    "semantic_hash": ""
+  },
+  "backend/src/composition-root.js": {
+    "mtime": 1793376945.4068558,
+    "seen": 1793377080.6922722,
+    "ast_hash": "f5c2783a58e635aab0d7c919585b51b4",
+    "semantic_hash": ""
+  },
+  "backend/src/db/index.js": {
+    "mtime": 1793396032.9325202,
+    "seen": 1793396859.1098757,
+    "ast_hash": "3dd75bf11a2826e3ed5607105c04b83d",
+    "semantic_hash": ""
+  },
+  "backend/src/db/migracoes.js": {
+    "mtime": 1793241749.8658588,
+    "seen": 1793360126.8217838,
+    "ast_hash": "2f3245b3acd67acaac5964edbe46d66b",
+    "semantic_hash": ""
+  },
+  "backend/src/env.js": {
+    "mtime": 1793377622.977554,
+    "seen": 1793377630.3238988,
+    "ast_hash": "8a6e60e5afd77c8af6540a53e9f1f20e",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/ambiente.js": {
+    "mtime": 1793241144.918029,
+    "seen": 1793360126.8217864,
+    "ast_hash": "bbf60b6580ad6a31698ba7d076e43e90",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/cache.js": {
+    "mtime": 1793377067.08423,
+    "seen": 1793377080.692283,
+    "ast_hash": "aaa88ec745ee1fa13c3173ad3c22d7c1",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/datas.js": {
+    "mtime": 1793245547.7688172,
+    "seen": 1793360126.821789,
+    "ast_hash": "c87e8c507731e4d5e7f59c9e7d7189c9",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/erros.js": {
+    "mtime": 1793246998.7812603,
+    "seen": 1793360126.8217907,
+    "ast_hash": "40c4f29e4a66d0f3fde55ad6835d7ce8",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/logger.js": {
+    "mtime": 1793241158.2441819,
+    "seen": 1793360126.821792,
+    "ast_hash": "47adddc6928b73e025f2f54f4098ff6e",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/validar.js": {
+    "mtime": 1793241158.2291818,
+    "seen": 1793360126.8217933,
+    "ast_hash": "d531f9a10c2a92a549354bd090a45044",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0001_schema_inicial.js": {
+    "mtime": 1793280059.2588034,
+    "seen": 1793360126.8217945,
+    "ast_hash": "0bda1af1e6809931ffb8c02e4f6087d7",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0002_resultado_votavel_colunas.js": {
+    "mtime": 1793296312.3761413,
+    "seen": 1793360126.821796,
+    "ast_hash": "df8d76e10af5fec460dd1be8db6043ae",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0003_bweb_staging.js": {
+    "mtime": 1793301215.6562252,
+    "seen": 1793360126.8217971,
+    "ast_hash": "a8def306dbcc173945adfabe77ef8958",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0004_indexes_performance.js": {
+    "mtime": 1793321627.0373929,
+    "seen": 1793360126.8217983,
+    "ast_hash": "60eea46e8b5cc9da252ea36113aab355",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0005_materialized_views.js": {
+    "mtime": 1793322177.0075712,
+    "seen": 1793360126.8218,
+    "ast_hash": "a9a4db34e02298c23778aee9623b8249",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/benford.js": {
+    "mtime": 1793285836.0321214,
+    "seen": 1793360126.821801,
+    "ast_hash": "dfca6442832f0385ce1389a527293f08",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/consistencia.js": {
+    "mtime": 1793397894.732325,
+    "seen": 1793398552.8773167,
+    "ast_hash": "bba18f95253e07c5c46650a4d612982b",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/descritivas.js": {
+    "mtime": 1793319847.432302,
+    "seen": 1793360126.8218036,
+    "ast_hash": "44d7da608f7b6348861d30f911c71c7d",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/duplicacao.js": {
+    "mtime": 1793394980.8678727,
+    "seen": 1793395538.2129767,
+    "ast_hash": "a09c3f56731dd3d25c4eec61bd94485f",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/estatisticas.js": {
+    "mtime": 1793394980.7118711,
+    "seen": 1793395538.2129798,
+    "ast_hash": "87e4ed02e93b2c7f64d5122e22461720",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/outliers.js": {
+    "mtime": 1793361352.7880068,
+    "seen": 1793364259.1278708,
+    "ast_hash": "3532e74d68033fd457ca00c8bbf5c819",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/versoes-bu.js": {
+    "mtime": 1793394980.9888742,
+    "seen": 1793395538.2129858,
+    "ast_hash": "defcb83b42309556a18b479c106d027f",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/apuracao/categoria-votavel.js": {
+    "mtime": 1793245547.770817,
+    "seen": 1793360126.821811,
+    "ast_hash": "d90ca1c34c8f4c9f0f449523360c3701",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/apuracao/corte.js": {
+    "mtime": 1793371862.4649844,
+    "seen": 1793371925.757938,
+    "ast_hash": "993827c6c84410ee65e67bccf5254bd2",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/apuracao/progresso.js": {
+    "mtime": 1793277113.3476727,
+    "seen": 1793360126.8218133,
+    "ast_hash": "90948a875af04ef8ba3e67441675fcb8",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/apuracao/status-secao.js": {
+    "mtime": 1793248201.2744484,
+    "seen": 1793360126.8218145,
+    "ast_hash": "7dfd476b22c08f34e7adc09bd7dfbbbb",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/apuracao/totais.js": {
+    "mtime": 1793375721.0871208,
+    "seen": 1793375745.982926,
+    "ast_hash": "523cf0b432c829b6feda884dd0c35a5f",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/campos.js": {
+    "mtime": 1793245249.9617906,
+    "seen": 1793360126.8218172,
+    "ast_hash": "8bb7b599b38f480a42c83389568960c3",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/detectar-leiaute.js": {
+    "mtime": 1793245104.709363,
+    "seen": 1793360126.8218184,
+    "ast_hash": "958edeb73f1fa31f6248f689f99120e1",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/leitor.js": {
+    "mtime": 1793395302.660408,
+    "seen": 1793395538.2130055,
+    "ast_hash": "cbc4deac31188936560e29224c4280f7",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/ler-arquivo.js": {
+    "mtime": 1793305423.0302205,
+    "seen": 1793360126.821821,
+    "ast_hash": "ee87579c9b2afca1d948b969777fe3c2",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/nome-arquivo-2014.js": {
+    "mtime": 1793245287.0911615,
+    "seen": 1793360126.8218222,
+    "ast_hash": "dd00998538b7cd14a1f14f9883f6faab",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/normalizar.js": {
+    "mtime": 1793245078.5641105,
+    "seen": 1793360126.8218236,
+    "ast_hash": "29d28a4cd606c2c683be88520c89fbf7",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/parser-2014.js": {
+    "mtime": 1793245287.0911615,
+    "seen": 1793360126.821825,
+    "ast_hash": "e72d467ec7f39356c0d56428855b4bab",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/parser-2018.js": {
+    "mtime": 1793245287.0741613,
+    "seen": 1793360126.8218265,
+    "ast_hash": "98de5db5777b761f6b67c361883dab4f",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/bweb/parser-45.js": {
+    "mtime": 1793305345.092332,
+    "seen": 1793360126.821828,
+    "ast_hash": "bb7bd2427f7d3e51b9f79574ffbe937a",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/carregar-pasta.js": {
+    "mtime": 1793305423.0312204,
+    "seen": 1793360126.8218288,
+    "ast_hash": "d6ea2739b8bc5a64af2116f338365513",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/conteudo-bu.js": {
+    "mtime": 1793245547.7798173,
+    "seen": 1793360126.8218305,
+    "ast_hash": "aacf152ec0288c06328d361ed73fec79",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/importar-arquivo.js": {
+    "mtime": 1793362908.2578578,
+    "seen": 1793364259.1279037,
+    "ast_hash": "9d63144e6b72467cc1e6a35fe43e58f1",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/lote.js": {
+    "mtime": 1793245669.512081,
+    "seen": 1793360126.8218362,
+    "ast_hash": "3afda42108c5bcee3bee07a1d1b21f57",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/persistir-bus.js": {
+    "mtime": 1793296312.3781412,
+    "seen": 1793360126.821838,
+    "ast_hash": "3b3e7577304a15d5274bac1896b27de3",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/relatorio.js": {
+    "mtime": 1793247531.460137,
+    "seen": 1793360126.821839,
+    "ast_hash": "05b14ab84806778ff5c21fb447e2f968",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/importacao/validacoes.js": {
+    "mtime": 1793290399.4660048,
+    "seen": 1793360126.8218403,
+    "ast_hash": "0366ec8009a48801a202c139053bfe98",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/index.js": {
+    "mtime": 1793400028.99214,
+    "seen": 1793400076.1177895,
+    "ast_hash": "061eaf1e502d0332ca2f80f0b48a1bc1",
+    "semantic_hash": ""
+  },
+  "backend/src/scripts/carregar-pasta.js": {
+    "mtime": 1793377010.3825889,
+    "seen": 1793377080.6923661,
+    "ast_hash": "ecd5b300950a23fcfad9b8ad75359651",
+    "semantic_hash": ""
+  },
+  "backend/src/scripts/cores-pendentes.js": {
+    "mtime": 1793280079.038992,
+    "seen": 1793360126.8218446,
+    "ast_hash": "4797ea803be988d3e26d3bfe09473d75",
+    "semantic_hash": ""
+  },
+  "backend/src/scripts/geo-carregar.js": {
+    "mtime": 1793282056.207851,
+    "seen": 1793360126.8218458,
+    "ast_hash": "f7a1a7de29ac1c7d4a77178eade83500",
+    "semantic_hash": ""
+  },
+  "backend/src/scripts/migrate.js": {
+    "mtime": 1793241648.4997249,
+    "seen": 1793360126.821847,
+    "ast_hash": "e9af9aa280ee220c14ca1085974ffaa0",
+    "semantic_hash": ""
+  },
+  "backend/src/scripts/purge-originais.js": {
+    "mtime": 1793326483.951105,
+    "seen": 1793360126.8218484,
+    "ast_hash": "2688307765e00118b1019a3753e736fb",
+    "semantic_hash": ""
+  },
+  "backend/src/scripts/seed-cores.js": {
+    "mtime": 1793280079.034992,
+    "seen": 1793360126.8218496,
+    "ast_hash": "ad388a335119f087ec3ccf75140ba6a3",
+    "semantic_hash": ""
+  },
+  "backend/src/server.js": {
+    "mtime": 1793279760.9109561,
+    "seen": 1793360126.8218513,
+    "ast_hash": "71dd77b9bd35e59363cc0f0687b33025",
+    "semantic_hash": ""
+  },
+  "backend/tests/fixtures/migrations/0001_teste.js": {
+    "mtime": 1793241215.7808394,
+    "seen": 1793360126.8218524,
+    "ast_hash": "431289de7368dd36b522c9ea62f9d2d3",
+    "semantic_hash": ""
+  },
+  "backend/tests/helpers/db-teste.js": {
+    "mtime": 1793301233.2724125,
+    "seen": 1793360126.8218536,
+    "ast_hash": "a67d8d9a4bf44e77629ab3145f44df1b",
+    "semantic_hash": ""
+  },
+  "backend/tests/helpers/fixtures.js": {
+    "mtime": 1793247747.6615043,
+    "seen": 1793360126.821855,
+    "ast_hash": "9f3dd3018ca72e5124048a35deb6ac75",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/api.test.js": {
+    "mtime": 1793361352.7880068,
+    "seen": 1793364259.127932,
+    "ast_hash": "67a1c32dfbed2a59161c30c5cf026d94",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/cache.test.js": {
+    "mtime": 1793302848.1214254,
+    "seen": 1793360126.8218575,
+    "ast_hash": "1fb9120ef32d6b972871ba46d7dd3744",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/carregar-pasta.test.js": {
+    "mtime": 1793279990.106147,
+    "seen": 1793360126.821859,
+    "ast_hash": "d4bdf6f35613acb8b6fcd2b80096a5ba",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/consistencia.test.js": {
+    "mtime": 1793395017.1522694,
+    "seen": 1793395538.2130647,
+    "ast_hash": "d81a6056eda80fd7307de1e82494582a",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/corte.test.js": {
+    "mtime": 1793248014.4274147,
+    "seen": 1793360126.8218613,
+    "ast_hash": "95066e19e7167219004c60907d5bab80",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/db-roles.test.js": {
+    "mtime": 1793241215.7808394,
+    "seen": 1793360126.8218627,
+    "ast_hash": "75d4beef35eed23065457dfab5c4e367",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/estatisticas.test.js": {
+    "mtime": 1793304059.9412267,
+    "seen": 1793360126.821864,
+    "ast_hash": "16e695f59a63599b752a158979eeadf3",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/fixtures-import.test.js": {
+    "mtime": 1793247786.3269267,
+    "seen": 1793360126.8218653,
+    "ast_hash": "de640f2de4f15bc29780a7c9ad649836",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/importacao-fora-de-ordem.test.js": {
+    "mtime": 1793301263.2447317,
+    "seen": 1793360126.8218665,
+    "ast_hash": "7ecccacea90020e4cfe56b4285f5b357",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/importacao-gzip.test.js": {
+    "mtime": 1793290594.5182009,
+    "seen": 1793360126.8218675,
+    "ast_hash": "8f0326a72fa5f54991badc3cf1d66e71",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/lote.test.js": {
+    "mtime": 1793247664.1445909,
+    "seen": 1793360126.8218691,
+    "ast_hash": "29f5a18e6a7c2e89cd5045603b33a7e2",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/migracoes.test.js": {
+    "mtime": 1793241815.189588,
+    "seen": 1793360126.8218703,
+    "ast_hash": "c9a06deaccb6431a98568ac6060f109f",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/partido-cor.test.js": {
+    "mtime": 1793280160.523772,
+    "seen": 1793360126.8218715,
+    "ast_hash": "d3443a0a515e8427ade6f3577d0606f4",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/progresso.test.js": {
+    "mtime": 1793277113.3476727,
+    "seen": 1793360126.821873,
+    "ast_hash": "86a8bfb629155d8edfb69427d2e6fb9e",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/regressao-apuracao.test.js": {
+    "mtime": 1793277169.0912352,
+    "seen": 1793360126.8218741,
+    "ast_hash": "e90ffe5b1e84310b1779bd834acc6f6a",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/resultado-colunas.test.js": {
+    "mtime": 1793296338.7994647,
+    "seen": 1793360126.8218756,
+    "ast_hash": "b7eb632e82c6565be380c4becf8f6791",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/schema.test.js": {
+    "mtime": 1793301276.1658695,
+    "seen": 1793360126.8218768,
+    "ast_hash": "0611d71077a348b78d5bc00b852d8708",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/status-secao.test.js": {
+    "mtime": 1793248241.3158839,
+    "seen": 1793360126.821878,
+    "ast_hash": "a2cfda9d4647a1ca69b67d8f3451e06c",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/totais.test.js": {
+    "mtime": 1793248122.212588,
+    "seen": 1793360126.8218794,
+    "ast_hash": "de2f8111a284446df3730aed099915a0",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/versoes.test.js": {
+    "mtime": 1793360031.3185434,
+    "seen": 1793360126.8218806,
+    "ast_hash": "b2747d6a755e9aec6f69c0d2c2bca727",
+    "semantic_hash": ""
+  },
+  "backend/tests/transport/app.test.js": {
+    "mtime": 1793247015.2094371,
+    "seen": 1793360126.821882,
+    "ast_hash": "5b23354d1b349f40ce07640a01342248",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/benford.test.js": {
+    "mtime": 1793285890.9486842,
+    "seen": 1793360126.8218834,
+    "ast_hash": "e64725ec69fa5b9b6440764ec2aa61f2",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/consistencia.test.js": {
+    "mtime": 1793372569.2782216,
+    "seen": 1793372607.491636,
+    "ast_hash": "3e4456b3bbf782e7c6774ba96d6a9c2b",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/duplicacao.test.js": {
+    "mtime": 1793293771.7680953,
+    "seen": 1793360126.821886,
+    "ast_hash": "a5db72398a5521bf583ca2c1b00c4ddb",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/niveis.test.js": {
+    "mtime": 1793293771.7620952,
+    "seen": 1793360126.8218873,
+    "ast_hash": "faf5b255e51034ca60da85c62be46145",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/outliers.test.js": {
+    "mtime": 1793293771.761095,
+    "seen": 1793360126.8218884,
+    "ast_hash": "bb4a3d4145ab020717c726c82750dd17",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/versoes-bu.test.js": {
+    "mtime": 1793395017.4572725,
+    "seen": 1793395538.2131176,
+    "ast_hash": "3371e68eae81e49d02afb339b92ff036",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/bweb/detectar-leiaute.test.js": {
+    "mtime": 1793245132.3766317,
+    "seen": 1793360126.8218913,
+    "ast_hash": "9e38e8a00ea315ac6f7c4b077c0e23b0",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/bweb/dividir-linha.test.js": {
+    "mtime": 1793245132.3736317,
+    "seen": 1793360126.8218942,
+    "ast_hash": "b1a5cbfdf35970ba8d853d08a30871e8",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/bweb/nome-arquivo-2014.test.js": {
+    "mtime": 1793245340.9887037,
+    "seen": 1793360126.8218956,
+    "ast_hash": "cf3160119228ef3da254686d3bb7da72",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/bweb/normalizar.test.js": {
+    "mtime": 1793245132.3736317,
+    "seen": 1793360126.821897,
+    "ast_hash": "0806dc7866656933c01a564d7d27c551",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/bweb/parser-2014.test.js": {
+    "mtime": 1793247285.5464287,
+    "seen": 1793360126.8218982,
+    "ast_hash": "77b212dcd31889af6564d9c8d8e4f38b",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/bweb/parser-2018.test.js": {
+    "mtime": 1793245407.600379,
+    "seen": 1793360126.8218994,
+    "ast_hash": "08786e98c538bd1ab30e73da0cd954f0",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/bweb/parser-45.test.js": {
+    "mtime": 1793305449.8705254,
+    "seen": 1793360126.8219008,
+    "ast_hash": "1b2c7e71124b1ef1cd2e13388050e6b0",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/cache.test.js": {
+    "mtime": 1793302713.4420538,
+    "seen": 1793360126.821902,
+    "ast_hash": "1548726db5b7703c4ead1d47ac20c330",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/categoria-votavel.test.js": {
+    "mtime": 1793248039.5656884,
+    "seen": 1793360126.8219035,
+    "ast_hash": "5b8222df367ff73c1642ddf899093415",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/conteudo-bu.test.js": {
+    "mtime": 1793245643.5428104,
+    "seen": 1793360126.8219047,
+    "ast_hash": "c51af72339c03e3cd138451914a4a1fa",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/corte.test.js": {
+    "mtime": 1793247895.8981225,
+    "seen": 1793360126.8219059,
+    "ast_hash": "06d4413f029a5372ff5dbc1788fbc37f",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/env.test.js": {
+    "mtime": 1793305449.8695254,
+    "seen": 1793360126.8219073,
+    "ast_hash": "c09fb701b6d90c6c1b57d59605e6eaa5",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/erros.test.js": {
+    "mtime": 1793241197.8046343,
+    "seen": 1793360126.8219085,
+    "ast_hash": "2567538025fa94eef11ca5cee9f48fa1",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/importacao/leitor-gzip.test.js": {
+    "mtime": 1793395308.5124726,
+    "seen": 1793395538.213144,
+    "ast_hash": "21a724334fad870af53bbc733ebb05ac",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/status-secao.test.js": {
+    "mtime": 1793248201.2774484,
+    "seen": 1793360126.821911,
+    "ast_hash": "1a00a2675b96bca4811b3c7faad8ea9a",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/validacoes.test.js": {
+    "mtime": 1793247575.2016168,
+    "seen": 1793360126.8219123,
+    "ast_hash": "a0eb205e7116efc5aef78c74042ad545",
+    "semantic_hash": ""
+  },
+  "backend/vitest.config.js": {
+    "mtime": 1793241197.788634,
+    "seen": 1793360126.8219137,
+    "ast_hash": "7ef874c158612a4e0f90859f610f3bdd",
+    "semantic_hash": ""
+  },
+  "backend/vitest.integration.config.js": {
+    "mtime": 1793241197.788634,
+    "seen": 1793360126.821915,
+    "ast_hash": "eb491f78f76a1dd57dfdb5eebafbcdf3",
+    "semantic_hash": ""
+  },
+  "frontend/package.json": {
+    "mtime": 1793332935.0722346,
+    "seen": 1793360126.821916,
+    "ast_hash": "20542b4b224dd698e3bee57c87bf7cba",
+    "semantic_hash": ""
+  },
+  "frontend/public/geo/manifesto.json": {
+    "mtime": 1793307895.1828277,
+    "seen": 1793360126.8219175,
+    "ast_hash": "fcf5132c71ff7be43f68c0be079b210b",
+    "semantic_hash": ""
+  },
+  "frontend/src/App.vue": {
+    "mtime": 1793379950.5611475,
+    "seen": 1793380494.0116658,
+    "ast_hash": "8feba846008f02fa685331d4c170a7bc",
+    "semantic_hash": ""
+  },
+  "frontend/src/api/client.js": {
+    "mtime": 1793379950.3161447,
+    "seen": 1793380494.011668,
+    "ast_hash": "cc3f7ae937b3becdda1be4e1e22931fb",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AnaliseSection.vue": {
+    "mtime": 1793396475.6944618,
+    "seen": 1793396859.1103485,
+    "ast_hash": "d279a2b08d76962aa2e57120e608999b",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AvisoBanner.vue": {
+    "mtime": 1793333792.3132846,
+    "seen": 1793360126.8219228,
+    "ast_hash": "e6775201e592d7c5a7f043cb2fcac384",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/BenfordNiveisPanel.vue": {
+    "mtime": 1793396455.027231,
+    "seen": 1793396859.1103568,
+    "ast_hash": "63a80e13049781e60caa98bb68f697f4",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/BenfordPanel.vue": {
+    "mtime": 1793396480.8425193,
+    "seen": 1793396859.1103604,
+    "ast_hash": "9e54d99255ccd6ed858fce0cdff5e801",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/BiometriaPanel.vue": {
+    "mtime": 1793375275.48871,
+    "seen": 1793375406.924524,
+    "ast_hash": "7342853defe9aaf78808ec9ffe6ef8aa",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/BiometriaUfPanel.vue": {
+    "mtime": 1793396425.7019033,
+    "seen": 1793396859.1103675,
+    "ast_hash": "05c98cf38302182435583783767f60ee",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ConsistenciaPanel.vue": {
+    "mtime": 1793396430.1589532,
+    "seen": 1793396859.1103816,
+    "ast_hash": "12f786f19a208402e982b07141863d88",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/DuplicacaoPanel.vue": {
+    "mtime": 1793396452.6442044,
+    "seen": 1793396859.110385,
+    "ast_hash": "02af9acb3e3ce2f56cb4404d0be1a327",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/EstatisticaPanel.vue": {
+    "mtime": 1793396600.043851,
+    "seen": 1793396859.1103885,
+    "ast_hash": "1fdc3bcab63cf1c1373e33dd088c311f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/FilterBar.vue": {
+    "mtime": 1793333076.0407736,
+    "seen": 1793360126.8219333,
+    "ast_hash": "0f2b209021e1625420beea2a103be648",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/KpiCards.vue": {
+    "mtime": 1793375275.4897099,
+    "seen": 1793375406.9245434,
+    "ast_hash": "a60d0c6f86593b115b3634a6fd7d9cb8",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/MapPanel.vue": {
+    "mtime": 1793396376.4653535,
+    "seen": 1793396859.1103995,
+    "ast_hash": "6135fe5617abccfb9ab78389c4a1894c",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/MapTable.vue": {
+    "mtime": 1793396375.1513388,
+    "seen": 1793396859.1104028,
+    "ast_hash": "9422f23b37edeec8a167635aa34f09fe",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/OutliersPanel.vue": {
+    "mtime": 1793396450.2661777,
+    "seen": 1793396859.110406,
+    "ast_hash": "e5e1b8239de9b270f9d1b13a9d26b635",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/PlacarRanking.vue": {
+    "mtime": 1793333308.750621,
+    "seen": 1793360126.8219395,
+    "ast_hash": "32917067733d80c6a11b49587f3ce0b3",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/PlotDia.vue": {
+    "mtime": 1793395046.46659,
+    "seen": 1793395538.2131987,
+    "ast_hash": "1977e55f59fde25d2b08b81629b151f8",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/SectionsTable.vue": {
+    "mtime": 1793396357.6861439,
+    "seen": 1793396859.1104171,
+    "ast_hash": "da11254cfa904e88a86f28428cfeb827",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/StateBlock.vue": {
+    "mtime": 1793374685.353976,
+    "seen": 1793375068.5092149,
+    "ast_hash": "d8369f9352230c4dc2b1f5b4ec2ee95a",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/UfPanel.vue": {
+    "mtime": 1793396396.7095797,
+    "seen": 1793396859.1104293,
+    "ast_hash": "61b7879edb0b442c77f380f018ad9685",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/VersoesBuPanel.vue": {
+    "mtime": 1793396500.7587416,
+    "seen": 1793396859.1104326,
+    "ast_hash": "d0d705b33ad985ee407e9a321b1174f3",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/VotosPorEstadoPanel.vue": {
+    "mtime": 1793396423.335877,
+    "seen": 1793396859.1104357,
+    "ast_hash": "ebe46f4291811f44e03ffb3ba1fa524a",
+    "semantic_hash": ""
+  },
+  "frontend/src/composables/queries.js": {
+    "mtime": 1793394328.5287578,
+    "seen": 1793394742.3173895,
+    "ast_hash": "36cb03e4ec8031cba3870e8331910302",
+    "semantic_hash": ""
+  },
+  "frontend/src/composables/selecao.js": {
+    "mtime": 1793400136.0094335,
+    "seen": 1793400189.7014573,
+    "ast_hash": "20b360a02f92ab8828c3bd4bddba7e84",
+    "semantic_hash": ""
+  },
+  "frontend/src/i18n/index.js": {
+    "mtime": 1793332968.1605957,
+    "seen": 1793360126.821951,
+    "ast_hash": "7f59feb6d8123868313ae90aeaafe171",
+    "semantic_hash": ""
+  },
+  "frontend/src/i18n/locales/en-US.json": {
+    "mtime": 1793397714.712312,
+    "seen": 1793397733.7480989,
+    "ast_hash": "508fa3c3977b5041453ce3da4b21f58b",
+    "semantic_hash": ""
+  },
+  "frontend/src/i18n/locales/es-ES.json": {
+    "mtime": 1793397714.989315,
+    "seen": 1793397733.7481036,
+    "ast_hash": "cbbafc1ed5336dc87310e82f95ff7a37",
+    "semantic_hash": ""
+  },
+  "frontend/src/i18n/locales/pt-BR.json": {
+    "mtime": 1793397714.359308,
+    "seen": 1793397733.7481077,
+    "ast_hash": "eaa89cd002dca5a68c48a204fefc532a",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/agregacoes.js": {
+    "mtime": 1793394288.1413035,
+    "seen": 1793394742.317425,
+    "ast_hash": "5f5531f980e72b2d73cd51236d55f2e6",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/colors.js": {
+    "mtime": 1793287982.3843386,
+    "seen": 1793360126.8219697,
+    "ast_hash": "406dde2bcd90a2be31d63b04a6affc28",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/format.js": {
+    "mtime": 1793400135.0924225,
+    "seen": 1793400189.701472,
+    "ast_hash": "4e88406996d3818ee286c84af3550b46",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/status.js": {
+    "mtime": 1793361768.407256,
+    "seen": 1793364259.1280916,
+    "ast_hash": "74a942e3115f3443412609a352078847",
+    "semantic_hash": ""
+  },
+  "frontend/src/main.js": {
+    "mtime": 1793333023.5012,
+    "seen": 1793360126.8219743,
+    "ast_hash": "ae2b16504e87de3f6204710c2d578809",
+    "semantic_hash": ""
+  },
+  "frontend/src/router.js": {
+    "mtime": 1793379950.5631475,
+    "seen": 1793380494.011745,
+    "ast_hash": "f9ef2507b9b19aae8ff9fd49e0deaa7b",
+    "semantic_hash": ""
+  },
+  "frontend/src/stores/filters.js": {
+    "mtime": 1793400029.9331512,
+    "seen": 1793400076.1181083,
+    "ast_hash": "ef95d4f517252b135a4d9a7714a52fa6",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/AnaliseView.vue": {
+    "mtime": 1793396476.9934762,
+    "seen": 1793396859.1104934,
+    "ast_hash": "854ef52a42b23ba5e84514d9a96da667",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/BiometriaView.vue": {
+    "mtime": 1793396620.54908,
+    "seen": 1793396859.1104968,
+    "ast_hash": "1652d1d82e6c33f0dc2efa01d9882cf3",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/EncerramentoView.vue": {
+    "mtime": 1793396619.5370686,
+    "seen": 1793396859.1105034,
+    "ast_hash": "e4ff17e0bec5654aaa32ff7d370f514c",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/MapaView.vue": {
+    "mtime": 1793396377.4283643,
+    "seen": 1793396859.1105065,
+    "ast_hash": "ff44647c0fb246ad98ee797eaef64b19",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/PainelView.vue": {
+    "mtime": 1793396478.2414901,
+    "seen": 1793396859.1105096,
+    "ast_hash": "fe7e3b7d302aa0bab9e4cc8f4566e737",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/SecaoView.vue": {
+    "mtime": 1793396706.6780424,
+    "seen": 1793396859.110516,
+    "ast_hash": "1b549d841c23900f88e524a6013acf50",
+    "semantic_hash": ""
+  },
+  "frontend/tests/components.test.js": {
+    "mtime": 1793396630.6381927,
+    "seen": 1793396859.1105187,
+    "ast_hash": "1cc8e60ff959d8550edaa6bf01cf483f",
+    "semantic_hash": ""
+  },
+  "frontend/tests/lib.test.js": {
+    "mtime": 1793400137.2564485,
+    "seen": 1793400189.7015,
+    "ast_hash": "231dd288f42c64f47ff3925484d425f6",
+    "semantic_hash": ""
+  },
+  "frontend/tests/setup.js": {
+    "mtime": 1793361352.7890067,
+    "seen": 1793364259.1281118,
+    "ast_hash": "d92187b24c295bc418cdce5b28f4cf2b",
+    "semantic_hash": ""
+  },
+  "frontend/tests/store.test.js": {
+    "mtime": 1793400032.4101813,
+    "seen": 1793400076.1181355,
+    "ast_hash": "c5ed9cda72d8c969f3f0ad39defd7820",
+    "semantic_hash": ""
+  },
+  "frontend/vite.config.js": {
+    "mtime": 1793288502.818285,
+    "seen": 1793360126.821992,
+    "ast_hash": "30b5522d9eefb25970bbfdd483da0c07",
+    "semantic_hash": ""
+  },
+  ".impeccable/surfaces/frontend.md": {
+    "mtime": 1793379823.0357146,
+    "seen": 1793380494.0117786,
+    "ast_hash": "fbeada8c18e02f7a6ddc483f44261212",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1791229331.0,
+    "seen": 1793360126.8219948,
+    "ast_hash": "46cfaf65f9ef86f2de83331b673288c6",
+    "semantic_hash": ""
+  },
+  "DESIGN.md": {
+    "mtime": 1793303408.107278,
+    "seen": 1793360126.821996,
+    "ast_hash": "3c83085bf89d26ff95ce2cf5297ee33f",
+    "semantic_hash": ""
+  },
+  "PRODUCT.md": {
+    "mtime": 1793288940.352088,
+    "seen": 1793360126.8219974,
+    "ast_hash": "aed99b0b8037b46f860444ba6f06cc61",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1793311642.1083646,
+    "seen": 1793360126.8219988,
+    "ast_hash": "5d3ac0757c8ce0aee0bf709e529ad857",
+    "semantic_hash": ""
+  },
+  "backend/tests/fixtures/bweb/bweb_1t_AC_14102014131600.txt": {
+    "mtime": 1793244921.3054907,
+    "seen": 1793360126.8220003,
+    "ast_hash": "cedd21fbe29f9c6aef1c82bb0708771e",
+    "semantic_hash": ""
+  },
+  "backend/tests/fixtures/bweb/bweb_2t_AC_28102014114450.txt": {
+    "mtime": 1793247285.569429,
+    "seen": 1793360126.8220017,
+    "ast_hash": "293c0d7b1535d23a430fe8cdf6d3fe2b",
+    "semantic_hash": ""
+  },
+  "changes.md": {
+    "mtime": 1793359167.8577476,
+    "seen": 1793360126.822003,
+    "ast_hash": "1592149f337601dae373ba22321eb1d4",
+    "semantic_hash": ""
+  },
+  "docs/API.md": {
+    "mtime": 1793397896.0893402,
+    "seen": 1793398552.87765,
+    "ast_hash": "fb82ec27c876772620cc9109e9a6cb2e",
+    "semantic_hash": ""
+  },
+  "docs/buweb-2014.md": {
+    "mtime": 1793233740.0,
+    "seen": 1793360126.8220057,
+    "ast_hash": "82d4515d14612488da3de78f188b42f9",
+    "semantic_hash": ""
+  },
+  "docs/buweb-2018.md": {
+    "mtime": 1793233787.0,
+    "seen": 1793360126.822007,
+    "ast_hash": "426bf21b6740eeb7deaaa9abfd31d816",
+    "semantic_hash": ""
+  },
+  "docs/buweb-2022.md": {
+    "mtime": 1793234008.0,
+    "seen": 1793360126.8220084,
+    "ast_hash": "3c5c59216ce0c2af7f27dec6ebc22df4",
+    "semantic_hash": ""
+  },
+  "docs/buweb-2026.md": {
+    "mtime": 1793234143.0,
+    "seen": 1793360126.8220098,
+    "ast_hash": "aa440b583de27d2b9e30fc91ec1dddd2",
+    "semantic_hash": ""
+  },
+  "docs/current-plan.md": {
+    "mtime": 1793387514.158629,
+    "seen": 1793388100.9984674,
+    "ast_hash": "ae12b0980ebf37c11a25f82b5e9da74e",
+    "semantic_hash": ""
+  },
+  "frontend/index.html": {
+    "mtime": 1793284007.6525846,
+    "seen": 1793360126.8220127,
+    "ast_hash": "f6ad01d3ec12101b2800e2988e1f7c59",
+    "semantic_hash": ""
+  },
+  "docs/doomsday.png": {
+    "mtime": 1793283723.0,
+    "seen": 1793360126.8220139,
+    "ast_hash": "f8eb398d78a6a80c71f30fcd1a384627",
+    "semantic_hash": ""
+  },
+  "frontend/public/doomsday.png": {
+    "mtime": 1793289031.0720704,
+    "seen": 1793360126.8220155,
+    "ast_hash": "baff015109068c802e4738209382bb7e",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/comparacao-local.js": {
+    "mtime": 1793373144.1371093,
+    "seen": 1793373217.6447268,
+    "ast_hash": "800e20ec947f12300e751cde0d297167",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/concentracao.js": {
+    "mtime": 1793394980.5688696,
+    "seen": 1793395538.212954,
+    "ast_hash": "c20c5c00ada80c1aeb1c7937f21493da",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/comparacao-local.test.js": {
+    "mtime": 1793395017.2632704,
+    "seen": 1793395538.213061,
+    "ast_hash": "62b2cff3d9024f6c078c91cdbb79ee28",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/concentracao.test.js": {
+    "mtime": 1793395017.3612716,
+    "seen": 1793395538.2130632,
+    "ast_hash": "113b8c04b25b1d81b59ddc7e994768df",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/comparacao-local.test.js": {
+    "mtime": 1793360296.998236,
+    "seen": 1793364259.1279836,
+    "ast_hash": "bedbb353b7f5b31de472a95c685b1bc6",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/concentracao.test.js": {
+    "mtime": 1793360872.7591019,
+    "seen": 1793364259.1279852,
+    "ast_hash": "526e38135026410b5c02188e0742c6b9",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/CoberturaBlock.vue": {
+    "mtime": 1793394852.3874748,
+    "seen": 1793395538.2131767,
+    "ast_hash": "d38013ad145c0d8419fb0f165a966f1f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ComparacaoLocalPanel.vue": {
+    "mtime": 1793396428.2399318,
+    "seen": 1793396859.110375,
+    "ast_hash": "07ed940a7be0ad0c5b055e184fc5a3b1",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ConcentracaoPanel.vue": {
+    "mtime": 1793396448.331156,
+    "seen": 1793396859.1103783,
+    "ast_hash": "fe4d9946d240c2103f4cb061e5535092",
+    "semantic_hash": ""
+  },
+  "docs/architecture.md": {
+    "mtime": 1793397905.6154468,
+    "seen": 1793398552.877652,
+    "ast_hash": "6685c6904f2a85a1f5eb7a589ff551af",
+    "semantic_hash": ""
+  },
+  "docs/blueprint.md": {
+    "mtime": 1793397904.7884376,
+    "seen": 1793398552.8776543,
+    "ast_hash": "fe2ba84b23bf8719b9f8654f9be4f2a9",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0006_mv_votos_final_splits.js": {
+    "mtime": 1793371497.3622487,
+    "seen": 1793371590.760157,
+    "ast_hash": "232309099439744e4faf0f6369619c8c",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0007_mv_totais_area.js": {
+    "mtime": 1793393120.3432276,
+    "seen": 1793393915.2333436,
+    "ast_hash": "853ab73cbf4bbcbc5073debb597f48bd",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/estatisticas.test.js": {
+    "mtime": 1793373161.0312822,
+    "seen": 1793373217.6448612,
+    "ast_hash": "19b7e4b0f779d4dd48c38998a979a934",
+    "semantic_hash": ""
+  },
+  ".codex/hooks.json": {
+    "mtime": 1793374250.0811946,
+    "seen": 1793375068.50848,
+    "ast_hash": "a2996d05816c23c163fe5d59b00d366b",
+    "semantic_hash": ""
+  },
+  ".impeccable/config.json": {
+    "mtime": 1793374271.570568,
+    "seen": 1793375068.508498,
+    "ast_hash": "f0e171bf8dad7043fef4c4d8b7890aec",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AnaliseCobertura.vue": {
+    "mtime": 1793375975.9561472,
+    "seen": 1793375990.6784441,
+    "ast_hash": "be15d17183568acc939eb5784673ee75",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0008_mv_secao_candidato_final.js": {
+    "mtime": 1793377120.09583,
+    "seen": 1793377132.228442,
+    "ast_hash": "064b386cbca5e63c2f6430f3c3ce213b",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/ComparacoesView.vue": {
+    "mtime": 1793396477.7234843,
+    "seen": 1793396859.1105003,
+    "ast_hash": "5a1eb1810fce2ed78600ca33d370436b",
+    "semantic_hash": ""
+  },
+  "frontend/src/views/RelatorioView.vue": {
+    "mtime": 1793397641.106489,
+    "seen": 1793397733.7481618,
+    "ast_hash": "fbf761c22c0ab0bcd75e3f5dabe917af",
+    "semantic_hash": ""
+  },
+  "backend/src/lib/ordenacao.js": {
+    "mtime": 1793393120.3422275,
+    "seen": 1793393915.2333274,
+    "ast_hash": "344af07fdd0ec112fc7008c6a85ea988",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/ordenacao.test.js": {
+    "mtime": 1793393584.1964004,
+    "seen": 1793393915.2334502,
+    "ast_hash": "b252fd1fdaaa49f5be2a1fd9b18e26d6",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/ordenacao.test.js": {
+    "mtime": 1793393120.3432276,
+    "seen": 1793393915.233514,
+    "ast_hash": "cb7d517a407ee3b138b1cfde7e07cf72",
+    "semantic_hash": ""
+  },
+  "frontend/src/composables/ordenacao.js": {
+    "mtime": 1793394280.3152156,
+    "seen": 1793394742.3173842,
+    "ast_hash": "05b9b5ce5af3b0211baa11bd990bd9c6",
+    "semantic_hash": ""
+  },
+  "frontend/tests/ordenacao.test.js": {
+    "mtime": 1793394674.65856,
+    "seen": 1793394742.317523,
+    "ast_hash": "24fd34a1047528b67bf646c504b1f0e3",
+    "semantic_hash": ""
+  },
+  "docs/design-system/tabelas.md": {
+    "mtime": 1793396632.4362128,
+    "seen": 1793396859.1106045,
+    "ast_hash": "e791bb7e16819dee8fa7b92ebbfe8474",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/TabelaScroll.vue": {
+    "mtime": 1793396343.4149845,
+    "seen": 1793396859.110425,
+    "ast_hash": "e7f20c0d1f006826a7a01d3a55227790",
+    "semantic_hash": ""
+  }
+}
