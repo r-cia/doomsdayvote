@@ -1416,15 +1416,12 @@ export async function registrarRotas(app) {
     }
 
     if (query.status) consulta = consulta.where(sql`${statusSql(corte)} = ${query.status}`);
-    const consultaTotal = query.status
-      ? consulta.clearSelect().clearOrderBy().select(sql`count(*)::bigint`.as('total_count'))
-      : null;
+    const consultaTotal = consulta.clearSelect().clearOrderBy().select(sql`count(*)::bigint`.as('total_count'));
     consulta = consulta.limit(pageSize).offset((query.page - 1) * pageSize);
 
     const linhas = await consulta.execute();
     const total = Number(
-      linhas[0]?.total_count ??
-        (consultaTotal ? (await consultaTotal.executeTakeFirstOrThrow()).total_count : 0),
+      linhas[0]?.total_count ?? (await consultaTotal.executeTakeFirstOrThrow()).total_count,
     );
     const itens = linhas.map((linha) => itemSecao(linha, corte));
 
