@@ -25,6 +25,11 @@ const router = createRouter({
       component: () => import('./views/ComparacoesView.vue'),
     },
     {
+      path: '/entre-anos',
+      name: 'entre-anos',
+      component: () => import('./views/EntreAnosView.vue'),
+    },
+    {
       path: '/biometria',
       name: 'biometria',
       component: () => import('./views/BiometriaView.vue'),

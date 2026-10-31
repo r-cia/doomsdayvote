@@ -8,11 +8,26 @@
       "mapa": "Mapa",
       "estatistica": "Estatística",
       "comparacoes": "Comparações",
+      "entreAnos": "Entre anos",
       "biometria": "Biometria",
       "encerramento": "Encerramento",
       "relatorio": "Consistência"
     },
     "idioma": "Idioma"
+  },
+  "entreAnos": {
+    "titulo": "Entre anos",
+    "anos": "Anos",
+    "turno": "Turno {n}",
+    "turnoCurto": "Turno",
+    "colocado": "{n}º colocado",
+    "vencedor": "Vencedor",
+    "derrotado": "Derrotado",
+    "votosIntervalo": "Votos por intervalo",
+    "pctAcumulada": "% acumulada",
+    "correlacao": "Correlação",
+    "par": "Anos",
+    "candidato": "Candidato"
   },
   "comum": {
     "carregando": "Carregando…",

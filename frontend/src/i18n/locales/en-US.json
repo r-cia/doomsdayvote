@@ -8,11 +8,26 @@
       "mapa": "Map",
       "estatistica": "Statistics",
       "comparacoes": "Comparisons",
+      "entreAnos": "Between years",
       "biometria": "Biometrics",
       "encerramento": "Closing",
       "relatorio": "Consistency"
     },
     "idioma": "Language"
+  },
+  "entreAnos": {
+    "titulo": "Between years",
+    "anos": "Years",
+    "turno": "Round {n}",
+    "turnoCurto": "Round",
+    "colocado": "Rank {n}",
+    "vencedor": "Winner",
+    "derrotado": "Defeated",
+    "votosIntervalo": "Votes per interval",
+    "pctAcumulada": "Cumulative %",
+    "correlacao": "Correlation",
+    "par": "Years",
+    "candidato": "Candidate"
   },
   "comum": {
     "carregando": "Loading…",

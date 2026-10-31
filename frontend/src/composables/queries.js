@@ -39,6 +39,18 @@ export function useEleicoes() {
   return query
 }
 
+export function useComparacaoAnos(anos) {
+  const store = useFiltersStore()
+  const ordenados = computed(() => [...toValue(anos)].sort((a, b) => a - b))
+  return useQuery({
+    queryKey: computed(() => ['comparacao-anos', ordenados.value, store.uf]),
+    queryFn: ({ signal }) =>
+      api.comparacaoAnos({ anos: ordenados.value.join(','), uf: store.uf }, signal),
+    enabled: computed(() => ordenados.value.length >= 2),
+    placeholderData: keepPreviousData,
+  })
+}
+
 export function useResumo(ordem = null) {
   const store = useFiltersStore()
   return useQuery({

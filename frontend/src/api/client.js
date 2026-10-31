@@ -48,6 +48,7 @@ export const api = {
   encerramentoUrnas: (params, signal) => obter('/encerramento/urnas', params, signal),
   encerramentoMunicipios: (params, signal) => obter('/encerramento/municipios', params, signal),
   encerramentoSecoes: (params, signal) => obter('/encerramento/secoes', params, signal),
+  comparacaoAnos: (params, signal) => obter('/comparacao-anos', params, signal),
   analise: (params, signal) => obter('/analysis', params, signal),
   anomalias: (params, signal) => obter('/anomalies', params, signal),
   estatisticas: (params, signal) => obter('/estatisticas', params, signal),
