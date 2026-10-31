@@ -20,14 +20,6 @@ function toNumberOrNull(valor) {
   return Number.isFinite(numero) ? numero : null;
 }
 
-function mediana(valores) {
-  const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v)).sort((a, b) => a - b);
-  if (validos.length === 0) return null;
-  const meio = Math.floor(validos.length / 2);
-  if (validos.length % 2 === 1) return validos[meio];
-  return (validos[meio - 1] + validos[meio]) / 2;
-}
-
 function media(valores) {
   const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v));
   if (validos.length === 0) return null;
@@ -50,29 +42,23 @@ function percentilRank(valores, valor) {
 }
 
 function normalizarSecao(secao) {
-  const candidatosRaw =
-    secao?.candidatos ?? secao?.candidates ?? secao?.votos ?? secao?.resultados ?? [];
-  const candidatos = Array.isArray(candidatosRaw)
-    ? candidatosRaw.map((c) => ({
-        nr_votavel: c?.nr_votavel ?? c?.nrVotavel ?? c?.numero ?? null,
-        nm_votavel: c?.nm_votavel ?? c?.nmVotavel ?? c?.nome ?? null,
-        sg_partido: c?.sg_partido ?? c?.sgPartido ?? c?.partido ?? null,
-        votos: toNumberOrNull(c?.qt_votos ?? c?.votos ?? c?.qtVotos),
-      }))
-    : [];
+  const candidatos = (secao?.candidatos ?? []).map((c) => ({
+    nr_votavel: c?.nr_votavel ?? null,
+    nm_votavel: c?.nm_votavel ?? null,
+    sg_partido: c?.sg_partido ?? null,
+    votos: toNumberOrNull(c?.qt_votos),
+  }));
 
   return {
-    id: secao?.id ?? secao?.secao_id ?? secao?.secaoId ?? null,
-    sg_uf: secao?.sg_uf ?? secao?.uf ?? secao?.sgUf ?? null,
-    cd_municipio_tse: secao?.cd_municipio_tse ?? secao?.municipio ?? secao?.cdMunicipioTse ?? null,
-    nm_municipio: secao?.nm_municipio ?? secao?.nmMunicipio ?? null,
-    nr_zona: secao?.nr_zona ?? secao?.zona ?? secao?.nrZona ?? null,
-    nr_secao: secao?.nr_secao ?? secao?.secao ?? secao?.nrSecao ?? null,
-    nr_local_votacao: secao?.nr_local_votacao ?? secao?.nrLocalVotacao ?? secao?.local_votacao ?? secao?.local ?? null,
-    aptos: toNumberOrNull(secao?.qt_aptos ?? secao?.aptos ?? secao?.qtAptos),
-    validos: toNumberOrNull(
-      secao?.qt_votos_validos ?? secao?.votos_validos ?? secao?.validos ?? secao?.total_validos,
-    ),
+    id: secao?.id ?? null,
+    sg_uf: secao?.sg_uf ?? null,
+    cd_municipio_tse: secao?.cd_municipio_tse ?? null,
+    nm_municipio: secao?.nm_municipio ?? null,
+    nr_zona: secao?.nr_zona ?? null,
+    nr_secao: secao?.nr_secao ?? null,
+    nr_local_votacao: secao?.nr_local_votacao ?? null,
+    aptos: toNumberOrNull(secao?.qt_aptos),
+    validos: toNumberOrNull(secao?.qt_votos_validos),
     candidatos,
   };
 }
@@ -154,10 +140,8 @@ function metricasSecao(secao) {
       : null,
     share_lider: shareLider,
     share_segundo: shareSegundo,
-    margem_segundo: margemAbsoluta,
     margem_absoluta: margemAbsoluta,
     margem_pp: margemPp,
-    margem_segundo_pp: margemPp,
   };
 }
 
@@ -197,16 +181,10 @@ function enriquecerGrupo(lista, grupoInfo, origem, minimoGrupo) {
       desvio_margem: desvioMargem,
       estado: ok ? 'ok' : 'dados_insuficientes',
     },
-    estado: ok ? 'ok' : 'dados_insuficientes',
   }));
 }
 
-export function agruparPorAptos(secoes = [], { bandas = 4, minimoGrupo = 5 } = {}) {
-  return agruparPorFaixaAptos(secoes, { bandas, minimoGrupo });
-}
-
-export function agruparPorFaixaAptos(secoes = [], { bandas = 4, minimoGrupo = 5 } = {}) {
-  const lista = (Array.isArray(secoes) ? secoes : []).map(normalizarSecao);
+function agruparPorFaixaAptos(lista, { bandas, minimoGrupo }) {
   const comAptos = lista.filter((s) => s.aptos !== null);
   const semAptos = lista.filter((s) => s.aptos === null);
   const resultado = [];
@@ -236,26 +214,8 @@ function faixaChave(banda) {
   return `aptos ${Math.min(...aptos)}-${Math.max(...aptos)}`;
 }
 
-export function calcularConcentracao(entrada, opcoes = {}) {
-  return concentracaoPura(entrada, opcoes);
-}
-
-export function concentracaoPura(entrada, opcoes = {}) {
-  let listaSecoes = [];
-  let opts = opcoes || {};
-  if (Array.isArray(entrada)) {
-    listaSecoes = entrada;
-  } else if (entrada && typeof entrada === 'object') {
-    listaSecoes =
-      entrada.secoes ?? entrada.sections ?? entrada.items ?? entrada.itens ?? [];
-    opts = { ...entrada, ...opcoes };
-  }
-
-  const topN = Number(opts.top ?? opts.topN ?? opts.limite ?? opts.limit ?? opts.n ?? 20);
-  const minimoGrupo = Number(opts.minimoGrupo ?? opts.minimo_grupo ?? 5);
-  const bandas = Number(opts.bandas ?? opts.bands ?? 4);
-
-  const normalizadas = (Array.isArray(listaSecoes) ? listaSecoes : []).map(normalizarSecao);
+export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4, ordenacaoShare, ordenacaoMargem } = {}) {
+  const normalizadas = secoes.map(normalizarSecao);
   const metricas = normalizadas.map(metricasSecao);
 
   const secoesParaGrupo = normalizadas.map((s) => ({
@@ -276,14 +236,6 @@ export function concentracaoPura(entrada, opcoes = {}) {
   }));
 
   const gruposComp = agruparSecoes(secoesParaGrupo, { minimoGrupo });
-
-  const grupoPorSecao = new Map();
-  for (const grupo of gruposComp.grupos ?? []) {
-    for (const item of grupo.secoes ?? []) {
-      const id = item?.secao?.id ?? item?.id ?? null;
-      if (id !== null) grupoPorSecao.set(id, grupo);
-    }
-  }
 
   const enriquecidosPorId = new Map();
 
@@ -347,7 +299,6 @@ export function concentracaoPura(entrada, opcoes = {}) {
         desvio_margem: null,
         estado: 'dados_insuficientes',
       },
-      estado: 'dados_insuficientes',
     });
   }
 
@@ -362,28 +313,22 @@ export function concentracaoPura(entrada, opcoes = {}) {
         return (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0);
       }),
     COLUNAS_CONCENTRACAO,
-    opts.ordenacaoShare,
-  ).slice(0, topN);
+    ordenacaoShare,
+  ).slice(0, top);
 
   const topMargem = ordenarLista(
     [...secoesFinais]
       .filter((s) => s.margem_absoluta !== null)
       .sort((a, b) => (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0)),
     COLUNAS_CONCENTRACAO,
-    opts.ordenacaoMargem,
-  ).slice(0, topN);
+    ordenacaoMargem,
+  ).slice(0, top);
 
   const comContexto = secoesFinais.filter((s) => s.contexto?.estado === 'ok').length;
 
-  const resultado = {
-    secoes: secoesFinais,
-    grupos: gruposComp.grupos ?? [],
+  return {
     top_share: topShare,
     top_margem: topMargem,
-    top_por_share: topShare,
-    top_por_margem: topMargem,
-    top_share_desc: topShare,
-    top_margem_desc: topMargem,
     cobertura: {
       consideradas: metricas.length,
       com_contexto: comContexto,
@@ -394,14 +339,10 @@ export function concentracaoPura(entrada, opcoes = {}) {
       faixas_aptos: faixasUtilizadas,
     },
     total: secoesFinais.length,
-    top: topN,
-    top_n: topN,
   };
-
-  return resultado;
 }
 
-export async function concentracao(db, { eleicaoId, cargo, corte, escopo = {}, limite, top, topN, ...rest } = {}) {
+export async function concentracao(db, { eleicaoId, cargo, corte, escopo = {}, limite = 20, ordenacaoShare, ordenacaoMargem } = {}) {
   const corteEfetivo = corte ?? { tipo: 'final' };
 
   let qb = db
@@ -487,24 +428,5 @@ export async function concentracao(db, { eleicaoId, cargo, corte, escopo = {}, l
     candidatos: s.candidatos,
   }));
 
-  const topNFinal = Number(limite ?? top ?? topN ?? 20);
-  return concentracaoPura(secoes, { top: topNFinal, minimoGrupo: 5, ...rest });
+  return concentracaoPura(secoes, { top: limite, ordenacaoShare, ordenacaoMargem });
 }
-
-// Aliases for pure helpers
-export const concentracaoDasSecoes = concentracaoPura;
-export const concentracaoPorSecao = concentracaoPura;
-export const concentracaoSecoes = concentracaoPura;
-export const analisarConcentracao = concentracaoPura;
-export const agruparConcentracao = concentracaoPura;
-export const concentracaoPorFaixaAptos = agruparPorFaixaAptos;
-export const faixaAptos = agruparPorFaixaAptos;
-export const bandasAptos = agruparPorFaixaAptos;
-export const agruparPorAptosAlias = agruparPorAptos;
-
-const defaultExport = concentracao;
-defaultExport.calcularConcentracao = calcularConcentracao;
-defaultExport.concentracaoPura = concentracaoPura;
-defaultExport.agruparPorAptos = agruparPorAptos;
-defaultExport.agruparPorFaixaAptos = agruparPorFaixaAptos;
-export default defaultExport;

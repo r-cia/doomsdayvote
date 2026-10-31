@@ -243,7 +243,7 @@ Concentração do candidato mais votado e margem para o segundo colocado por se�
     {
       "secao": { "id": "…", "sg_uf": "AC", "nr_zona": 9, "nr_secao": 1 },
       "share_lider": 0.72,
-      "margem_segundo": 120,
+      "margem_absoluta": 120,
       "margem_pp": 14.5,
       "contexto": { "origem": "grupo_comparavel", "estado": "ok", "share_lider_percentil": 90.0, "share_lider_z": 1.4 }
     }
