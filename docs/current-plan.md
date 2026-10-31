@@ -96,3 +96,14 @@ As constantes `COLUNAS_*` ficam junto da rota que as usa. Os contratos de API n�
 - `npm test` no backend e no frontend a cada card. Os testes de integração precisam de `TEST_DATABASE_URL`, que não está definida: ou você define, ou os cards 2, 3, 4 e a Parte B ficam validados só por testes unitários.
 - `graphify update .` ao final e push no fim.
 - O limite de 30 chamadas de ferramenta será ultrapassado pelo volume (7 cards e a medição).
+
+## Correção — refresh das views na carga (2026-10-31)
+
+- Causa: o refresh das views materializadas na carga rodava com `doomsday_app`; `REFRESH MATERIALIZED VIEW` exige o dono (`doomsday_owner`).
+- Mudanças:
+  1. `backend/src/env.js`: `DATABASE_MIGRATION_URL` obrigatória no `workerSchema`.
+  2. `backend/src/scripts/carregar-pasta.js`: o `cliente` (lock e refresh) conecta com `DATABASE_MIGRATION_URL`; o `db` da importação segue com `DATABASE_URL`.
+  3. `backend/.env.example`: seção do worker indica que `DATABASE_MIGRATION_URL` também é exigida.
+  4. `docs/architecture.md`: refresh ao fim da carga roda com o papel dono.
+- Validação: `npm test`, `npm run test:integration`.
+- Passo final: rodar `npm run carga` para atualizar as views (autorizado pelo usuário, executado pelo orquestrador).

@@ -52,6 +52,7 @@ describe('loadWorkerEnv', () => {
   const ambienteValido = {
     NODE_ENV: 'test',
     DATABASE_URL: 'postgres://usuario:senha@localhost:5432/banco',
+    DATABASE_MIGRATION_URL: 'postgres://dono:senha@localhost:5432/banco',
     BWEB_INPUT_DIR: '/dados/entrada',
     BWEB_STORAGE_DIR: '/dados/storage',
   };

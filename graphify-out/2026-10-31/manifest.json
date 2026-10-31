@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/consistencia.js": {
-    "mtime": 1793397894.732325,
-    "seen": 1793398552.8773167,
+    "mtime": 1793453447.7716467,
+    "seen": 1793461606.9739654,
     "ast_hash": "bba18f95253e07c5c46650a4d612982b",
     "semantic_hash": ""
   },
@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/duplicacao.js": {
-    "mtime": 1793413761.5164733,
-    "seen": 1793419495.4580102,
-    "ast_hash": "1c00675bd7fcab91da9e3fdb3b7ff6a9",
+    "mtime": 1793453064.1137052,
+    "seen": 1793461606.9739716,
+    "ast_hash": "4fdc5d4652ad4c134093bd0356e0aea3",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatisticas.js": {
@@ -144,9 +144,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/outliers.js": {
-    "mtime": 1793406550.7649994,
-    "seen": 1793406950.3168604,
-    "ast_hash": "30dc81eef8c27e80dedc84ff790eb5dc",
+    "mtime": 1793461206.3725376,
+    "seen": 1793461606.9739816,
+    "ast_hash": "60cc56b145351a5e4c92f508bc65fd37",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/versoes-bu.js": {
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/totais.js": {
-    "mtime": 1793375721.0871208,
-    "seen": 1793375745.982926,
-    "ast_hash": "523cf0b432c829b6feda884dd0c35a5f",
+    "mtime": 1793461107.9954712,
+    "seen": 1793461606.9739983,
+    "ast_hash": "d84ec64cedf79ed8852bb2f0a07e5c6f",
     "semantic_hash": ""
   },
   "backend/src/modules/importacao/bweb/campos.js": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793418512.9441752,
-    "seen": 1793419495.4580603,
-    "ast_hash": "f248306c98c6becace2c849f3af9180d",
+    "mtime": 1793460528.0090685,
+    "seen": 1793461606.9740393,
+    "ast_hash": "c9c6b6a8e076b5b5d6b03c34ccb9abf4",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -1002,15 +1002,15 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/comparacao-local.js": {
-    "mtime": 1793413760.8044655,
-    "seen": 1793419495.4580023,
-    "ast_hash": "38a1dbc19340eb6c329af6d5ac242020",
+    "mtime": 1793448596.7048573,
+    "seen": 1793461606.9739518,
+    "ast_hash": "edddf1f4a1f868e3b99eda269ffbec12",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/concentracao.js": {
-    "mtime": 1793413760.4104612,
-    "seen": 1793419495.4580045,
-    "ast_hash": "fc5dd8dffaacfa3c2aeb6f52e02bfdec",
+    "mtime": 1793448610.2350016,
+    "seen": 1793461606.973954,
+    "ast_hash": "e6c47bfd5bbcb1c8cc866f85a0a8a1b1",
     "semantic_hash": ""
   },
   "backend/tests/integration/comparacao-local.test.js": {
@@ -1056,9 +1056,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793418336.6012723,
-    "seen": 1793419495.458307,
-    "ast_hash": "e5754b64e32176213c65b0d7c5bb78fc",
+    "mtime": 1793461253.2470446,
+    "seen": 1793461606.9742951,
+    "ast_hash": "70c6a21d5c720afa8fa547f647953953",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
@@ -1164,9 +1164,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatistica-basica.js": {
-    "mtime": 1793406537.0098405,
-    "seen": 1793406950.3168566,
-    "ast_hash": "06e1352a79aad2a5022378664abf852b",
+    "mtime": 1793448595.907849,
+    "seen": 1793461606.9739757,
+    "ast_hash": "dc70b4b1fceb1efeaa59825c854e3638",
     "semantic_hash": ""
   },
   "backend/src/db/views.js": {
@@ -1209,6 +1209,84 @@
     "mtime": 1793418546.4065373,
     "seen": 1793419495.4582024,
     "ast_hash": "560bce8a9641eddb1587e93c98c67019",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/biometria.js": {
+    "mtime": 1793461138.8108058,
+    "seen": 1793461606.973948,
+    "ast_hash": "01ec895123458c1ff1ee214614b91f53",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/encerramento.js": {
+    "mtime": 1793461167.7441194,
+    "seen": 1793461606.9739733,
+    "ast_hash": "fc0ea2b41d32fc89a6d762d5226db436",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/relatorio.js": {
+    "mtime": 1793461188.1733406,
+    "seen": 1793461606.9739833,
+    "ast_hash": "3567e16c1536a20ee645c476cbc30322",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/apuracao/secoes.js": {
+    "mtime": 1793461070.7280664,
+    "seen": 1793461606.973993,
+    "ast_hash": "3ae20e31abc129d92c72a35a2b475e65",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/apuracao/timeline.js": {
+    "mtime": 1793461094.8293283,
+    "seen": 1793461606.9739966,
+    "ast_hash": "a6259e706d2fa6e5b9a6ecf3f2c3c75a",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/analise.js": {
+    "mtime": 1793461221.5967023,
+    "seen": 1793461606.9740322,
+    "ast_hash": "0a443c3db40df9beb540007ae56704c1",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/apuracao.js": {
+    "mtime": 1793461123.7106419,
+    "seen": 1793461606.9740336,
+    "ast_hash": "22f5bfff3c27e710653ae58b4fa17689",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/biometria.js": {
+    "mtime": 1793461139.1388092,
+    "seen": 1793461606.974035,
+    "ast_hash": "99c83e520151f1b2a594787b0adcb28d",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/comum.js": {
+    "mtime": 1793460527.7850661,
+    "seen": 1793461606.9740365,
+    "ast_hash": "2e8070247c7668740d77e86fb37a000d",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/encerramento.js": {
+    "mtime": 1793461167.9331214,
+    "seen": 1793461606.9740376,
+    "ast_hash": "086721930db93fed4e78febdad613a28",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/relatorio.js": {
+    "mtime": 1793461188.3513424,
+    "seen": 1793461606.9740405,
+    "ast_hash": "eddb65314c31ac3490019a9be31fe790",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/secoes.js": {
+    "mtime": 1793461085.0682223,
+    "seen": 1793461606.9740422,
+    "ast_hash": "c5c4aa644d40229e64ff4985af958970",
+    "semantic_hash": ""
+  },
+  "backend/tests/unit/analise/estatistica-basica.test.js": {
+    "mtime": 1793448692.3278747,
+    "seen": 1793461606.9741223,
+    "ast_hash": "d7eb6610bc7a23eaa5385385f0aeab02",
     "semantic_hash": ""
   }
 }
