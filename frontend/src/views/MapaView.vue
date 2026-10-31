@@ -89,6 +89,14 @@ function selecionarUf(uf) {
   store.definirNivel('municipio')
 }
 
+function alterarNivel(nivel) {
+  if (nivel === 'uf') {
+    limparParaBrasil()
+    return
+  }
+  store.definirNivel(nivel)
+}
+
 function limparParaBrasil() {
   store.definirUf(null)
   store.definirMunicipio(null)
@@ -142,7 +150,7 @@ function atualizarSecoes() {
       :atualizando="mapaTabelaQuery.isFetching.value"
       :error="mapaQuery.error.value?.message ?? ''"
       altura="630px"
-      @update:level="(nivel) => { if (nivel === 'uf') { store.definirUf(null); store.definirMunicipio(null); store.definirNivel('uf'); } else { store.definirNivel(nivel); } }"
+      @update:level="alterarNivel"
       @update:mode="store.definirModo"
       @select="selecionarNoMapa"
       @retry="atualizarMapa"

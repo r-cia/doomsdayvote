@@ -1,9 +1,24 @@
-import { computed, isRef, toValue, watch } from 'vue'
+import { computed, toValue, watch } from 'vue'
 import { useQuery, keepPreviousData } from '@tanstack/vue-query'
 import { api } from '../api/client'
 import { useFiltersStore } from '../stores/filters'
 
+const CARGO_GOVERNADOR = 3
+
 const paramsDe = (ordem) => toValue(ordem) ?? {}
+
+const habilitadoBase = (store) =>
+  Boolean(store.electionId && store.cargo && !(Number(store.cargo) === CARGO_GOVERNADOR && !store.uf))
+
+const filtrosBase = (store) => ({
+  election_id: store.electionId,
+  cargo: store.cargo,
+  as_of: store.asOf,
+  uf: store.uf,
+  municipio: store.municipio,
+})
+
+const chaveBase = (store) => [store.electionId, store.cargo, store.asOf, store.uf, store.municipio]
 
 export function useEleicoes() {
   const store = useFiltersStore()
@@ -27,28 +42,9 @@ export function useEleicoes() {
 export function useResumo(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
-    queryKey: computed(() => [
-      'resumo',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      paramsDe(ordem),
-    ]),
-    queryFn: ({ signal }) =>
-      api.resumo(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          ...paramsDe(ordem),
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    queryKey: computed(() => ['resumo', ...chaveBase(store), paramsDe(ordem)]),
+    queryFn: ({ signal }) => api.resumo({ ...filtrosBase(store), ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -76,7 +72,7 @@ export function useTimeline() {
         },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -84,28 +80,9 @@ export function useTimeline() {
 export function useAnalise(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
-    queryKey: computed(() => [
-      'analise',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      paramsDe(ordem),
-    ]),
-    queryFn: ({ signal }) =>
-      api.analise(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          ...paramsDe(ordem),
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    queryKey: computed(() => ['analise', ...chaveBase(store), paramsDe(ordem)]),
+    queryFn: ({ signal }) => api.analise({ ...filtrosBase(store), ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -113,64 +90,21 @@ export function useAnalise(ordem = null) {
 export function useAnomalias(habilitado = null, ordem = null) {
   const store = useFiltersStore()
   return useQuery({
-    queryKey: computed(() => [
-      'anomalias',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      paramsDe(ordem),
-    ]),
-    queryFn: ({ signal }) =>
-      api.anomalias(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          ...paramsDe(ordem),
-        },
-        signal,
-      ),
-    enabled: computed(
-      () =>
-        Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)) &&
-        (habilitado ? habilitado.value : true),
-    ),
+    queryKey: computed(() => ['anomalias', ...chaveBase(store), paramsDe(ordem)]),
+    queryFn: ({ signal }) => api.anomalias({ ...filtrosBase(store), ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store) && toValue(habilitado ?? true)),
     placeholderData: keepPreviousData,
   })
 }
 
 export function useEstatisticas(escopo, ordem = null) {
   const store = useFiltersStore()
-  const escopoValor = computed(() => escopo?.value ?? escopo ?? 'turno')
+  const escopoValor = computed(() => toValue(escopo) ?? 'turno')
   return useQuery({
-    queryKey: computed(() => [
-      'estatisticas',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      escopoValor.value,
-      paramsDe(ordem),
-    ]),
+    queryKey: computed(() => ['estatisticas', ...chaveBase(store), escopoValor.value, paramsDe(ordem)]),
     queryFn: ({ signal }) =>
-      api.estatisticas(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          escopo: escopoValor.value,
-          ...paramsDe(ordem),
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+      api.estatisticas({ ...filtrosBase(store), escopo: escopoValor.value, ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -183,21 +117,16 @@ export function useMapa(nivel = null, opcoes = {}) {
     opcoes.ignorarMunicipio ? null : store.municipio,
   )
   const asOfEfetivo = computed(() => {
-    const o = opcoes.asOfOverride
-    const v = o && typeof o === 'object' && 'value' in o ? o.value : o
+    const v = toValue(opcoes.asOfOverride)
     return (v === null || v === undefined || v === '') ? store.asOf : v
   })
   const asOfAnterior = computed(() => {
-    const o = opcoes.asOfAnterior
-    const v = o && typeof o === 'object' && 'value' in o ? o.value : o
+    const v = toValue(opcoes.asOfAnterior)
     return (v === null || v === undefined || v === '') ? undefined : v
   })
-  const candidatosMapa = computed(() => {
-    if (!opcoes.incluirTodosCandidatos) return store.candidato
-    if (typeof opcoes.candidatos === 'function') return opcoes.candidatos()
-    if (opcoes.candidatos?.value !== undefined) return opcoes.candidatos.value
-    return opcoes.candidatos
-  })
+  const candidatosMapa = computed(() =>
+    opcoes.incluirTodosCandidatos ? toValue(opcoes.candidatos) : store.candidato,
+  )
 
   return useQuery({
     queryKey: computed(() => [
@@ -228,9 +157,7 @@ export function useMapa(nivel = null, opcoes = {}) {
         signal,
       ),
     enabled: computed(
-      () =>
-        Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)) &&
-        (nivelEfetivo.value !== 'municipio' || Boolean(ufDoMapa.value)),
+      () => habilitadoBase(store) && (nivelEfetivo.value !== 'municipio' || Boolean(ufDoMapa.value)),
     ),
     placeholderData: keepPreviousData,
   })
@@ -241,11 +168,7 @@ export function useSecoes(ordem = null) {
   return useQuery({
     queryKey: computed(() => [
       'secoes',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
+      ...chaveBase(store),
       store.sectionStatus,
       store.sectionZona,
       store.sectionSecao,
@@ -257,11 +180,7 @@ export function useSecoes(ordem = null) {
     queryFn: ({ signal }) =>
       api.secoes(
         {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
+          ...filtrosBase(store),
           status: store.sectionStatus,
           zona: store.sectionZona,
           secao: store.sectionSecao,
@@ -272,43 +191,22 @@ export function useSecoes(ordem = null) {
         },
         signal,
       ),
-    enabled: computed(() =>
-      Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf) && store.municipio),
-    ),
+    enabled: computed(() => habilitadoBase(store) && Boolean(store.municipio)),
     placeholderData: keepPreviousData,
   })
 }
 
 export function useConsistencia(regra = null, ordem = null) {
   const store = useFiltersStore()
-  const regraEfetiva = computed(() =>
-    typeof regra === 'function' ? regra() : regra?.value !== undefined ? regra.value : regra,
-  )
+  const regraEfetiva = computed(() => toValue(regra))
   return useQuery({
-    queryKey: computed(() => [
-      'consistencia',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      regraEfetiva.value ?? null,
-      paramsDe(ordem),
-    ]),
+    queryKey: computed(() => ['consistencia', ...chaveBase(store), regraEfetiva.value ?? null, paramsDe(ordem)]),
     queryFn: ({ signal }) =>
       api.consistencia(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          regra: regraEfetiva.value ?? undefined,
-          ...paramsDe(ordem),
-        },
+        { ...filtrosBase(store), regra: regraEfetiva.value ?? undefined, ...paramsDe(ordem) },
         signal,
       ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -316,28 +214,9 @@ export function useConsistencia(regra = null, ordem = null) {
 export function useComparacaoLocal(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
-    queryKey: computed(() => [
-      'comparacao-local',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      paramsDe(ordem),
-    ]),
-    queryFn: ({ signal }) =>
-      api.comparacaoLocal(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          ...paramsDe(ordem),
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    queryKey: computed(() => ['comparacao-local', ...chaveBase(store), paramsDe(ordem)]),
+    queryFn: ({ signal }) => api.comparacaoLocal({ ...filtrosBase(store), ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -345,28 +224,9 @@ export function useComparacaoLocal(ordem = null) {
 export function useConcentracao(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
-    queryKey: computed(() => [
-      'concentracao',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      paramsDe(ordem),
-    ]),
-    queryFn: ({ signal }) =>
-      api.concentracao(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          ...paramsDe(ordem),
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf))),
+    queryKey: computed(() => ['concentracao', ...chaveBase(store), paramsDe(ordem)]),
+    queryFn: ({ signal }) => api.concentracao({ ...filtrosBase(store), ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -374,30 +234,9 @@ export function useConcentracao(ordem = null) {
 export function useRelatorio(ordem = null) {
   const store = useFiltersStore()
   return useQuery({
-    queryKey: computed(() => [
-      'relatorio',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      paramsDe(ordem),
-    ]),
-    queryFn: ({ signal }) =>
-      api.relatorio(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          ...paramsDe(ordem),
-        },
-        signal,
-      ),
-    enabled: computed(
-      () => Boolean(store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
-    ),
+    queryKey: computed(() => ['relatorio', ...chaveBase(store), paramsDe(ordem)]),
+    queryFn: ({ signal }) => api.relatorio({ ...filtrosBase(store), ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store)),
     placeholderData: keepPreviousData,
   })
 }
@@ -405,7 +244,7 @@ export function useRelatorio(ordem = null) {
 export function useSecao(id, ordem = null) {
   const store = useFiltersStore()
   const idEfetivo = computed(() => {
-    const valor = isRef(id) ? id.value : id
+    const valor = toValue(id)
     return valor ? String(valor) : null
   })
   return useQuery({
@@ -428,9 +267,7 @@ export function useSecao(id, ordem = null) {
         },
         signal,
       ),
-    enabled: computed(() =>
-      Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
-    ),
+    enabled: computed(() => Boolean(idEfetivo.value) && habilitadoBase(store)),
     placeholderData: (anterior, consulta) => (consulta?.queryKey[1] === idEfetivo.value ? anterior : undefined),
   })
 }
@@ -439,7 +276,7 @@ export function useSecao(id, ordem = null) {
 export function useSecaoVersoes(id, ordem = null) {
   const store = useFiltersStore()
   const idEfetivo = computed(() => {
-    const valor = isRef(id) ? id.value : id
+    const valor = toValue(id)
     return valor ? String(valor) : null
   })
   return useQuery({
@@ -462,9 +299,7 @@ export function useSecaoVersoes(id, ordem = null) {
         },
         signal,
       ),
-    enabled: computed(() =>
-      Boolean(idEfetivo.value && store.electionId && store.cargo && !(Number(store.cargo) === 3 && !store.uf)),
-    ),
+    enabled: computed(() => Boolean(idEfetivo.value) && habilitadoBase(store)),
     placeholderData: (anterior, consulta) => (consulta?.queryKey[1] === idEfetivo.value ? anterior : undefined),
   })
 }
