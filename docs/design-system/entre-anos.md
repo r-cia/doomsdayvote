@@ -12,11 +12,16 @@ Botões `button button--ghost button--compacto` em grupo (`role="group"`, rótul
 
 Abas de turno: "1º Turno" e "2º Turno" (`entreAnos.turno`), em `role="tablist"` com `role="tab"` (`aria-selected`, `aria-controls`, `tabindex` móvel) e `role="tabpanel"`; setas esquerda/direita, Home e End trocam de aba. Só os gráficos do turno selecionado são exibidos (a primeira aba é a inicial).
 
-Em cada turno, para cada posição (1º e 2º colocado; no 2º turno, vencedor e derrotado), duas colunas (grade `auto-fit`, mínimo 320px):
+Em cada turno, para cada posição (1º e 2º colocado; no 2º turno, vencedor e derrotado), um gráfico por linha, em largura total, empilhados (o SVG ajusta a largura ao contêiner), nesta ordem:
 - Votos por intervalo: escala logarítmica, com marcas nas potências de 10 que cobrem os dados. Intervalos com 0 voto não existem em escala log e ficam como lacuna na linha (nunca 0 ou 1). Abaixo: diferença em votos (A − B) e diferença em pontos percentuais do % do total do ano (votos do intervalo ÷ total de votos do candidato na curva do ano × 100).
 - % acumulada: escala linear. Abaixo: diferença em pontos percentuais (pct_acumulada A − B).
 
 Diferenças: calculadas no frontend (`lib/entre-anos.js`) a partir de `pontos`, uma linha por par de anos (os mesmos pares da tabela de correlação), rotulada "A − B" na legenda, só nos intervalos presentes nos dois anos. Escala linear com linha de zero visível (`.curvas__zero`). O pareamento segue a posição.
+
+Cores e traços (`lib/entre-anos.js`):
+- Uma cor por candidato, identificado por `nm_votavel`, igual em todos os gráficos, abas de turno e anos. A cor sai da ordem alfabética dos nomes de todos os candidatos da resposta atual, sobre `PALETA_CANDIDATOS` (`#ffb52e`, `#7ec8ff`, `#74e08c`, `#ff6b57`, `#c79bff`, `#e6e6a0`), então a mesma seleção sempre gera as mesmas cores.
+- Mesmo candidato em anos diferentes no mesmo gráfico: mesma cor, traço fixo por ano (`TRACOS_ANOS`: contínuo, `8 4`, `2 3`, `10 3 2 3`, `4 4`, `1 3`), na ordem crescente dos anos selecionados e igual em todos os gráficos. O ano aparece na legenda (`ano · candidato (partido)`) com a amostra da cor e do traço.
+- Gráficos de diferença: paleta própria, disjunta da dos candidatos (`PALETA_DIFERENCAS`: `#ff7ac6`, `#2ed3c4`, `#f2efe4`, `#c4e04a`, `#d98c5f`, `#8f9bff`), uma cor por par de anos (pares em ordem crescente), igual em todos os gráficos de diferença, traço contínuo.
 
 A margem esquerda do SVG é calculada pelo maior rótulo do eixo Y, para que nenhum rótulo seja cortado.
 

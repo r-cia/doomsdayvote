@@ -170,3 +170,7 @@ As constantes `COLUNAS_*` ficam junto da rota que as usa. Os contratos de API n�
 2. "Votos por intervalo" usa eixo Y logarítmico, com marcas em potências de 10 e rótulos sem corte; intervalos com 0 voto ficam como lacuna. "% acumulada" segue linear.
 3. As curvas dos anos continuam sobrepostas, com gráficos de diferença abaixo, uma linha por par de anos ("A − B"), só nos intervalos presentes nos dois anos, em escala linear com linha de zero: sob votos por intervalo, a diferença em votos e a diferença em pontos percentuais do % do total do ano; sob % acumulada, a diferença em pontos percentuais.
 4. O pareamento continua por posição (1º com 1º e 2º com 2º; vencedor com vencedor e derrotado com derrotado).
+5. Cada gráfico (curvas sobrepostas e cada diferença) ocupa uma linha de largura total, empilhados verticalmente.
+6. Uma cor por candidato (identificado por `nm_votavel`), constante em todos os gráficos, abas de turno e anos, atribuída de forma determinística pela ordem alfabética dos candidatos da resposta.
+7. O mesmo candidato em dois anos no mesmo gráfico mantém a cor e ganha um traço fixo por ano (contínuo, tracejado, pontilhado…), igual em todos os gráficos; o ano aparece na legenda.
+8. Os gráficos de diferença usam uma paleta disjunta da dos candidatos, uma cor por par de anos, constante em todos os gráficos de diferença.
