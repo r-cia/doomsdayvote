@@ -68,6 +68,25 @@ describe('parser BWEB_2014_31', () => {
     expect(registro.bruto.NR_TURNO).toBeUndefined();
   });
 
+  it('preenche SG_PARTIDO com a sigla de NM_PARTIDO e mantém NM_PARTIDO', () => {
+    const derivados = interpretarNomeArquivo2014('bweb_1t_AC_14102014131600.txt');
+    const registro = parsearRegistro2014(LINHA_2014, 2, derivados);
+
+    expect(registro.valores.NM_PARTIDO).toBe('PT');
+    expect(registro.valores.SG_PARTIDO).toBe('PT');
+    expect(registro.ausencias.SG_PARTIDO).toBeUndefined();
+  });
+
+  it('deixa SG_PARTIDO sem valor quando NM_PARTIDO está vazio', () => {
+    const derivados = interpretarNomeArquivo2014('bweb_1t_AC_14102014131600.txt');
+    const linha = [...LINHA_2014];
+    linha[11] = '';
+    const registro = parsearRegistro2014(linha, 2, derivados);
+
+    expect(registro.valores.SG_PARTIDO).toBeNull();
+    expect(registro.ausencias.SG_PARTIDO).toBe('INEXISTENTE_NO_LEIAUTE');
+  });
+
   it('sinaliza linha com largura diferente de 31', () => {
     const derivados = interpretarNomeArquivo2014('bweb_1t_AC_14102014131600.txt');
     const registro = parsearRegistro2014(LINHA_2014.slice(0, 30), 2, derivados);
