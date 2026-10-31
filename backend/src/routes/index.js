@@ -98,13 +98,15 @@ const COLUNAS_COMPARACAO_LOCAL = {
   abstencao_pp: (i) => i.distancia_pp?.abstencao_pp,
 };
 
-const COLUNAS_RELATORIO = {
+const diferencaPct = (valor, base) => (valor === null || valor === undefined || base === null || base === undefined ? null : valor - base);
+
+const colunasRelatorio = (alvo) => ({
   referencia: (r) => r.ano_eleicao * 10 + r.nr_turno,
   bus: (r) => r.bus,
   participacao_pct: (r) => r.participacao_pct,
-  diferenca_participacao: (r) => r.participacao_pct,
+  diferenca_participacao: (r) => diferencaPct(r.participacao_pct, alvo?.participacao_pct),
   abstencao_pct: (r) => r.abstencao_pct,
-  diferenca_abstencao: (r) => r.abstencao_pct,
+  diferenca_abstencao: (r) => diferencaPct(r.abstencao_pct, alvo?.abstencao_pct),
   data_hora: (r) => r.recebimento.data_hora,
   somente_data: (r) => r.recebimento.somente_data,
   ausente: (r) => r.recebimento.ausente,
@@ -114,7 +116,7 @@ const COLUNAS_RELATORIO = {
   antes_emissao: (r) => r.recebimento.antes_emissao,
   mediana_atraso_min: (r) => r.recebimento.mediana_atraso_min,
   p90_atraso_min: (r) => r.recebimento.p90_atraso_min,
-};
+});
 
 const COLUNAS_RESULTADOS = {
   cd_tipo_votavel: (r) => r.cd_tipo_votavel,
@@ -1214,7 +1216,7 @@ export async function registrarRotas(app) {
     };
   }));
 
-  app.get('/api/relatorio', cacheado('relatorio', 300, baseSchema.extend(ordenacaoSchema(Object.keys(COLUNAS_RELATORIO))), async (query) => {
+  app.get('/api/relatorio', cacheado('relatorio', 300, baseSchema.extend(ordenacaoSchema(Object.keys(colunasRelatorio()))), async (query) => {
     const eleicao = await buscarEleicao(db, query.election_id);
     const corte = resolverCorte(query);
     const agregadosRelatorio = () => [
@@ -1315,16 +1317,18 @@ export async function registrarRotas(app) {
       };
     };
 
+    const alvo = {
+      election_id: eleicao.id,
+      ano_eleicao: eleicao.ano_eleicao,
+      nr_turno: eleicao.nr_turno,
+      cd_eleicao: eleicao.cd_eleicao,
+      cd_pleito: eleicao.cd_pleito,
+      ds_eleicao: eleicao.ds_eleicao,
+      ...metricas(resumoAtual),
+    };
+
     return {
-      alvo: {
-        election_id: eleicao.id,
-        ano_eleicao: eleicao.ano_eleicao,
-        nr_turno: eleicao.nr_turno,
-        cd_eleicao: eleicao.cd_eleicao,
-        cd_pleito: eleicao.cd_pleito,
-        ds_eleicao: eleicao.ds_eleicao,
-        ...metricas(resumoAtual),
-      },
+      alvo,
       comparacao_final_disponivel: corte.tipo === 'final',
       referencias: ordenarLista(
         referencias.map((referencia) => ({
@@ -1336,7 +1340,7 @@ export async function registrarRotas(app) {
           ds_eleicao: referencia.ds_eleicao,
           ...metricas(referencia),
         })),
-        COLUNAS_RELATORIO,
+        colunasRelatorio(alvo),
         lerOrdenacao(query),
       ),
     };
