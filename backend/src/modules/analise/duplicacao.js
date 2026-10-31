@@ -206,7 +206,7 @@ export async function duplicacaoPorAssinatura(
       sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
       sql`(array_agg(rv.nr_votavel ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_nr'),
       sql`(array_agg(rv.nm_votavel ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_nm'),
-      sql`(array_agg(rv.sg_partido ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_sg'),
+      sql`(array_agg(coalesce(rv.sg_partido, rv.nm_partido) ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_sg'),
       sql`md5(string_agg(rv.cd_tipo_votavel::text || ':' || rv.nr_votavel::text || ':' || coalesce(rv.qt_votos, 0)::text, '|' order by rv.cd_tipo_votavel, rv.nr_votavel))`.as(
         'assinatura',
       ),

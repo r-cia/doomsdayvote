@@ -53,7 +53,7 @@ export async function somarVotos(db, { eleicaoId, cargo, corte, escopo = {}, dat
     'rv.categoria',
     sql`max(rv.nm_votavel)`.as('nm_votavel'),
     sql`max(rv.nr_partido)`.as('nr_partido'),
-    sql`max(rv.sg_partido)`.as('sg_partido'),
+    sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
     sql`max(rv.nm_partido)`.as('nm_partido'),
     sql`max(pc.cor_hex)`.as('cor_hex'),
     sql`sum(rv.qt_votos)`.as('qt_votos'),

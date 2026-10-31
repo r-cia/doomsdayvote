@@ -380,7 +380,7 @@ export async function concentracao(db, { eleicaoId, cargo, corte, escopo = {}, l
       sql`max(bv.qt_aptos)`.as('qt_aptos'),
       'rv.nr_votavel',
       sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(rv.sg_partido)`.as('sg_partido'),
+      sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
       'rv.categoria',
       sql`sum(rv.qt_votos)`.as('votos'),
     ])

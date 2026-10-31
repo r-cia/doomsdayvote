@@ -347,7 +347,7 @@ export async function comparacaoLocal(db, { eleicaoId, cargo, corte, escopo = {}
       sql`max(bv.qt_abstencoes)`.as('qt_abstencoes'),
       'rv.nr_votavel',
       sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(rv.sg_partido)`.as('sg_partido'),
+      sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
       sql`sum(rv.qt_votos)`.as('votos'),
     ])
     .where('rv.categoria', '=', 'nominal')

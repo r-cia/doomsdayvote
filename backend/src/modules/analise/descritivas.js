@@ -61,7 +61,7 @@ export async function estatisticasDaEleicao(
       .select([
         'rv.nr_votavel',
         sql`max(rv.nm_votavel)`.as('nm_votavel'),
-        sql`max(rv.sg_partido)`.as('sg_partido'),
+        sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
         sql`count(*)::int`.as('secoes'),
         sql`count(*) filter (where rv.qt_votos > 0)::int`.as('secoes_com_voto'),
         sql`avg(rv.qt_votos)`.as('media'),

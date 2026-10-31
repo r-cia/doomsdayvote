@@ -219,7 +219,13 @@ export async function detalheDoBoletim(db, { eleicaoId, secaoId, cargo, corte })
       ])
     : [[], null, { total: 0 }];
 
-  return { boletim, statusBu, resultados, lote, anteriores };
+  return {
+    boletim,
+    statusBu,
+    resultados: resultados.map((r) => ({ ...r, sg_partido: r.sg_partido ?? r.nm_partido })),
+    lote,
+    anteriores,
+  };
 }
 
 export async function versoesDaSecao(db, { eleicaoId, secaoId, cargo }) {
@@ -239,7 +245,7 @@ export async function versoesDaSecao(db, { eleicaoId, secaoId, cargo }) {
   const porBu = new Map();
   for (const r of resultados) {
     if (!porBu.has(r.boletim_versao_id)) porBu.set(r.boletim_versao_id, []);
-    porBu.get(r.boletim_versao_id).push(r);
+    porBu.get(r.boletim_versao_id).push({ ...r, sg_partido: r.sg_partido ?? r.nm_partido });
   }
   const loteIds = [...new Set(versoesRows.map((v) => v.lote_id))];
   const lotes = loteIds.length

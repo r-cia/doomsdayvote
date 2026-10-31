@@ -129,10 +129,10 @@ export async function encerramentoPorMunicipio(db, { eleicao, cargo, corte, uf, 
   const linhasPartidos = await qbPartidos
     .select([
       's.cd_municipio_tse',
-      'rv.sg_partido',
+      sql`coalesce(rv.sg_partido, rv.nm_partido)`.as('sg_partido'),
       sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('votos'),
     ])
-    .groupBy(['s.cd_municipio_tse', 'rv.sg_partido'])
+    .groupBy(['s.cd_municipio_tse', sql`coalesce(rv.sg_partido, rv.nm_partido)`])
     .execute();
 
   const resumoPorMunicipio = resumoPartidoVencedor(linhasPartidos, (linha) => linha.cd_municipio_tse);
@@ -201,13 +201,13 @@ export async function encerramentoPorSecao(db, { eleicao, cargo, corte, uf, muni
       .selectFrom('resultado_votavel as rv')
       .select([
         'rv.boletim_versao_id',
-        'rv.sg_partido',
+        sql`coalesce(rv.sg_partido, rv.nm_partido)`.as('sg_partido'),
         sql`coalesce(sum(rv.qt_votos), 0)::bigint`.as('votos'),
       ])
       .where('rv.boletim_versao_id', 'in', ids)
       .where('rv.categoria', 'in', ['nominal', 'legenda'])
       .where('rv.qt_votos', 'is not', null)
-      .groupBy(['rv.boletim_versao_id', 'rv.sg_partido'])
+      .groupBy(['rv.boletim_versao_id', sql`coalesce(rv.sg_partido, rv.nm_partido)`])
       .execute();
 
     resumoPorBu = resumoPartidoVencedor(linhasPartidos, (linha) => linha.boletim_versao_id);

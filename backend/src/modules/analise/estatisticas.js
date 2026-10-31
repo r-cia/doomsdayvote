@@ -110,7 +110,7 @@ async function consultarBaseSecaoCandidato(db, { eleicaoId, cargo, corte, escopo
     .select([
       'rv.nr_votavel',
       sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(rv.sg_partido)`.as('sg_partido'),
+      sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
       'bv.secao_id',
       sql`max(s.sg_uf)`.as('sg_uf'),
       sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
