@@ -38,6 +38,12 @@
 - A aba só mostra as métricas: nada é marcado como suspeito e não há limites.
 - A aba ignora o corte (`as_of`) e usa sempre a apuração completa.
 
+## Siglas e cores de partidos
+
+- O leiaute de 2014 não tem `SG_PARTIDO`; `NM_PARTIDO` já traz a sigla (ex.: "PT", "PC do B"). A importação de 2014 preenche `sg_partido` com `NM_PARTIDO` e mantém `nm_partido`. A migração `0011_sg_partido_2014` aplica a mesma regra aos dados já carregados (`sg_partido = nm_partido` em 2014 onde `sg_partido` é nulo) e atualiza as views materializadas.
+- A cor do partido vem da sigla normalizada (sem acentos, maiúsculas, só letras e números; "PC do B" vira PCDOB). Sigla histórica usa a cor do sucessor: PMDB → MDB; PR → PL; PRB → REPUBLICANOS; PPS → CIDADANIA; SD → SOLIDARIEDADE; PSDC → DC; PTN e PHS → PODE; PT do B → AVANTE; PSL → UNIAO; PPL → PCDOB; PTB, PATRIOTA, PATRI, PEN e PRP → PRD.
+- PRD tem cor própria, verde escuro `#14532D`.
+
 ## Limitações conhecidas
 
 - Biometria é agregada por seção, sem vínculo individual.

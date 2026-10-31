@@ -174,3 +174,10 @@ As constantes `COLUNAS_*` ficam junto da rota que as usa. Os contratos de API n�
 6. Uma cor por candidato (identificado por `nm_votavel`), constante em todos os gráficos, abas de turno e anos, atribuída de forma determinística pela ordem alfabética dos candidatos da resposta.
 7. O mesmo candidato em dois anos no mesmo gráfico mantém a cor e ganha um traço fixo por ano (contínuo, tracejado, pontilhado…), igual em todos os gráficos; o ano aparece na legenda.
 8. Os gráficos de diferença usam uma paleta disjunta da dos candidatos, uma cor por par de anos, constante em todos os gráficos de diferença.
+
+## Cores e siglas de partidos 2014/2018 (2026-10-31)
+- Causa 1: o leiaute de 2014 não tem `SG_PARTIDO` (só `NR_PARTIDO` e `NM_PARTIDO`, que traz a sigla), então `sg_partido` ficou nulo em 2014 e a cor ficou neutra.
+- Causa 2: partidos históricos faltavam em `PALETA_PARTIDOS`.
+- Decisão A: o parser de 2014 preenche `sg_partido` com `NM_PARTIDO` (mantendo `nm_partido`); a migração `0011_sg_partido_2014` faz um único UPDATE (`ano_eleicao = 2014 and sg_partido is null and nm_partido is not null`) e atualiza as views materializadas; `down` volta `sg_partido` a nulo em 2014.
+- Decisão B: siglas históricas usam a cor existente do sucessor (PMDB→MDB, PR→PL, PRB→REPUBLICANOS, PPS→CIDADANIA, SD→SOLIDARIEDADE, PSDC→DC, PTN e PHS→PODE, PTDOB→AVANTE, PSL→UNIAO, PPL→PCDOB, PTB/PATRIOTA/PATRI/PEN/PRP→PRD); novo PRD em verde escuro `#14532D`.
+- Passo final (executado pelo orquestrador): `npm run migrate`.
