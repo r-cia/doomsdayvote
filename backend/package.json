@@ -7,8 +7,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env --watch src/server.js",
-    "start": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/server.js",
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
     "migrate": "node --env-file-if-exists=.env src/scripts/migrate.js",
     "migrate:reset": "node --env-file-if-exists=.env src/scripts/migrate.js --reset",
     "test": "vitest run",
