@@ -1,3 +1,5 @@
+import { mediana } from './estatistica-basica.js'
+
 export const FEATURES = Object.freeze([
   'participacao',
   'biometria',
@@ -100,14 +102,6 @@ export function isolationForest(dados, { arvores = 100, amostra = 256, semente =
   })
 
   return { scores, arvores, amostra: tamanhoAmostra, limiar: 0.6 }
-}
-
-function mediana(valores) {
-  const ordenados = [...valores].sort((a, b) => a - b)
-  const meio = Math.floor(ordenados.length / 2)
-  return ordenados.length % 2 === 0
-    ? (ordenados[meio - 1] + ordenados[meio]) / 2
-    : ordenados[meio]
 }
 
 function padronizarRobusto(dados) {

@@ -2,6 +2,7 @@ import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 import { agruparSecoes } from './comparacao-local.js';
 import { ordenarLista } from '../../lib/ordenacao.js';
+import { desvioPadrao, media, percentilRank, toNumberOrNull } from './estatistica-basica.js';
 
 export const COLUNAS_CONCENTRACAO = {
   sg_uf: (i) => i.secao?.sg_uf,
@@ -13,33 +14,6 @@ export const COLUNAS_CONCENTRACAO = {
   margem_pp: (i) => i.margem_pp,
   share_lider_percentil: (i) => i.contexto?.share_lider_percentil,
 };
-
-function toNumberOrNull(valor) {
-  if (valor === null || valor === undefined) return null;
-  const numero = Number(valor);
-  return Number.isFinite(numero) ? numero : null;
-}
-
-function media(valores) {
-  const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v));
-  if (validos.length === 0) return null;
-  return validos.reduce((soma, v) => soma + v, 0) / validos.length;
-}
-
-function desvioPadrao(valores) {
-  const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v));
-  if (validos.length === 0) return null;
-  const m = media(validos);
-  const variancia = validos.reduce((soma, v) => soma + (v - m) ** 2, 0) / validos.length;
-  return Math.sqrt(variancia);
-}
-
-function percentilRank(valores, valor) {
-  const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v));
-  if (validos.length < 2 || typeof valor !== 'number' || !Number.isFinite(valor)) return null;
-  const menoresOuIguais = validos.filter((v) => v <= valor).length;
-  return (menoresOuIguais / validos.length) * 100;
-}
 
 function normalizarSecao(secao) {
   const candidatos = (secao?.candidatos ?? []).map((c) => ({

@@ -3,7 +3,7 @@
 ## Backend
 
 - Fastify em `backend/src/server.js`, rotas em `backend/src/routes/index.js`.
-- Módulos de análise em `backend/src/modules/analise/`.
+- Módulos de análise em `backend/src/modules/analise/`. Os helpers estatísticos compartilhados (`mediana`, `media`, `desvioPadrao`, `percentilRank`, `toNumberOrNull`) ficam em `estatistica-basica.js`.
 - Apuração/corte em `backend/src/modules/apuracao/`.
 - Cache Redis via `backend/src/lib/cache.js`.
 - Banco Postgres via Kysely. O pool da aplicação usa 20 conexões e `work_mem` de 64 MB por operação, configuráveis por `DB_POOL_MAX` e `DB_WORK_MEM_MB`; esses limites reduzem picos das consultas da aplicação, mas não limitam a memória total do servidor Postgres.
