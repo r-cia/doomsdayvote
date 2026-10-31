@@ -4,6 +4,8 @@ import { validar } from '../../lib/validar.js';
 
 const FUSO_EXIBICAO = 'America/Sao_Paulo';
 
+export const CARGO_EM_ESCOPO = sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`;
+
 const corteSchema = z
   .object({
     as_of: z.string().optional(),
@@ -70,7 +72,7 @@ export function aplicarFiltroCorte(qb, corte) {
   let consulta = qb
     .where('bv.ativo', '=', true)
     .where('bv.cd_tipo_urna', '=', 1)
-    .where(sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`);
+    .where(CARGO_EM_ESCOPO);
 
   if (corte.tipo === 'recebimento_intradiario') {
     consulta = consulta
@@ -94,7 +96,7 @@ function baseEscopo(db, { eleicaoId, cargo, escopo = {} }) {
     .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
     .where('bv.ativo', '=', true)
     .where('bv.cd_tipo_urna', '=', 1)
-    .where(sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`)
+    .where(CARGO_EM_ESCOPO)
     .where('bv.eleicao_id', '=', eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', cargo);
   return aplicarEscopo(qb, escopo);

@@ -2,7 +2,7 @@ import { sql } from 'kysely';
 import { z } from 'zod';
 import { AppError } from '../lib/erros.js';
 import { validar } from '../lib/validar.js';
-import { aplicarEscopo, aplicarFiltroCorte, avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../modules/apuracao/corte.js';
+import { CARGO_EM_ESCOPO, aplicarEscopo, aplicarFiltroCorte, avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../modules/apuracao/corte.js';
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
@@ -210,6 +210,52 @@ function escopoDe(query) {
   return { sgUf: query.uf, cdMunicipio: query.municipio };
 }
 
+const ENCERRAMENTO_BU = sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`;
+
+function escopoDaEleicao(query, eleicao, corte) {
+  return { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
+}
+
+function metadadosEAvisos(cache, db, query, escopo, corte) {
+  return Promise.all([
+    cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
+    cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
+  ]);
+}
+
+function tamanhoPagina(app, query) {
+  const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
+  const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
+  return Math.min(query.page_size ?? padrao, maximo);
+}
+
+function resumoPartidoVencedor(linhasPartidos, chaveDe) {
+  const acumulados = new Map();
+  for (const linha of linhasPartidos) {
+    const chave = chaveDe(linha);
+    if (!acumulados.has(chave)) {
+      acumulados.set(chave, { total: 0, partidos: new Map() });
+    }
+    const acumulado = acumulados.get(chave);
+    const votos = Number(linha.votos);
+    acumulado.total += votos;
+    acumulado.partidos.set(linha.sg_partido, (acumulado.partidos.get(linha.sg_partido) ?? 0) + votos);
+  }
+  const resumos = new Map();
+  for (const [chave, acumulado] of acumulados) {
+    let partido = null;
+    let votosPartido = 0;
+    for (const [nome, votos] of acumulado.partidos) {
+      if (votos > votosPartido) {
+        votosPartido = votos;
+        partido = nome;
+      }
+    }
+    resumos.set(chave, { partido, votos: votosPartido, total: acumulado.total });
+  }
+  return resumos;
+}
+
 async function buscarEleicao(db, id) {
   const eleicao = await db
     .selectFrom('eleicao')
@@ -342,7 +388,7 @@ export async function registrarRotas(app) {
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query), dataPleito: eleicao.dt_pleito };
     const semEscopo = !query.uf && !query.municipio;
 
-    const [votos, metricas, secoes, metadados, avisos] = await Promise.all([
+    const [votos, metricas, secoes, [metadados, avisos]] = await Promise.all([
       somarVotos(db, escopo),
       corte.tipo === 'final' && semEscopo
         ? sql`select qt_aptos, qt_comparecimento, qt_abstencoes, bus_considerados from mv_metricas_final where eleicao_id = ${eleicao.id} and cargo = ${query.cargo}`
@@ -364,8 +410,7 @@ export async function registrarRotas(app) {
             })
         : somarMetricasSecao(db, escopo),
       contarSecoesComBu(db, escopo),
-      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
-      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
+      metadadosEAvisos(cache, db, query, escopo, corte),
     ]);
 
     return {
@@ -401,7 +446,7 @@ export async function registrarRotas(app) {
         and bv.precisao_dt_bu_recebido = 'DATA_HORA'
         and bv.eleicao_id = ${eleicao.id}
         and bv.cd_cargo_pergunta = ${query.cargo}
-        and lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')
+        and ${CARGO_EM_ESCOPO}
         ${filtroUf}
         ${filtroMunicipio}
       group by 1
@@ -436,7 +481,7 @@ export async function registrarRotas(app) {
           and bv.precisao_dt_bu_recebido = 'DATA_HORA'
           and bv.eleicao_id = ${eleicao.id}
           and bv.cd_cargo_pergunta = ${query.cargo}
-          and lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')
+          and ${CARGO_EM_ESCOPO}
           and rv.categoria = 'nominal'
           and rv.qt_votos is not null
           ${filtroUf}
@@ -496,12 +541,11 @@ export async function registrarRotas(app) {
       escopo: escopoDe(query),
     };
 
-    const [biometria, biometriaUf, benford, metadados, avisos] = await Promise.all([
+    const [biometria, biometriaUf, benford, [metadados, avisos]] = await Promise.all([
       composicaoBiometria(db, escopo),
       biometriaPorUf(db, escopo),
       benfordPorCandidato(db, escopo),
-      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
-      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
+      metadadosEAvisos(cache, db, query, escopo, corte),
     ]);
 
     return {
@@ -549,11 +593,10 @@ export async function registrarRotas(app) {
       escopo: escopoDe(query),
     };
 
-    const [linhas, duplicacao, metadados, avisos] = await Promise.all([
+    const [linhas, duplicacao, [metadados, avisos]] = await Promise.all([
       baseSecaoCandidato(db, escopo),
       duplicacaoPorAssinatura(db, { ...escopo, ordenacao: lerOrdenacao(query, '_duplicacao') }),
-      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
-      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
+      metadadosEAvisos(cache, db, query, escopo, corte),
     ]);
 
     const benfordBase = benfordDosNiveis(linhas);
@@ -575,28 +618,28 @@ export async function registrarRotas(app) {
       indices.map((indice, posicao) => [indice, lof.scores[posicao]]),
     );
 
-    const vencedorPorMunicipio = new Map()
+    const vencedorPorMunicipio = new Map();
     for (const linha of linhas) {
-      const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}`
+      const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}`;
       if (!vencedorPorMunicipio.has(chave)) {
-        vencedorPorMunicipio.set(chave, new Map())
+        vencedorPorMunicipio.set(chave, new Map());
       }
-      const candidatos = vencedorPorMunicipio.get(chave)
+      const candidatos = vencedorPorMunicipio.get(chave);
       const atual = candidatos.get(linha.nr_votavel) ?? {
         nr_votavel: linha.nr_votavel,
         nm_votavel: linha.nm_votavel,
         sg_partido: linha.sg_partido,
         votos: 0,
-      }
-      atual.votos += Number(linha.votos ?? 0)
-      candidatos.set(linha.nr_votavel, atual)
+      };
+      atual.votos += Number(linha.votos ?? 0);
+      candidatos.set(linha.nr_votavel, atual);
     }
-    const vencedorCidade = new Map()
+    const vencedorCidade = new Map();
     for (const [chave, candidatos] of vencedorPorMunicipio) {
-      let vencedor = null
+      let vencedor = null;
       for (const candidato of candidatos.values()) {
         if (!vencedor || candidato.votos > vencedor.votos) {
-          vencedor = candidato
+          vencedor = candidato;
         }
       }
       if (vencedor) {
@@ -604,20 +647,20 @@ export async function registrarRotas(app) {
           nr_votavel: vencedor.nr_votavel,
           nm_votavel: vencedor.nm_votavel,
           sg_partido: vencedor.sg_partido,
-        })
+        });
       }
     }
     const ranking = ordenarLista(
       secoes
         .map((secao, indice) => {
-          const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`
-          const vencedor = vencedorCidade.get(chave) ?? null
+          const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`;
+          const vencedor = vencedorCidade.get(chave) ?? null;
           return {
             ...secao,
             score_if: isolamento.scores[indice],
             score_lof: scoreLof.get(indice) ?? null,
             vencedor,
-          }
+          };
         })
         .sort((a, b) => b.score_if - a.score_if),
       COLUNAS_OUTLIERS,
@@ -711,9 +754,9 @@ export async function registrarRotas(app) {
           .map((valor) => Number(valor))
           .filter((valor) => Number.isInteger(valor) && valor !== 0)
       : [];
-    const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
+    const escopo = escopoDaEleicao(query, eleicao, corte);
 
-    const [areas, areasAnteriores, metadados, avisos, votosCandidatos] = await Promise.all([
+    const [areas, areasAnteriores, [metadados, avisos], votosCandidatos] = await Promise.all([
       totaisPorArea(db, {
         eleicaoId: eleicao.id,
         cargo: query.cargo,
@@ -732,8 +775,7 @@ export async function registrarRotas(app) {
             candidatos,
           })
         : Promise.resolve(null),
-      cacheDeCorte(cache, 'metadados', query, () => metadadosCorte(db, escopo, corte)),
-      cacheDeCorte(cache, 'avisos', query, () => avisosCorte(db, escopo, corte)),
+      metadadosEAvisos(cache, db, query, escopo, corte),
       somarVotos(db, { ...escopo, dataPleito: eleicao.dt_pleito }),
     ]);
 
@@ -910,9 +952,9 @@ export async function registrarRotas(app) {
       .select([
         's.sg_uf',
         sql`count(*)::int`.as('total'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= ${corte1715}::timestamptz)::int`.as('ate_1715'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz and coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) <= ${corte1915}::timestamptz)::int`.as('ate_1915'),
-        sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1915}::timestamptz)::int`.as('apos_1915'),
+        sql`count(*) filter (where ${ENCERRAMENTO_BU} <= ${corte1715}::timestamptz)::int`.as('ate_1715'),
+        sql`count(*) filter (where ${ENCERRAMENTO_BU} > ${corte1715}::timestamptz and ${ENCERRAMENTO_BU} <= ${corte1915}::timestamptz)::int`.as('ate_1915'),
+        sql`count(*) filter (where ${ENCERRAMENTO_BU} > ${corte1915}::timestamptz)::int`.as('apos_1915'),
       ])
       .groupBy('s.sg_uf')
       .orderBy('s.sg_uf')
@@ -963,7 +1005,7 @@ export async function registrarRotas(app) {
     qb = aplicarFiltroCorte(qb, corte);
     qb = qb.where('s.sg_uf', '=', query.uf);
 
-    const aposExpr = sql`count(*) filter (where coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz)`;
+    const aposExpr = sql`count(*) filter (where ${ENCERRAMENTO_BU} > ${corte1715}::timestamptz)`;
     const colunasSql = {
       nm_municipio: sql`max(l.nm_municipio)`,
       total: sql`count(*)`,
@@ -1007,34 +1049,7 @@ export async function registrarRotas(app) {
       .groupBy(['s.cd_municipio_tse', 'rv.sg_partido'])
       .execute();
 
-    const totaisPorMunicipio = new Map();
-    for (const linha of linhasPartidos) {
-      const cd = linha.cd_municipio_tse;
-      if (!totaisPorMunicipio.has(cd)) {
-        totaisPorMunicipio.set(cd, { total: 0, partidos: new Map() });
-      }
-      const acumulado = totaisPorMunicipio.get(cd);
-      const votos = Number(linha.votos);
-      acumulado.total += votos;
-      const atual = acumulado.partidos.get(linha.sg_partido) ?? 0;
-      acumulado.partidos.set(linha.sg_partido, atual + votos);
-    }
-    const resumoPorMunicipio = new Map();
-    for (const [cd, acumulado] of totaisPorMunicipio) {
-      let partido = null;
-      let votosPartido = 0;
-      for (const [nome, votos] of acumulado.partidos) {
-        if (votos > votosPartido) {
-          votosPartido = votos;
-          partido = nome;
-        }
-      }
-      resumoPorMunicipio.set(cd, {
-        partido,
-        votos: votosPartido,
-        total: acumulado.total,
-      });
-    }
+    const resumoPorMunicipio = resumoPartidoVencedor(linhasPartidos, (linha) => linha.cd_municipio_tse);
 
     return {
       corte: corteResposta(corte),
@@ -1088,8 +1103,8 @@ export async function registrarRotas(app) {
       sql`bv.id`.as('bu_id'),
       's.nr_zona',
       's.nr_secao',
-      sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`.as('dt_encerramento'),
-      sql`case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then true else false end`.as('apos_1715'),
+      ENCERRAMENTO_BU.as('dt_encerramento'),
+      sql`case when ${ENCERRAMENTO_BU} > ${corte1715}::timestamptz then true else false end`.as('apos_1715'),
     ]);
     const ordenada =
       ordenacao && !derivada
@@ -1098,16 +1113,16 @@ export async function registrarRotas(app) {
             {
               nr_zona: sql.ref('s.nr_zona'),
               nr_secao: sql.ref('s.nr_secao'),
-              dt_encerramento: sql`coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts)`,
+              dt_encerramento: ENCERRAMENTO_BU,
             },
             ordenacao,
             ['s.id'],
           )
-        : consultaSecoes.orderBy(sql`(case when coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) > ${corte1715}::timestamptz then 1 else 0 end) desc, coalesce(bv.dt_encerramento, bv.dt_emissao_bu, bv.dt_bu_recebido_ts) desc nulls last`);
+        : consultaSecoes.orderBy(sql`(case when ${ENCERRAMENTO_BU} > ${corte1715}::timestamptz then 1 else 0 end) desc, ${ENCERRAMENTO_BU} desc nulls last`);
     const linhas = await (derivada ? ordenada : ordenada.limit(query.limit)).execute();
 
     const ids = linhas.map((linha) => linha.bu_id).filter(Boolean);
-    const resumoPorBu = new Map();
+    let resumoPorBu = new Map();
     if (ids.length > 0) {
       const linhasPartidos = await db
         .selectFrom('resultado_votavel as rv')
@@ -1122,32 +1137,7 @@ export async function registrarRotas(app) {
         .groupBy(['rv.boletim_versao_id', 'rv.sg_partido'])
         .execute();
 
-      const acumuladoPorBu = new Map();
-      for (const linha of linhasPartidos) {
-        if (!acumuladoPorBu.has(linha.boletim_versao_id)) {
-          acumuladoPorBu.set(linha.boletim_versao_id, { total: 0, partidos: new Map() });
-        }
-        const acumulado = acumuladoPorBu.get(linha.boletim_versao_id);
-        const votos = Number(linha.votos);
-        acumulado.total += votos;
-        const atual = acumulado.partidos.get(linha.sg_partido) ?? 0;
-        acumulado.partidos.set(linha.sg_partido, atual + votos);
-      }
-      for (const [buId, acumulado] of acumuladoPorBu) {
-        let partido = null;
-        let votosPartido = 0;
-        for (const [nome, votos] of acumulado.partidos) {
-          if (votos > votosPartido) {
-            votosPartido = votos;
-            partido = nome;
-          }
-        }
-        resumoPorBu.set(buId, {
-          partido,
-          votos: votosPartido,
-          total: acumulado.total,
-        });
-      }
+      resumoPorBu = resumoPartidoVencedor(linhasPartidos, (linha) => linha.boletim_versao_id);
     }
 
     return {
@@ -1184,9 +1174,7 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
-    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
-    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
-    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+    const pageSize = tamanhoPagina(app, query);
 
     const resultado = await consistenciaPorSecao(db, {
       eleicaoId: eleicao.id,
@@ -1212,14 +1200,7 @@ export async function registrarRotas(app) {
     }
     const divergencias = ordenarLista(divergenciasBase, COLUNAS_CONSISTENCIA, lerOrdenacao(query));
 
-    const [metadados, avisos] = await Promise.all([
-      cacheDeCorte(cache, 'metadados', query, () =>
-        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-      cacheDeCorte(cache, 'avisos', query, () =>
-        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-    ]);
+    const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
 
     const inicio = (query.page - 1) * pageSize;
     return {
@@ -1274,7 +1255,7 @@ export async function registrarRotas(app) {
         .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
         .where('bv.ativo', '=', true)
         .where('bv.cd_tipo_urna', '=', 1)
-        .where(sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`)
+        .where(CARGO_EM_ESCOPO)
         .where('bv.cd_cargo_pergunta', '=', query.cargo)
         .where('e.id', '!=', eleicao.id);
       referenciasQuery = eleicao.nm_tipo_eleicao
@@ -1374,9 +1355,7 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
-    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
-    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
-    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+    const pageSize = tamanhoPagina(app, query);
 
     let consulta = db
       .selectFrom('secao_eleitoral as s')
@@ -1449,14 +1428,7 @@ export async function registrarRotas(app) {
     );
     const itens = linhas.map((linha) => itemSecao(linha, corte));
 
-    const [metadados, avisos] = await Promise.all([
-      cacheDeCorte(cache, 'metadados', query, () =>
-        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-      cacheDeCorte(cache, 'avisos', query, () =>
-        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-    ]);
+    const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
 
     return {
       corte: corteResposta(corte),
@@ -1662,9 +1634,7 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
-    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
-    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
-    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+    const pageSize = tamanhoPagina(app, query);
 
     const resultado = await comparacaoLocal(db, {
       eleicaoId: eleicao.id,
@@ -1673,14 +1643,7 @@ export async function registrarRotas(app) {
       escopo: escopoDe(query),
     });
 
-    const [metadados, avisos] = await Promise.all([
-      cacheDeCorte(cache, 'metadados', query, () =>
-        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-      cacheDeCorte(cache, 'avisos', query, () =>
-        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-    ]);
+    const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
 
     const grupos = resultado.grupos ?? [];
     const inicio = (query.page - 1) * pageSize;
@@ -1707,9 +1670,7 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
-    const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
-    const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
-    const pageSize = Math.min(query.page_size ?? padrao, maximo);
+    const pageSize = tamanhoPagina(app, query);
 
     const resultado = await concentracao(db, {
       eleicaoId: eleicao.id,
@@ -1721,14 +1682,7 @@ export async function registrarRotas(app) {
       ordenacaoMargem: lerOrdenacao(query, '_margem'),
     });
 
-    const [metadados, avisos] = await Promise.all([
-      cacheDeCorte(cache, 'metadados', query, () =>
-        metadadosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-      cacheDeCorte(cache, 'avisos', query, () =>
-        avisosCorte(db, { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) }, corte),
-      ),
-    ]);
+    const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
 
     const inicio = (query.page - 1) * pageSize;
 
