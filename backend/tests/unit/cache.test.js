@@ -6,6 +6,7 @@ class RedisFalso {
     this.dados = new Map();
     this.gravacoes = [];
     this.falhar = false;
+    this.status = 'ready';
   }
 
   async get(chave) {
@@ -69,6 +70,29 @@ describe('cache', () => {
 
     expect(resultado).toEqual({ valor: { valor: 7 }, cache: 'off' });
     expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('não consulta o Redis quando o cliente não está pronto', async () => {
+    const cliente = new RedisFalso();
+    cliente.status = 'connecting';
+    cliente.get = vi.fn();
+    const cache = criarCache({ cliente });
+    const fn = vi.fn().mockResolvedValue({ valor: 7 });
+
+    const resultado = await cache.obter('summary', params, 60, fn);
+
+    expect(resultado).toEqual({ valor: { valor: 7 }, cache: 'off' });
+    expect(cliente.get).not.toHaveBeenCalled();
+  });
+
+  it('registra aviso e não propaga erro quando invalidar falha', async () => {
+    const cliente = new RedisFalso();
+    cliente.falhar = true;
+    const logger = { warn: vi.fn(), info: vi.fn(), debug: vi.fn() };
+    const cache = criarCache({ cliente, logger });
+
+    await expect(cache.invalidar()).resolves.toBeUndefined();
+    expect(logger.warn).toHaveBeenCalledTimes(1);
   });
 
   it('junta chamadas simultâneas em uma única consulta', async () => {

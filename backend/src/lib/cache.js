@@ -54,6 +54,7 @@ export function criarCache({ url, logger, cliente: fornecido } = {}) {
     const inicio = performance.now();
 
     try {
+      if (cliente.status !== 'ready') throw new Error('redis_nao_pronto');
       const versao = (await cliente.get(CHAVE_VERSAO)) ?? '0';
       chave = `dv:v${versao}:${rota}:${hash(params)}`;
 
@@ -119,7 +120,11 @@ export function criarCache({ url, logger, cliente: fornecido } = {}) {
   }
 
   async function invalidar() {
-    await cliente.incr(CHAVE_VERSAO);
+    try {
+      await cliente.incr(CHAVE_VERSAO);
+    } catch (erro) {
+      logger?.warn({ err: erro }, 'cache_nao_invalidado');
+    }
   }
 
   async function fechar() {

@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { criarCache } from '../../src/lib/cache.js';
 
 const url = process.env.REDIS_URL;
@@ -7,6 +7,14 @@ describe.skipIf(!url)('cache Redis', () => {
   const cache = criarCache({ url });
   const rota = `teste-${Date.now()}`;
   const params = { election_id: 'a', cargo: 1 };
+
+  beforeAll(async () => {
+    for (let i = 0; i < 50; i += 1) {
+      const { cache: estado } = await cache.obter(`${rota}-pronto`, params, 1, async () => 0);
+      if (estado !== 'off') return;
+      await new Promise((resolver) => setTimeout(resolver, 100));
+    }
+  });
 
   afterAll(async () => {
     await cache.fechar();
