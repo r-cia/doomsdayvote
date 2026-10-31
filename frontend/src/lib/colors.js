@@ -35,7 +35,32 @@ const PALETA_PARTIDOS = Object.freeze({
   AGIR: '#0E7490',
   MOBILIZA: '#0369A1',
   MISSAO: '#166534',
+  PRD: '#14532D',
 })
+
+const SUCESSORES_PARTIDOS = Object.freeze({
+  PMDB: 'MDB',
+  PR: 'PL',
+  PRB: 'REPUBLICANOS',
+  PPS: 'CIDADANIA',
+  SD: 'SOLIDARIEDADE',
+  PSDC: 'DC',
+  PTN: 'PODE',
+  PHS: 'PODE',
+  PTDOB: 'AVANTE',
+  PSL: 'UNIAO',
+  PPL: 'PCDOB',
+  PTB: 'PRD',
+  PATRIOTA: 'PRD',
+  PATRI: 'PRD',
+  PEN: 'PRD',
+  PRP: 'PRD',
+})
+
+function hexDoPartido(sigla) {
+  const chave = normalizarSigla(sigla)
+  return PALETA_PARTIDOS[chave] ?? PALETA_PARTIDOS[SUCESSORES_PARTIDOS[chave]]
+}
 
 function normalizarSigla(sigla) {
   return String(sigla ?? '')
@@ -55,12 +80,12 @@ function clarear(hex, fator = 0.26) {
 }
 
 export function corPartido(sigla) {
-  const cor = PALETA_PARTIDOS[normalizarSigla(sigla)]
+  const cor = hexDoPartido(sigla)
   return cor ? clarear(cor) : COR_NEUTRA
 }
 
 export function siglaTemCor(sigla) {
-  return normalizarSigla(sigla) in PALETA_PARTIDOS
+  return hexDoPartido(sigla) !== undefined
 }
 
 export const FAIXAS_PERCENTUAL = Object.freeze([

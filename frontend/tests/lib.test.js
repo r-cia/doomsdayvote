@@ -111,6 +111,44 @@ describe('cores', () => {
     expect(siglaTemCor('XYZ')).toBe(false)
   })
 
+  it('resolve siglas históricas para a cor do sucessor', () => {
+    const sucessores = {
+      PMDB: 'MDB',
+      PR: 'PL',
+      PRB: 'REPUBLICANOS',
+      PPS: 'CIDADANIA',
+      SD: 'SOLIDARIEDADE',
+      PSDC: 'DC',
+      PTN: 'PODE',
+      PHS: 'PODE',
+      'PT do B': 'AVANTE',
+      PSL: 'UNIAO',
+      PPL: 'PCDOB',
+      PTB: 'PRD',
+      PATRIOTA: 'PRD',
+      PATRI: 'PRD',
+      PEN: 'PRD',
+      PRP: 'PRD',
+    }
+    for (const [historica, sucessor] of Object.entries(sucessores)) {
+      expect(corPartido(historica)).toBe(corPartido(sucessor))
+      expect(siglaTemCor(historica)).toBe(true)
+    }
+  })
+
+  it('define PRD em verde escuro distinto de MDB, PV e REDE', () => {
+    expect(corPartido('PRD')).toBe('#518064')
+    for (const outro of ['MDB', 'PV', 'MISSAO', 'REDE']) {
+      expect(corPartido('PRD')).not.toBe(corPartido(outro))
+    }
+  })
+
+  it('resolve siglas de 2014 com espaços e caixa mista', () => {
+    expect(corPartido('PC do B')).toBe(corPartido('PCDOB'))
+    expect(corPartido('PT do B')).toBe(corPartido('AVANTE'))
+    expect(corPartido('PSDB')).not.toBe(COR_NEUTRA)
+  })
+
   it('distribui percentual em dez faixas de dez pontos', () => {
     expect(FAIXAS_PERCENTUAL).toHaveLength(10)
     expect(faixaPercentual(0).rotulo).toBe('0–10%')
