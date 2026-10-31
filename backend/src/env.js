@@ -34,6 +34,7 @@ const workerSchema = z.object({
   NODE_ENV: nodeEnv,
   LOG_LEVEL: logLevel,
   DATABASE_URL: z.string().min(1),
+  DATABASE_MIGRATION_URL: z.string().min(1),
   ...databaseEnv,
   REDIS_URL: z.string().min(1).optional(),
   BWEB_INPUT_DIR: z.string().min(1),

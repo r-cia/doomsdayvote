@@ -16,7 +16,8 @@ async function main() {
     process.exit(1);
   }
 
-  const cliente = new pg.Client({ connectionString: env.DATABASE_URL });
+  // REFRESH MATERIALIZED VIEW exige o dono da view.
+  const cliente = new pg.Client({ connectionString: env.DATABASE_MIGRATION_URL });
   await cliente.connect();
   await cliente.query('SET statement_timeout = 0');
   const { rows } = await cliente.query('select pg_try_advisory_lock($1) as ok', [LOCK]);
