@@ -3,7 +3,7 @@ import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 import { agruparSecoes } from './comparacao-local.js';
 import { ordenarLista } from '../../lib/ordenacao.js';
 import { agruparPorSecao, linhasMvSecaoCandidato } from './mv-secao-candidato.js';
-import { desvioPadrao, media, percentilRank, toNumberOrNull } from './estatistica-basica.js';
+import { criarPercentilRank, desvioPadrao, media, toNumberOrNull } from './estatistica-basica.js';
 
 export const COLUNAS_CONCENTRACAO = {
   sg_uf: (i) => i.secao?.sg_uf,
@@ -130,6 +130,8 @@ function enriquecerGrupo(lista, grupoInfo, origem, minimoGrupo) {
   const desvioMargem = desvioPadrao(margens);
 
   const ok = lista.length >= minimoGrupo && shares.length >= 2;
+  const rankShare = criarPercentilRank(shares);
+  const rankMargem = criarPercentilRank(margens);
 
   return lista.map((s) => ({
     ...s,
@@ -140,12 +142,12 @@ function enriquecerGrupo(lista, grupoInfo, origem, minimoGrupo) {
         chave: grupoInfo?.chave ?? null,
         tamanho: grupoInfo?.tamanho ?? lista.length,
       },
-      share_lider_percentil: ok ? percentilRank(shares, s.share_lider) : null,
+      share_lider_percentil: ok ? rankShare(s.share_lider) : null,
       share_lider_z:
         ok && desvioShare && desvioShare > 0
           ? (s.share_lider - mediaShare) / desvioShare
           : null,
-      margem_percentil: ok ? percentilRank(margens, s.margem_absoluta) : null,
+      margem_percentil: ok ? rankMargem(s.margem_absoluta) : null,
       margem_z:
         ok && desvioMargem && desvioMargem > 0
           ? (s.margem_absoluta - mediaMargem) / desvioMargem
@@ -215,10 +217,12 @@ export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4
   const gruposComp = agruparSecoes(secoesParaGrupo, { minimoGrupo });
 
   const enriquecidosPorId = new Map();
+  const metricasPorId = new Map(metricas.map((m) => [m.secao.id, m]));
+  const paresDe = (ids) => [...ids].map((id) => metricasPorId.get(id)).filter(Boolean);
 
   for (const grupo of gruposComp.grupos ?? []) {
     const ids = new Set((grupo.secoes ?? []).map((item) => item?.secao?.id ?? item?.id));
-    const peers = metricas.filter((m) => ids.has(m.secao.id));
+    const peers = paresDe(ids);
     if (peers.length === 0) continue;
     const enriched = enriquecerGrupo(
       peers,
@@ -241,8 +245,7 @@ export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4
     const bandasAgrupadas = agruparPorFaixaAptos(fallbackNormalizadas, { bandas, minimoGrupo });
     faixasUtilizadas = bandasAgrupadas.length;
     for (const banda of bandasAgrupadas) {
-      const ids = new Set(banda.map((s) => s.id));
-      const peers = metricas.filter((m) => ids.has(m.secao.id));
+      const peers = paresDe(new Set(banda.map((s) => s.id)));
       if (peers.length === 0) continue;
       const enriched = enriquecerGrupo(
         peers,
