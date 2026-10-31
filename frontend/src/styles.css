@@ -1589,16 +1589,9 @@ tbody tr[data-ativo='true'] {
 }
 
 .entre-anos__graficos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: calc(var(--passo) * 2);
-}
-
-.entre-anos__coluna {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--passo) * 2);
-  min-width: 0;
+  gap: calc(var(--passo) * 3);
 }
 
 .curvas__zero {

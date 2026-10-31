@@ -6,7 +6,13 @@ import StateBlock from '../components/StateBlock.vue'
 import TabelaScroll from '../components/TabelaScroll.vue'
 import { useComparacaoAnos } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
-import { diferencasEntrePares, percentualDoTotal } from '../lib/entre-anos'
+import {
+  coresDosCandidatos,
+  coresDosPares,
+  diferencasEntrePares,
+  percentualDoTotal,
+  tracosDosAnos,
+} from '../lib/entre-anos'
 import { formatarDecimal } from '../lib/format'
 
 const CARGO_PRESIDENTE = 1
@@ -66,12 +72,13 @@ function graficosDe(turno, posicao) {
   const votos = seriesDe(turno, posicao, 'votos')
   return {
     votos,
-    difVotos: diferencasEntrePares(votos),
+    difVotos: diferencasEntrePares(votos, coresPares.value),
     difPctDoTotal: diferencasEntrePares(
       votos.map((serie) => ({ ...serie, pontos: percentualDoTotal(serie.pontos) })),
+      coresPares.value,
     ),
     pct: seriesDe(turno, posicao, 'pct_acumulada'),
-    difPct: diferencasEntrePares(seriesDe(turno, posicao, 'pct_acumulada')),
+    difPct: diferencasEntrePares(seriesDe(turno, posicao, 'pct_acumulada'), coresPares.value),
   }
 }
 
@@ -79,6 +86,18 @@ function rotuloPosicao(turno, posicao) {
   if (turno === 2) return t(posicao === 1 ? 'entreAnos.vencedor' : 'entreAnos.derrotado')
   return t('entreAnos.colocado', { n: posicao })
 }
+
+const nomeDe = (candidato) => String(candidato.nm_votavel ?? candidato.nr_votavel)
+
+const coresCandidatos = computed(() =>
+  coresDosCandidatos(
+    (dados.value?.anos ?? []).flatMap((ano) =>
+      ano.turnos.flatMap((turno) => turno.candidatos.map(nomeDe)),
+    ),
+  ),
+)
+const tracosAnos = computed(() => tracosDosAnos((dados.value?.anos ?? []).map((ano) => ano.ano)))
+const coresPares = computed(() => coresDosPares((dados.value?.anos ?? []).map((ano) => ano.ano)))
 
 function seriesDe(turno, posicao, campo) {
   const series = []
@@ -90,7 +109,9 @@ function seriesDe(turno, posicao, campo) {
     series.push({
       chave: `${ano.ano}-${turno}-${posicao}`,
       ano: ano.ano,
-      rotulo: `${ano.ano} · ${candidato.nm_votavel ?? candidato.nr_votavel}${partido}`,
+      cor: coresCandidatos.value.get(nomeDe(candidato)),
+      tracejado: tracosAnos.value.get(ano.ano),
+      rotulo: `${ano.ano} · ${nomeDe(candidato)}${partido}`,
       pontos: doTurno.pontos.map((ponto) => ({
         minuto: ponto.minuto,
         valor: ponto.candidatos[posicao - 1][campo],
@@ -161,26 +182,22 @@ function seriesDe(turno, posicao, campo) {
             <h3>{{ rotuloPosicao(turno, posicao) }}</h3>
             <div class="entre-anos__graficos">
               <template v-for="g in [graficosDe(turno, posicao)]" :key="posicao">
-                <div class="entre-anos__coluna">
-                  <CurvasAnos :titulo="$t('entreAnos.votosIntervalo')" escala="log" :series="g.votos" />
-                  <CurvasAnos
-                    :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.votosIntervalo')}`"
-                    :series="g.difVotos"
-                  />
-                  <CurvasAnos
-                    :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.pctDoTotal')}`"
-                    formato="pontos"
-                    :series="g.difPctDoTotal"
-                  />
-                </div>
-                <div class="entre-anos__coluna">
-                  <CurvasAnos :titulo="$t('entreAnos.pctAcumulada')" formato="percentual" :series="g.pct" />
-                  <CurvasAnos
-                    :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.pctAcumulada')}`"
-                    formato="pontos"
-                    :series="g.difPct"
-                  />
-                </div>
+                <CurvasAnos :titulo="$t('entreAnos.votosIntervalo')" escala="log" :series="g.votos" />
+                <CurvasAnos
+                  :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.votosIntervalo')}`"
+                  :series="g.difVotos"
+                />
+                <CurvasAnos
+                  :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.pctDoTotal')}`"
+                  formato="pontos"
+                  :series="g.difPctDoTotal"
+                />
+                <CurvasAnos :titulo="$t('entreAnos.pctAcumulada')" formato="percentual" :series="g.pct" />
+                <CurvasAnos
+                  :titulo="`${$t('entreAnos.diferenca')} · ${$t('entreAnos.pctAcumulada')}`"
+                  formato="pontos"
+                  :series="g.difPct"
+                />
               </template>
             </div>
           </div>

@@ -1,6 +1,6 @@
 <script setup>
-import { computed } from 'vue'
-import { dominioLog, margemEsquerda } from '../lib/entre-anos'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { CORES_PADRAO, dominioLog, margemEsquerda } from '../lib/entre-anos'
 import { formatarDecimal, formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
@@ -10,12 +10,22 @@ const props = defineProps({
   escala: { type: String, default: 'linear' },
 })
 
-const LARGURA = 640
 const ALTURA = 220
 const MARGEM = { dir: 12, topo: 10, base: 26 }
 
-const CORES = ['#ffb52e', '#7ec8ff', '#74e08c', '#ff6b57', '#c79bff', '#e6e6a0']
-const TRACOS = [null, '6 3', '2 3', '10 3 2 3', '4 4', '1 3']
+const figura = ref(null)
+const largura = ref(640)
+let observador = null
+
+onMounted(() => {
+  if (typeof ResizeObserver === 'undefined' || !figura.value) return
+  observador = new ResizeObserver(([entrada]) => {
+    largura.value = Math.max(320, Math.round(entrada.contentRect.width))
+  })
+  observador.observe(figura.value)
+})
+
+onBeforeUnmount(() => observador?.disconnect())
 
 const log = computed(() => props.escala === 'log')
 
@@ -54,7 +64,7 @@ const limitesX = computed(() => {
 const x = (minuto) =>
   margemEsq.value +
   ((minuto - limitesX.value.min) / Math.max(1, limitesX.value.max - limitesX.value.min)) *
-    (LARGURA - margemEsq.value - MARGEM.dir)
+    (largura.value - margemEsq.value - MARGEM.dir)
 
 function y(valor) {
   const { min, max } = dominioY.value
@@ -103,8 +113,8 @@ const tracos = computed(() =>
   props.series.map((serie, indice) => ({
     chave: serie.chave,
     rotulo: serie.rotulo,
-    cor: CORES[indice % CORES.length],
-    tracejado: TRACOS[indice % TRACOS.length],
+    cor: serie.cor ?? CORES_PADRAO[indice % CORES_PADRAO.length],
+    tracejado: serie.tracejado ?? null,
     caminho: caminhoDe(serie.pontos),
   })),
 )
@@ -120,17 +130,17 @@ const resumo = computed(() =>
 </script>
 
 <template>
-  <figure class="curvas">
+  <figure ref="figura" class="curvas">
     <figcaption class="curvas__titulo">{{ titulo }}</figcaption>
     <svg
       class="curvas__svg"
-      :viewBox="`0 0 ${LARGURA} ${ALTURA}`"
+      :viewBox="`0 0 ${largura} ${ALTURA}`"
       role="img"
       :aria-label="`${titulo}. ${resumo}`"
     >
       <g class="curvas__grade">
         <template v-for="valor in dominioY.marcas" :key="`y${valor}`">
-          <line :x1="margemEsq" :x2="LARGURA - MARGEM.dir" :y1="y(valor)" :y2="y(valor)" />
+          <line :x1="margemEsq" :x2="largura - MARGEM.dir" :y1="y(valor)" :y2="y(valor)" />
           <text :x="margemEsq - 8" :y="y(valor)" text-anchor="end" dominant-baseline="middle">
             {{ formatarY(valor) }}
           </text>
@@ -149,7 +159,7 @@ const resumo = computed(() =>
         v-if="linhaZero"
         class="curvas__zero"
         :x1="margemEsq"
-        :x2="LARGURA - MARGEM.dir"
+        :x2="largura - MARGEM.dir"
         :y1="y(0)"
         :y2="y(0)"
       />

@@ -1,3 +1,8 @@
+export const PALETA_CANDIDATOS = ['#ffb52e', '#7ec8ff', '#74e08c', '#ff6b57', '#c79bff', '#e6e6a0']
+export const PALETA_DIFERENCAS = ['#ff7ac6', '#2ed3c4', '#f2efe4', '#c4e04a', '#d98c5f', '#8f9bff']
+export const TRACOS_ANOS = [null, '8 4', '2 3', '10 3 2 3', '4 4', '1 3']
+export const CORES_PADRAO = PALETA_CANDIDATOS
+
 const LARGURA_CARACTERE = 6
 const FOLGA_ROTULO = 14
 
@@ -36,13 +41,35 @@ export function percentualDoTotal(pontos) {
   }))
 }
 
-export function diferencasEntrePares(series) {
+export function coresDosCandidatos(nomes) {
+  const ordenados = [...new Set(nomes)].sort()
+  return new Map(ordenados.map((nome, indice) => [nome, PALETA_CANDIDATOS[indice % PALETA_CANDIDATOS.length]]))
+}
+
+export function tracosDosAnos(anos) {
+  const ordenados = [...new Set(anos)].sort((a, b) => a - b)
+  return new Map(ordenados.map((ano, indice) => [ano, TRACOS_ANOS[indice % TRACOS_ANOS.length]]))
+}
+
+export function coresDosPares(anos) {
+  const ordenados = [...new Set(anos)].sort((a, b) => a - b)
+  const cores = new Map()
+  for (let i = 0; i < ordenados.length; i += 1) {
+    for (let j = i + 1; j < ordenados.length; j += 1) {
+      cores.set(`${ordenados[i]}-${ordenados[j]}`, PALETA_DIFERENCAS[cores.size % PALETA_DIFERENCAS.length])
+    }
+  }
+  return cores
+}
+
+export function diferencasEntrePares(series, cores = new Map()) {
   const diferencas = []
   for (let i = 0; i < series.length; i += 1) {
     for (let j = i + 1; j < series.length; j += 1) {
       diferencas.push({
         chave: `${series[i].chave}-${series[j].chave}`,
         rotulo: `${series[i].ano} − ${series[j].ano}`,
+        cor: cores.get(`${series[i].ano}-${series[j].ano}`),
         pontos: diferenca(series[i].pontos, series[j].pontos),
       })
     }
