@@ -277,7 +277,6 @@
     "desconhecido": "Desconhecido",
     "naoReconhecido": "Status não reconhecido pela interface.",
     "precisaoInsuficiente": "A data de recebimento do BU não tem precisão suficiente para este corte.",
-    "horariosInconsistentes": "Os horários do BU são inconsistentes.",
     "tipoUrnaAusente": "O tipo de urna não foi informado.",
     "corteInvalido": "O corte informado não pôde ser aplicado."
   },
