@@ -277,7 +277,6 @@
     "desconhecido": "Unknown",
     "naoReconhecido": "Status not recognized by the interface.",
     "precisaoInsuficiente": "The BU receipt date lacks sufficient precision for this cutoff.",
-    "horariosInconsistentes": "BU times are inconsistent.",
     "tipoUrnaAusente": "Ballot box type not informed.",
     "corteInvalido": "The informed cutoff could not be applied."
   },

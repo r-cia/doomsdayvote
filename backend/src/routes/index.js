@@ -4,7 +4,7 @@ import { AppError } from '../lib/erros.js';
 import { validar } from '../lib/validar.js';
 import { CARGO_EM_ESCOPO, aplicarEscopo, aplicarFiltroCorte, avisosCorte, corteResposta, metadadosCorte, resolverCorte } from '../modules/apuracao/corte.js';
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
-import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
+import { horariosDoBu } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
 import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
@@ -291,8 +291,7 @@ function buDaSecao(linha) {
   };
 }
 
-function itemSecao(linha, corte) {
-  const status = classificarStatusSecao(buDaSecao(linha), corte);
+function itemSecao(linha) {
   return {
     id: linha.id,
     sg_uf: linha.sg_uf,
@@ -301,9 +300,9 @@ function itemSecao(linha, corte) {
     nr_zona: linha.nr_zona,
     nr_secao: linha.nr_secao,
     nr_local_votacao: linha.nr_local_votacao,
-    status: status.status,
-    motivo: status.motivo,
-    ...status.horarios,
+    status: linha.status,
+    motivo: linha.motivo,
+    ...horariosDoBu(buDaSecao(linha)),
   };
 }
 
@@ -338,6 +337,16 @@ function statusSql(corte) {
     when bv.cd_tipo_urna = 5 then 'nao_instalada'
     when bv.cd_tipo_urna is null or bv.cd_tipo_urna not between 1 and 5 then 'desconhecido'
     else ${porCorte}
+  end`;
+}
+
+function motivoSql(corte) {
+  return sql`case
+    when ${statusSql(corte)} = 'desconhecido' then
+      case
+        when bv.cd_tipo_urna is null or bv.cd_tipo_urna not between 1 and 5 then 'TIPO_URNA_AUSENTE'
+        else 'PRECISAO_INSUFICIENTE'
+      end
   end`;
 }
 
@@ -1388,6 +1397,8 @@ export async function registrarRotas(app) {
         'bv.dt_emissao_bu',
         'bv.dt_bu_recebido_ts',
         'bv.dt_bu_recebido_data',
+        statusSql(corte).as('status'),
+        motivoSql(corte).as('motivo'),
         sql`count(*) over()`.as('total_count'),
       ])
       .where('s.ano_eleicao', '=', eleicao.ano_eleicao)
@@ -1423,7 +1434,7 @@ export async function registrarRotas(app) {
     const total = Number(
       linhas[0]?.total_count ?? (await consultaTotal.executeTakeFirstOrThrow()).total_count,
     );
-    const itens = linhas.map((linha) => itemSecao(linha, corte));
+    const itens = linhas.map(itemSecao);
 
     const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
 
@@ -1478,6 +1489,14 @@ export async function registrarRotas(app) {
       .where('ativo', '=', true)
       .executeTakeFirst();
 
+    const statusBu = boletim
+      ? await db
+          .selectFrom('boletim_versao as bv')
+          .select([statusSql(corte).as('status'), motivoSql(corte).as('motivo')])
+          .where('bv.id', '=', boletim.id)
+          .executeTakeFirstOrThrow()
+      : { status: 'sem_bu', motivo: null };
+
     const [resultados, lote, anteriores] = boletim
       ? await Promise.all([
           db
@@ -1516,7 +1535,7 @@ export async function registrarRotas(app) {
 
     return {
       secao,
-      status: classificarStatusSecao(boletim, corte),
+      status: { ...statusBu, horarios: horariosDoBu(boletim ?? null) },
       boletim,
       resultados: ordenarLista(resultados, COLUNAS_RESULTADOS, lerOrdenacao(query)),
       lote,

@@ -24,7 +24,6 @@ export const STATUS_SECAO = Object.freeze({
 
 export const MOTIVOS = Object.freeze({
   PRECISAO_INSUFICIENTE: 'status.precisaoInsuficiente',
-  HORARIOS_INCONSISTENTES: 'status.horariosInconsistentes',
   TIPO_URNA_AUSENTE: 'status.tipoUrnaAusente',
   CORTE_INVALIDO: 'status.corteInvalido',
 })

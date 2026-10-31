@@ -82,7 +82,7 @@ Totais por área. `level=uf|municipio`; `candidatos` é uma lista de números se
 
 ## `GET /api/sections`
 
-Seções eleitorais paginadas. `busca` procura por município, zona ou seção; `status` filtra pelo status calculado no corte; `page` e `page_size` paginam.
+Seções eleitorais paginadas. `busca` procura por município, zona ou seção; `status` filtra pelo status calculado no corte (a regra de status e o `motivo` — `TIPO_URNA_AUSENTE` ou `PRECISAO_INSUFICIENTE` — são calculados só em SQL e valem para filtro, ordenação e exibição, na lista e no detalhe); `page` e `page_size` paginam.
 
 ```json
 { "page": 1, "page_size": 25, "total": 17528, "items": [{ "id": "…", "sg_uf": "AC", "nm_municipio": "…", "nr_zona": 9, "nr_secao": 1, "status": "bu_recebido", "motivo": null }] }
