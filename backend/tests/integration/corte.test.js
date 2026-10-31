@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { sql } from 'kysely';
 import { criarDb } from '../../src/db/index.js';
 import { aplicarFiltroCorte, avisosCorte, metadadosCorte, resolverCorte } from '../../src/modules/apuracao/corte.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
@@ -35,7 +36,8 @@ async function primeiroCargo(eid) {
     .selectFrom('boletim_versao')
     .select('cd_cargo_pergunta')
     .where('eleicao_id', '=', eid)
-    .where('ds_cargo_pergunta', 'in', ['Presidente', 'Governador'])
+    .where(sql`lower(ds_cargo_pergunta)`, 'in', ['presidente', 'governador'])
+    .orderBy('cd_cargo_pergunta')
     .executeTakeFirstOrThrow();
   return cargo.cd_cargo_pergunta;
 }
@@ -83,9 +85,20 @@ describe('corte temporal', () => {
       const final = await contarCorte(eid, cargo, { tipo: 'final' });
 
       expect(final).toBeGreaterThan(0);
-      expect(await contarCorte(eid, cargo, resolverCorte({ as_of: '2026-10-04T17:08:43-03:00' }))).toBe(0);
-      expect(await contarCorte(eid, cargo, resolverCorte({ as_of: '2026-10-04T17:08:44-03:00' }))).toBeGreaterThanOrEqual(1);
-      expect(await contarCorte(eid, cargo, resolverCorte({ as_of: '2026-10-04T20:40:01-03:00' }))).toBe(final);
+
+      const { primeiro, ultimo } = await db
+        .selectFrom('boletim_versao')
+        .select(({ fn }) => [fn.min('dt_bu_recebido_ts').as('primeiro'), fn.max('dt_bu_recebido_ts').as('ultimo')])
+        .where('eleicao_id', '=', eid)
+        .where('cd_cargo_pergunta', '=', cargo)
+        .where('ativo', '=', true)
+        .where('cd_tipo_urna', '=', 1)
+        .executeTakeFirstOrThrow();
+      const asOf = (instante) => resolverCorte({ as_of: instante.toISOString() });
+
+      expect(await contarCorte(eid, cargo, asOf(new Date(primeiro.getTime() - 1000)))).toBe(0);
+      expect(await contarCorte(eid, cargo, asOf(primeiro))).toBeGreaterThanOrEqual(1);
+      expect(await contarCorte(eid, cargo, asOf(ultimo))).toBe(final);
 
       const metadados = await metadadosCorte(db, { eleicaoId: eid, cargo }, { tipo: 'final' });
       expect(metadados.lotes).toHaveLength(1);
