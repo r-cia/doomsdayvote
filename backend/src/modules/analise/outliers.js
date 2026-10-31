@@ -110,7 +110,7 @@ function mediana(valores) {
     : ordenados[meio]
 }
 
-export function padronizarRobusto(dados) {
+function padronizarRobusto(dados) {
   if (dados.length === 0) return { padronizados: [], medianas: [], iqrs: [] }
   const colunas = dados[0].map((_, indice) => dados.map((linha) => linha[indice]))
   const medianas = colunas.map(mediana)

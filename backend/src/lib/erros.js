@@ -7,9 +7,3 @@ export class AppError extends Error {
     this.details = details;
   }
 }
-
-export const CODIGOS = {
-  VALIDATION: 400,
-  NOT_FOUND: 404,
-  INTERNAL: 500,
-};

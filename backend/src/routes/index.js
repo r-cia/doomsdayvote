@@ -8,14 +8,12 @@ import { classificarStatusSecao } from '../modules/apuracao/status-secao.js';
 import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
 import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
-import { duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
+import { COLUNAS_DUPLICACAO, duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
 import { consistenciaPorSecao, validarConsistenciaBu } from '../modules/analise/consistencia.js';
 import { compararVersoes } from '../modules/analise/versoes-bu.js';
 import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
-import { concentracao } from '../modules/analise/concentracao.js';
+import { COLUNAS_CONCENTRACAO, concentracao } from '../modules/analise/concentracao.js';
 import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
-import { COLUNAS_CONCENTRACAO } from '../modules/analise/concentracao.js';
-import { COLUNAS_DUPLICACAO } from '../modules/analise/duplicacao.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista, ordenarSql } from '../lib/ordenacao.js';
 
 const COLUNAS_VOTOS = {
@@ -651,17 +649,12 @@ export async function registrarRotas(app) {
       cobertura: {
         consideradas: secoes.length,
         benford_abaixo_minimo: benford.candidatos.reduce(
-          (total, candidato) =>
-            total +
-            (candidato.niveis?.secao?.secoes_abaixo_minimo ??
-              candidato.secoes_abaixo_minimo ??
-              0),
+          (total, candidato) => total + (candidato.niveis?.secao?.secoes_abaixo_minimo ?? 0),
           0,
         ),
         duplicacao_grupos: duplicacao.total_grupos ?? 0,
         duplicacao_secoes: duplicacao.total_secoes ?? 0,
         duplicacao_secoes_escopo: duplicacao.total_secoes_escopo ?? 0,
-        outliers_limitado: secoes.length > indices.length,
       },
     };
   }));
@@ -716,7 +709,7 @@ export async function registrarRotas(app) {
       ? query.candidatos
           .split(',')
           .map((valor) => Number(valor))
-          .filter((valor) => Number.isInteger(valor) && valor !== 0 && !Number.isNaN(valor))
+          .filter((valor) => Number.isInteger(valor) && valor !== 0)
       : [];
     const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
 
@@ -793,7 +786,6 @@ export async function registrarRotas(app) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
-    const escopo = { eleicaoId: eleicao.id, cargo: query.cargo, corte, escopo: escopoDe(query) };
 
     let qb = db
       .selectFrom('boletim_versao as bv')
@@ -1611,7 +1603,7 @@ export async function registrarRotas(app) {
       : [];
     const loteMap = new Map(lotes.map((l) => [l.id, l]));
 
-    const versoes = versoesRows.map((bv) => ({
+    const versoes =versoesRows.map((bv) => ({
       id: bv.id,
       versao: bv.versao,
       ativo: bv.ativo,
@@ -1622,7 +1614,6 @@ export async function registrarRotas(app) {
       dt_emissao_bu: bv.dt_emissao_bu,
       dt_bu_recebido_ts: bv.dt_bu_recebido_ts,
       dt_bu_recebido_data: bv.dt_bu_recebido_data,
-      precisao: bv.precisao_dt_bu_recebido,
       precisao_dt_bu_recebido: bv.precisao_dt_bu_recebido,
       qt_aptos: bv.qt_aptos,
       qt_comparecimento: bv.qt_comparecimento,
@@ -1630,7 +1621,7 @@ export async function registrarRotas(app) {
       qt_elei_biom_sem_habilitacao: bv.qt_elei_biom_sem_habilitacao,
       cd_tipo_urna: bv.cd_tipo_urna,
       ds_tipo_urna: bv.ds_tipo_urna,
-      lote: loteMap.get(bv.lote_id) ? { id: loteMap.get(bv.lote_id).id, nome_arquivo: loteMap.get(bv.lote_id).nome_arquivo, sha256: loteMap.get(bv.lote_id).sha256 } : null,
+      lote: loteMap.get(bv.lote_id) ?? null,
       conteudo_sha256: bv.conteudo_sha256,
       imported_at: bv.imported_at,
       resultados: (porBu.get(bv.id) ?? []).sort((x, y) => Number(y.qt_votos ?? 0) - Number(x.qt_votos ?? 0)),
