@@ -19,8 +19,8 @@ const { alternar: alternarMargem, ariaSort: ariaSortMargem, seta: setaMargem } =
 
 const emit = defineEmits(['retry'])
 
-const topShare = computed(() => props.dados?.top_share ?? props.dados?.top_por_share ?? [])
-const topMargem = computed(() => props.dados?.top_margem ?? props.dados?.top_por_margem ?? [])
+const topShare = computed(() => props.dados?.top_share ?? [])
+const topMargem = computed(() => props.dados?.top_margem ?? [])
 const cobertura = computed(() => props.dados?.cobertura ?? null)
 
 function percentualRazao(valor) {

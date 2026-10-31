@@ -149,7 +149,7 @@ describe('ordenação no servidor', () => {
 
   it('concentração: top-N por coluna escolhida sai de todas as seções', async () => {
     const completo = await json('/api/concentracao', '&limit=100');
-    const comShare = completo.secoes.filter((s) => s.share_lider !== null).map((s) => s.secao.nr_secao);
+    const comShare = completo.top_share.map((s) => s.secao.nr_secao);
     const menorSecao = Math.min(...comShare);
     const resposta = await json('/api/concentracao', '&limit=3&ordem_share=nr_secao&direcao_share=asc');
     expect(resposta.top_share[0].secao.nr_secao).toBe(menorSecao);

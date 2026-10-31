@@ -1700,13 +1700,9 @@ export async function registrarRotas(app) {
   }));
 
   app.get('/api/concentracao', cacheado('concentracao', 300, baseSchema.extend({
-    limit: z.coerce.number().int().min(1).max(100).optional(),
-    limite: z.coerce.number().int().min(1).max(100).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
     page: z.coerce.number().int().min(1).default(1),
-    pagina: z.coerce.number().int().min(1).optional(),
     page_size: z.coerce.number().int().min(1).optional(),
-    top: z.coerce.number().int().min(1).max(100).optional(),
-    top_n: z.coerce.number().int().min(1).max(100).optional(),
     ...ordenacaoSchema(Object.keys(COLUNAS_CONCENTRACAO), '_share'),
     ...ordenacaoSchema(Object.keys(COLUNAS_CONCENTRACAO), '_margem'),
   }), async (query) => {
@@ -1715,15 +1711,13 @@ export async function registrarRotas(app) {
     const padrao = app.config?.SECTIONS_PAGE_SIZE_DEFAULT ?? 50;
     const maximo = app.config?.SECTIONS_PAGE_SIZE_MAX ?? 200;
     const pageSize = Math.min(query.page_size ?? padrao, maximo);
-    const limite = query.limit ?? query.limite ?? query.top ?? query.top_n ?? 20;
-    const pagina = query.pagina ?? query.page ?? 1;
 
     const resultado = await concentracao(db, {
       eleicaoId: eleicao.id,
       cargo: query.cargo,
       corte,
       escopo: escopoDe(query),
-      limite,
+      limite: query.limit,
       ordenacaoShare: lerOrdenacao(query, '_share'),
       ordenacaoMargem: lerOrdenacao(query, '_margem'),
     });
@@ -1737,27 +1731,18 @@ export async function registrarRotas(app) {
       ),
     ]);
 
-    const topShare = resultado.top_share ?? [];
-    const topMargem = resultado.top_margem ?? [];
-    const inicioShare = (pagina - 1) * pageSize;
-    const inicioMargem = (pagina - 1) * pageSize;
+    const inicio = (query.page - 1) * pageSize;
 
     return {
       corte: corteResposta(corte),
       ...metadados,
       avisos,
       cobertura: resultado.cobertura,
-      page: pagina,
+      page: query.page,
       page_size: pageSize,
-      total: topShare.length,
-      total_share: topShare.length,
-      total_margem: topMargem.length,
-      top_share: topShare.slice(inicioShare, inicioShare + pageSize),
-      top_margem: topMargem.slice(inicioMargem, inicioMargem + pageSize),
-      top_por_share: topShare.slice(inicioShare, inicioShare + pageSize),
-      top_por_margem: topMargem.slice(inicioMargem, inicioMargem + pageSize),
-      secoes: resultado.secoes ?? [],
-      grupos: resultado.grupos ?? [],
+      total: resultado.top_share.length,
+      top_share: resultado.top_share.slice(inicio, inicio + pageSize),
+      top_margem: resultado.top_margem.slice(inicio, inicio + pageSize),
     };
   }));
 }
