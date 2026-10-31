@@ -262,7 +262,77 @@ cd backend && npm run test:integration
 cd frontend && npm test
 ```
 
-## 14. Licença e observações
+## 14. Tuning do banco de dados
+
+Ajustes feitos para que as consultas sobre milhões de versões de BU e dezenas de milhões de linhas de votos respondam em tempo interativo.
+
+### 14.1 Servidor Postgres 16
+
+O `postgresql.conf` fica fora do repositório. Estes são os valores em uso, todos diferentes do padrão:
+
+| Parâmetro | Valor | Função |
+| :-- | :-- | :-- |
+| `shared_buffers` | 7.5 GB | Cache de páginas do próprio Postgres. |
+| `effective_cache_size` | 22.5 GB | Diz ao planejador quanto cache (Postgres + SO) existe, o que favorece índices. |
+| `work_mem` | 64 MB | Memória por operação de ordenação/hash antes de ir para disco. |
+| `maintenance_work_mem` | 1 GB | Acelera `CREATE INDEX`, `REFRESH MATERIALIZED VIEW` e `VACUUM`. |
+| `autovacuum_work_mem` | 256 MB | Memória do autovacuum após as cargas. |
+| `max_parallel_workers_per_gather` | 4 | Paralelismo nas agregações grandes. |
+| `max_parallel_maintenance_workers` | 4 | Paralelismo na criação de índices. |
+
+O serviço é limitado por systemd em `ops/systemd/postgresql@16-main.service.d/override.conf` (`MemoryHigh=22G`, `MemoryMax=24G`). O teto de memória do banco vem desse limite, não do pool da aplicação.
+
+### 14.2 Conexões da aplicação (`backend/src/db/index.js`)
+
+| Ajuste | Valor | Configuração |
+| :-- | :-- | :-- |
+| Pool por processo | 20 conexões | `DB_POOL_MAX` (máx. 32) |
+| `work_mem` por sessão | 64 MB | `DB_WORK_MEM_MB` (8–64) |
+| `statement_timeout` da API | 180 s | fixo em `criarDb` |
+| `statement_timeout` da carga | sem limite | o `COPY` de arquivos grandes passa do limite da API |
+| Sessão da API | somente leitura | `default_transaction_read_only=on` |
+| Fuso da sessão | UTC | `-c timezone=UTC` |
+
+Os parâmetros de sessão vão em `options` da conexão porque o driver `pg` descarta `statement_timeout = 0`.
+
+### 14.3 Índices
+
+| Migration | Índice | Colunas | Uso |
+| :-- | :-- | :-- | :-- |
+| `0002` | `resultado_votavel_eleicao_idx` | `ano_eleicao, nr_turno` | Recorte de votos por pleito. |
+| `0002` | `resultado_votavel_uf_cargo_idx` | `ano_eleicao, nr_turno, sg_uf, cd_cargo_pergunta` | Recorte por UF e cargo. |
+| `0004` | `boletim_versao_eleicao_cargo_recebimento_idx` | `eleicao_id, cd_cargo_pergunta, precisao_dt_bu_recebido, dt_bu_recebido_ts` (parcial, `ativo`) | Corte temporal por horário de recebimento. |
+| `0004` | `boletim_versao_eleicao_cargo_data_idx` | `eleicao_id, cd_cargo_pergunta, dt_bu_recebido_data` (parcial, `ativo`) | Corte temporal por data. |
+| `0004` | `boletim_versao_secao_ativo_idx` | `secao_id, eleicao_id, cd_cargo_pergunta` (parcial, `ativo`) | Junção BU ↔ seção. |
+| `0004` | `resultado_votavel_boletim_categoria_idx` | `boletim_versao_id, categoria, nr_votavel` | Junção BU ↔ votos e agregação por candidato. |
+| `0004` | `secao_eleitoral_localidade_full_idx` | `sg_uf, cd_municipio_tse` | Filtro por UF e município. |
+
+Os índices parciais em `ativo` deixam de fora as versões substituídas de BU, que nunca entram nas consultas.
+
+### 14.4 Estatísticas estendidas
+
+A migration `0009` cria `boletim_versao_filtro_stats` (`dependencies, ndistinct, mcv`) sobre `eleicao_id, cd_cargo_pergunta, ativo, cd_tipo_urna, lower(ds_cargo_pergunta)`. São as colunas filtradas juntas nas views e na API. As estatísticas estendidas dão ao planejador a dependência entre elas, o que melhora a estimativa de linhas desses filtros combinados.
+
+### 14.5 Views materializadas
+
+O corte final e sem recorte temporal (o caso mais comum) lê agregados prontos em vez de varrer as tabelas:
+
+| View | Migration | Conteúdo | Índice |
+| :-- | :-- | :-- | :-- |
+| `mv_votos_final` | `0005`, `0006` | Votos por eleição, cargo e votável, já com a cor do partido e os votos antes/depois de 17:15. | `eleicao_id, cargo` |
+| `mv_metricas_final` | `0005` | Aptos, comparecimento, abstenções e BUs considerados por eleição e cargo. | — |
+| `mv_totais_area` | `0007` | Totais por município e candidato, usados no mapa. | `eleicao_id, cargo, sg_uf` |
+| `mv_secao_candidato_final` | `0008`, `0010` | Agregado por seção e votável, usado pelas análises (estatísticas, concentração, comparação local, duplicação). | `eleicao_id, cargo, sg_uf, cd_municipio_tse` |
+
+Cortes parciais (`as_of`, `as_of_date`) continuam lendo as tabelas.
+
+As views são atualizadas no fim de `npm run carga`, com o papel dono (`DATABASE_MIGRATION_URL`), porque `REFRESH MATERIALIZED VIEW` exige o dono da view. Quando um dado é corrigido por migration, a própria migration faz o refresh (por exemplo, a `0011`). Se a carga for interrompida antes do fim, rode `npm run carga` de novo: os arquivos já importados são ignorados e as views são atualizadas.
+
+### 14.6 Cache
+
+Além do banco, as respostas da API ficam no Redis com TTL por rota. Metadados e avisos do corte ficam 24 h. A carga invalida o cache pela versão `dv:versao`.
+
+## 15. Licença e observações
 
 - **Uso:** Projeto voltado à conferência e auditoria offline de BUs. 
 - **Dados:** Os arquivos BWEB são públicos do TSE, mas não são versionados neste repositório. Você deve obtê-los por conta própria.
