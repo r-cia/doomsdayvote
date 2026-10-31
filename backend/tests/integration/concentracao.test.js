@@ -6,7 +6,7 @@ import { buildApp } from '../../src/app.js';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
-import { limparBanco } from '../helpers/db-teste.js';
+import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
 import { caminhoFixture } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
@@ -24,7 +24,9 @@ let cargo;
 let eleicao;
 
 async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  await atualizarViews();
+  return resultado;
 }
 
 describe('concentração e margem', () => {

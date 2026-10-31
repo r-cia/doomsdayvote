@@ -22,7 +22,7 @@ Toda rota que alimenta uma tabela aceita `ordem` (coluna) e `direcao` (`asc` ou 
 | `/api/anomalies` | `ordem_benford` (`benford_niveis.candidatos`) | `nm_votavel`, `secao_n`, `secao_mad`, `zona_n`, `zona_mad`, `municipio_n`, `municipio_mad` | `total_votos` desc |
 | `/api/consistencia` | `ordem` (antes da paginação) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `regra`, `diferenca` | ordem de cálculo |
 | `/api/estatisticas` | `ordem` (`candidatos` de cada bloco) | `nm_votavel`, `sg_partido`, `secoes`, `secoes_zero`, `media`, `mediana`, `desvio` | `media` desc |
-| `/api/comparacao-local` | `ordem` (`secoes` dentro de cada grupo; a ordem dos grupos não muda) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `participacao`, `abstencao`, `participacao_pp`, `abstencao_pp` | ordem de cálculo |
+| `/api/comparacao-local/secoes` | `ordem` (`secoes` do grupo pedido; `/api/comparacao-local` não ordena, só lista grupos) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `participacao`, `abstencao`, `participacao_pp`, `abstencao_pp` | ordem de cálculo |
 | `/api/concentracao` | `ordem_share` (`top_share`), `ordem_margem` (`top_margem`); top-N escolhido depois de ordenar todas as seções | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `share_lider`, `margem_absoluta`, `margem_pp`, `share_lider_percentil` | `share_lider` desc / `margem_absoluta` desc |
 | `/api/encerramento/urnas` | `ordem` | `sg_uf`, `total`, `ate_1715`, `pct_1715`, `ate_1915`, `pct_1915`, `apos_1915`, `pct_apos_1915` | `sg_uf` |
 | `/api/encerramento/municipios` | `ordem` (antes de `limit`) | `nm_municipio`, `total`, `apos_1715`, `pct_apos_1715`, `partido`, `votos`, `pct_votos` | `pct_apos_1715` desc |
@@ -214,15 +214,25 @@ Comparações locais entre seções semelhantes. Grupos formados por local de vo
       "tamanho": 8,
       "estado": "ok",
       "dados_insuficientes": false,
-      "metricas_grupo": { "participacao": { "mediana": 0.8 }, "abstencao": { "mediana": 0.2 }, "candidatos": [] },
-      "secoes": [
-        {
-          "secao": { "id": "…", "sg_uf": "AC", "nr_zona": 9, "nr_secao": 1 },
-          "metricas": { "participacao": 0.82, "abstencao": 0.18, "candidatos": [] },
-          "distancia_pp": { "participacao": 2.0, "abstencao": -2.0 },
-          "percentil": { "participacao": 75.0 }
-        }
-      ]
+      "chave": "local:AC|1392|1228",
+      "metricas_grupo": { "participacao": { "mediana": 0.8 }, "abstencao": { "mediana": 0.2 }, "candidatos": [] }
+    }
+  ]
+}
+```
+
+A lista traz só o resumo de cada grupo (sem `secoes`). As seções de um grupo vêm de `GET /api/comparacao-local/secoes`, que aceita os parâmetros comuns e `chave` (a `chave` do grupo, ex.: `local:AC|1392|1228`, `zona:AC|1392|1` ou `municipio:AC|1392`), mais `ordem`/`direcao` (colunas da tabela de ordenação desta rota); responde 404 se o grupo não existir no corte.
+
+```json
+{
+  "corte": { "tipo": "final" },
+  "chave": "local:AC|1392|1228",
+  "secoes": [
+    {
+      "secao": { "id": "…", "sg_uf": "AC", "nr_zona": 9, "nr_secao": 1 },
+      "metricas": { "participacao": 0.82, "abstencao": 0.18, "candidatos": [] },
+      "distancia_pp": { "participacao_pp": 2.0, "abstencao_pp": -2.0 },
+      "percentil": { "participacao": 75.0 }
     }
   ]
 }

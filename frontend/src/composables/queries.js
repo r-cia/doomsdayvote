@@ -223,6 +223,17 @@ export function useComparacaoLocal(ordem = null) {
   })
 }
 
+export function useComparacaoLocalSecoes(chave, ordem = null) {
+  const store = useFiltersStore()
+  return useQuery({
+    queryKey: computed(() => ['comparacao-local-secoes', ...chaveBase(store), toValue(chave), paramsDe(ordem)]),
+    queryFn: ({ signal }) =>
+      api.comparacaoLocalSecoes({ ...filtrosBase(store), chave: toValue(chave), ...paramsDe(ordem) }, signal),
+    enabled: computed(() => habilitadoBase(store) && Boolean(toValue(chave))),
+    placeholderData: keepPreviousData,
+  })
+}
+
 export function useConcentracao(ordem = null) {
   const store = useFiltersStore()
   return useQuery({

@@ -174,9 +174,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/status-secao.js": {
-    "mtime": 1793248201.2744484,
-    "seen": 1793360126.8218145,
-    "ast_hash": "7dfd476b22c08f34e7adc09bd7dfbbbb",
+    "mtime": 1793407824.6392379,
+    "seen": 1793408069.1231737,
+    "ast_hash": "86c6dbaa9df83caa9ab4e160c13ec425",
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/totais.js": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793406786.7067235,
-    "seen": 1793406950.316917,
-    "ast_hash": "944e5bdab3c2532e7aee2f4926d5e128",
+    "mtime": 1793407955.6167235,
+    "seen": 1793408069.123209,
+    "ast_hash": "95f4d21d255e28330f199943f5e8f2bf",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
@@ -449,12 +449,6 @@
     "ast_hash": "0611d71077a348b78d5bc00b852d8708",
     "semantic_hash": ""
   },
-  "backend/tests/integration/status-secao.test.js": {
-    "mtime": 1793248241.3158839,
-    "seen": 1793360126.821878,
-    "ast_hash": "a2cfda9d4647a1ca69b67d8f3451e06c",
-    "semantic_hash": ""
-  },
   "backend/tests/integration/totais.test.js": {
     "mtime": 1793248122.212588,
     "seen": 1793360126.8218794,
@@ -593,12 +587,6 @@
     "ast_hash": "21a724334fad870af53bbc733ebb05ac",
     "semantic_hash": ""
   },
-  "backend/tests/unit/status-secao.test.js": {
-    "mtime": 1793248201.2774484,
-    "seen": 1793360126.821911,
-    "ast_hash": "1a00a2675b96bca4811b3c7faad8ea9a",
-    "semantic_hash": ""
-  },
   "backend/tests/unit/validacoes.test.js": {
     "mtime": 1793247575.2016168,
     "seen": 1793360126.8219123,
@@ -684,15 +672,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/DuplicacaoPanel.vue": {
-    "mtime": 1793396452.6442044,
-    "seen": 1793396859.110385,
-    "ast_hash": "02af9acb3e3ce2f56cb4404d0be1a327",
+    "mtime": 1793408036.3336406,
+    "seen": 1793408069.1233563,
+    "ast_hash": "e950af929832d5fe5653d82dcb78c6c1",
     "semantic_hash": ""
   },
   "frontend/src/components/EstatisticaPanel.vue": {
-    "mtime": 1793396600.043851,
-    "seen": 1793396859.1103885,
-    "ast_hash": "1fdc3bcab63cf1c1373e33dd088c311f",
+    "mtime": 1793408016.2704124,
+    "seen": 1793408069.1233582,
+    "ast_hash": "8ff79cf11bac1769d298c475f189eb95",
     "semantic_hash": ""
   },
   "frontend/src/components/FilterBar.vue": {
@@ -768,9 +756,9 @@
     "semantic_hash": ""
   },
   "frontend/src/composables/queries.js": {
-    "mtime": 1793406887.5228262,
-    "seen": 1793406950.317232,
-    "ast_hash": "8bcb2f9c0645f2985015b2d746386e02",
+    "mtime": 1793407902.9201255,
+    "seen": 1793408069.123386,
+    "ast_hash": "31ae8518fd1b0540ba989c313f5ab2fb",
     "semantic_hash": ""
   },
   "frontend/src/composables/selecao.js": {
@@ -786,21 +774,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793397714.712312,
-    "seen": 1793397733.7480989,
-    "ast_hash": "508fa3c3977b5041453ce3da4b21f58b",
+    "mtime": 1793407840.100413,
+    "seen": 1793408069.1233912,
+    "ast_hash": "867146d7019ca423119c20bdae712d33",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793397714.989315,
-    "seen": 1793397733.7481036,
-    "ast_hash": "cbbafc1ed5336dc87310e82f95ff7a37",
+    "mtime": 1793407839.568407,
+    "seen": 1793408069.1233928,
+    "ast_hash": "bca72ad33408016ee7454c34c606a693",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793397714.359308,
-    "seen": 1793397733.7481077,
-    "ast_hash": "eaa89cd002dca5a68c48a204fefc532a",
+    "mtime": 1793407839.2564037,
+    "seen": 1793408069.1233943,
+    "ast_hash": "2e06ac0841eb1ca0647a8b9c357b8a2e",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -822,9 +810,9 @@
     "semantic_hash": ""
   },
   "frontend/src/lib/status.js": {
-    "mtime": 1793361768.407256,
-    "seen": 1793364259.1280916,
-    "ast_hash": "74a942e3115f3443412609a352078847",
+    "mtime": 1793407838.8143985,
+    "seen": 1793408069.1234019,
+    "ast_hash": "5a89e1e74bad4f40b211a0ab19318f99",
     "semantic_hash": ""
   },
   "frontend/src/main.js": {
@@ -960,9 +948,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793406489.9692976,
-    "seen": 1793406950.3172996,
-    "ast_hash": "045e82aa26bad6e5ad85ed2caf2283cf",
+    "mtime": 1793407956.1227293,
+    "seen": 1793408069.1234505,
+    "ast_hash": "e414b35f7846f299f9448b5b21125e05",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -990,9 +978,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793406063.2273724,
-    "seen": 1793406950.3173127,
-    "ast_hash": "17214312e2913d4acee7a9ac48841c34",
+    "mtime": 1793407716.2930121,
+    "seen": 1793408069.1234634,
+    "ast_hash": "1672d62b825dead092035bd022bdff27",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1074,9 +1062,9 @@
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
-    "mtime": 1793397904.7884376,
-    "seen": 1793398552.8776543,
-    "ast_hash": "fe2ba84b23bf8719b9f8654f9be4f2a9",
+    "mtime": 1793407773.4616585,
+    "seen": 1793408069.123454,
+    "ast_hash": "559baf7d0c27a37059f9a2d71270c22c",
     "semantic_hash": ""
   },
   "backend/src/migrations/0006_mv_votos_final_splits.js": {
@@ -1110,9 +1098,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/AnaliseCobertura.vue": {
-    "mtime": 1793375975.9561472,
-    "seen": 1793375990.6784441,
-    "ast_hash": "be15d17183568acc939eb5784673ee75",
+    "mtime": 1793408035.8696353,
+    "seen": 1793408069.1233354,
+    "ast_hash": "7a640e536d48e1011d3fbf8e311856f3",
     "semantic_hash": ""
   },
   "backend/src/migrations/0008_mv_secao_candidato_final.js": {
@@ -1164,9 +1152,9 @@
     "semantic_hash": ""
   },
   "docs/design-system/tabelas.md": {
-    "mtime": 1793396632.4362128,
-    "seen": 1793396859.1106045,
-    "ast_hash": "e791bb7e16819dee8fa7b92ebbfe8474",
+    "mtime": 1793408036.8916469,
+    "seen": 1793408069.123465,
+    "ast_hash": "d2af22051de4d5811b1d4f16f93dc416",
     "semantic_hash": ""
   },
   "frontend/src/components/TabelaScroll.vue": {
