@@ -439,28 +439,27 @@ export async function registrarRotas(app) {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
     const intervalo = query.granularity === '1m' ? '1 minute' : '5 minutes';
-    const filtroUf = query.uf ? sql`and s.sg_uf = ${query.uf}` : sql``;
-    const filtroMunicipio = query.municipio ? sql`and s.cd_municipio_tse = ${query.municipio}` : sql``;
+    const baseTimeline = () => {
+      const qb = db
+        .selectFrom('boletim_versao as bv')
+        .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
+        .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
+        .where('bv.precisao_dt_bu_recebido', '=', 'DATA_HORA')
+        .where('bv.eleicao_id', '=', eleicao.id)
+        .where('bv.cd_cargo_pergunta', '=', query.cargo);
+      return aplicarEscopo(aplicarFiltroCorte(qb, corte), escopoDe(query));
+    };
+    const instante = sql`date_bin(${intervalo}::interval, bv.dt_bu_recebido_ts, timestamptz '2000-01-01')`.as('t');
 
-    const { rows } = await sql`
-      select
-        date_bin(${intervalo}::interval, bv.dt_bu_recebido_ts, timestamptz '2000-01-01') as t,
-        sum(rv.qt_votos) as votos,
-        count(distinct bv.secao_id) as secoes
-      from boletim_versao bv
-      join resultado_votavel rv on rv.boletim_versao_id = bv.id
-      join secao_eleitoral s on s.id = bv.secao_id
-      where bv.ativo = true
-        and bv.cd_tipo_urna = 1
-        and bv.precisao_dt_bu_recebido = 'DATA_HORA'
-        and bv.eleicao_id = ${eleicao.id}
-        and bv.cd_cargo_pergunta = ${query.cargo}
-        and ${CARGO_EM_ESCOPO}
-        ${filtroUf}
-        ${filtroMunicipio}
-      group by 1
-      order by 1
-    `.execute(db);
+    const rows = await baseTimeline()
+      .select([
+        instante,
+        sql`sum(rv.qt_votos)`.as('votos'),
+        sql`count(distinct bv.secao_id)`.as('secoes'),
+      ])
+      .groupBy(sql`1`)
+      .orderBy(sql`1`)
+      .execute();
 
     let votos = 0;
     let secoes = 0;
@@ -476,28 +475,19 @@ export async function registrarRotas(app) {
 
     let series = null;
     if (query.por_candidato === 'true') {
-      const { rows: linhas } = await sql`
-        select
-          date_bin(${intervalo}::interval, bv.dt_bu_recebido_ts, timestamptz '2000-01-01') as t,
-          rv.nr_votavel,
-          max(rv.nm_votavel) as nm_votavel,
-          sum(rv.qt_votos) as votos
-        from boletim_versao bv
-        join resultado_votavel rv on rv.boletim_versao_id = bv.id
-        join secao_eleitoral s on s.id = bv.secao_id
-        where bv.ativo = true
-          and bv.cd_tipo_urna = 1
-          and bv.precisao_dt_bu_recebido = 'DATA_HORA'
-          and bv.eleicao_id = ${eleicao.id}
-          and bv.cd_cargo_pergunta = ${query.cargo}
-          and ${CARGO_EM_ESCOPO}
-          and rv.categoria = 'nominal'
-          and rv.qt_votos is not null
-          ${filtroUf}
-          ${filtroMunicipio}
-        group by 1, 2
-        order by 1, 2
-      `.execute(db);
+      const linhas = await baseTimeline()
+        .select([
+          instante,
+          'rv.nr_votavel',
+          sql`max(rv.nm_votavel)`.as('nm_votavel'),
+          sql`sum(rv.qt_votos)`.as('votos'),
+        ])
+        .where('rv.categoria', '=', 'nominal')
+        .where('rv.qt_votos', 'is not', null)
+        .groupBy([sql`1`, sql`2`])
+        .orderBy(sql`1`)
+        .orderBy(sql`2`)
+        .execute();
 
       const acumulado = new Map();
       for (const linha of linhas) {

@@ -70,7 +70,7 @@ Série acumulada do dia por intervalo (`granularity=1m|5m`, padrão `5m`). Com `
 }
 ```
 
-O traçado usa o dia inteiro, independentemente do corte; o corte é desenhado como linha vertical.
+O traçado respeita o corte (`as_of`/`as_of_date`): a curva termina no instante ou data do filtro.
 
 ## `GET /api/map`
 

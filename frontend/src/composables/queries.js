@@ -56,6 +56,7 @@ export function useTimeline() {
       'timeline',
       store.electionId,
       store.cargo,
+      store.asOf,
       store.uf,
       store.municipio,
       store.timelineGranularity,
@@ -65,6 +66,7 @@ export function useTimeline() {
         {
           election_id: store.electionId,
           cargo: store.cargo,
+          as_of: store.asOf,
           uf: store.uf,
           municipio: store.municipio,
           granularity: store.timelineGranularity,
