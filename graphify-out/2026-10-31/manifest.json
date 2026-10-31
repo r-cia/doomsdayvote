@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   "backend/package.json": {
-    "mtime": 1793334267.0,
-    "seen": 1793360126.8217776,
-    "ast_hash": "3d3e00b2eb59188a6d697ea58061dfa7",
+    "mtime": 1793410324.8800485,
+    "seen": 1793419495.4579375,
+    "ast_hash": "2d27152e243492bff6312b2ddb64ad6a",
     "semantic_hash": ""
   },
   "backend/src/app.js": {
@@ -132,15 +132,15 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/duplicacao.js": {
-    "mtime": 1793394980.8678727,
-    "seen": 1793395538.2129767,
-    "ast_hash": "a09c3f56731dd3d25c4eec61bd94485f",
+    "mtime": 1793413761.5164733,
+    "seen": 1793419495.4580102,
+    "ast_hash": "1c00675bd7fcab91da9e3fdb3b7ff6a9",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatisticas.js": {
-    "mtime": 1793406588.2914326,
-    "seen": 1793406950.3168588,
-    "ast_hash": "e117788086ddda93599b3305ad4c8a8c",
+    "mtime": 1793413758.569441,
+    "seen": 1793419495.4580138,
+    "ast_hash": "8e489065f51249bc0232694dc9ab19bb",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/outliers.js": {
@@ -282,15 +282,15 @@
     "semantic_hash": ""
   },
   "backend/src/routes/index.js": {
-    "mtime": 1793407955.6167235,
-    "seen": 1793408069.123209,
-    "ast_hash": "95f4d21d255e28330f199943f5e8f2bf",
+    "mtime": 1793418512.9441752,
+    "seen": 1793419495.4580603,
+    "ast_hash": "f248306c98c6becace2c849f3af9180d",
     "semantic_hash": ""
   },
   "backend/src/scripts/carregar-pasta.js": {
-    "mtime": 1793377010.3825889,
-    "seen": 1793377080.6923661,
-    "ast_hash": "ecd5b300950a23fcfad9b8ad75359651",
+    "mtime": 1793411817.5250468,
+    "seen": 1793419495.4580622,
+    "ast_hash": "750085b2c9a233a868db8b8d0534b793",
     "semantic_hash": ""
   },
   "backend/src/scripts/cores-pendentes.js": {
@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "backend/tests/helpers/db-teste.js": {
-    "mtime": 1793301233.2724125,
-    "seen": 1793360126.8218536,
-    "ast_hash": "a67d8d9a4bf44e77629ab3145f44df1b",
+    "mtime": 1793412637.6664193,
+    "seen": 1793419495.4580772,
+    "ast_hash": "dcdffaa322c8549ca35fa754a798493c",
     "semantic_hash": ""
   },
   "backend/tests/helpers/fixtures.js": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/api.test.js": {
-    "mtime": 1793361352.7880068,
-    "seen": 1793364259.127932,
-    "ast_hash": "67a1c32dfbed2a59161c30c5cf026d94",
+    "mtime": 1793411835.7532547,
+    "seen": 1793419495.458081,
+    "ast_hash": "4d12b401931c6210534f903fb8fd062e",
     "semantic_hash": ""
   },
   "backend/tests/integration/cache.test.js": {
@@ -372,9 +372,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/corte.test.js": {
-    "mtime": 1793248014.4274147,
-    "seen": 1793360126.8218613,
-    "ast_hash": "95066e19e7167219004c60907d5bab80",
+    "mtime": 1793411836.7372658,
+    "seen": 1793419495.4580922,
+    "ast_hash": "2a170d955ec2d738e06d72df3ebc4af1",
     "semantic_hash": ""
   },
   "backend/tests/integration/db-roles.test.js": {
@@ -384,9 +384,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/estatisticas.test.js": {
-    "mtime": 1793304059.9412267,
-    "seen": 1793360126.821864,
-    "ast_hash": "16e695f59a63599b752a158979eeadf3",
+    "mtime": 1793411837.6802766,
+    "seen": 1793419495.458096,
+    "ast_hash": "b95782ad64cc8f55d9b5c8b067bfe1c1",
     "semantic_hash": ""
   },
   "backend/tests/integration/fixtures-import.test.js": {
@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/partido-cor.test.js": {
-    "mtime": 1793280160.523772,
-    "seen": 1793360126.8218715,
-    "ast_hash": "d3443a0a515e8427ade6f3577d0606f4",
+    "mtime": 1793413050.4750023,
+    "seen": 1793419495.458111,
+    "ast_hash": "39e20991a8d9b1d65394245fc184e0e2",
     "semantic_hash": ""
   },
   "backend/tests/integration/progresso.test.js": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/regressao-apuracao.test.js": {
-    "mtime": 1793277169.0912352,
-    "seen": 1793360126.8218741,
-    "ast_hash": "e90ffe5b1e84310b1779bd834acc6f6a",
+    "mtime": 1793411840.6883109,
+    "seen": 1793419495.4581149,
+    "ast_hash": "fbf1d7bbac2b8182d8ce2e315fe25af8",
     "semantic_hash": ""
   },
   "backend/tests/integration/resultado-colunas.test.js": {
@@ -444,15 +444,15 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/schema.test.js": {
-    "mtime": 1793301276.1658695,
-    "seen": 1793360126.8218768,
-    "ast_hash": "0611d71077a348b78d5bc00b852d8708",
+    "mtime": 1793412636.9494112,
+    "seen": 1793419495.4581187,
+    "ast_hash": "881f6b8f78d7266f0d09f6de1eee5d26",
     "semantic_hash": ""
   },
   "backend/tests/integration/totais.test.js": {
-    "mtime": 1793248122.212588,
-    "seen": 1793360126.8218794,
-    "ast_hash": "de2f8111a284446df3730aed099915a0",
+    "mtime": 1793411838.9102905,
+    "seen": 1793419495.4581218,
+    "ast_hash": "c458e9ac7d603ef438de12bb2fec6481",
     "semantic_hash": ""
   },
   "backend/tests/integration/versoes.test.js": {
@@ -624,9 +624,9 @@
     "semantic_hash": ""
   },
   "frontend/src/api/client.js": {
-    "mtime": 1793379950.3161447,
-    "seen": 1793380494.011668,
-    "ast_hash": "cc3f7ae937b3becdda1be4e1e22931fb",
+    "mtime": 1793418527.5543334,
+    "seen": 1793419495.4581852,
+    "ast_hash": "357e86f95e85e12bb6a2c1807bd2079d",
     "semantic_hash": ""
   },
   "frontend/src/components/AnaliseSection.vue": {
@@ -756,9 +756,9 @@
     "semantic_hash": ""
   },
   "frontend/src/composables/queries.js": {
-    "mtime": 1793407902.9201255,
-    "seen": 1793408069.123386,
-    "ast_hash": "31ae8518fd1b0540ba989c313f5ab2fb",
+    "mtime": 1793418528.4623432,
+    "seen": 1793419495.4582396,
+    "ast_hash": "262b9f9f3607b642ec9875ac13063cdd",
     "semantic_hash": ""
   },
   "frontend/src/composables/selecao.js": {
@@ -948,9 +948,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793407956.1227293,
-    "seen": 1793408069.1234505,
-    "ast_hash": "e414b35f7846f299f9448b5b21125e05",
+    "mtime": 1793418586.9779766,
+    "seen": 1793419495.4583056,
+    "ast_hash": "b895ca336b4332c76ace940287a84a4c",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -978,9 +978,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793407716.2930121,
-    "seen": 1793408069.1234634,
-    "ast_hash": "1672d62b825dead092035bd022bdff27",
+    "mtime": 1793410858.609189,
+    "seen": 1793419495.4583178,
+    "ast_hash": "2f6599b0a5a2419322c983be31084038",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1002,27 +1002,27 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/comparacao-local.js": {
-    "mtime": 1793406589.79745,
-    "seen": 1793406950.3168464,
-    "ast_hash": "40faeb601b39fae38c60a6f9a61743cf",
+    "mtime": 1793413760.8044655,
+    "seen": 1793419495.4580023,
+    "ast_hash": "38a1dbc19340eb6c329af6d5ac242020",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/concentracao.js": {
-    "mtime": 1793406589.2964442,
-    "seen": 1793406950.3168483,
-    "ast_hash": "3591eae57cd14885f3bb0fe1556fc265",
+    "mtime": 1793413760.4104612,
+    "seen": 1793419495.4580045,
+    "ast_hash": "fc5dd8dffaacfa3c2aeb6f52e02bfdec",
     "semantic_hash": ""
   },
   "backend/tests/integration/comparacao-local.test.js": {
-    "mtime": 1793395017.2632704,
-    "seen": 1793395538.213061,
-    "ast_hash": "62b2cff3d9024f6c078c91cdbb79ee28",
+    "mtime": 1793418650.0106597,
+    "seen": 1793419495.4580872,
+    "ast_hash": "b2e323c1bd194a4d3d21d3a3b207b270",
     "semantic_hash": ""
   },
   "backend/tests/integration/concentracao.test.js": {
-    "mtime": 1793395017.3612716,
-    "seen": 1793395538.2130632,
-    "ast_hash": "113b8c04b25b1d81b59ddc7e994768df",
+    "mtime": 1793418651.3846745,
+    "seen": 1793419495.4580886,
+    "ast_hash": "c76793a4c5898abfaf66dc543a11fb28",
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/comparacao-local.test.js": {
@@ -1044,9 +1044,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/ComparacaoLocalPanel.vue": {
-    "mtime": 1793396428.2399318,
-    "seen": 1793396859.110375,
-    "ast_hash": "07ed940a7be0ad0c5b055e184fc5a3b1",
+    "mtime": 1793418570.8428018,
+    "seen": 1793419495.4582043,
+    "ast_hash": "61e6b78275c9986a4a248d4f1198c120",
     "semantic_hash": ""
   },
   "frontend/src/components/ConcentracaoPanel.vue": {
@@ -1056,9 +1056,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793406551.250005,
-    "seen": 1793406950.3173015,
-    "ast_hash": "11ed176282062da22a61237b83f79df7",
+    "mtime": 1793418336.6012723,
+    "seen": 1793419495.458307,
+    "ast_hash": "e5754b64e32176213c65b0d7c5bb78fc",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
@@ -1110,9 +1110,9 @@
     "semantic_hash": ""
   },
   "frontend/src/views/ComparacoesView.vue": {
-    "mtime": 1793396477.7234843,
-    "seen": 1793396859.1105003,
-    "ast_hash": "5a1eb1810fce2ed78600ca33d370436b",
+    "mtime": 1793418585.1209564,
+    "seen": 1793419495.4582682,
+    "ast_hash": "bc8501b86f68e9492097ba59d355bf19",
     "semantic_hash": ""
   },
   "frontend/src/views/RelatorioView.vue": {
@@ -1128,9 +1128,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/ordenacao.test.js": {
-    "mtime": 1793406490.521304,
-    "seen": 1793406950.3170247,
-    "ast_hash": "72b26e89a694a963b15c1f7f109dfc6b",
+    "mtime": 1793418659.1837592,
+    "seen": 1793419495.4581094,
+    "ast_hash": "c70f55507ca2451c5dcbafda384cec12",
     "semantic_hash": ""
   },
   "backend/tests/unit/ordenacao.test.js": {
@@ -1152,9 +1152,9 @@
     "semantic_hash": ""
   },
   "docs/design-system/tabelas.md": {
-    "mtime": 1793408036.8916469,
-    "seen": 1793408069.123465,
-    "ast_hash": "d2af22051de4d5811b1d4f16f93dc416",
+    "mtime": 1793418594.220055,
+    "seen": 1793419495.4583194,
+    "ast_hash": "bf6cb3f657dd8e51e68f1c4e61bc4aac",
     "semantic_hash": ""
   },
   "frontend/src/components/TabelaScroll.vue": {
@@ -1167,6 +1167,48 @@
     "mtime": 1793406537.0098405,
     "seen": 1793406950.3168566,
     "ast_hash": "06e1352a79aad2a5022378664abf852b",
+    "semantic_hash": ""
+  },
+  "backend/src/db/views.js": {
+    "mtime": 1793411816.4260342,
+    "seen": 1793419495.4579492,
+    "ast_hash": "6aba69cd871a375ced9bd947ab3a1811",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0009_estatisticas_boletim_versao.js": {
+    "mtime": 1793415855.6607895,
+    "seen": 1793419495.4579968,
+    "ast_hash": "b98bfbdca346e8428608d67ed9c77617",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0010_mv_secao_candidato_final_v2.js": {
+    "mtime": 1793417855.6861482,
+    "seen": 1793419495.4579985,
+    "ast_hash": "f64f0212ce349afbc93ec2b009009705",
+    "semantic_hash": ""
+  },
+  "backend/src/modules/analise/mv-secao-candidato.js": {
+    "mtime": 1793413758.0504355,
+    "seen": 1793419495.4580152,
+    "ast_hash": "266464b53ead0e8c9c8d80e84e738951",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/mv-secao-candidato.test.js": {
+    "mtime": 1793414085.1340163,
+    "seen": 1793419495.4581077,
+    "ast_hash": "d827147fde837a37bc97dae50db60274",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/status-secao.test.js": {
+    "mtime": 1793411643.489064,
+    "seen": 1793419495.45812,
+    "ast_hash": "8b929c78f979e13e9a45eaf929bbc8ec",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ComparacaoLocalGrupo.vue": {
+    "mtime": 1793418546.4065373,
+    "seen": 1793419495.4582024,
+    "ast_hash": "560bce8a9641eddb1587e93c98c67019",
     "semantic_hash": ""
   }
 }

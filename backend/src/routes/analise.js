@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { AppError } from '../lib/erros.js';
 import { corteResposta, resolverCorte } from '../modules/apuracao/corte.js';
-import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria, featuresDasSecoes } from '../modules/analise/estatisticas.js';
+import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria } from '../modules/analise/estatisticas.js';
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
 import { COLUNAS_DUPLICACAO, duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
 import { consistenciaPorSecao } from '../modules/analise/consistencia.js';
 import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
 import { COLUNAS_CONCENTRACAO, concentracao } from '../modules/analise/concentracao.js';
-import { FEATURES, amostraLof, isolationForest, localOutlierFactor } from '../modules/analise/outliers.js';
+import { FEATURES, pontuarOutliers } from '../modules/analise/outliers.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
 import { baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos, tamanhoPagina } from './comum.js';
 
@@ -152,68 +152,8 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
       ...benfordBase,
       candidatos: ordenarLista(benfordBase.candidatos, COLUNAS_BENFORD_NIVEIS, lerOrdenacao(query, '_benford')),
     };
-    const secoes = featuresDasSecoes(linhas);
-    const matriz = secoes.map((secao) =>
-      FEATURES.map((feature) => secao[feature]),
-    );
-    const isolamento = isolationForest(matriz, { semente: 42 });
-    const indices = amostraLof(secoes.length, isolamento.scores);
-    const lof = localOutlierFactor(
-      indices.map((indice) => matriz[indice]),
-      { k: 10 },
-    );
-    const scoreLof = new Map(
-      indices.map((indice, posicao) => [indice, lof.scores[posicao]]),
-    );
-
-    const vencedorPorMunicipio = new Map();
-    for (const linha of linhas) {
-      const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}`;
-      if (!vencedorPorMunicipio.has(chave)) {
-        vencedorPorMunicipio.set(chave, new Map());
-      }
-      const candidatos = vencedorPorMunicipio.get(chave);
-      const atual = candidatos.get(linha.nr_votavel) ?? {
-        nr_votavel: linha.nr_votavel,
-        nm_votavel: linha.nm_votavel,
-        sg_partido: linha.sg_partido,
-        votos: 0,
-      };
-      atual.votos += Number(linha.votos ?? 0);
-      candidatos.set(linha.nr_votavel, atual);
-    }
-    const vencedorCidade = new Map();
-    for (const [chave, candidatos] of vencedorPorMunicipio) {
-      let vencedor = null;
-      for (const candidato of candidatos.values()) {
-        if (!vencedor || candidato.votos > vencedor.votos) {
-          vencedor = candidato;
-        }
-      }
-      if (vencedor) {
-        vencedorCidade.set(chave, {
-          nr_votavel: vencedor.nr_votavel,
-          nm_votavel: vencedor.nm_votavel,
-          sg_partido: vencedor.sg_partido,
-        });
-      }
-    }
-    const ranking = ordenarLista(
-      secoes
-        .map((secao, indice) => {
-          const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`;
-          const vencedor = vencedorCidade.get(chave) ?? null;
-          return {
-            ...secao,
-            score_if: isolamento.scores[indice],
-            score_lof: scoreLof.get(indice) ?? null,
-            vencedor,
-          };
-        })
-        .sort((a, b) => b.score_if - a.score_if),
-      COLUNAS_OUTLIERS,
-      lerOrdenacao(query),
-    ).slice(0, 20);
+    const outliers = pontuarOutliers(linhas);
+    const ranking = ordenarLista(outliers.pontuadas, COLUNAS_OUTLIERS, lerOrdenacao(query)).slice(0, 20);
 
     return {
       corte: corteResposta(corte),
@@ -225,20 +165,20 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
         features: FEATURES,
         parametros: {
           isolamento: {
-            arvores: isolamento.arvores,
-            amostra: isolamento.amostra,
+            arvores: outliers.isolamento.arvores,
+            amostra: outliers.isolamento.amostra,
           },
           lof: {
-            k: lof.k,
-            amostra: indices.length,
-            limitado: secoes.length > indices.length,
+            k: outliers.lof.k,
+            amostra: outliers.amostraLof,
+            limitado: outliers.total > outliers.amostraLof,
           },
         },
-        total_secoes: secoes.length,
+        total_secoes: outliers.total,
         secoes: ranking,
       },
       cobertura: {
-        consideradas: secoes.length,
+        consideradas: outliers.total,
         benford_abaixo_minimo: benford.candidatos.reduce(
           (total, candidato) => total + (candidato.niveis?.secao?.secoes_abaixo_minimo ?? 0),
           0,

@@ -2,9 +2,12 @@
 
 ## Backend
 
-- Fastify em `backend/src/server.js`, rotas em `backend/src/routes/index.js`.
-- Módulos de análise em `backend/src/modules/analise/`. Os helpers estatísticos compartilhados (`mediana`, `media`, `desvioPadrao`, `percentilRank`, `toNumberOrNull`) ficam em `estatistica-basica.js`.
-- Apuração/corte em `backend/src/modules/apuracao/`.
+- Fastify em `backend/src/server.js`. `backend/src/routes/index.js` só cria o cache e registra as rotas de cada domínio; os handlers validam a consulta, delegam a um módulo e montam a resposta:
+  - `routes/comum.js`: schemas base, escopo, paginação, metadados/avisos de corte e `buscarEleicao`.
+  - `routes/apuracao.js` (`/api/elections`, `/api/summary`, `/api/timeline`, `/api/map`), `routes/secoes.js` (`/api/sections` e `/:id`, `/:id/versions`), `routes/analise.js` (`/api/analysis`, `/api/anomalies`, `/api/estatisticas`, `/api/consistencia`, `/api/comparacao-local` e `/secoes`, `/api/concentracao`), `routes/biometria.js`, `routes/encerramento.js` e `routes/relatorio.js`.
+  - As constantes `COLUNAS_*` (colunas ordenáveis) ficam junto da rota que as usa.
+- Módulos de análise em `backend/src/modules/analise/`. Os helpers estatísticos compartilhados (`mediana`, `media`, `desvioPadrao`, `percentilRank`, `toNumberOrNull`) ficam em `estatistica-basica.js`. Consultas e agregações das rotas: `biometria.js` (biometria por município e seção), `encerramento.js` (urnas, municípios e seções, incluindo o partido vencedor), `relatorio.js` (agregados do relatório) e `outliers.js` (pontuação e vencedor por município de `/api/anomalies`).
+- Apuração/corte em `backend/src/modules/apuracao/`, incluindo `secoes.js` (lista, detalhe e versões de seção, `statusSql`/`motivoSql`), `timeline.js` (linha do tempo) e, em `totais.js`, o delta do mapa entre cortes.
 - Cache Redis via `backend/src/lib/cache.js`.
 - Banco Postgres via Kysely. O pool da aplicação usa 20 conexões e `work_mem` de 64 MB por operação, configuráveis por `DB_POOL_MAX` e `DB_WORK_MEM_MB`; esses limites reduzem picos das consultas da aplicação, mas não limitam a memória total do servidor Postgres.
 - O mapa usa `mv_totais_area` no corte final; ao exibir por UF, soma primeiro os totais pré-agregados de cada município por candidato antes de calcular líder e percentuais.

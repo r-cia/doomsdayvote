@@ -1,8 +1,9 @@
 import { sql } from 'kysely';
 import { z } from 'zod';
-import { aplicarEscopo, aplicarFiltroCorte, corteResposta, resolverCorte } from '../modules/apuracao/corte.js';
+import { corteResposta, resolverCorte } from '../modules/apuracao/corte.js';
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
-import { somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
+import { linhaDoTempo } from '../modules/apuracao/timeline.js';
+import { areasComDeltaEntreCortes, somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
 import { baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos } from './comum.js';
 
@@ -100,77 +101,15 @@ export function registrarApuracao({ app, db, cache, cacheado }) {
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
-    const intervalo = query.granularity === '1m' ? '1 minute' : '5 minutes';
-    const baseTimeline = () => {
-      const qb = db
-        .selectFrom('boletim_versao as bv')
-        .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-        .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
-        .where('bv.precisao_dt_bu_recebido', '=', 'DATA_HORA')
-        .where('bv.eleicao_id', '=', eleicao.id)
-        .where('bv.cd_cargo_pergunta', '=', query.cargo);
-      return aplicarEscopo(aplicarFiltroCorte(qb, corte), escopoDe(query));
-    };
-    const instante = sql`date_bin(${intervalo}::interval, bv.dt_bu_recebido_ts, timestamptz '2000-01-01')`.as('t');
 
-    const rows = await baseTimeline()
-      .select([
-        instante,
-        sql`sum(rv.qt_votos)`.as('votos'),
-        sql`count(distinct bv.secao_id)`.as('secoes'),
-      ])
-      .groupBy(sql`1`)
-      .orderBy(sql`1`)
-      .execute();
-
-    let votos = 0;
-    let secoes = 0;
-    const pontos = rows.map((linha) => {
-      votos += Number(linha.votos);
-      secoes += Number(linha.secoes);
-      return {
-        t: new Date(linha.t).toISOString(),
-        votos_acumulados: votos,
-        secoes_com_bu_acumuladas: secoes,
-      };
+    const { pontos, series } = await linhaDoTempo(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+      granularidade: query.granularity,
+      porCandidato: query.por_candidato === 'true',
     });
-
-    let series = null;
-    if (query.por_candidato === 'true') {
-      const linhas = await baseTimeline()
-        .select([
-          instante,
-          'rv.nr_votavel',
-          sql`max(rv.nm_votavel)`.as('nm_votavel'),
-          sql`sum(rv.qt_votos)`.as('votos'),
-        ])
-        .where('rv.categoria', '=', 'nominal')
-        .where('rv.qt_votos', 'is not', null)
-        .groupBy([sql`1`, sql`2`])
-        .orderBy(sql`1`)
-        .orderBy(sql`2`)
-        .execute();
-
-      const acumulado = new Map();
-      for (const linha of linhas) {
-        if (!acumulado.has(linha.nr_votavel)) {
-          acumulado.set(linha.nr_votavel, {
-            nr_votavel: linha.nr_votavel,
-            nm_votavel: linha.nm_votavel,
-            total: 0,
-            pontos: [],
-          });
-        }
-        const serie = acumulado.get(linha.nr_votavel);
-        serie.total += Number(linha.votos);
-        serie.pontos.push({
-          t: new Date(linha.t).toISOString(),
-          votos_acumulados: serie.total,
-        });
-      }
-
-      series = [...acumulado.values()].map(({ total, ...serie }) => serie);
-    }
 
     return {
       granularity: query.granularity,
@@ -229,36 +168,12 @@ export function registrarApuracao({ app, db, cache, cacheado }) {
       somarVotos(db, { ...escopo, dataPleito: eleicao.dt_pleito }),
     ]);
 
-    const nomePorNumero = new Map(votosCandidatos.map((v) => [Number(v.nr_votavel), v.nm_votavel]));
-    const candidatoSelecionado = candidatos[0];
-
-    const anterioresPorChave = new Map();
-    if (areasAnteriores) {
-      for (const a of areasAnteriores) {
-        const chave = query.level === 'uf' ? a.sg_uf : a.cd_municipio_tse;
-        anterioresPorChave.set(chave, a);
-      }
-    }
-
-    const areasComDelta = areas.map((area) => {
-      const chave = query.level === 'uf' ? area.sg_uf : area.cd_municipio_tse;
-      const anterior = anterioresPorChave.get(chave);
-      const anteriorPorCandidato = new Map((anterior?.candidatos ?? []).map((x) => [Number(x.nr_votavel), x]));
-      const candidatosComDelta = (area.candidatos ?? []).map((c) => {
-        const ant = anteriorPorCandidato.get(Number(c.nr_votavel));
-        const delta = ant
-          ? Math.max(0, Number(c.qt_votos ?? 0) - Number(ant.qt_votos ?? 0))
-          : Number(c.qt_votos ?? 0);
-        return { ...c, qt_votos_delta: delta };
-      });
-      const selecionado = candidatosComDelta.find((c) => Number(c.nr_votavel) === candidatoSelecionado);
-      return {
-        ...area,
-        lider_nome: area.lider ? (nomePorNumero.get(Number(area.lider.nr_votavel)) ?? null) : null,
-        candidato_votos: selecionado?.qt_votos ?? null,
-        candidato_percentual: selecionado?.percentual ?? null,
-        candidatos: candidatosComDelta,
-      };
+    const areasComDelta = areasComDeltaEntreCortes({
+      areas,
+      areasAnteriores,
+      nivel: query.level,
+      candidatoSelecionado: candidatos[0],
+      votosCandidatos,
     });
 
     return {

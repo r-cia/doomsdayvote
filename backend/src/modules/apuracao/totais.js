@@ -211,3 +211,36 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
     })),
   }));
 }
+
+export function areasComDeltaEntreCortes({ areas, areasAnteriores, nivel, candidatoSelecionado, votosCandidatos }) {
+  const nomePorNumero = new Map(votosCandidatos.map((v) => [Number(v.nr_votavel), v.nm_votavel]));
+
+  const anterioresPorChave = new Map();
+  if (areasAnteriores) {
+    for (const a of areasAnteriores) {
+      const chave = nivel === 'uf' ? a.sg_uf : a.cd_municipio_tse;
+      anterioresPorChave.set(chave, a);
+    }
+  }
+
+  return areas.map((area) => {
+    const chave = nivel === 'uf' ? area.sg_uf : area.cd_municipio_tse;
+    const anterior = anterioresPorChave.get(chave);
+    const anteriorPorCandidato = new Map((anterior?.candidatos ?? []).map((x) => [Number(x.nr_votavel), x]));
+    const candidatosComDelta = (area.candidatos ?? []).map((c) => {
+      const ant = anteriorPorCandidato.get(Number(c.nr_votavel));
+      const delta = ant
+        ? Math.max(0, Number(c.qt_votos ?? 0) - Number(ant.qt_votos ?? 0))
+        : Number(c.qt_votos ?? 0);
+      return { ...c, qt_votos_delta: delta };
+    });
+    const selecionado = candidatosComDelta.find((c) => Number(c.nr_votavel) === candidatoSelecionado);
+    return {
+      ...area,
+      lider_nome: area.lider ? (nomePorNumero.get(Number(area.lider.nr_votavel)) ?? null) : null,
+      candidato_votos: selecionado?.qt_votos ?? null,
+      candidato_percentual: selecionado?.percentual ?? null,
+      candidatos: candidatosComDelta,
+    };
+  });
+}
