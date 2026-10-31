@@ -32,9 +32,6 @@ const campos = computed(() => {
 const camposAusentes = computed(() => campos.value.filter((campo) => campo.valor > 0))
 const camposNaoInformados = computed(() => campos.value.some((campo) => campo.valor === null))
 
-function numero(valor) {
-  return formatarNumero(valor ?? 0)
-}
 </script>
 
 <template>
@@ -47,14 +44,14 @@ function numero(valor) {
     <dl class="analise-cobertura__dados">
       <div>
         <dt>{{ $t('analiseUI.secoesConsideradas') }}</dt>
-        <dd>{{ numero(cobertura.consideradas) }}</dd>
+        <dd>{{ formatarNumero(cobertura.consideradas) }}</dd>
       </div>
       <div>
         <dt>{{ $t('analiseUI.camposAusentes') }}</dt>
         <dd v-if="camposAusentes.length > 0">
           <ul>
             <li v-for="campo in camposAusentes" :key="campo.rotulo">
-              {{ campo.rotulo }}: {{ numero(campo.valor) }}
+              {{ campo.rotulo }}: {{ formatarNumero(campo.valor) }}
             </li>
             <li v-if="camposNaoInformados">{{ $t('analiseUI.camposParciais') }}</li>
           </ul>
@@ -63,8 +60,8 @@ function numero(valor) {
         <dd v-else>{{ $t('analiseUI.nenhumCampoAusente') }}</dd>
       </div>
       <div>
-        <dt>{{ $t('analiseUI.abaixoMinimoBenford', { minimo: numero(minimoBenford) }) }}</dt>
-        <dd>{{ numero(cobertura.secoes_abaixo_minimo_benford) }}</dd>
+        <dt>{{ $t('analiseUI.abaixoMinimoBenford', { minimo: formatarNumero(minimoBenford) }) }}</dt>
+        <dd>{{ formatarNumero(cobertura.secoes_abaixo_minimo_benford) }}</dd>
       </div>
     </dl>
   </section>

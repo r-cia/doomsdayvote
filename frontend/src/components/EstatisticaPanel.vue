@@ -1,10 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import TabelaScroll from './TabelaScroll.vue'
 import { useEstatisticas } from '../composables/queries'
-import { formatarNumero } from '../lib/format'
+import { formatarDecimal, formatarNumero } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
@@ -12,7 +11,6 @@ const props = defineProps({
   electionId: { type: String, default: '' },
 })
 
-const { locale } = useI18n()
 const escopo = ref('turno')
 const { alternar, ariaSort, seta, params } = useOrdenacao()
 const estatisticasQuery = useEstatisticas(escopo, params)
@@ -23,17 +21,7 @@ const temDoisTurnos = computed(
 
 const blocos = computed(() => estatisticasQuery.data.value?.blocos ?? [])
 
-function numero(valor) {
-  if (valor === null || valor === undefined) return '—'
-  const convertido = Number(valor)
-  if (Number.isNaN(convertido)) return '—'
-  return convertido.toLocaleString(locale.value, { maximumFractionDigits: 1 })
-}
-
-function inteiro(valor) {
-  if (valor === null || valor === undefined) return '—'
-  return formatarNumero(valor)
-}
+const numero = (valor) => formatarDecimal(valor, 0, 1)
 
 function erroMensagem(erro) {
   if (!erro) return ''
@@ -89,7 +77,7 @@ function erroMensagem(erro) {
       >
         <header class="estatistica-bloco__cabecalho">
           <h3>Turno {{ bloco.nr_turno }} · {{ bloco.ano_eleicao }}</h3>
-          <p>{{ inteiro(bloco.comparecimento.secoes) }} seções</p>
+          <p>{{ formatarNumero(bloco.comparecimento.secoes) }} seções</p>
         </header>
 
         <section class="estatistica-tabela-wrap" aria-label="Comparecimento por seção">
@@ -107,7 +95,7 @@ function erroMensagem(erro) {
             <tbody>
               <tr>
                 <td>{{ $t('estatistica.comparecimento') }}</td>
-                <td class="tabela__numero">{{ inteiro(bloco.comparecimento.secoes) }}</td>
+                <td class="tabela__numero">{{ formatarNumero(bloco.comparecimento.secoes) }}</td>
                 <td class="tabela__numero">{{ numero(bloco.comparecimento.media) }}</td>
                 <td class="tabela__numero">{{ numero(bloco.comparecimento.mediana) }}</td>
                 <td class="tabela__numero">{{ numero(bloco.comparecimento.desvio) }}</td>
@@ -140,8 +128,8 @@ function erroMensagem(erro) {
                   </span>
                 </td>
                 <td>{{ candidato.sg_partido }}</td>
-                <td class="tabela__numero">{{ inteiro(candidato.secoes) }}</td>
-                <td class="tabela__numero">{{ inteiro(bloco.comparecimento.secoes - (candidato.secoes_com_voto ?? 0)) }}</td>
+                <td class="tabela__numero">{{ formatarNumero(candidato.secoes) }}</td>
+                <td class="tabela__numero">{{ formatarNumero(bloco.comparecimento.secoes - (candidato.secoes_com_voto ?? 0)) }}</td>
                 <td class="tabela__numero">{{ numero(candidato.media) }}</td>
                 <td class="tabela__numero">{{ numero(candidato.mediana) }}</td>
                 <td class="tabela__numero">{{ numero(candidato.desvio) }}</td>

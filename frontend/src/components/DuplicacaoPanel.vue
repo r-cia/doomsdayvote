@@ -26,6 +26,7 @@ function numeros(grupo) {
   const valores = [...new Set(grupo.secoes.map((secao) => secao.nr_secao))].sort(
     (a, b) => a - b,
   )
+  if (valores.length === 0) return '—'
   const visiveis = valores.slice(0, 12).join(', ')
   return valores.length > 12 ? `${visiveis}…` : visiveis
 }
