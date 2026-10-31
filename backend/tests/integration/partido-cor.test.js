@@ -25,6 +25,7 @@ function ambiente() {
     ...process.env,
     NODE_ENV: 'test',
     DATABASE_URL: url,
+    DATABASE_MIGRATION_URL: process.env.TEST_DATABASE_MIGRATION_URL,
     BWEB_INPUT_DIR: '../data',
     BWEB_STORAGE_DIR: '../data/storage',
   };

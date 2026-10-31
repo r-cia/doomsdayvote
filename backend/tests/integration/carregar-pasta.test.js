@@ -106,6 +106,7 @@ describe('worker de carga manual', () => {
             ...process.env,
             NODE_ENV: 'test',
             DATABASE_URL: url,
+            DATABASE_MIGRATION_URL: process.env.TEST_DATABASE_MIGRATION_URL,
             BWEB_INPUT_DIR: inputDir,
             BWEB_STORAGE_DIR: storageDir,
           },
