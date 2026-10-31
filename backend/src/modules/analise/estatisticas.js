@@ -95,7 +95,8 @@ async function consultarBaseSecaoCandidato(db, { eleicaoId, cargo, corte, escopo
       .selectFrom('mv_secao_candidato_final')
       .selectAll()
       .where('eleicao_id', '=', eleicaoId)
-      .where('cargo', '=', cargo);
+      .where('cargo', '=', cargo)
+      .where('categoria', '=', 'nominal');
     if (escopo.sgUf) consulta = consulta.where('sg_uf', '=', escopo.sgUf);
     if (escopo.cdMunicipio) consulta = consulta.where('cd_municipio_tse', '=', escopo.cdMunicipio);
     return consulta.execute();

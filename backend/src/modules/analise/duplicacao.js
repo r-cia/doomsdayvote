@@ -1,6 +1,7 @@
 import { sql } from 'kysely'
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js'
 import { ordenarLista } from '../../lib/ordenacao.js'
+import { agruparPorSecao, linhasMvSecaoCandidato } from './mv-secao-candidato.js'
 
 function chaveZona(secao) {
   return `${secao.sg_uf}|${secao.cd_municipio_tse}|${secao.nr_zona}`
@@ -105,10 +106,79 @@ export function agruparAssinaturas(secoes = [], limite = 50, ordenacao = null) {
   }
 }
 
+function agruparComVencedorDeZona(linhas, vencedorPorZona, limite, ordenacao) {
+  const linhasAjustadas = linhas.map((linha) => {
+    const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`
+    const vencedorZona = vencedorPorZona.get(chave)
+    if (vencedorZona === null || vencedorZona === undefined || Number(linha.vencedor_nr) !== vencedorZona) {
+      return { ...linha, vencedor_nr: null, vencedor_nm: null, vencedor_sg: null }
+    }
+    return linha
+  })
+
+  return agruparAssinaturas(
+    linhasAjustadas.map((linha) => ({ ...linha, votaveis: Number(linha.votaveis) })),
+    limite,
+    ordenacao,
+  )
+}
+
+function vencedorDaSecao(grupo) {
+  const nominais = grupo.filter((linha) => linha.categoria === 'nominal')
+  if (nominais.length === 0) return { nr_votavel: null, nm_votavel: null, sg_partido: null }
+  return nominais.reduce((melhor, linha) => {
+    if (!melhor) return linha
+    const diferenca = Number(linha.votos) - Number(melhor.votos)
+    return diferenca > 0 || (diferenca === 0 && Number(linha.nr_votavel) < Number(melhor.nr_votavel)) ? linha : melhor
+  }, null)
+}
+
+async function duplicacaoPelaMv(db, { eleicaoId, cargo, escopo, limite, ordenacao }) {
+  const linhasMv = await linhasMvSecaoCandidato(db, { eleicaoId, cargo, escopo })
+  const linhas = [...agruparPorSecao(linhasMv).values()].map((grupo) => {
+    const primeira = grupo[0]
+    const vencedor = vencedorDaSecao(grupo)
+    return {
+      id: primeira.secao_id,
+      sg_uf: primeira.sg_uf,
+      cd_municipio_tse: primeira.cd_municipio_tse,
+      nr_zona: primeira.nr_zona,
+      nr_secao: primeira.nr_secao,
+      nr_local_votacao: primeira.nr_local_votacao,
+      nm_municipio: primeira.nm_municipio,
+      qt_aptos: primeira.qt_aptos,
+      qt_comparecimento: primeira.qt_comparecimento,
+      vencedor_nr: vencedor.nr_votavel,
+      vencedor_nm: vencedor.nm_votavel,
+      vencedor_sg: vencedor.sg_partido,
+      assinatura: primeira.assinatura,
+      votaveis: primeira.votaveis,
+    }
+  })
+
+  const vencedoresPorZona = new Map()
+  for (const linha of linhas) {
+    const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`
+    if (!vencedoresPorZona.has(chave)) vencedoresPorZona.set(chave, [])
+    vencedoresPorZona.get(chave).push(linha.vencedor_nr)
+  }
+  const vencedorPorZona = new Map()
+  for (const [chave, vencedores] of vencedoresPorZona) {
+    const unico = Number(vencedores[0])
+    vencedorPorZona.set(chave, vencedores.every((v) => v !== null && v !== undefined && Number(v) === unico) ? unico : null)
+  }
+
+  return agruparComVencedorDeZona(linhas, vencedorPorZona, limite, ordenacao)
+}
+
 export async function duplicacaoPorAssinatura(
   db,
   { eleicaoId, cargo, corte, escopo = {}, limite = 50, ordenacao = null },
 ) {
+  if (corte.tipo === 'final') {
+    return duplicacaoPelaMv(db, { eleicaoId, cargo, escopo, limite, ordenacao })
+  }
+
   let consulta = db
     .selectFrom('boletim_versao as bv')
     .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
@@ -238,18 +308,5 @@ export async function duplicacaoPorAssinatura(
     }
   }
 
-  const linhasAjustadas = linhas.map((linha) => {
-    const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`
-    const vencedorZona = vencedorPorZona.get(chave)
-    if (vencedorZona === null || vencedorZona === undefined || Number(linha.vencedor_nr) !== vencedorZona) {
-      return { ...linha, vencedor_nr: null, vencedor_nm: null, vencedor_sg: null }
-    }
-    return linha
-  })
-
-  return agruparAssinaturas(
-    linhasAjustadas.map((linha) => ({ ...linha, votaveis: Number(linha.votaveis) })),
-    limite,
-    ordenacao,
-  )
+  return agruparComVencedorDeZona(linhas, vencedorPorZona, limite, ordenacao)
 }

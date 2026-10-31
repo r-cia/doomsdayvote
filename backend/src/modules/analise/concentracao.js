@@ -2,6 +2,7 @@ import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 import { agruparSecoes } from './comparacao-local.js';
 import { ordenarLista } from '../../lib/ordenacao.js';
+import { agruparPorSecao, linhasMvSecaoCandidato } from './mv-secao-candidato.js';
 import { desvioPadrao, media, percentilRank, toNumberOrNull } from './estatistica-basica.js';
 
 export const COLUNAS_CONCENTRACAO = {
@@ -317,8 +318,39 @@ export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4
   };
 }
 
+async function secoesPelaMv(db, { eleicaoId, cargo, escopo }) {
+  const linhas = await linhasMvSecaoCandidato(db, { eleicaoId, cargo, escopo, categorias: ['nominal', 'legenda'] });
+  return [...agruparPorSecao(linhas).values()].map((grupo) => {
+    const primeira = grupo[0];
+    return {
+      id: primeira.secao_id,
+      sg_uf: primeira.sg_uf,
+      cd_municipio_tse: primeira.cd_municipio_tse,
+      nm_municipio: primeira.nm_municipio,
+      nr_zona: primeira.nr_zona,
+      nr_secao: primeira.nr_secao,
+      nr_local_votacao: primeira.nr_local_votacao,
+      qt_aptos: toNumberOrNull(primeira.qt_aptos),
+      qt_votos_validos: toNumberOrNull(primeira.validos) ?? 0,
+      candidatos: grupo
+        .filter((linha) => linha.categoria === 'nominal')
+        .map((linha) => ({
+          nr_votavel: linha.nr_votavel,
+          nm_votavel: linha.nm_votavel,
+          sg_partido: linha.sg_partido,
+          qt_votos: toNumberOrNull(linha.votos),
+        })),
+    };
+  });
+}
+
 export async function concentracao(db, { eleicaoId, cargo, corte, escopo = {}, limite = 20, ordenacaoShare, ordenacaoMargem } = {}) {
   const corteEfetivo = corte ?? { tipo: 'final' };
+
+  if (corteEfetivo.tipo === 'final') {
+    const secoes = await secoesPelaMv(db, { eleicaoId, cargo, escopo });
+    return concentracaoPura(secoes, { top: limite, ordenacaoShare, ordenacaoMargem });
+  }
 
   let qb = db
     .selectFrom('boletim_versao as bv')
