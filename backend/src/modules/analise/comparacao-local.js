@@ -1,32 +1,7 @@
 import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 
-function toNumberOrNull(valor) {
-  if (valor === null || valor === undefined) return null;
-  const numero = Number(valor);
-  return Number.isFinite(numero) ? numero : null;
-}
-
-function mediana(valores) {
-  const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v)).sort((a, b) => a - b);
-  if (validos.length === 0) return null;
-  const meio = Math.floor(validos.length / 2);
-  if (validos.length % 2 === 1) return validos[meio];
-  return (validos[meio - 1] + validos[meio]) / 2;
-}
-
-function media(valores) {
-  const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v));
-  if (validos.length === 0) return null;
-  return validos.reduce((soma, v) => soma + v, 0) / validos.length;
-}
-
-function percentilRank(valores, valor) {
-  const validos = valores.filter((v) => typeof v === 'number' && Number.isFinite(v));
-  if (validos.length < 2 || typeof valor !== 'number' || !Number.isFinite(valor)) return null;
-  const menoresOuIguais = validos.filter((v) => v <= valor).length;
-  return (menoresOuIguais / validos.length) * 100;
-}
+import { media, mediana, percentilRank, toNumberOrNull } from './estatistica-basica.js';
 
 function aplicarEscala(secoes) {
   const aptos = secoes.map((s) => s.aptos).filter((v) => typeof v === 'number' && Number.isFinite(v));
