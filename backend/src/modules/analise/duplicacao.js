@@ -191,56 +191,29 @@ export async function duplicacaoPorAssinatura(
   consulta = aplicarFiltroCorte(consulta, corte)
   consulta = aplicarEscopo(consulta, escopo)
 
+  const ordemVencedor = sql`order by rv.qt_votos desc, rv.nr_votavel asc`
   const linhas = await consulta
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .leftJoinLateral(
-      (eb) =>
-        eb
-          .selectFrom('resultado_votavel as rv2')
-          .select([
-            'rv2.nr_votavel',
-            'rv2.nm_votavel',
-            'rv2.sg_partido',
-          ])
-          .whereRef('rv2.boletim_versao_id', '=', 'bv.id')
-          .where('rv2.categoria', '=', 'nominal')
-          .where('rv2.qt_votos', 'is not', null)
-          .orderBy('rv2.qt_votos', 'desc')
-          .orderBy('rv2.nr_votavel', 'asc')
-          .limit(1)
-          .as('venc'),
-      (join) => join.onTrue(),
-    )
     .select([
       'bv.secao_id as id',
-      's.sg_uf',
-      's.cd_municipio_tse',
-      's.nr_zona',
-      's.nr_secao',
-      's.nr_local_votacao',
+      sql`max(s.sg_uf)`.as('sg_uf'),
+      sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
+      sql`max(s.nr_zona)`.as('nr_zona'),
+      sql`max(s.nr_secao)`.as('nr_secao'),
+      sql`max(s.nr_local_votacao)`.as('nr_local_votacao'),
       sql`max(l.nm_municipio)`.as('nm_municipio'),
       sql`max(bv.qt_aptos)`.as('qt_aptos'),
       sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
-      'venc.nr_votavel as vencedor_nr',
-      'venc.nm_votavel as vencedor_nm',
-      'venc.sg_partido as vencedor_sg',
+      sql`(array_agg(rv.nr_votavel ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_nr'),
+      sql`(array_agg(rv.nm_votavel ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_nm'),
+      sql`(array_agg(rv.sg_partido ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_sg'),
       sql`md5(string_agg(rv.cd_tipo_votavel::text || ':' || rv.nr_votavel::text || ':' || coalesce(rv.qt_votos, 0)::text, '|' order by rv.cd_tipo_votavel, rv.nr_votavel))`.as(
         'assinatura',
       ),
       sql`count(*)`.as('votaveis'),
     ])
     .where('rv.qt_votos', 'is not', null)
-    .groupBy([
-      'bv.secao_id',
-      's.sg_uf',
-      's.cd_municipio_tse',
-      's.nr_zona',
-      's.nr_secao',
-      's.nr_local_votacao',
-      'venc.nr_votavel',
-      'venc.nm_votavel',
-      'venc.sg_partido',
-    ])
+    .groupBy('bv.secao_id')
     .execute()
 
   // Garante que o vencedor só é exibido se ele venceu em TODAS as seções
@@ -261,35 +234,21 @@ export async function duplicacaoPorAssinatura(
     consultaZonas = aplicarFiltroCorte(consultaZonas, corte)
     consultaZonas = aplicarEscopo(consultaZonas, escopo)
     consultaZonas = consultaZonas
-      .leftJoinLateral(
-        (eb) =>
-          eb
-            .selectFrom('resultado_votavel as rv2')
-            .select(['rv2.nr_votavel'])
-            .whereRef('rv2.boletim_versao_id', '=', 'bv.id')
-            .where('rv2.categoria', '=', 'nominal')
-            .where('rv2.qt_votos', 'is not', null)
-            .orderBy('rv2.qt_votos', 'desc')
-            .orderBy('rv2.nr_votavel', 'asc')
-            .limit(1)
-            .as('venc'),
-        (join) => join.onTrue(),
+      .leftJoin('resultado_votavel as rv', (join) =>
+        join
+          .onRef('rv.boletim_versao_id', '=', 'bv.id')
+          .on('rv.categoria', '=', 'nominal')
+          .on('rv.qt_votos', 'is not', null),
       )
       .select([
-        's.sg_uf',
-        's.cd_municipio_tse',
-        's.nr_zona',
-        'venc.nr_votavel as vencedor_nr',
+        sql`max(s.sg_uf)`.as('sg_uf'),
+        sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
+        sql`max(s.nr_zona)`.as('nr_zona'),
+        sql`(array_agg(rv.nr_votavel order by rv.qt_votos desc, rv.nr_votavel asc) filter (where rv.nr_votavel is not null))[1]`.as(
+          'vencedor_nr',
+        ),
       ])
-      .where(
-        sql`(s.sg_uf, s.cd_municipio_tse, s.nr_zona) in (${sql.join(
-          zonasUnicas.map((zona) => {
-            const [uf, municipio, numero] = zona.split('|')
-            return sql`(${uf}, ${Number(municipio)}, ${Number(numero)})`
-          }),
-          sql`, `,
-        )})`,
-      )
+      .groupBy('bv.id')
 
     const linhasZonas = await consultaZonas.execute()
     const porZona = new Map()
