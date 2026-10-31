@@ -2,7 +2,7 @@ import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 
 import { agruparPorSecao, linhasMvSecaoCandidato } from './mv-secao-candidato.js';
-import { media, mediana, percentilRank, toNumberOrNull } from './estatistica-basica.js';
+import { criarPercentilRank, media, mediana, toNumberOrNull } from './estatistica-basica.js';
 
 function aplicarEscala(secoes) {
   const aptos = secoes.map((s) => s.aptos).filter((v) => typeof v === 'number' && Number.isFinite(v));
@@ -96,8 +96,20 @@ function criarGrupo(secoes, nivel, chave, minimoGrupo) {
     ).values(),
   ];
 
+  const sharesPorCandidato = new Map(
+    candidatosUnicos.map((c) => [
+      Number(c.nr_votavel),
+      secoes.map((s) => shareCandidato(s, c.nr_votavel)).filter((v) => v !== null),
+    ]),
+  );
+  const rankPorCandidato = new Map(
+    [...sharesPorCandidato].map(([nr, shares]) => [nr, criarPercentilRank(shares)]),
+  );
+  const rankParticipacao = criarPercentilRank(participacoes);
+  const rankAbstencao = criarPercentilRank(abstencoesArr);
+
   const metricasCandidatos = candidatosUnicos.map((c) => {
-    const shares = secoes.map((s) => shareCandidato(s, c.nr_votavel)).filter((v) => v !== null);
+    const shares = sharesPorCandidato.get(Number(c.nr_votavel));
     return {
       nr_votavel: c.nr_votavel,
       nm_votavel: c.nm_votavel,
@@ -109,6 +121,12 @@ function criarGrupo(secoes, nivel, chave, minimoGrupo) {
       n: shares.length,
     };
   });
+
+  const metricasPorCandidato = new Map();
+  for (const metrica of metricasCandidatos) {
+    const chave = Number(metrica.nr_votavel);
+    if (!metricasPorCandidato.has(chave)) metricasPorCandidato.set(chave, metrica);
+  }
 
   const secoesMetricas = secoes.map((s) => {
     const totalVotos = s.candidatos.reduce((soma, c) => soma + (c.votos ?? 0), 0);
@@ -129,20 +147,20 @@ function criarGrupo(secoes, nivel, chave, minimoGrupo) {
       abstencao !== null && medianaAbstencao !== null ? (abstencao - medianaAbstencao) * 100 : null;
 
     const distanciaCandidatos = candidatos.map((c) => {
-      const grupo = metricasCandidatos.find((g) => Number(g.nr_votavel) === Number(c.nr_votavel));
+      const grupo = metricasPorCandidato.get(Number(c.nr_votavel));
       const medianaShare = grupo?.share_mediana ?? null;
       const pp = c.share !== null && medianaShare !== null ? (c.share - medianaShare) * 100 : null;
       return { nr_votavel: c.nr_votavel, share_pp: pp, pp };
     });
 
-    const percentilParticipacao = percentilRank(participacoes, participacao);
-    const percentilAbstencao = percentilRank(abstencoesArr, abstencao);
+    const percentilParticipacao = rankParticipacao(participacao);
+    const percentilAbstencao = rankAbstencao(abstencao);
     const percentilCandidatos = candidatos.map((c) => {
-      const shares = secoes.map((sec) => shareCandidato(sec, c.nr_votavel)).filter((v) => v !== null);
+      const percentil = rankPorCandidato.get(Number(c.nr_votavel))(c.share);
       return {
         nr_votavel: c.nr_votavel,
-        share_percentil: percentilRank(shares, c.share),
-        percentil: percentilRank(shares, c.share),
+        share_percentil: percentil,
+        percentil,
       };
     });
 

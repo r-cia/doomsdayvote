@@ -30,9 +30,21 @@ export function desvioPadrao(valores) {
   return Math.sqrt(variancia);
 }
 
+export function criarPercentilRank(valores) {
+  const ordenados = finitos(valores).sort((a, b) => a - b);
+  return (valor) => {
+    if (ordenados.length < 2 || typeof valor !== 'number' || !Number.isFinite(valor)) return null;
+    let inicio = 0;
+    let fim = ordenados.length;
+    while (inicio < fim) {
+      const meio = (inicio + fim) >> 1;
+      if (ordenados[meio] <= valor) inicio = meio + 1;
+      else fim = meio;
+    }
+    return (inicio / ordenados.length) * 100;
+  };
+}
+
 export function percentilRank(valores, valor) {
-  const validos = finitos(valores);
-  if (validos.length < 2 || typeof valor !== 'number' || !Number.isFinite(valor)) return null;
-  const menoresOuIguais = validos.filter((v) => v <= valor).length;
-  return (menoresOuIguais / validos.length) * 100;
+  return criarPercentilRank(valores)(valor);
 }
