@@ -164,3 +164,9 @@ As constantes `COLUNAS_*` ficam junto da rota que as usa. Os contratos de API n�
 - Implementação pelo subagente Sonnet.
 - Validação com `npm test` no backend e no frontend e com `npm run test:integration`.
 - `graphify update .`, um commit por etapa (backend, frontend, docs) e push no fim.
+
+### Ajustes dos gráficos (2026-10-31)
+1. Os gráficos ficam em duas abas dentro da tela, "1º Turno" e "2º Turno"; só os do turno selecionado aparecem.
+2. "Votos por intervalo" usa eixo Y logarítmico, com marcas em potências de 10 e rótulos sem corte; intervalos com 0 voto ficam como lacuna. "% acumulada" segue linear.
+3. As curvas dos anos continuam sobrepostas, com gráficos de diferença abaixo, uma linha por par de anos ("A − B"), só nos intervalos presentes nos dois anos, em escala linear com linha de zero: sob votos por intervalo, a diferença em votos e a diferença em pontos percentuais do % do total do ano; sob % acumulada, a diferença em pontos percentuais.
+4. O pareamento continua por posição (1º com 1º e 2º com 2º; vencedor com vencedor e derrotado com derrotado).
