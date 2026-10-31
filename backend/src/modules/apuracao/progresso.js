@@ -17,7 +17,3 @@ export async function contarSecoesComBu(db, { eleicaoId, cargo, corte, escopo = 
 
   return Number(total);
 }
-
-export async function calcularProgresso(db, escopo) {
-  return { secoes_com_bu: await contarSecoesComBu(db, escopo) };
-}
