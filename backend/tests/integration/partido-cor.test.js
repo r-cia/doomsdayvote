@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { criarDb } from '../../src/db/index.js';
 import { somarVotos } from '../../src/modules/apuracao/totais.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
-import { contar, limparBanco } from '../helpers/db-teste.js';
+import { atualizarViews, contar, limparBanco } from '../helpers/db-teste.js';
 import { caminhoFixture } from '../helpers/fixtures.js';
 
 const execFileAsync = promisify(execFile);
@@ -98,6 +98,7 @@ describe('cores de partido', () => {
         storageDir,
       });
       await semear();
+      await atualizarViews();
       const { eleicaoId, cargo } = await alvoCargo('Presidente');
       const votos = await somarVotos(db, { eleicaoId, cargo, corte: { tipo: 'final' } });
       expect(votos.some((voto) => voto.cor_hex)).toBe(true);

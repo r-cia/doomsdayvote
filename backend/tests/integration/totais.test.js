@@ -7,7 +7,7 @@ import { resolverCorte } from '../../src/modules/apuracao/corte.js';
 import { somarMetricasSecao, somarVotos } from '../../src/modules/apuracao/totais.js';
 import { lerArquivoBweb } from '../../src/modules/importacao/bweb/ler-arquivo.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
-import { limparBanco } from '../helpers/db-teste.js';
+import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
 import { caminhoFixture } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
@@ -17,7 +17,9 @@ const db = criarDb({ connectionString: url });
 let storageDir;
 
 async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+  await atualizarViews(db);
+  return resultado;
 }
 
 async function alvoCargo(nome) {

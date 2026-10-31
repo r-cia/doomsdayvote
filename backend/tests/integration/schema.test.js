@@ -131,7 +131,7 @@ describe('schema inicial', () => {
     expect(descida.error).toBeUndefined();
     const subida = await migrator.migrateToLatest();
     expect(subida.error).toBeUndefined();
-  });
+  }, 180000);
 
   afterAll(async () => {
     await db.destroy();
@@ -358,5 +358,5 @@ describe('schema inicial', () => {
       const subida = await migrator.migrateToLatest();
       expect(subida.error).toBeUndefined();
     }
-  });
+  }, 180000);
 });

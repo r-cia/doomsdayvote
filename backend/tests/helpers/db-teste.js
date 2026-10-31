@@ -1,4 +1,17 @@
+import pg from 'pg';
 import { sql } from 'kysely';
+import { atualizarViewsMaterializadas } from '../../src/db/views.js';
+
+// REFRESH MATERIALIZED VIEW exige o dono da view; o papel da aplicação não tem essa permissão.
+export async function atualizarViews() {
+  const cliente = new pg.Client({ connectionString: process.env.TEST_DATABASE_MIGRATION_URL });
+  await cliente.connect();
+  try {
+    await atualizarViewsMaterializadas((texto) => cliente.query(texto));
+  } finally {
+    await cliente.end();
+  }
+}
 
 export async function limparBanco(db) {
   await sql`DELETE FROM bweb_staging`.execute(db);

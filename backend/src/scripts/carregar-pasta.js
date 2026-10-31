@@ -1,6 +1,7 @@
 import pg from 'pg';
 import { loadWorkerEnv } from '../env.js';
 import { criarDb } from '../db/index.js';
+import { atualizarViewsMaterializadas } from '../db/views.js';
 import { criarCache } from '../lib/cache.js';
 import { carregarPasta } from '../modules/importacao/carregar-pasta.js';
 
@@ -42,18 +43,7 @@ async function main() {
       skipCargosLegislativos: env.BWEB_SKIP_CARGOS_LEGISLATIVOS,
     });
     console.log(JSON.stringify(resumo, null, 2));
-    await cliente
-      .query('refresh materialized view concurrently mv_votos_final')
-      .catch(() => cliente.query('refresh materialized view mv_votos_final'));
-    await cliente
-      .query('refresh materialized view concurrently mv_metricas_final')
-      .catch(() => cliente.query('refresh materialized view mv_metricas_final'));
-    await cliente
-      .query('refresh materialized view concurrently mv_totais_area')
-      .catch(() => cliente.query('refresh materialized view mv_totais_area'));
-    await cliente
-      .query('refresh materialized view concurrently mv_secao_candidato_final')
-      .catch(() => cliente.query('refresh materialized view mv_secao_candidato_final'));
+    await atualizarViewsMaterializadas((texto) => cliente.query(texto));
     await cache.invalidar();
     await cache.fechar();
     await db.destroy();
