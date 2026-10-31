@@ -8,6 +8,17 @@ Toda tabela fica dentro de `TabelaScroll` (`frontend/src/components/TabelaScroll
 
 Cada grupo começa recolhido: o cabeçalho (`.grupo__cabecalho`) contém um botão `.grupo__alternar` com `aria-expanded`, o indicador `▸`/`▾` (`aria-hidden`), o nível e o tamanho do grupo. Ao expandir, a tabela de seções do grupo é buscada em `/api/comparacao-local/secoes` (hook `useComparacaoLocalSecoes`) e exibida dentro de `TabelaScroll`, com `StateBlock` para carregando e erro. A ordenação das colunas é a mesma do painel e vale para todos os grupos abertos. Componente: `ComparacaoLocalGrupo.vue`.
 
+## Estados: carregando, erro, sem dados, dados
+
+Todo bloco ligado a uma consulta (tabela, painel, gráfico, mapa) resolve o estado nesta ordem: carregando → erro → sem dados → dados.
+
+- Carregando: `StateBlock` carregando, só quando ainda não há dados (com dados já exibidos vale o overlay de "Recarga").
+- Erro: `StateBlock` `estado="erro"` com `comum.erro`, a mensagem do `ApiError` como descrição e a ação `comum.tentarNovamente` que refaz a consulta (painel filho emite `retry`). O erro vem antes do vazio e dos dados: uma falha nunca cai em "Sem dados" e, numa recarga que falha, substitui o conteúdo antigo em vez de mantê-lo.
+- Sem dados: `comum.semDados` (ou a variante do bloco) só quando a requisição teve sucesso e não trouxe nada.
+- Dados: o conteúdo.
+
+Quando mais de uma consulta alimenta o bloco, qualquer falha mostra o erro. Chamadas diretas à API (sem `useQuery`) guardam a mensagem de erro em um ref e não a trocam por lista vazia. Falha ao carregar a malha do mapa também é erro, não "Sem dados".
+
 ## Valor nulo
 
 Valor nulo ou ausente em célula ou painel é exibido como travessão (`—`) em todas as telas. Use os formatadores de `frontend/src/lib/format.js` (`formatarNumero`, `formatarDecimal`, `formatarPercentual`, etc.), que já devolvem `—` para nulo, indefinido, vazio ou não numérico; painéis não definem helper próprio com outra regra. Zero é exibido como `0`.
