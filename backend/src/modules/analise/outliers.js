@@ -1,4 +1,5 @@
 import { mediana } from './estatistica-basica.js'
+import { featuresDasSecoes } from './estatisticas.js'
 
 export const FEATURES = Object.freeze([
   'participacao',
@@ -203,4 +204,72 @@ export function amostraLof(total, scores, limite = 2000, semente = 42) {
   }
 
   return escolhidos
+}
+
+export function vencedoresPorMunicipio(linhas) {
+  const votosPorMunicipio = new Map()
+  for (const linha of linhas) {
+    const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}`
+    if (!votosPorMunicipio.has(chave)) {
+      votosPorMunicipio.set(chave, new Map())
+    }
+    const candidatos = votosPorMunicipio.get(chave)
+    const atual = candidatos.get(linha.nr_votavel) ?? {
+      nr_votavel: linha.nr_votavel,
+      nm_votavel: linha.nm_votavel,
+      sg_partido: linha.sg_partido,
+      votos: 0,
+    }
+    atual.votos += Number(linha.votos ?? 0)
+    candidatos.set(linha.nr_votavel, atual)
+  }
+  const vencedorCidade = new Map()
+  for (const [chave, candidatos] of votosPorMunicipio) {
+    let vencedor = null
+    for (const candidato of candidatos.values()) {
+      if (!vencedor || candidato.votos > vencedor.votos) {
+        vencedor = candidato
+      }
+    }
+    if (vencedor) {
+      vencedorCidade.set(chave, {
+        nr_votavel: vencedor.nr_votavel,
+        nm_votavel: vencedor.nm_votavel,
+        sg_partido: vencedor.sg_partido,
+      })
+    }
+  }
+  return vencedorCidade
+}
+
+export function pontuarOutliers(linhas) {
+  const secoes = featuresDasSecoes(linhas)
+  const matriz = secoes.map((secao) =>
+    FEATURES.map((feature) => secao[feature]),
+  )
+  const isolamento = isolationForest(matriz, { semente: 42 })
+  const indices = amostraLof(secoes.length, isolamento.scores)
+  const lof = localOutlierFactor(
+    indices.map((indice) => matriz[indice]),
+    { k: 10 },
+  )
+  const scoreLof = new Map(
+    indices.map((indice, posicao) => [indice, lof.scores[posicao]]),
+  )
+
+  const vencedorCidade = vencedoresPorMunicipio(linhas)
+  const pontuadas = secoes
+    .map((secao, indice) => {
+      const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`
+      const vencedor = vencedorCidade.get(chave) ?? null
+      return {
+        ...secao,
+        score_if: isolamento.scores[indice],
+        score_lof: scoreLof.get(indice) ?? null,
+        vencedor,
+      }
+    })
+    .sort((a, b) => b.score_if - a.score_if)
+
+  return { total: secoes.length, isolamento, lof, amostraLof: indices.length, pontuadas }
 }
