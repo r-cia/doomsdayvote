@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/descritivas.js": {
-    "mtime": 1793480165.9280453,
-    "seen": 1793480618.0508134,
-    "ast_hash": "091472444e457409ff04cd760d62c7b6",
+    "mtime": 1793546552.4103138,
+    "seen": 1793546997.335896,
+    "ast_hash": "bb87bc2d4cd12e2a22c61a2745c55395",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/duplicacao.js": {
@@ -642,9 +642,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordNiveisPanel.vue": {
-    "mtime": 1793507093.3156826,
-    "seen": 1793507162.0657427,
-    "ast_hash": "66bd68155b423d7ff377a58889496ce6",
+    "mtime": 1793546280.9852378,
+    "seen": 1793546997.336123,
+    "ast_hash": "e155661f1516a361211b27255958820f",
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordPanel.vue": {
@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/DuplicacaoPanel.vue": {
-    "mtime": 1793495844.8676057,
-    "seen": 1793496560.9966514,
-    "ast_hash": "98e160a8ef784e2e2cf77ffb516e6dea",
+    "mtime": 1793546322.8088124,
+    "seen": 1793546997.3361425,
+    "ast_hash": "f1b4c869201f1093e663ccef9b6c97c6",
     "semantic_hash": ""
   },
   "frontend/src/components/EstatisticaPanel.vue": {
@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/OutliersPanel.vue": {
-    "mtime": 1793495967.6672597,
-    "seen": 1793496560.9966614,
-    "ast_hash": "e4a1d125aa0d8896cde2831dcb5a4369",
+    "mtime": 1793546322.569809,
+    "seen": 1793546997.3361542,
+    "ast_hash": "83b822a35d7f86a71ec0abc35898a41b",
     "semantic_hash": ""
   },
   "frontend/src/components/PlacarRanking.vue": {
@@ -774,21 +774,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793543714.0690484,
-    "seen": 1793543765.3910158,
-    "ast_hash": "b461f08178915d2e641583fec2b872f2",
+    "mtime": 1793546281.1742404,
+    "seen": 1793546997.3361776,
+    "ast_hash": "413d41b5625f6ae964418e9184308d1b",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793543714.16305,
-    "seen": 1793543765.3910172,
-    "ast_hash": "a50f6ad77decfb9b15a85ee366638730",
+    "mtime": 1793546281.277242,
+    "seen": 1793546997.3361793,
+    "ast_hash": "4bbdd0339879b61ece4a1da546fe696e",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793543713.9800467,
-    "seen": 1793543765.3910189,
-    "ast_hash": "290954c77ec029f0705f01eb132c5d5b",
+    "mtime": 1793546281.0882392,
+    "seen": 1793546997.336181,
+    "ast_hash": "77414c390adaf629ef41bce152d399ec",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -1467,6 +1467,12 @@
     "mtime": 1793543703.4898636,
     "seen": 1793543765.3910635,
     "ast_hash": "05f28f6ab05ca8c9e580bbb5713a0d0f",
+    "semantic_hash": ""
+  },
+  "frontend/tests/benford-niveis.test.js": {
+    "mtime": 1793546299.8054936,
+    "seen": 1793546997.3362188,
+    "ast_hash": "3b5ab2e9eddf3d6118a57bea2c2e6228",
     "semantic_hash": ""
   }
 }
