@@ -11,6 +11,8 @@ import {
   coresDosPares,
   diferencasEntrePares,
   dominioLog,
+  larguraRotulo,
+  margemDireita,
   margemEsquerda,
   percentualDoTotal,
   tracosDosAnos,
@@ -200,6 +202,26 @@ describe('CurvasAnos', () => {
     }
     const horas = cedo.findAll('.curvas__grade text').map((item) => item.text())
     expect(horas).toEqual(expect.arrayContaining(['23:00', '00:00', '01:00', '02:00']))
+  })
+
+  it('a margem direita comporta metade do último rótulo, em qualquer largura', async () => {
+    expect(margemDireita('03:00')).toBeGreaterThanOrEqual(larguraRotulo('03:00') / 2)
+
+    for (const largura of [320, 480, 520, 640, 1200]) {
+      const wrapper = mount(CurvasAnos, {
+        props: { titulo: 't', series: [{ chave: 'a', rotulo: 'a', pontos: [{ minuto: 1000, valor: 1 }, { minuto: 1010, valor: 2 }] }] },
+      })
+      wrapper.vm.$.setupState.largura = largura
+      await wrapper.vm.$nextTick()
+
+      const largSvg = Number(wrapper.get('svg.curvas__svg').attributes('viewBox').split(' ')[2])
+      const ultimo = wrapper.findAll('.curvas__grade text').filter((item) => item.text() === '03:00').at(-1)
+      const x = Number(ultimo.attributes('x'))
+      expect(largSvg).toBe(largura)
+      expect(x + larguraRotulo('03:00') / 2).toBeLessThanOrEqual(largSvg)
+      const linhaDireita = Number(wrapper.get('.curvas__grade line').attributes('x2'))
+      expect(largSvg - linhaDireita).toBeGreaterThanOrEqual(larguraRotulo('03:00') / 2)
+    }
   })
 
   it('pontos fora de 15:00–03:00 não são desenhados nem alteram a escala', () => {

@@ -23,6 +23,14 @@ export function margemEsquerda(rotulos) {
   return largura * LARGURA_CARACTERE + FOLGA_ROTULO
 }
 
+export function larguraRotulo(rotulo) {
+  return String(rotulo).length * LARGURA_CARACTERE
+}
+
+export function margemDireita(rotuloUltimaMarca) {
+  return Math.ceil(larguraRotulo(rotuloUltimaMarca) / 2) + 2
+}
+
 export function diferenca(pontosA, pontosB) {
   const porMinuto = new Map(pontosB.map((ponto) => [ponto.minuto, ponto.valor]))
   const resultado = []

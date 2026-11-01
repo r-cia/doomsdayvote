@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { CORES_PADRAO, DOMINIO_X, dominioLog, margemEsquerda } from '../lib/entre-anos'
+import { CORES_PADRAO, DOMINIO_X, dominioLog, margemDireita, margemEsquerda } from '../lib/entre-anos'
 import { formatarDecimal, formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
@@ -11,7 +11,7 @@ const props = defineProps({
 })
 
 const ALTURA = 220
-const MARGEM = { dir: 12, topo: 10, base: 26 }
+const MARGEM = { topo: 10, base: 26 }
 
 const figura = ref(null)
 const largura = ref(640)
@@ -64,7 +64,7 @@ const limitesX = DOMINIO_X
 const x = (minuto) =>
   margemEsq.value +
   ((minuto - limitesX.min) / (limitesX.max - limitesX.min)) *
-    (largura.value - margemEsq.value - MARGEM.dir)
+    (largura.value - margemEsq.value - margemDir.value)
 
 function y(valor) {
   const { min, max } = dominioY.value
@@ -87,6 +87,8 @@ const marcasX = computed(() => {
   for (let minuto = limitesX.min; minuto <= limitesX.max; minuto += passo) marcas.push(minuto)
   return marcas
 })
+
+const margemDir = computed(() => margemDireita(horaDe(marcasX.value.at(-1) ?? limitesX.max)))
 
 const linhaZero = computed(
   () => !log.value && dominioY.value.min < 0 && dominioY.value.max > 0,
@@ -140,7 +142,7 @@ const resumo = computed(() =>
     >
       <g class="curvas__grade">
         <template v-for="valor in dominioY.marcas" :key="`y${valor}`">
-          <line :x1="margemEsq" :x2="largura - MARGEM.dir" :y1="y(valor)" :y2="y(valor)" />
+          <line :x1="margemEsq" :x2="largura - margemDir" :y1="y(valor)" :y2="y(valor)" />
           <text :x="margemEsq - 8" :y="y(valor)" text-anchor="end" dominant-baseline="middle">
             {{ formatarY(valor) }}
           </text>
@@ -159,7 +161,7 @@ const resumo = computed(() =>
         v-if="linhaZero"
         class="curvas__zero"
         :x1="margemEsq"
-        :x2="largura - MARGEM.dir"
+        :x2="largura - margemDir"
         :y1="y(0)"
         :y2="y(0)"
       />
