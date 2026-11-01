@@ -38,6 +38,11 @@ describe('benfordDosNiveis', () => {
     expect(candidatos[0].secoes_abaixo_minimo).toBe(1);
     expect(candidatos[0].total_votos).toBe(35);
     expect(niveis.secao.digitos).toHaveLength(9);
+    for (const nivel of Object.values(niveis)) {
+      expect(nivel.monte_carlo.simulacoes).toBe(10_000);
+      expect(nivel.monte_carlo.p_valor).toBeGreaterThan(0);
+      expect(nivel.monte_carlo.p_valor).toBeLessThanOrEqual(1);
+    }
   });
 
   it('separa candidatos e ordena por votos', () => {

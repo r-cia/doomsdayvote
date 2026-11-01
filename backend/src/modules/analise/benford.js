@@ -1,4 +1,6 @@
 const DIGITOS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+export const SIMULACOES_BENFORD = 10_000
+const distribuicoesMonteCarlo = new Map()
 
 export const ESPERADO_BENFORD = Object.freeze(
   DIGITOS.map((digito) => Math.log10(1 + 1 / digito)),
@@ -9,6 +11,68 @@ export const LIMIAR_MAD = Object.freeze([
   { limite: 0.012, classificacao: 'conformidade aceitável' },
   { limite: 0.015, classificacao: 'conformidade marginal' },
 ])
+
+function distribuicaoMonteCarlo(n) {
+  if (distribuicoesMonteCarlo.has(n)) {
+    const distribuicao = distribuicoesMonteCarlo.get(n)
+    distribuicoesMonteCarlo.delete(n)
+    distribuicoesMonteCarlo.set(n, distribuicao)
+    return distribuicao
+  }
+
+  let estado = (n ^ 0x9e3779b9) >>> 0 || 1
+  const aleatorio = () => {
+    estado ^= estado << 13
+    estado ^= estado >>> 17
+    estado ^= estado << 5
+    return (estado >>> 0) / 0x1_0000_0000
+  }
+  const acumuladas = []
+  let acumulado = 0
+  for (const esperado of ESPERADO_BENFORD) {
+    acumulado += esperado
+    acumuladas.push(acumulado)
+  }
+
+  const mads = Array.from({ length: SIMULACOES_BENFORD }, () => {
+    const observadas = Array(9).fill(0)
+    for (let indice = 0; indice < n; indice += 1) {
+      const sorteio = aleatorio()
+      let inicio = 0
+      let fim = acumuladas.length - 1
+      while (inicio < fim) {
+        const meio = (inicio + fim) >>> 1
+        if (sorteio < acumuladas[meio]) fim = meio
+        else inicio = meio + 1
+      }
+      observadas[inicio] += 1
+    }
+    return observadas.reduce(
+      (total, quantidade, indice) =>
+        total + Math.abs(quantidade / n - ESPERADO_BENFORD[indice]),
+      0,
+    ) / DIGITOS.length
+  }).sort((a, b) => a - b)
+
+  distribuicoesMonteCarlo.set(n, mads)
+  // shortcut: 64 tamanhos limitam o cache a ~5 MB; elevar se uma resposta repetir n após a 64ª chave.
+  if (distribuicoesMonteCarlo.size > 64) {
+    distribuicoesMonteCarlo.delete(distribuicoesMonteCarlo.keys().next().value)
+  }
+  return mads
+}
+
+function pValorMonteCarlo(n, mad) {
+  const mads = distribuicaoMonteCarlo(n)
+  let inicio = 0
+  let fim = mads.length
+  while (inicio < fim) {
+    const meio = (inicio + fim) >>> 1
+    if (mads[meio] < mad) inicio = meio + 1
+    else fim = meio
+  }
+  return (mads.length - inicio + 1) / (mads.length + 1)
+}
 
 export function primeiroDigito(valor) {
   const numero = Math.abs(Number(valor))
@@ -41,6 +105,7 @@ export function calcularBenford(contagens = []) {
       n: 0,
       mad: null,
       classificacao: null,
+      monte_carlo: { simulacoes: SIMULACOES_BENFORD, p_valor: null },
       digitos: DIGITOS.map((digito, indice) => ({
         digito,
         observado: 0,
@@ -62,6 +127,7 @@ export function calcularBenford(contagens = []) {
     n,
     mad,
     classificacao: classificarMad(mad),
+    monte_carlo: { simulacoes: SIMULACOES_BENFORD, p_valor: pValorMonteCarlo(n, mad) },
     digitos: DIGITOS.map((digito, indice) => ({
       digito,
       observado: observadas[indice],

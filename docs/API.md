@@ -116,14 +116,14 @@ Duas leituras no recorte e no corte atuais.
 
 `qt_habilitados_por_biometria` é `qt_comparecimento − qt_biometria_nao_habilitada`. O campo `QT_ELEI_BIOM_SEM_HABILITACAO` do BU conta eleitores **com** biometria que não foram habilitados por ela; não há biometria por candidato e a API não rateia.
 
-Benford usa o primeiro dígito dos votos por seção com 10 votos ou mais, a distribuição esperada `log10(1 + 1/d)` e o MAD de Nigrini (0,006 / 0,012 / 0,015).
+Benford usa o primeiro dígito dos votos por seção com 10 votos ou mais, a distribuição esperada `log10(1 + 1/d)` e o MAD de Nigrini (0,006 / 0,012 / 0,015). Cada resultado inclui `monte_carlo: { simulacoes, p_valor }`: p-valor empírico unilateral, calculado com 10.000 amostras multinomiais sob Benford, condicionado a `n`, e correção `(1 + simulações com MAD >= MAD observado) / 10.001`. A sequência é determinística por `n`. O p-valor é exploratório, sem ajuste por comparações múltiplas e não indica fraude.
 `/api/analysis` também retorna `cobertura` (seções consideradas, BUs sem campos).
 
 ## `GET /api/anomalies`
 
 Benford por nível, duplicação de vetor de votos e outliers por seção, no corte e no recorte.
 
-- `benford_niveis`: por candidato, `niveis.secao`, `niveis.zona` e `niveis.municipio`, cada um com `n`, `mad` e `digitos`; mínimo de 10 votos por unidade.
+- `benford_niveis`: por candidato, `niveis.secao`, `niveis.zona` e `niveis.municipio`, cada um com `n`, `mad`, `digitos` e `monte_carlo`; mínimo de 10 votos por unidade. O p-valor segue o método exploratório descrito acima.
 - `duplicacao`: `grupos` com a mesma assinatura do vetor de votos, `mesma_zona`, `mesmo_municipio`, `mesmo_local`, `secoes_consecutivas`; cada seção inclui `nr_local_votacao`, `qt_aptos` e `qt_comparecimento`; `total_secoes_escopo`.
 - `outliers`: `features` (6), `parametros` (`isolamento`: 100 árvores, amostra 256; `lof`: k 10, amostra até 5.000) e as 20 seções com maior score. Sem rótulos de limiar.
 

@@ -36,6 +36,7 @@
 ## Fluxo de análise
 
 - Cada painel consome queries do TanStack Vue Query.
+- A análise Benford calcula o MAD e um p-valor Monte Carlo determinístico por tamanho amostral; os painéis exibem esse p-valor por candidato e por nível, com ressalva de ausência de ajuste múltiplo.
 - Endpoints retornam `cobertura` padronizada.
 - A consistência agrega votos por BU no Postgres antes de retornar os dados, evitando transferir todas as linhas de resultado ou montar uma lista de parâmetros por BU.
 - A cobertura conta cada BU avaliável uma vez; ausências ficam na cobertura. Comparações históricas agrupam por `election_id` e usam apenas o corte final.

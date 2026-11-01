@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   "backend/package.json": {
-    "mtime": 1793410324.8800485,
-    "seen": 1793419495.4579375,
-    "ast_hash": "2d27152e243492bff6312b2ddb64ad6a",
+    "mtime": 1793505705.0,
+    "seen": 1793507162.065101,
+    "ast_hash": "babef017203a7e7c7661113594486b3e",
     "semantic_hash": ""
   },
   "backend/src/app.js": {
@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/benford.js": {
-    "mtime": 1793285836.0321214,
-    "seen": 1793360126.821801,
-    "ast_hash": "dfca6442832f0385ce1389a527293f08",
+    "mtime": 1793507079.1135156,
+    "seen": 1793507162.0652208,
+    "ast_hash": "1b9023efcd3672c18ed1a9a5a1f1d212",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/consistencia.js": {
@@ -132,21 +132,21 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/duplicacao.js": {
-    "mtime": 1793480166.4930518,
-    "seen": 1793480618.0508153,
-    "ast_hash": "72cec734b534f51c892e7b19f5c16724",
+    "mtime": 1793501521.0044105,
+    "seen": 1793503233.8108692,
+    "ast_hash": "8107fa0d490b941d082806e07dd9a25b",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatisticas.js": {
-    "mtime": 1793480166.0440466,
-    "seen": 1793480618.050821,
-    "ast_hash": "9418decda1a44ecdf6b42d846093693b",
+    "mtime": 1793501945.5541823,
+    "seen": 1793503233.8108823,
+    "ast_hash": "b55cab1d23c949bcd00627cbd4764d84",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/outliers.js": {
-    "mtime": 1793461206.3725376,
-    "seen": 1793461606.9739816,
-    "ast_hash": "60cc56b145351a5e4c92f508bc65fd37",
+    "mtime": 1793505569.1414251,
+    "seen": 1793507162.065267,
+    "ast_hash": "caa175fb4fd4c2398d5a4e6048c69249",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/versoes-bu.js": {
@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/benford.test.js": {
-    "mtime": 1793285890.9486842,
-    "seen": 1793360126.8218834,
-    "ast_hash": "e64725ec69fa5b9b6440764ec2aa61f2",
+    "mtime": 1793507079.142516,
+    "seen": 1793507162.0655916,
+    "ast_hash": "4e7cb64f640eaea59976b8c565728c5f",
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/consistencia.test.js": {
@@ -486,9 +486,9 @@
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/niveis.test.js": {
-    "mtime": 1793293771.7620952,
-    "seen": 1793360126.8218873,
-    "ast_hash": "faf5b255e51034ca60da85c62be46145",
+    "mtime": 1793507138.621215,
+    "seen": 1793507162.0656211,
+    "ast_hash": "076019fd55d9b3cfe2e252de91cd1931",
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/outliers.test.js": {
@@ -642,15 +642,15 @@
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordNiveisPanel.vue": {
-    "mtime": 1793495791.8448365,
-    "seen": 1793496560.9966335,
-    "ast_hash": "31fc8370d7131edf747ecdddf9b0530d",
+    "mtime": 1793507093.3156826,
+    "seen": 1793507162.0657427,
+    "ast_hash": "66bd68155b423d7ff377a58889496ce6",
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordPanel.vue": {
-    "mtime": 1793495797.0629137,
-    "seen": 1793496560.9966352,
-    "ast_hash": "a95c5a86ed4d2104302537447fd9a48b",
+    "mtime": 1793507093.3146827,
+    "seen": 1793507162.0657475,
+    "ast_hash": "4712ca238343294a6402381b036034fb",
     "semantic_hash": ""
   },
   "frontend/src/components/BiometriaPanel.vue": {
@@ -774,21 +774,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793496961.2472472,
-    "seen": 1793498114.3475134,
-    "ast_hash": "5c21e611a4bf8085ce100ca0733d6a84",
+    "mtime": 1793507104.2658114,
+    "seen": 1793507162.0658827,
+    "ast_hash": "045114e51cca7b3b436e16cf59746224",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793496961.8012521,
-    "seen": 1793498114.3475153,
-    "ast_hash": "c3b2e15cff93c00374ee968e6a1e3485",
+    "mtime": 1793507104.2668114,
+    "seen": 1793507162.0658865,
+    "ast_hash": "d2af6d2a0199349f9b59df5d3a02a02d",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793496961.091246,
-    "seen": 1793498114.347517,
-    "ast_hash": "59ddb81b3b057486067dd1b9eac97f19",
+    "mtime": 1793507104.2638113,
+    "seen": 1793507162.065891,
+    "ast_hash": "8d625f1164c9e1722126bfe69356191d",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -948,9 +948,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793499145.8116078,
-    "seen": 1793500927.720963,
-    "ast_hash": "c0f434aa28753ae767fa6c6673e6294c",
+    "mtime": 1793507104.2678115,
+    "seen": 1793507162.0660598,
+    "ast_hash": "03f240af3fcfdc5118adeefce254ffc6",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -978,9 +978,9 @@
     "semantic_hash": ""
   },
   "docs/current-plan.md": {
-    "mtime": 1793495369.0210395,
-    "seen": 1793496560.9967768,
-    "ast_hash": "84865a8482d8bfd8c0c7ff23cc6a7968",
+    "mtime": 1793507064.787347,
+    "seen": 1793507162.066088,
+    "ast_hash": "172221ec892df67fc2ab60b9cd63dc56",
     "semantic_hash": ""
   },
   "frontend/index.html": {
@@ -1002,15 +1002,15 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/comparacao-local.js": {
-    "mtime": 1793480166.1860483,
-    "seen": 1793480618.0508077,
-    "ast_hash": "dbeb3979112bd84743826a38fd457da5",
+    "mtime": 1793502803.7982323,
+    "seen": 1793503233.8108504,
+    "ast_hash": "5a5d912b97c3cd98d0d6845d76b11266",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/concentracao.js": {
-    "mtime": 1793480166.33205,
-    "seen": 1793480618.0508099,
-    "ast_hash": "eb030ea826650fdc0ea1442d61ded4e1",
+    "mtime": 1793502394.1712415,
+    "seen": 1793503233.8108554,
+    "ast_hash": "79629ff1301a10bdbde1ce3e39524f78",
     "semantic_hash": ""
   },
   "backend/tests/integration/comparacao-local.test.js": {
@@ -1050,21 +1050,21 @@
     "semantic_hash": ""
   },
   "frontend/src/components/ConcentracaoPanel.vue": {
-    "mtime": 1793406489.4102912,
-    "seen": 1793406950.3171961,
-    "ast_hash": "931cb2df660785c5c5e9cabe8d9557dd",
+    "mtime": 1793504578.5559657,
+    "seen": 1793507162.065787,
+    "ast_hash": "10b03be7eeb457d82c8b33ae1f57751f",
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793499145.3496027,
-    "seen": 1793500927.720965,
-    "ast_hash": "9e6fc67a2eb64574541153cc852debc7",
+    "mtime": 1793507104.2688115,
+    "seen": 1793507162.066064,
+    "ast_hash": "d7377d0e5f740089360ec4c89d737a16",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
-    "mtime": 1793482164.2861395,
-    "seen": 1793494426.2938662,
-    "ast_hash": "2e64abd5041118666bbdcb4098c5d0dd",
+    "mtime": 1793507104.2678115,
+    "seen": 1793507162.0660675,
+    "ast_hash": "ed19e7fb92b81537abe25ea31576b1c9",
     "semantic_hash": ""
   },
   "backend/src/migrations/0006_mv_votos_final_splits.js": {
@@ -1080,9 +1080,9 @@
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/estatisticas.test.js": {
-    "mtime": 1793373161.0312822,
-    "seen": 1793373217.6448612,
-    "ast_hash": "19b7e4b0f779d4dd48c38998a979a934",
+    "mtime": 1793501956.3333402,
+    "seen": 1793503233.811247,
+    "ast_hash": "04a79c785c2e40f5fdc6a63407526266",
     "semantic_hash": ""
   },
   ".codex/hooks.json": {
@@ -1188,9 +1188,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/mv-secao-candidato.js": {
-    "mtime": 1793413758.0504355,
-    "seen": 1793419495.4580152,
-    "ast_hash": "266464b53ead0e8c9c8d80e84e738951",
+    "mtime": 1793502803.9132338,
+    "seen": 1793503233.8108864,
+    "ast_hash": "9f6fa4202734393d7ac2e5bf256279cb",
     "semantic_hash": ""
   },
   "backend/tests/integration/mv-secao-candidato.test.js": {
@@ -1326,9 +1326,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/CurvasAnos.vue": {
-    "mtime": 1793500850.4121003,
-    "seen": 1793500927.7208443,
-    "ast_hash": "7997295f6e4d43607b9e996df1b7e926",
+    "mtime": 1793503331.8973544,
+    "seen": 1793507162.0657954,
+    "ast_hash": "3b805e6fc9e146b4911c9a5958abb552",
     "semantic_hash": ""
   },
   "frontend/src/views/EntreAnosView.vue": {
@@ -1338,21 +1338,21 @@
     "semantic_hash": ""
   },
   "frontend/tests/entre-anos.test.js": {
-    "mtime": 1793500878.8584144,
-    "seen": 1793500927.7209246,
-    "ast_hash": "8c1ad1e369599bfa9cd61e61c4c16c93",
+    "mtime": 1793503332.1813576,
+    "seen": 1793507162.06598,
+    "ast_hash": "57658e3748e245ae5010f94f77134d16",
     "semantic_hash": ""
   },
   "docs/design-system/entre-anos.md": {
-    "mtime": 1793474256.8827405,
-    "seen": 1793474264.2406855,
-    "ast_hash": "c396920fcc9535857ec7336f08f588e8",
+    "mtime": 1793503339.5074413,
+    "seen": 1793507162.0660923,
+    "ast_hash": "22ce417b5f0beb2905ca752a83ee6733",
     "semantic_hash": ""
   },
   "frontend/src/lib/entre-anos.js": {
-    "mtime": 1793500850.5591018,
-    "seen": 1793500927.720892,
-    "ast_hash": "ede958c31666fbaa4c6e38d6e9acbc4d",
+    "mtime": 1793503331.7073522,
+    "seen": 1793507162.0659027,
+    "ast_hash": "95431a1f03259bb98f551100caf474c7",
     "semantic_hash": ""
   },
   "backend/src/migrations/0011_sg_partido_2014.js": {
@@ -1431,6 +1431,18 @@
     "mtime": 1793496962.7482603,
     "seen": 1793498114.3475614,
     "ast_hash": "40654fc31cb8fe72a565e2603995c383",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/mv-compacto.test.js": {
+    "mtime": 1793501969.4465308,
+    "seen": 1793503233.8111606,
+    "ast_hash": "30c79303af39cc4a489e9f529da1f0f2",
+    "semantic_hash": ""
+  },
+  "frontend/tests/concentracao-lider.test.js": {
+    "mtime": 1793504586.56706,
+    "seen": 1793507162.0659747,
+    "ast_hash": "8859f092db9bc65cdbd3f6d73333059c",
     "semantic_hash": ""
   }
 }

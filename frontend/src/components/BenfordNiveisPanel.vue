@@ -42,10 +42,13 @@ function mad(nivel) {
             <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">{{ $t('tabela.candidato') }}{{ seta('nm_votavel') }}</button></th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_n')"><button type="button" @click="alternar('secao_n')">{{ $t('tabela.secaoN') }}{{ seta('secao_n') }}</button></th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_mad')"><button type="button" @click="alternar('secao_mad')">{{ $t('tabela.secaoMad') }}{{ seta('secao_mad') }}</button></th>
+            <th scope="col" class="num">{{ $t('tabela.secaoP') }}</th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_n')"><button type="button" @click="alternar('zona_n')">{{ $t('tabela.zonaN') }}{{ seta('zona_n') }}</button></th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_mad')"><button type="button" @click="alternar('zona_mad')">{{ $t('tabela.zonaMad') }}{{ seta('zona_mad') }}</button></th>
+            <th scope="col" class="num">{{ $t('tabela.zonaP') }}</th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_n')"><button type="button" @click="alternar('municipio_n')">{{ $t('tabela.municipioN') }}{{ seta('municipio_n') }}</button></th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_mad')"><button type="button" @click="alternar('municipio_mad')">{{ $t('tabela.municipioMad') }}{{ seta('municipio_mad') }}</button></th>
+            <th scope="col" class="num">{{ $t('tabela.municipioP') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -55,17 +58,21 @@ function mad(nivel) {
             <td class="num">
               {{ mad(candidato.niveis.secao) }}
             </td>
+            <td class="num">{{ mad(candidato.niveis.secao.monte_carlo?.p_valor) }}</td>
             <td class="num">{{ candidato.niveis.zona.n }}</td>
             <td class="num">
               {{ mad(candidato.niveis.zona) }}
             </td>
+            <td class="num">{{ mad(candidato.niveis.zona.monte_carlo?.p_valor) }}</td>
             <td class="num">{{ candidato.niveis.municipio.n }}</td>
             <td class="num">
               {{ mad(candidato.niveis.municipio) }}
             </td>
+            <td class="num">{{ mad(candidato.niveis.municipio.monte_carlo?.p_valor) }}</td>
           </tr>
         </tbody>
       </table>
     </TabelaScroll>
+    <p v-if="candidatos.length" class="nota">{{ $t('estatistica.monteCarloNota') }}</p>
   </section>
 </template>

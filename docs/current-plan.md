@@ -1,5 +1,13 @@
 # Plano — Decisões da rodada de perguntas + arquitetura e performance
 
+## Plano — calibração Monte Carlo de Benford (2026-11-01)
+
+- Hipótese nula: primeiros dígitos independentes com probabilidades Benford, condicionado ao n observado.
+- Estatística: MAD de Nigrini; 10.000 simulações determinísticas por n e p empírico `(1 + simulações com MAD >= observado) / 10.001`.
+- Calcular para Benford por candidato e para níveis seção, zona e município; não corrigir múltiplas comparações e identificar p-valores como exploratórios.
+- Mostrar a calibração nos painéis Benford; manter MAD e contratos existentes.
+- Testar cálculo e documentar contrato/método em API, blueprint e arquitetura.
+
 ## Decisões do usuário (2026-10-31)
 | Card | Decisão |
 |---|---|

@@ -99,6 +99,7 @@ function formatarMad(valor) {
                 <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">{{ $t('estatistica.candidato') }}{{ seta('nm_votavel') }}</button></th>
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSort('n')"><button type="button" @click="alternar('n')">n{{ seta('n') }}</button></th>
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSort('mad')"><button type="button" @click="alternar('mad')">MAD{{ seta('mad') }}</button></th>
+                <th scope="col" class="num">{{ $t('tabela.pValorMonteCarlo') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -118,6 +119,7 @@ function formatarMad(valor) {
                 </td>
                 <td class="num">{{ formatarNumero(candidato.n) }}</td>
                 <td class="num">{{ formatarMad(candidato.mad) }}</td>
+                <td class="num">{{ formatarMad(candidato.monte_carlo?.p_valor) }}</td>
               </tr>
             </tbody>
           </table>
@@ -128,6 +130,7 @@ function formatarMad(valor) {
         <p class="nota">
           <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> {{ $t('estatistica.abaixoMinimo', ativo?.secoes_abaixo_minimo ?? 0) }}
         </p>
+        <p class="nota">{{ $t('estatistica.monteCarloNota') }}</p>
       </div>
     </template>
   </section>

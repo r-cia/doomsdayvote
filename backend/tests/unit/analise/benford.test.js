@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   ESPERADO_BENFORD,
+  SIMULACOES_BENFORD,
   calcularBenford,
   classificarMad,
   primeiroDigito,
@@ -56,6 +57,9 @@ describe('calcularBenford', () => {
     expect(resultado.mad).toBeLessThan(0.0005);
     expect(resultado.classificacao).toBe('conformidade próxima');
     expect(resultado.digitos[0].esperado_percentual).toBeCloseTo(30.103, 2);
+    expect(resultado.monte_carlo.simulacoes).toBe(SIMULACOES_BENFORD);
+    expect(resultado.monte_carlo.p_valor).toBeGreaterThan(0);
+    expect(resultado.monte_carlo.p_valor).toBeLessThanOrEqual(1);
   });
 
   it('reconhece uma distribuição uniforme como não conformidade', () => {
@@ -68,6 +72,7 @@ describe('calcularBenford', () => {
     expect(resultado.n).toBe(900);
     expect(resultado.mad).toBeGreaterThan(0.015);
     expect(resultado.classificacao).toBe('não conformidade');
+    expect(resultado.monte_carlo.p_valor).toBeLessThan(0.01);
   });
 
   it('devolve n zero quando não há contagens válidas', () => {
@@ -76,6 +81,7 @@ describe('calcularBenford', () => {
     expect(resultado.n).toBe(0);
     expect(resultado.mad).toBeNull();
     expect(resultado.classificacao).toBeNull();
+    expect(resultado.monte_carlo.p_valor).toBeNull();
     expect(resultado.digitos.map((digito) => digito.observado)).toEqual(
       Array(9).fill(0),
     );
@@ -84,5 +90,12 @@ describe('calcularBenford', () => {
   it('mantém a distribuição esperada somando 100%', () => {
     const soma = ESPERADO_BENFORD.reduce((total, valor) => total + valor, 0);
     expect(soma).toBeCloseTo(1, 10);
+  });
+
+  it('reproduz o mesmo p-valor para o mesmo n e distribuição', () => {
+    const valores = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    expect(calcularBenford(valores).monte_carlo).toEqual(
+      calcularBenford(valores).monte_carlo,
+    );
   });
 });
