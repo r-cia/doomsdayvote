@@ -1,10 +1,13 @@
 const BASE = '/api'
 
+import { mensagemErroApi } from '../lib/erros-api'
+
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, codigo = null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.codigo = codigo
   }
 }
 
@@ -26,12 +29,11 @@ async function obter(caminho, params, signal) {
   })
 
   if (!resposta.ok) {
-    let mensagem = `Falha ao consultar a API (${resposta.status})`
     const corpo = await resposta.json().catch(() => null)
-    if (corpo) {
-      mensagem = corpo.message ?? corpo.mensagem ?? corpo.erro ?? mensagem
-    }
-    throw new ApiError(mensagem, resposta.status)
+    const erro = corpo?.error ?? corpo ?? {}
+    const codigo = erro.code ?? erro.codigo ?? null
+    const mensagem = mensagemErroApi({ codigo, mensagem: erro.message ?? erro.mensagem }, resposta.status)
+    throw new ApiError(mensagem, resposta.status, codigo)
   }
 
   return resposta.json()

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { avisoInfo } from '../lib/status'
+import { avisoInfo, avisoMensagem } from '../lib/status'
 
 const props = defineProps({
   avisos: { type: Array, default: () => [] },
@@ -25,7 +25,7 @@ const lista = computed(() => {
       :class="`aviso--${avisoInfo(aviso.codigo).tom}`"
     >
       <strong>{{ avisoInfo(aviso.codigo).rotulo }}</strong>
-      <p>{{ aviso.mensagem }}</p>
+      <p>{{ avisoMensagem(aviso) }}</p>
     </article>
   </div>
 </template>

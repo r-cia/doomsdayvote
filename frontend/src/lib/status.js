@@ -71,6 +71,12 @@ export function avisoInfo(codigo) {
   }
 }
 
+export function avisoMensagem(aviso) {
+  const { t, te } = i18n.global
+  const chave = `avisos.mensagem.${aviso.codigo}`
+  return te(chave) ? t(chave, { quantidade: aviso.quantidade }) : aviso.mensagem
+}
+
 export function opcoesStatus() {
   return Object.keys(STATUS_KEYS).map((valor) => ({
     valor,

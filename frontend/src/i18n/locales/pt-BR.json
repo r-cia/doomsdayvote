@@ -451,6 +451,24 @@
     "aviso": "Aviso",
     "precisaoInsuficiente": "Precisão insuficiente",
     "corteIndisponivel": "Corte indisponível",
-    "metadadosDerivados": "Metadados derivados"
+    "metadadosDerivados": "Metadados derivados",
+    "mensagem": {
+      "CORTE_INDISPONIVEL": "A fonte deste ano não permite consulta por horário/dia de recebimento",
+      "PRECISAO_INSUFICIENTE": "{quantidade} BUs desta seleção não têm horário de recebimento com a precisão pedida e não entram neste corte",
+      "METADADOS_DERIVADOS": "Ano e turno derivados do nome do arquivo",
+      "SEM_HORARIO": "Sem horário de encerramento"
+    }
+  },
+  "erros": {
+    "falhaConsulta": "Falha ao consultar a API ({status})",
+    "codigo": {
+      "VALIDATION": "Parâmetro inválido",
+      "INTERNAL": "Erro interno"
+    },
+    "naoEncontrado": {
+      "eleicao": "Eleição não encontrada",
+      "secao": "Seção não encontrada",
+      "grupo": "Grupo não encontrado"
+    }
   }
 }

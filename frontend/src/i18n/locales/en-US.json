@@ -451,6 +451,24 @@
     "aviso": "Notice",
     "precisaoInsuficiente": "Insufficient precision",
     "corteIndisponivel": "Cutoff unavailable",
-    "metadadosDerivados": "Derived metadata"
+    "metadadosDerivados": "Derived metadata",
+    "mensagem": {
+      "CORTE_INDISPONIVEL": "This year's source does not allow querying by receipt time/day",
+      "PRECISAO_INSUFICIENTE": "{quantidade} BUs in this selection do not have a receipt time at the requested precision and are not included in this cutoff",
+      "METADADOS_DERIVADOS": "Year and round derived from the file name",
+      "SEM_HORARIO": "Missing closing time"
+    }
+  },
+  "erros": {
+    "falhaConsulta": "Failed to query the API ({status})",
+    "codigo": {
+      "VALIDATION": "Invalid parameter",
+      "INTERNAL": "Internal error"
+    },
+    "naoEncontrado": {
+      "eleicao": "Election not found",
+      "secao": "Section not found",
+      "grupo": "Group not found"
+    }
   }
 }
