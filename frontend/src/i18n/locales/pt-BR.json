@@ -311,7 +311,12 @@
     "amostraLof": "amostra LOF",
     "limitada": "(limitada)",
     "maiorScore": "Seções com maior score de anomalia",
-    "erroCarregar": "Erro ao carregar estatísticas"
+    "erroCarregar": "Erro ao carregar estatísticas",
+    "nivelGrafico": "Nível do gráfico",
+    "legendaObservado": "Observado",
+    "legendaEsperado": "Esperado",
+    "legendaFaixa": "Faixa de 95% (Monte Carlo)",
+    "faixaDigito": "faixa {min}% a {max}%"
   },
   "analiseUI": {
     "titulo": "Análise",

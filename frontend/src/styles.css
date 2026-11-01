@@ -934,49 +934,65 @@ select {
   background: var(--line-soft);
 }
 
-.benford__grafico {
-  display: grid;
-  grid-template-columns: repeat(9, minmax(0, 1fr));
-  align-items: end;
-  gap: 6px;
-  height: 224px;
+.benford__visual {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
   padding: 10px 14px 0;
 }
 
-.benford__coluna {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  gap: 4px;
-  height: 100%;
+.benford-faixa {
+  margin: 0;
+  min-width: 0;
 }
 
-.benford__par {
-  position: relative;
+.benford-faixa__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.benford-faixa__grade line {
+  stroke: rgba(255, 181, 46, 0.09);
+}
+
+.benford-faixa__grade text {
+  fill: var(--ink-faint);
+}
+
+.benford-faixa__faixa {
+  fill: #7ec8ff;
+  fill-opacity: 0.22;
+}
+
+.benford-faixa__barra {
+  fill: var(--amber);
+}
+
+.benford-faixa__esperado {
+  fill: none;
+  stroke: #7ec8ff;
+  stroke-width: 1.6;
+}
+
+.benford-faixa__legenda {
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
-  height: 100%;
-  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+  gap: var(--passo) calc(var(--passo) * 2);
+  margin: var(--passo) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-dim);
+  font-size: 11px;
 }
 
-.benford__obs {
-  width: 46%;
-  background: var(--amber);
-  min-height: 1px;
-}
-
-.benford__esp {
-  width: 26%;
-  border: 1px solid var(--ink-faint);
-  border-bottom: 0;
-  min-height: 1px;
-}
-
-.benford__digito {
-  text-align: center;
-  font-size: 9px;
-  color: var(--ink-faint);
+.benford-faixa__legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--passo);
 }
 
 .benford__tabela {
@@ -2431,8 +2447,7 @@ tr.linha--ativa th {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .benford__grafico {
-    gap: 3px;
+  .benford__visual {
     padding: 10px 8px 0;
   }
 }

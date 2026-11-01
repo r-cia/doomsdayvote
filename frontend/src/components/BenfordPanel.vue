@@ -1,6 +1,8 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { formatarDecimal, formatarNumero } from '../lib/format'
+import BenfordFaixa from './BenfordFaixa.vue'
 import StateBlock from './StateBlock.vue'
 import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -11,6 +13,8 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   atualizando: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  niveis: { type: Object, default: null },
+  niveisCarregando: { type: Boolean, default: false },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
@@ -29,9 +33,21 @@ const ativo = computed(() => {
   )
 })
 
-function altura(valor) {
-  return `${Math.max(1, Math.min(100, (valor / 35) * 100))}%`
-}
+const { t } = useI18n()
+const NIVEIS = ['secao', 'zona', 'municipio']
+const nivelAtivo = ref('secao')
+const rotulosNivel = computed(() => ({
+  secao: t('tabela.secao'),
+  zona: t('tabela.zona'),
+  municipio: t('tabela.municipio'),
+}))
+
+const dadosDoNivel = computed(() => {
+  if (!ativo.value) return null
+  if (nivelAtivo.value === 'secao') return ativo.value
+  const candidato = props.niveis?.candidatos?.find((item) => item.nr_votavel === ativo.value.nr_votavel)
+  return candidato?.niveis?.[nivelAtivo.value] ?? null
+})
 
 function formatarMad(valor) {
   return formatarDecimal(valor, 4, 4)
@@ -63,30 +79,31 @@ function formatarMad(valor) {
 
     <template v-else>
       <div class="benford">
-        <div
-          class="benford__grafico"
-          role="img"
-          :aria-label="$t('estatistica.distribuicaoBenford', { nome: ativo?.nm_votavel })"
-        >
-          <div
-            v-for="digito in ativo?.digitos ?? []"
-            :key="digito.digito"
-            class="benford__coluna"
-          >
-            <div class="benford__par">
-              <span
-                class="benford__obs"
-                :style="{ height: altura(digito.observado_percentual) }"
-                :title="$t('estatistica.observado', { valor: formatarMad(digito.observado_percentual) })"
-              />
-              <span
-                class="benford__esp"
-                :style="{ height: altura(digito.esperado_percentual) }"
-                :title="$t('estatistica.esperado', { valor: formatarMad(digito.esperado_percentual) })"
-              />
-            </div>
-            <span class="benford__digito">{{ digito.digito }}</span>
+        <div class="benford__visual">
+          <div class="segmented" role="group" :aria-label="$t('estatistica.nivelGrafico')">
+            <button
+              v-for="nivel in NIVEIS"
+              :key="nivel"
+              type="button"
+              :class="{ ativo: nivelAtivo === nivel }"
+              :aria-pressed="nivelAtivo === nivel"
+              @click="nivelAtivo = nivel"
+            >
+              {{ rotulosNivel[nivel] }}
+            </button>
           </div>
+          <StateBlock
+            v-if="nivelAtivo !== 'secao' && niveisCarregando && !dadosDoNivel"
+            estado="carregando"
+            :titulo="$t('comum.carregando')"
+          />
+          <BenfordFaixa
+            v-else-if="dadosDoNivel"
+            :titulo="$t('estatistica.distribuicaoBenford', { nome: ativo?.nm_votavel })"
+            :digitos="dadosDoNivel.digitos ?? []"
+            :faixa="dadosDoNivel.monte_carlo?.faixa_digitos ?? null"
+          />
+          <div v-else class="vazio">{{ $t('comum.semDados') }}</div>
         </div>
 
         <TabelaScroll class="benford__tabela" :atualizando="atualizando">
