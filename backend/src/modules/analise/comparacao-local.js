@@ -1,7 +1,7 @@
 import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 
-import { agruparPorSecao, linhasMvSecaoCandidato } from './mv-secao-candidato.js';
+import { expandirSecao, secoesCompactas } from './mv-secao-candidato.js';
 import { criarPercentilRank, media, mediana, toNumberOrNull } from './estatistica-basica.js';
 
 function aplicarEscala(secoes) {
@@ -289,8 +289,9 @@ export function agruparSecoes(secoes = [], { minimoGrupo = 5 } = {}) {
 }
 
 async function secoesPelaMv(db, { eleicaoId, cargo, escopo }) {
-  const linhas = await linhasMvSecaoCandidato(db, { eleicaoId, cargo, escopo, categorias: ['nominal'] });
-  return [...agruparPorSecao(linhas).values()].map((grupo) => {
+  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, escopo, categorias: ['nominal'] });
+  return secoes.map((secao) => {
+    const grupo = expandirSecao(secao, votaveis);
     const primeira = grupo[0];
     return {
       id: primeira.secao_id,

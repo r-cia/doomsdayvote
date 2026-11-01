@@ -18,6 +18,7 @@
 - O orçamento de 24 GB para o Postgres requer também um limite no serviço ou contêiner do banco; a configuração de pool da aplicação não estabelece esse teto global.
 - No host verificado, `postgresql@16-main.service` estava sem `MemoryHigh`/`MemoryMax` e com cerca de 15,7 GiB em seu cgroup. `ops/systemd/postgresql@16-main.service.d/override.conf` define `MemoryHigh=22G` e `MemoryMax=24G`; instalar o drop-in e reiniciar o serviço exige uma ação administrativa no servidor.
 - Os scripts da API e da carga não definem flag de heap: vale o limite padrão do V8 (cerca de 4 GB). Por isso as análises devem agregar no Postgres e levar ao Node só a página ou o resumo; carregar todas as seções ou BUs de uma eleição em memória estoura o heap (foi o caso de `/api/consistencia`, hoje calculada em SQL).
+- Análises que precisam dos votos por seção leem **uma linha por seção, com os votos em arrays** (`secoesCompactas` em `backend/src/modules/analise/mv-secao-candidato.js`, a partir de `mv_secao_candidato_final`; no corte parcial, `baseSecaoCandidato` em `estatisticas.js` faz o mesmo a partir das tabelas). Nomes e partidos vêm de um dicionário pequeno indexado por `refs`. Nunca carregue seção × votável no Node: são milhões de linhas por eleição.
 - Observabilidade: hook `onResponse` em `backend/src/app.js` registra rota, status, duração e bytes; `cache.obter` registra hit/miss/off e duração da função. Logs estruturados via pino.
 
 ## Frontend
