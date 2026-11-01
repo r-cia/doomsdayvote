@@ -183,8 +183,8 @@ describe('CurvasAnos', () => {
     expect(wrapper.text()).toContain('17:00')
   })
 
-  it('o eixo x é fixo de 15:00 a 03:00 do dia seguinte, qualquer que seja a faixa dos dados', () => {
-    expect(DOMINIO_X).toEqual({ min: 900, max: 1620 })
+  it('o eixo x é fixo de 14:00 a 03:00 do dia seguinte, qualquer que seja a faixa dos dados', () => {
+    expect(DOMINIO_X).toEqual({ min: 840, max: 1620 })
 
     const cedo = mount(CurvasAnos, {
       props: { titulo: 't', series: [{ chave: 'a', rotulo: 'a', pontos: [{ minuto: 1000, valor: 1 }, { minuto: 1010, valor: 2 }] }] },
@@ -197,7 +197,7 @@ describe('CurvasAnos', () => {
 
     for (const wrapper of [cedo, tarde]) {
       const rotulos = wrapper.findAll('.curvas__grade text').map((item) => item.text())
-      expect(rotulos).toContain('15:00')
+      expect(rotulos).toContain('14:00')
       expect(rotulos).toContain('03:00')
     }
     const horas = cedo.findAll('.curvas__grade text').map((item) => item.text())
@@ -224,7 +224,7 @@ describe('CurvasAnos', () => {
     }
   })
 
-  it('pontos fora de 15:00–03:00 não são desenhados nem alteram a escala', () => {
+  it('pontos fora de 14:00–03:00 não são desenhados nem alteram a escala', () => {
     const wrapper = mount(CurvasAnos, {
       props: {
         titulo: 't',

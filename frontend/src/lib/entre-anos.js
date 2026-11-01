@@ -2,7 +2,7 @@ export const PALETA_CANDIDATOS = ['#ffb52e', '#7ec8ff', '#74e08c', '#ff6b57', '#
 export const PALETA_DIFERENCAS = ['#ff7ac6', '#2ed3c4', '#f2efe4', '#c4e04a', '#d98c5f', '#8f9bff']
 export const TRACOS_ANOS = [null, '8 4', '2 3', '10 3 2 3', '4 4', '1 3']
 export const CORES_PADRAO = PALETA_CANDIDATOS
-export const DOMINIO_X = Object.freeze({ min: 900, max: 1620 })
+export const DOMINIO_X = Object.freeze({ min: 840, max: 1620 })
 
 const LARGURA_CARACTERE = 6
 const FOLGA_ROTULO = 14

@@ -84,7 +84,7 @@ const horaDe = (minuto) => {
 const marcasX = computed(() => {
   const marcas = []
   const passo = largura.value >= 520 ? 60 : 120
-  for (let minuto = limitesX.min; minuto <= limitesX.max; minuto += passo) marcas.push(minuto)
+  for (let minuto = limitesX.max; minuto >= limitesX.min; minuto -= passo) marcas.unshift(minuto)
   return marcas
 })
 
