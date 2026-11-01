@@ -9,7 +9,7 @@ import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
 import { COLUNAS_CONCENTRACAO, concentracao } from '../modules/analise/concentracao.js';
 import { FEATURES, pontuarOutliers } from '../modules/analise/outliers.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
-import { baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos, tamanhoPagina } from './comum.js';
+import { TTL_CACHE_ESTATICO, baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos, tamanhoPagina } from './comum.js';
 
 const COLUNAS_BENFORD = {
   nm_votavel: (c) => c.nm_votavel,
@@ -67,7 +67,7 @@ const COLUNAS_COMPARACAO_LOCAL = {
 };
 
 export function registrarAnalise({ app, db, cache, cacheado }) {
-  app.get('/api/analysis', cacheado('analysis', 300, baseSchema.extend({
+  app.get('/api/analysis', cacheado('analysis', TTL_CACHE_ESTATICO, baseSchema.extend({
     ...ordenacaoSchema(Object.keys(COLUNAS_BENFORD)),
     ...ordenacaoSchema(Object.keys(COLUNAS_BIOMETRIA_UF), '_biometria_uf'),
   }), async (query) => {
@@ -118,7 +118,7 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
     };
   }));
 
-  app.get('/api/anomalies', cacheado('anomalies', 600, baseSchema.extend({
+  app.get('/api/anomalies', cacheado('anomalies', TTL_CACHE_ESTATICO, baseSchema.extend({
     ...ordenacaoSchema(Object.keys(COLUNAS_OUTLIERS)),
     ...ordenacaoSchema(Object.keys(COLUNAS_DUPLICACAO), '_duplicacao'),
     ...ordenacaoSchema(Object.keys(COLUNAS_BENFORD_NIVEIS), '_benford'),
@@ -181,7 +181,7 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
     };
   }));
 
-  app.get('/api/estatisticas', cacheado('estatisticas', 300, baseSchema.extend({
+  app.get('/api/estatisticas', cacheado('estatisticas', TTL_CACHE_ESTATICO, baseSchema.extend({
     escopo: z.enum(['turno', 'ano']).default('turno'),
     ...ordenacaoSchema(Object.keys(COLUNAS_ESTATISTICAS)),
   }), async (query) => {
@@ -218,7 +218,7 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
     };
   }));
 
-  app.get('/api/consistencia', cacheado('consistencia', 300, baseSchema.extend({
+  app.get('/api/consistencia', cacheado('consistencia', TTL_CACHE_ESTATICO, baseSchema.extend({
     regra: z.enum([
       'comparecimento_vs_votos',
       'aptos_vs_comparecimento_abstencao',
@@ -258,7 +258,7 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
     };
   }));
 
-  app.get('/api/comparacao-local', cacheado('comparacao-local', 300, baseSchema.extend({
+  app.get('/api/comparacao-local', cacheado('comparacao-local', TTL_CACHE_ESTATICO, baseSchema.extend({
     page: z.coerce.number().int().min(1).default(1),
     page_size: z.coerce.number().int().min(1).optional(),
     ...ordenacaoSchema(Object.keys(COLUNAS_COMPARACAO_LOCAL)),
@@ -290,7 +290,7 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
     };
   }));
 
-  app.get('/api/comparacao-local/secoes', cacheado('comparacao-local-secoes', 300, baseSchema.extend({
+  app.get('/api/comparacao-local/secoes', cacheado('comparacao-local-secoes', TTL_CACHE_ESTATICO, baseSchema.extend({
     chave: z.string().regex(/^(local|zona|municipio):[A-Z]{2}\|\d+(\|\d+)?$/),
     ...ordenacaoSchema(Object.keys(COLUNAS_COMPARACAO_LOCAL)),
   }), async (query) => {
@@ -315,7 +315,7 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
     };
   }));
 
-  app.get('/api/concentracao', cacheado('concentracao', 300, baseSchema.extend({
+  app.get('/api/concentracao', cacheado('concentracao', TTL_CACHE_ESTATICO, baseSchema.extend({
     limit: z.coerce.number().int().min(1).max(100).default(20),
     page: z.coerce.number().int().min(1).default(1),
     page_size: z.coerce.number().int().min(1).optional(),

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { corteResposta, resolverCorte } from '../modules/apuracao/corte.js';
 import { DERIVADAS_PARTIDO, encerramentoPorMunicipio, encerramentoPorSecao, encerramentoPorUf } from '../modules/analise/encerramento.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
-import { baseSchema, buscarEleicao } from './comum.js';
+import { TTL_CACHE_ESTATICO, baseSchema, buscarEleicao } from './comum.js';
 
 const COLUNAS_ENCERRAMENTO_URNAS = {
   sg_uf: (u) => u.sg_uf,
@@ -19,7 +19,7 @@ const CHAVES_ENCERRAMENTO_MUNICIPIOS = ['nm_municipio', 'total', 'apos_1715', 'p
 const CHAVES_ENCERRAMENTO_SECOES = ['nr_zona', 'nr_secao', 'dt_encerramento', ...Object.keys(DERIVADAS_PARTIDO)];
 
 export function registrarEncerramento({ app, db, cacheado }) {
-  app.get('/api/encerramento/urnas', cacheado('encerramento-urnas', 300, baseSchema.extend(ordenacaoSchema(Object.keys(COLUNAS_ENCERRAMENTO_URNAS))), async (query) => {
+  app.get('/api/encerramento/urnas', cacheado('encerramento-urnas', TTL_CACHE_ESTATICO, baseSchema.extend(ordenacaoSchema(Object.keys(COLUNAS_ENCERRAMENTO_URNAS))), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
 
@@ -31,7 +31,7 @@ export function registrarEncerramento({ app, db, cacheado }) {
     };
   }));
 
-  app.get('/api/encerramento/municipios', cacheado('encerramento-municipios', 300, baseSchema.extend({
+  app.get('/api/encerramento/municipios', cacheado('encerramento-municipios', TTL_CACHE_ESTATICO, baseSchema.extend({
     uf: z.string().length(2),
     ...ordenacaoSchema(CHAVES_ENCERRAMENTO_MUNICIPIOS),
     limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -51,7 +51,7 @@ export function registrarEncerramento({ app, db, cacheado }) {
     return { corte: corteResposta(corte), municipios };
   }));
 
-  app.get('/api/encerramento/secoes', cacheado('encerramento-secoes', 300, baseSchema.extend({
+  app.get('/api/encerramento/secoes', cacheado('encerramento-secoes', TTL_CACHE_ESTATICO, baseSchema.extend({
     uf: z.string().length(2),
     municipio: z.coerce.number().int(),
     ...ordenacaoSchema(CHAVES_ENCERRAMENTO_SECOES),

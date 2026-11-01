@@ -331,7 +331,7 @@ As views são atualizadas no fim de `npm run carga`, com o papel dono (`DATABASE
 
 ### 14.6 Cache
 
-Além do banco, as respostas da API ficam no Redis com TTL por rota. Metadados e avisos do corte ficam 24 h. A carga invalida o cache pela versão `dv:versao`.
+Além do banco, as respostas da API ficam no Redis com TTL por rota. As rotas pesadas (`elections`, `map`, `analysis`, `anomalies`, `estatisticas`, `consistencia`, `concentracao`, `comparacao-local` e `comparacao-local-secoes`, `comparacao-anos`, `relatorio`, `biometria-*` e `encerramento-*`) e os metadados e avisos do corte ficam 24 h (`TTL_CACHE_ESTATICO` em `backend/src/routes/comum.js`). `summary` e `sections` ficam 60 s, `timeline` 120 s e `section` e `section-versions` 300 s. A carga invalida o cache pela versão `dv:versao`.
 
 ## 15. Licença e observações
 

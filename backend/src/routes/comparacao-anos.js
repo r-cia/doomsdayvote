@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { compararAnos } from '../modules/comparacao-anos/comparar.js';
+import { TTL_CACHE_ESTATICO } from './comum.js';
 
 const comparacaoAnosSchema = z.object({
   anos: z
@@ -10,7 +11,7 @@ const comparacaoAnosSchema = z.object({
 });
 
 export function registrarComparacaoAnos({ app, db, cacheado }) {
-  app.get('/api/comparacao-anos', cacheado('comparacao-anos', 300, comparacaoAnosSchema, (query) =>
+  app.get('/api/comparacao-anos', cacheado('comparacao-anos', TTL_CACHE_ESTATICO, comparacaoAnosSchema, (query) =>
     compararAnos(db, { anos: query.anos, uf: query.uf }),
   ));
 }

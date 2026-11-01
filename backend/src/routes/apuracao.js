@@ -5,7 +5,7 @@ import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { linhaDoTempo } from '../modules/apuracao/timeline.js';
 import { areasComDeltaEntreCortes, somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
-import { baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos } from './comum.js';
+import { TTL_CACHE_ESTATICO, baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos } from './comum.js';
 
 const COLUNAS_VOTOS = {
   nm_votavel: (v) => v.nm_votavel,
@@ -26,7 +26,7 @@ const COLUNAS_MAPA = {
 };
 
 export function registrarApuracao({ app, db, cache, cacheado }) {
-  app.get('/api/elections', cacheado('elections', 300, z.object({}), async () => {
+  app.get('/api/elections', cacheado('elections', TTL_CACHE_ESTATICO, z.object({}), async () => {
     const eleicoes = await db
       .selectFrom('eleicao')
       .selectAll()
@@ -128,7 +128,7 @@ export function registrarApuracao({ app, db, cache, cacheado }) {
     };
   }));
 
-  app.get('/api/map', cacheado('map', 300, baseSchema.extend({
+  app.get('/api/map', cacheado('map', TTL_CACHE_ESTATICO, baseSchema.extend({
     level: z.enum(['uf', 'municipio']).default('uf'),
     candidatos: z.string().optional(),
     as_of_anterior: z.string().optional(),

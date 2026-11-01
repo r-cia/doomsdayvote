@@ -1,7 +1,7 @@
 import { resolverCorte } from '../modules/apuracao/corte.js';
 import { relatorioDaEleicao } from '../modules/analise/relatorio.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
-import { baseSchema, buscarEleicao, escopoDe } from './comum.js';
+import { TTL_CACHE_ESTATICO, baseSchema, buscarEleicao, escopoDe } from './comum.js';
 
 const diferencaPct = (valor, base) => (valor === null || valor === undefined || base === null || base === undefined ? null : valor - base);
 
@@ -24,7 +24,7 @@ const colunasRelatorio = (alvo) => ({
 });
 
 export function registrarRelatorio({ app, db, cacheado }) {
-  app.get('/api/relatorio', cacheado('relatorio', 300, baseSchema.extend(ordenacaoSchema(Object.keys(colunasRelatorio()))), async (query) => {
+  app.get('/api/relatorio', cacheado('relatorio', TTL_CACHE_ESTATICO, baseSchema.extend(ordenacaoSchema(Object.keys(colunasRelatorio()))), async (query) => {
     const eleicao = await buscarEleicao(db, query.election_id);
     const corte = resolverCorte(query);
 

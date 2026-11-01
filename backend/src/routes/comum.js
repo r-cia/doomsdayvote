@@ -15,7 +15,7 @@ export const baseSchema = z.object({
   ...corteSchema,
 });
 
-const TTL_CACHE_ESTATICO = 86400;
+export const TTL_CACHE_ESTATICO = 86400;
 
 function escopoCache(query) {
   return {
