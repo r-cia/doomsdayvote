@@ -323,9 +323,9 @@ O corte final e sem recorte temporal (o caso mais comum) lê agregados prontos e
 | `mv_votos_final` | `0005`, `0006` | Votos por eleição, cargo e votável, já com a cor do partido e os votos antes/depois de 17:15. | `eleicao_id, cargo` |
 | `mv_metricas_final` | `0005` | Aptos, comparecimento, abstenções e BUs considerados por eleição e cargo. | — |
 | `mv_totais_area` | `0007` | Totais por município e candidato, usados no mapa. | `eleicao_id, cargo, sg_uf` |
-| `mv_secao_candidato_final` | `0008`, `0010` | Agregado por seção e votável, usado pelas análises (estatísticas, concentração, comparação local, duplicação). | `eleicao_id, cargo, sg_uf, cd_municipio_tse` |
+| `mv_secao_candidato_final` | `0008`, `0010`, `0014` | Agregado por seção e votável, usado pelas análises (estatísticas, concentração, comparação local, duplicação), nos cortes final e parciais. Traz `precisao_dt_bu_recebido`, `dt_bu_recebido_ts` e `dt_bu_recebido_data` do BU para recortar por recebimento. | `eleicao_id, cargo, sg_uf, cd_municipio_tse`; `eleicao_id, cargo, dt_bu_recebido_ts` |
 
-Cortes parciais (`as_of`, `as_of_date`) continuam lendo as tabelas.
+Cortes parciais (`as_of`, `as_of_date`) leem `mv_secao_candidato_final` filtrada por recebimento (`aplicarCorteMv`), nas análises acima. A migration `0014` constrói a view nova ao lado da antiga e só troca os nomes no fim, então as leituras não ficam bloqueadas durante a construção; os demais painéis (resumo, mapa, linha do tempo, consistência) seguem lendo as tabelas nos cortes parciais.
 
 As views são atualizadas no fim de `npm run carga`, com o papel dono (`DATABASE_MIGRATION_URL`), porque `REFRESH MATERIALIZED VIEW` exige o dono da view. A migration `0011` recria as views `mv_votos_final`, `mv_totais_area` e `mv_secao_candidato_final` lendo a sigla do partido como `coalesce(sg_partido, nm_partido)` (os dados de 2014 já importados mantêm `sg_partido` nulo). Migrations de correção de dados atualizam as views com `REFRESH MATERIALIZED VIEW CONCURRENTLY`, para não bloquear as leituras; `DROP`/`CREATE` de uma view bloqueia as leituras durante toda a operação. Se a carga for interrompida antes do fim, rode `npm run carga` de novo: os arquivos já importados são ignorados e as views são atualizadas.
 
