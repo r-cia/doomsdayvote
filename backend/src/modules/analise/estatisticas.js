@@ -1,6 +1,7 @@
 import { sql } from 'kysely'
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js'
 import { calcularBenford } from './benford.js'
+import { linhasDeSecoesCompactas, secoesCompactas } from './mv-secao-candidato.js'
 
 export const MINIMO_VOTOS_BENFORD = 10
 
@@ -91,18 +92,17 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
 
 async function consultarBaseSecaoCandidato(db, { eleicaoId, cargo, corte, escopo = {} }) {
   if (corte.tipo === 'final') {
-    let consulta = db
-      .selectFrom('mv_secao_candidato_final')
-      .selectAll()
-      .where('eleicao_id', '=', eleicaoId)
-      .where('cargo', '=', cargo)
-      .where('categoria', '=', 'nominal');
-    if (escopo.sgUf) consulta = consulta.where('sg_uf', '=', escopo.sgUf);
-    if (escopo.cdMunicipio) consulta = consulta.where('cd_municipio_tse', '=', escopo.cdMunicipio);
-    return consulta.execute();
+    return linhasDeSecoesCompactas(
+      await secoesCompactas(db, {
+        eleicaoId,
+        cargo,
+        escopo: { sgUf: escopo.sgUf, cdMunicipio: escopo.cdMunicipio },
+        categorias: ['nominal'],
+      }),
+    );
   }
 
-  return base(db, { eleicaoId, cargo, corte, escopo })
+  const porVotavel = base(db, { eleicaoId, cargo, corte, escopo })
     .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
     .leftJoin('localidade as l', (join) =>
       join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
@@ -130,7 +130,43 @@ async function consultarBaseSecaoCandidato(db, { eleicaoId, cargo, corte, escopo
       'rv.nr_votavel',
       'bv.secao_id',
     ])
-    .execute()
+
+  // Uma linha por seção, com os votos em arrays (mesmo formato de `secoesCompactas`).
+  const { rows } = await sql`
+    with por_votavel as (${porVotavel}),
+    dic as (
+      select nm_votavel, sg_partido, (row_number() over (order by nm_votavel nulls first, sg_partido nulls first) - 1)::int as ref
+      from (select distinct nm_votavel, sg_partido from por_votavel) distintos
+    )
+    select
+      p.secao_id,
+      max(p.sg_uf) as sg_uf,
+      max(p.cd_municipio_tse) as cd_municipio_tse,
+      max(p.nm_municipio) as nm_municipio,
+      max(p.nr_zona) as nr_zona,
+      max(p.nr_secao) as nr_secao,
+      max(p.qt_aptos) as qt_aptos,
+      max(p.qt_comparecimento) as qt_comparecimento,
+      max(p.qt_abstencoes) as qt_abstencoes,
+      max(p.qt_biom) as qt_biom,
+      max(p.dt_bu_recebido_ts) as dt_bu_recebido_ts,
+      array_agg(p.nr_votavel order by p.nr_votavel)::int[] as nrs,
+      array_agg(p.votos order by p.nr_votavel)::int[] as votos,
+      array_agg(d.ref order by p.nr_votavel)::int[] as refs,
+      null::jsonb as dicionario
+    from por_votavel p
+    join dic d on p.nm_votavel is not distinct from d.nm_votavel and p.sg_partido is not distinct from d.sg_partido
+    group by p.secao_id
+    union all
+    select
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      (select jsonb_agg(jsonb_build_object('nm_votavel', nm_votavel, 'sg_partido', sg_partido) order by ref) from dic)
+    order by secao_id nulls last
+  `.execute(db)
+
+  const secoes = rows.filter((linha) => linha.secao_id !== null)
+  const votaveis = rows.find((linha) => linha.secao_id === null)?.dicionario ?? []
+  return linhasDeSecoesCompactas({ secoes, votaveis })
 }
 
 export async function baseSecaoCandidato(db, escopo = {}) {

@@ -1,37 +1,26 @@
+import { DummyDriver, Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler } from 'kysely';
 import { describe, expect, it } from 'vitest';
 import { baseSecaoCandidato } from '../../../src/modules/analise/estatisticas.js';
 
+function bancoQueContaConsultas() {
+  const consultas = [];
+  const db = new Kysely({
+    dialect: {
+      createAdapter: () => new PostgresAdapter(),
+      createDriver: () => new DummyDriver(),
+      createIntrospector: (instancia) => new PostgresIntrospector(instancia),
+      createQueryCompiler: () => new PostgresQueryCompiler(),
+    },
+    log: (evento) => {
+      if (evento.level === 'query') consultas.push(evento.query.sql);
+    },
+  });
+  return { db, consultas };
+}
+
 describe('baseSecaoCandidato', () => {
   it('compartilha a mesma consulta concorrente para o mesmo escopo', async () => {
-    let resolver;
-    let execucoes = 0;
-    const resultado = [{ secao_id: 'secao', nr_votavel: 13, votos: '10' }];
-    const consultaPendente = new Promise((resolve) => {
-      resolver = resolve;
-    });
-    const qb = {
-      innerJoin() {
-        return this;
-      },
-      leftJoin(_tabela, configurar) {
-        configurar({ onRef() { return this; } });
-        return this;
-      },
-      where() {
-        return this;
-      },
-      select() {
-        return this;
-      },
-      groupBy() {
-        return this;
-      },
-      execute() {
-        execucoes += 1;
-        return consultaPendente;
-      },
-    };
-    const db = { selectFrom: () => qb };
+    const { db, consultas } = bancoQueContaConsultas();
     const escopo = {
       eleicaoId: 'eleicao',
       cargo: 1,
@@ -41,11 +30,19 @@ describe('baseSecaoCandidato', () => {
 
     const primeira = baseSecaoCandidato(db, escopo);
     const segunda = baseSecaoCandidato(db, { ...escopo, corte: { ...escopo.corte, instante: new Date(escopo.corte.instante) } });
-    resolver(resultado);
 
     const [resultadoPrimeiro, resultadoSegundo] = await Promise.all([primeira, segunda]);
-    expect(execucoes).toBe(1);
+    expect(consultas).toHaveLength(1);
     expect(resultadoPrimeiro).toBe(resultadoSegundo);
-    expect(resultadoPrimeiro).toEqual(resultado);
+    expect([...resultadoPrimeiro]).toEqual([]);
+  });
+
+  it('nova consulta depois que a anterior termina', async () => {
+    const { db, consultas } = bancoQueContaConsultas();
+    const escopo = { eleicaoId: 'eleicao', cargo: 1, corte: { tipo: 'recebimento_diario', data: '2026-10-04' } };
+
+    await baseSecaoCandidato(db, escopo);
+    await baseSecaoCandidato(db, escopo);
+    expect(consultas).toHaveLength(2);
   });
 });
