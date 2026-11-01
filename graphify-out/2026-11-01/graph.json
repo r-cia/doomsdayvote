@@ -2432,7 +2432,7 @@
       "file_type": "code",
       "norm_label": "calcularbenford()",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L93"
+      "source_location": "L94"
     },
     {
       "id": "backend_src_modules_analise_benford_classificarmad",
@@ -2444,7 +2444,7 @@
       "file_type": "code",
       "norm_label": "classificarmad()",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L82"
+      "source_location": "L83"
     },
     {
       "id": "backend_src_modules_analise_benford_distribuicaomontecarlo",
@@ -2468,7 +2468,7 @@
       "file_type": "code",
       "norm_label": "primeirodigito()",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L76"
+      "source_location": "L77"
     },
     {
       "id": "backend_src_modules_analise_benford_pvalormontecarlo",
@@ -2480,7 +2480,7 @@
       "file_type": "code",
       "norm_label": "pvalormontecarlo()",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L64"
+      "source_location": "L65"
     },
     {
       "id": "backend_tests_unit_analise_benford_test_valorescomdigito",
@@ -17960,7 +17960,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L128",
+      "source_location": "L129",
       "weight": 1.0
     },
     {
@@ -17972,7 +17972,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L129",
+      "source_location": "L130",
       "weight": 1.0
     },
     {
@@ -17984,7 +17984,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L97",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -17996,7 +17996,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -42044,7 +42044,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L64",
+      "source_location": "L65",
       "weight": 1.0
     },
     {
@@ -42055,7 +42055,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L76",
+      "source_location": "L77",
       "weight": 1.0
     },
     {
@@ -42066,7 +42066,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L82",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -42088,7 +42088,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/modules/analise/benford.js",
-      "source_location": "L93",
+      "source_location": "L94",
       "weight": 1.0
     },
     {

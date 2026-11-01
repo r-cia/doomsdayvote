@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/benford.js": {
-    "mtime": 1793507079.1135156,
-    "seen": 1793507162.0652208,
-    "ast_hash": "1b9023efcd3672c18ed1a9a5a1f1d212",
+    "mtime": 1793507207.461023,
+    "seen": 1793507220.266264,
+    "ast_hash": "70d29538c050bfca64596e8309512b4a",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/consistencia.js": {

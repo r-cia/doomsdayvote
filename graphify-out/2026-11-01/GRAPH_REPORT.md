@@ -1,7 +1,7 @@
 # Graph Report - doomsdayvote  (2026-11-01)
 
 ## Corpus Check
-- 236 files · ~196,681 words
+- 236 files · ~196,701 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
