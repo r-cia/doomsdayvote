@@ -225,3 +225,43 @@ As constantes `COLUNAS_*` ficam junto da rota que as usa. Os contratos de API n�
 - O Sonnet implementa com a skill `impeccable`.
 - Validação com `npm test` no frontend e verificação visual nos 3 idiomas com o app rodando.
 - Um commit por etapa e push no fim.
+
+## Plano — cortes parciais pela view materializada (2026-11-01)
+
+### Contexto
+Com `as_of` ou `as_of_date`, as análises leem `boletim_versao` + `resultado_votavel`:
+- estatísticas descritivas: cerca de 150 s em 2026;
+- concentração, comparação local, duplicação e base de anomalias e Benford: carregam seção × votável.
+
+O corte parcial usa os mesmos filtros de `mv_secao_candidato_final`: BU `ativo`, `cd_tipo_urna = 1`, cargo Presidente ou Governador e `qt_votos` não nulo. A única diferença é a condição de horário de recebimento.
+
+Como há uma única versão ativa por seção e cargo, **o corte parcial é um subconjunto de seções inteiras da view**. As colunas calculadas por seção (`validos`, `assinatura`, `votaveis`) continuam corretas.
+
+### Etapas
+1. **Migration `0014`: view com os campos do corte, sem travar leituras.**
+   - Cria `mv_secao_candidato_final_v3`, com a definição atual mais `precisao_dt_bu_recebido` e `dt_bu_recebido_data` (`dt_bu_recebido_ts` já existe).
+   - Índices: os atuais e mais `(eleicao_id, cargo, dt_bu_recebido_ts)`.
+   - No fim, na mesma migration: `drop` da antiga, `rename` da nova e dos índices, e grant para `doomsday_app`.
+   - A leitura só bloqueia no instante da troca. A construção (de 20 a 40 min no disco mecânico) não bloqueia, porque roda sobre um objeto novo.
+   - O `down` recria a definição da 0011.
+2. **`aplicarCorteMv(qb, corte)` em `modules/apuracao/corte.js`:** a mesma regra de `aplicarFiltroCorte`, mas sobre as colunas da view.
+   - **Intradiário:** `precisao = 'DATA_HORA'` e `dt_bu_recebido_ts <= instante`.
+   - **Diário:** `DATA_HORA` com a data local (fuso de exibição) `<=` data, ou `DATA` com `dt_bu_recebido_data <= data`.
+3. **Leitura pela view em todos os cortes**, removendo o ramo `corte.tipo === 'final'`:
+   - `secoesCompactas` (duplicação, concentração, comparação local);
+   - `baseSecaoCandidato` (anomalias e Benford);
+   - estatísticas descritivas (`descritivas.js`).
+   As consultas por tabela dessas análises saem.
+4. **Fora do escopo:**
+   - consistência, que precisa de campos por BU que a view não tem, e já leva 7 s;
+   - resumo, mapa e linha do tempo, que leem `mv_votos_final`/`mv_totais_area` no corte final. Se o corte parcial deles também estiver lento, fica para uma segunda fase com medição antes.
+5. **Documentação:**
+   - `docs/architecture.md`: corte parcial lido da view;
+   - README 14.5: a nova view e o índice;
+   - `docs/API.md`: só se algum contrato mudar, e a expectativa é que nenhum mude.
+
+### Verificação
+- **Equivalência (integração):** para os cortes intradiário e diário nos fixtures de 2014, 2018 e 2026, a saída pela view deve ser igual à da consulta antiga por tabela. A consulta antiga fica só no teste, para comparação.
+- **Suítes:** a suíte completa de integração e a unitária.
+- **Banco real:** EXPLAIN ANALYZE de leitura de uma análise com `as_of` em 2026 1T, antes (cerca de 150 s) e depois.
+- **Na tela:** Obscura na aba Estatística com corte do dia, depois de `npm run migrate`.
