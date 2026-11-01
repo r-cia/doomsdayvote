@@ -454,7 +454,10 @@
     "corteIndisponivel": "Cutoff unavailable",
     "metadadosDerivados": "Derived metadata",
     "mensagem": {
-      "CORTE_INDISPONIVEL": "This year's source does not allow querying by receipt time/day",
+      "CORTE_INDISPONIVEL": {
+        "consulta": "This year's source does not allow querying by receipt time/day",
+        "linhaTempo": "This year's source does not allow a timeline by time"
+      },
       "PRECISAO_INSUFICIENTE": "{quantidade} BUs in this selection do not have a receipt time at the requested precision and are not included in this cutoff",
       "METADADOS_DERIVADOS": "Year and round derived from the file name",
       "SEM_HORARIO": "Missing closing time"

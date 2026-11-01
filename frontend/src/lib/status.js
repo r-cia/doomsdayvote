@@ -71,8 +71,20 @@ export function avisoInfo(codigo) {
   }
 }
 
+const MENSAGEM_POR_TEXTO = {
+  CORTE_INDISPONIVEL: {
+    'A fonte deste ano não permite consulta por horário/dia de recebimento': 'consulta',
+    'A fonte deste ano não permite linha do tempo por horário': 'linhaTempo',
+  },
+}
+
 export function avisoMensagem(aviso) {
   const { t, te } = i18n.global
+  const variante = MENSAGEM_POR_TEXTO[aviso.codigo]
+  if (variante) {
+    const sub = variante[aviso.mensagem]
+    return sub ? t(`avisos.mensagem.${aviso.codigo}.${sub}`) : aviso.mensagem
+  }
   const chave = `avisos.mensagem.${aviso.codigo}`
   return te(chave) ? t(chave, { quantidade: aviso.quantidade }) : aviso.mensagem
 }

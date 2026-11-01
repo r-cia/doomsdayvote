@@ -41,7 +41,10 @@ describe('textos da API traduzidos pelo código', () => {
     const { avisos, erros } = codigosDoBackend()
     const exibidos = [...avisos].filter((codigo) => !NAO_EXIBIDOS.has(codigo))
     expect(exibidos.length).toBeGreaterThan(0)
-    for (const codigo of exibidos) expect(i18n.global.te(`avisos.mensagem.${codigo}`), codigo).toBe(true)
+    for (const codigo of exibidos) {
+      const chave = `avisos.mensagem.${codigo}`
+      expect(i18n.global.te(chave) || i18n.global.te(`${chave}.consulta`), codigo).toBe(true)
+    }
     for (const codigo of erros) {
       const coberto = i18n.global.te(`erros.codigo.${codigo}`) || codigo === 'NOT_FOUND'
       expect(coberto, codigo).toBe(true)
@@ -57,6 +60,25 @@ describe('textos da API traduzidos pelo código', () => {
     )
     i18n.global.locale.value = 'es-ES'
     expect(avisoMensagem({ codigo: 'METADADOS_DERIVADOS', mensagem: 'x' })).toBe('Año y vuelta derivados del nombre del archivo')
+  })
+
+  it('CORTE_INDISPONIVEL mantém uma tradução por mensagem do backend', () => {
+    const consulta = 'A fonte deste ano não permite consulta por horário/dia de recebimento'
+    const linhaTempo = 'A fonte deste ano não permite linha do tempo por horário'
+    expect(avisoMensagem({ codigo: 'CORTE_INDISPONIVEL', mensagem: consulta })).toBe(consulta)
+    expect(avisoMensagem({ codigo: 'CORTE_INDISPONIVEL', mensagem: linhaTempo })).toBe(linhaTempo)
+    i18n.global.locale.value = 'en-US'
+    expect(avisoMensagem({ codigo: 'CORTE_INDISPONIVEL', mensagem: linhaTempo })).toBe(
+      "This year's source does not allow a timeline by time",
+    )
+    expect(avisoMensagem({ codigo: 'CORTE_INDISPONIVEL', mensagem: consulta })).toBe(
+      "This year's source does not allow querying by receipt time/day",
+    )
+    i18n.global.locale.value = 'es-ES'
+    expect(avisoMensagem({ codigo: 'CORTE_INDISPONIVEL', mensagem: linhaTempo })).toBe(
+      'La fuente de este año no permite una cronología por hora',
+    )
+    expect(avisoMensagem({ codigo: 'CORTE_INDISPONIVEL', mensagem: 'texto novo' })).toBe('texto novo')
   })
 
   it('usa a mensagem da API só quando o código é desconhecido', () => {

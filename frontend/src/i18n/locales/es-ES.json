@@ -454,7 +454,10 @@
     "corteIndisponivel": "Corte no disponible",
     "metadadosDerivados": "Metadatos derivados",
     "mensagem": {
-      "CORTE_INDISPONIVEL": "La fuente de este año no permite consultar por hora/día de recepción",
+      "CORTE_INDISPONIVEL": {
+        "consulta": "La fuente de este año no permite consultar por hora/día de recepción",
+        "linhaTempo": "La fuente de este año no permite una cronología por hora"
+      },
       "PRECISAO_INSUFICIENTE": "{quantidade} BU de esta selección no tienen hora de recepción con la precisión solicitada y no entran en este corte",
       "METADADOS_DERIVADOS": "Año y vuelta derivados del nombre del archivo",
       "SEM_HORARIO": "Sin hora de cierre"
