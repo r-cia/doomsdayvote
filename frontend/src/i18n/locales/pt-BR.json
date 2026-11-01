@@ -295,6 +295,7 @@
     "desvio": "Desvio padrão (pop.)",
     "comparecimento": "Comparecimento",
     "benford": "Benford",
+    "benfordNiveis": "Benford por níveis",
     "duplicacao": "Duplicação",
     "isolamento": "Isolamento e LOF",
     "aderenciaBenfordNiveis": "Aderência à lei de Benford por candidato em seção, zona e município",

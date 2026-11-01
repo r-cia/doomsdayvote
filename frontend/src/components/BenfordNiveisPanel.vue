@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import TabelaScroll from './TabelaScroll.vue'
-import { formatarDecimal } from '../lib/format'
+import { formatarDecimal, formatarNumero } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
@@ -17,12 +17,16 @@ const candidatos = computed(() => props.dados?.candidatos ?? [])
 function mad(nivel) {
   return formatarDecimal(nivel?.mad, 4, 4)
 }
+
+function pValor(nivel) {
+  return formatarDecimal(nivel?.monte_carlo?.p_valor, 4, 4)
+}
 </script>
 
 <template>
   <section class="painel" aria-labelledby="benford-niveis-titulo">
     <header class="painel__cabecalho">
-      <h2 id="benford-niveis-titulo">{{ $t('estatistica.benford') }}</h2>
+      <h2 id="benford-niveis-titulo">{{ $t('estatistica.benfordNiveis') }}</h2>
       <p class="painel__meta">
         <b>{{ candidatos.length }}</b> {{ $t('unidade.candidato', candidatos.length) }}
       </p>
@@ -54,21 +58,21 @@ function mad(nivel) {
         <tbody>
           <tr v-for="candidato in candidatos" :key="candidato.nr_votavel">
             <td>{{ candidato.nm_votavel }}</td>
-            <td class="num">{{ candidato.niveis.secao.n }}</td>
+            <td class="num">{{ formatarNumero(candidato.niveis.secao.n) }}</td>
             <td class="num">
               {{ mad(candidato.niveis.secao) }}
             </td>
-            <td class="num">{{ mad(candidato.niveis.secao.monte_carlo?.p_valor) }}</td>
-            <td class="num">{{ candidato.niveis.zona.n }}</td>
+            <td class="num">{{ pValor(candidato.niveis.secao) }}</td>
+            <td class="num">{{ formatarNumero(candidato.niveis.zona.n) }}</td>
             <td class="num">
               {{ mad(candidato.niveis.zona) }}
             </td>
-            <td class="num">{{ mad(candidato.niveis.zona.monte_carlo?.p_valor) }}</td>
-            <td class="num">{{ candidato.niveis.municipio.n }}</td>
+            <td class="num">{{ pValor(candidato.niveis.zona) }}</td>
+            <td class="num">{{ formatarNumero(candidato.niveis.municipio.n) }}</td>
             <td class="num">
               {{ mad(candidato.niveis.municipio) }}
             </td>
-            <td class="num">{{ mad(candidato.niveis.municipio.monte_carlo?.p_valor) }}</td>
+            <td class="num">{{ pValor(candidato.niveis.municipio) }}</td>
           </tr>
         </tbody>
       </table>

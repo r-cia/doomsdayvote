@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import CoberturaBlock from './CoberturaBlock.vue'
 import TabelaScroll from './TabelaScroll.vue'
+import { formatarNumero } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
@@ -37,9 +38,9 @@ function numeros(grupo) {
     <header class="painel__cabecalho">
       <h2 id="duplicacao-titulo">{{ $t('estatistica.duplicacao') }}</h2>
       <p class="painel__meta">
-        <b>{{ dados?.total_grupos ?? 0 }}</b> {{ $t('unidade.grupo', dados?.total_grupos ?? 0) }} ·
-        {{ dados?.total_secoes ?? 0 }} {{ $t('unidade.secao', dados?.total_secoes ?? 0) }} ·
-        {{ $t('estatistica.escopo') }} {{ dados?.total_secoes_escopo ?? 0 }}
+        <b>{{ formatarNumero(dados?.total_grupos ?? 0) }}</b> {{ $t('unidade.grupo', dados?.total_grupos ?? 0) }} ·
+        {{ formatarNumero(dados?.total_secoes ?? 0) }} {{ $t('unidade.secao', dados?.total_secoes ?? 0) }} ·
+        {{ $t('estatistica.escopo') }} {{ formatarNumero(dados?.total_secoes_escopo ?? 0) }}
       </p>
     </header>
 
@@ -68,7 +69,7 @@ function numeros(grupo) {
         </thead>
         <tbody>
           <tr v-for="grupo in grupos" :key="grupo.assinatura">
-            <td class="num">{{ grupo.secoes.length }}</td>
+            <td class="num">{{ formatarNumero(grupo.secoes.length) }}</td>
             <td>{{ grupo.secoes[0].sg_uf }}</td>
             <td>{{ grupo.secoes[0].nm_municipio || grupo.secoes[0].cd_municipio_tse }}</td>
             <td>{{ grupo.secoes[0].nr_local_votacao ?? '—' }}</td>

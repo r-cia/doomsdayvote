@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import TabelaScroll from './TabelaScroll.vue'
-import { formatarDecimal } from '../lib/format'
+import { formatarDecimal, formatarNumero } from '../lib/format'
 import { useOrdenacao } from '../composables/ordenacao'
 
 const props = defineProps({
@@ -27,7 +27,7 @@ function score(valor) {
     <header class="painel__cabecalho">
       <h2 id="outliers-titulo">{{ $t('estatistica.isolamento') }}</h2>
       <p class="painel__meta">
-        <b>{{ dados?.total_secoes ?? 0 }}</b> {{ $t('unidade.secao', dados?.total_secoes ?? 0) }} · {{ $t('estatistica.amostraLof') }} {{ parametros.lof?.amostra ?? dados?.lof?.amostra ?? 0 }}
+        <b>{{ formatarNumero(dados?.total_secoes ?? 0) }}</b> {{ $t('unidade.secao', dados?.total_secoes ?? 0) }} · {{ $t('estatistica.amostraLof') }} {{ formatarNumero(parametros.lof?.amostra ?? dados?.lof?.amostra ?? 0) }}
         <template v-if="parametros.lof?.limitado ?? dados?.lof?.limitado"> {{ $t('estatistica.limitada') }}</template>
       </p>
     </header>

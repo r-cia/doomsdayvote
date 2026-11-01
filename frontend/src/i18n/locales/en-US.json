@@ -295,6 +295,7 @@
     "desvio": "Standard deviation (pop.)",
     "comparecimento": "Attendance",
     "benford": "Benford",
+    "benfordNiveis": "Benford by level",
     "duplicacao": "Duplication",
     "isolamento": "Isolation and LOF",
     "aderenciaBenfordNiveis": "Adherence to Benford's law by candidate at section, zone and municipality level",
