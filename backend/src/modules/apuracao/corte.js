@@ -160,25 +160,24 @@ export async function avisosCorte(db, escopo, corte) {
 }
 
 export async function metadadosCorte(db, escopo, corte) {
-  let qb = db
+  const filtroEscopo = escopo.escopo ?? {};
+  const comSecao = Boolean(filtroEscopo.sgUf || filtroEscopo.cdMunicipio || filtroEscopo.nrZona || filtroEscopo.secaoId);
+
+  let bus = db
     .selectFrom('boletim_versao as bv')
-    .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
-    .innerJoin('lote_importacao as l', 'l.id', 'bv.lote_id')
-    .select([
-      'l.id',
-      'l.nome_arquivo',
-      'l.sha256',
-      sql`max(l.dt_geracao_arquivo)`.as('dt_geracao_arquivo'),
-      sql`max(l.captured_at)`.as('captured_at'),
-    ])
+    .select(sql`1`.as('existe'))
+    .whereRef('bv.lote_id', '=', 'l.id')
     .where('bv.eleicao_id', '=', escopo.eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', escopo.cargo);
+  if (comSecao) bus = bus.innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id');
 
-  qb = aplicarFiltroCorte(qb, corte);
-  qb = aplicarEscopo(qb, escopo.escopo ?? {});
+  bus = aplicarFiltroCorte(bus, corte);
+  bus = aplicarEscopo(bus, filtroEscopo);
 
-  const linhas = await qb
-    .groupBy(['l.id', 'l.nome_arquivo', 'l.sha256'])
+  const linhas = await db
+    .selectFrom('lote_importacao as l')
+    .select(['l.id', 'l.nome_arquivo', 'l.sha256', 'l.dt_geracao_arquivo', 'l.captured_at'])
+    .where((eb) => eb.exists(bus))
     .execute();
   const lotes = new Map();
   let source = null;

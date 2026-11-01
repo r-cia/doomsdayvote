@@ -105,6 +105,15 @@ describe('corte temporal', () => {
       expect(metadados.source_updated_at).toBeTruthy();
       expect(metadados.captured_at).toBeTruthy();
 
+      const daUf = await metadadosCorte(db, { eleicaoId: eid, cargo, escopo: { sgUf: 'AC' } }, { tipo: 'final' });
+      expect(daUf.lotes).toEqual(metadados.lotes);
+      const deOutraUf = await metadadosCorte(db, { eleicaoId: eid, cargo, escopo: { sgUf: 'SP' } }, { tipo: 'final' });
+      expect(deOutraUf).toEqual({ source_updated_at: null, captured_at: null, lotes: [] });
+      const antes = await metadadosCorte(db, { eleicaoId: eid, cargo }, asOf(new Date(primeiro.getTime() - 1000)));
+      expect(antes.lotes).toEqual([]);
+      const noPrimeiro = await metadadosCorte(db, { eleicaoId: eid, cargo }, asOf(primeiro));
+      expect(noPrimeiro.lotes).toEqual(metadados.lotes);
+
       const avisos = await avisosCorte(db, { eleicaoId: eid, cargo }, { tipo: 'final' });
       expect(avisos.map((a) => a.codigo)).not.toContain('CORTE_INDISPONIVEL');
     },

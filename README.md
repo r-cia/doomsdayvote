@@ -306,6 +306,7 @@ Os parâmetros de sessão vão em `options` da conexão porque o driver `pg` des
 | `0004` | `boletim_versao_secao_ativo_idx` | `secao_id, eleicao_id, cd_cargo_pergunta` (parcial, `ativo`) | Junção BU ↔ seção. |
 | `0004` | `resultado_votavel_boletim_categoria_idx` | `boletim_versao_id, categoria, nr_votavel` | Junção BU ↔ votos e agregação por candidato. |
 | `0004` | `secao_eleitoral_localidade_full_idx` | `sg_uf, cd_municipio_tse` | Filtro por UF e município. |
+| `0013` | `boletim_versao_lote_eleicao_cargo_idx` | `lote_id, eleicao_id, cd_cargo_pergunta, dt_bu_recebido_ts` (parcial, `ativo` e `cd_tipo_urna = 1`) | Metadados do corte: uma busca por lote (`EXISTS`) em vez de varrer os BUs da eleição. |
 
 Os índices parciais em `ativo` deixam de fora as versões substituídas de BU, que nunca entram nas consultas.
 
