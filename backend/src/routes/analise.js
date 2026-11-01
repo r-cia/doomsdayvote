@@ -4,7 +4,7 @@ import { corteResposta, resolverCorte } from '../modules/apuracao/corte.js';
 import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria } from '../modules/analise/estatisticas.js';
 import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
 import { COLUNAS_DUPLICACAO, duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
-import { consistenciaPorSecao } from '../modules/analise/consistencia.js';
+import { COLUNAS_CONSISTENCIA, consistenciaPorSecao } from '../modules/analise/consistencia.js';
 import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
 import { COLUNAS_CONCENTRACAO, concentracao } from '../modules/analise/concentracao.js';
 import { FEATURES, pontuarOutliers } from '../modules/analise/outliers.js';
@@ -53,15 +53,6 @@ const COLUNAS_ESTATISTICAS = {
   media: (c) => c.media,
   mediana: (c) => c.mediana,
   desvio: (c) => c.desvio,
-};
-
-const COLUNAS_CONSISTENCIA = {
-  sg_uf: (i) => i.secao.sg_uf,
-  nm_municipio: (i) => i.secao.nm_municipio,
-  nr_zona: (i) => i.secao.nr_zona,
-  nr_secao: (i) => i.secao.nr_secao,
-  regra: (i) => i.regra,
-  diferenca: (i) => i.diferenca,
 };
 
 const COLUNAS_COMPARACAO_LOCAL = {
@@ -236,7 +227,7 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
     ]).optional(),
     page: z.coerce.number().int().min(1).default(1),
     page_size: z.coerce.number().int().min(1).optional(),
-    ...ordenacaoSchema(Object.keys(COLUNAS_CONSISTENCIA)),
+    ...ordenacaoSchema(COLUNAS_CONSISTENCIA),
   }), async (query) => {
     const corte = resolverCorte(query);
     const eleicao = await buscarEleicao(db, query.election_id);
@@ -247,28 +238,14 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
       cargo: query.cargo,
       corte,
       escopo: escopoDe(query),
+      regra: query.regra,
+      ordenacao: lerOrdenacao(query),
+      limite: pageSize,
+      deslocamento: (query.page - 1) * pageSize,
     });
-
-    const divergenciasBase = [];
-    for (const item of resultado.secoes) {
-      for (const regra of item.regras) {
-        if (regra.status !== 'divergente') continue;
-        if (query.regra && regra.regra !== query.regra) continue;
-        divergenciasBase.push({
-          secao: item.secao,
-          regra: regra.regra,
-          diferenca: regra.diferenca,
-          campos: regra.campos,
-          valores: regra.valores,
-          bu: item.bu,
-        });
-      }
-    }
-    const divergencias = ordenarLista(divergenciasBase, COLUNAS_CONSISTENCIA, lerOrdenacao(query));
 
     const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
 
-    const inicio = (query.page - 1) * pageSize;
     return {
       corte: corteResposta(corte),
       ...metadados,
@@ -276,8 +253,8 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
       cobertura: resultado.cobertura,
       page: query.page,
       page_size: pageSize,
-      total: divergencias.length,
-      itens: divergencias.slice(inicio, inicio + pageSize),
+      total: resultado.total,
+      itens: resultado.itens,
     };
   }));
 

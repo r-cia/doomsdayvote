@@ -20,7 +20,7 @@ Toda rota que alimenta uma tabela aceita `ordem` (coluna) e `direcao` (`asc` ou 
 | `/api/anomalies` | `ordem` (`outliers.secoes`, top 20 depois de ordenar) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `score_if`, `score_lof`, `candidato` | `score_if` desc |
 | `/api/anomalies` | `ordem_duplicacao` (`duplicacao.grupos`, top 50 depois de ordenar) | `secoes`, `sg_uf`, `nm_municipio`, `nr_local_votacao`, `votaveis`, `candidato` | quantidade de seções desc |
 | `/api/anomalies` | `ordem_benford` (`benford_niveis.candidatos`) | `nm_votavel`, `secao_n`, `secao_mad`, `zona_n`, `zona_mad`, `municipio_n`, `municipio_mad` | `total_votos` desc |
-| `/api/consistencia` | `ordem` (antes da paginação) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `regra`, `diferenca` | ordem de cálculo |
+| `/api/consistencia` | `ordem` (antes da paginação) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `regra`, `diferenca` | `sg_uf`, `cd_municipio_tse`, `nr_zona`, `nr_secao`, posição da regra |
 | `/api/estatisticas` | `ordem` (`candidatos` de cada bloco) | `nm_votavel`, `sg_partido`, `secoes`, `secoes_zero`, `media`, `mediana`, `desvio` | `media` desc |
 | `/api/comparacao-local/secoes` | `ordem` (`secoes` do grupo pedido; `/api/comparacao-local` não ordena, só lista grupos) | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `participacao`, `abstencao`, `participacao_pp`, `abstencao_pp` | ordem de cálculo |
 | `/api/concentracao` | `ordem_share` (`top_share`), `ordem_margem` (`top_margem`); top-N escolhido depois de ordenar todas as seções | `sg_uf`, `nm_municipio`, `nr_zona`, `nr_secao`, `share_lider`, `margem_absoluta`, `margem_pp`, `share_lider_percentil` | `share_lider` desc / `margem_absoluta` desc |
@@ -133,7 +133,7 @@ Benford por nível, duplicação de vetor de votos e outliers por seção, no co
 
 ## `GET /api/consistencia`
 
-Consistência aritmética por seção no BU ativo: `comparecimento_vs_votos`, `aptos_vs_comparecimento_abstencao`, `comparecimento_vs_aptos`, `biometria_vs_comparecimento`. Retorna apenas as regras divergentes (uma linha por regra), com `cobertura` (consideradas, avaliadas, sem divergência, com divergência, sem campo e divergências por regra). Aceita `regra`, `page` e `page_size`. Ausência de campo ou de resultados não é tratada como zero.
+Consistência aritmética por seção no BU ativo: `comparecimento_vs_votos`, `aptos_vs_comparecimento_abstencao`, `comparecimento_vs_aptos`, `biometria_vs_comparecimento`. Retorna apenas as regras divergentes (uma linha por regra), com `cobertura` (consideradas, avaliadas, sem divergência, com divergência, sem campo e divergências por regra). Aceita `regra`, `page` e `page_size`. Ausência de campo ou de resultados não é tratada como zero. As regras, a cobertura e a paginação são calculadas no Postgres; só a página chega ao Node. Sem `ordem`, os itens saem por `sg_uf`, `cd_municipio_tse`, `nr_zona`, `nr_secao` e posição da regra (na ordem acima); com `ordem`, esses campos desempatam e valores nulos ficam por último.
 
 ```json
 { "corte": { "tipo": "final" }, "cobertura": { "consideradas": 100, "com_divergencia": 2, "sem_campo_por_regra": { "comparecimento_vs_votos": 0 } }, "page": 1, "page_size": 50, "total": 2, "itens": [{ "secao": { "id": "…", "sg_uf": "AC" }, "regra": "comparecimento_vs_votos", "diferenca": 3, "campos": ["qt_comparecimento", "qt_votos"], "valores": { "qt_comparecimento": 80, "soma_qt_votos": 83 }, "bu": { "id": "…", "versao": 1, "lote": { "id": "…", "nome": "…" }, "sha256": "…", "timestamps": {} } }] }
