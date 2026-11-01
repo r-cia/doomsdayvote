@@ -182,3 +182,38 @@ As constantes `COLUNAS_*` ficam junto da rota que as usa. Os contratos de API n�
 - Decisão B: siglas históricas usam a cor existente do sucessor (PMDB→MDB, PR→PL, PRB→REPUBLICANOS, PPS→CIDADANIA, SD→SOLIDARIEDADE, PSDC→DC, PTN e PHS→PODE, PTDOB→AVANTE, PSL→UNIAO, PPL→PCDOB, PTB/PATRIOTA/PATRI/PEN/PRP→PRD); novo PRD em verde escuro `#14532D`.
 - Passo final (executado pelo orquestrador): `npm run migrate`.
 - Ajuste: o backfill por UPDATE foi substituído por correção na leitura, porque o UPDATE de ~9M linhas no HDD de produção levaria cerca de 30 h. A `0011` agora só recria `mv_votos_final`, `mv_totais_area` e `mv_secao_candidato_final` com `max(coalesce(sg_partido, nm_partido))`, e as consultas da API leem `coalesce(rv.sg_partido, rv.nm_partido)`. Os dados de 2014 já importados mantêm `sg_partido` nulo; a importação nova preenche pelo parser.
+
+## Plano — i18n da aplicação inteira (2026-11-01)
+
+### Decisões do usuário
+| Tema | Decisão |
+|---|---|
+| Textos da API | O frontend traduz avisos e erros pelo `codigo` que a API envia. A `mensagem` da API só aparece quando o código é desconhecido. |
+| Formatos | Números, percentuais e datas/horas seguem o idioma selecionado (pt-BR, es-ES, en-US). O fuso continua o mesmo de hoje. |
+
+### Escopo
+1. **Auditoria do frontend inteiro:** todo texto visível ao usuário passa a vir do i18n.
+   - Inclui templates, `aria-label`, `title`, `placeholder`, props de texto (`titulo`, `descricao`) e textos montados em JS (por exemplo, legendas do mapa, "feições" e mensagens do `ApiError` padrão).
+   - Ficam de fora os dados (nomes de candidatos, partidos, municípios e UFs).
+2. **Paridade das chaves:** os três locales têm exatamente o mesmo conjunto de chaves.
+   - Nenhuma chave usada no código fica faltando e nenhuma chave existe sem uso.
+   - Pluralização via vue-i18n onde houver contagem.
+3. **Textos da API:**
+   - Inventário de todos os `codigo` de avisos e erros que o backend emite.
+   - Uma chave i18n por código.
+   - `AvisoBanner` e os blocos de erro traduzem pelo código.
+   - O backend não muda.
+4. **Formatação:** os formatadores de `lib/format.js` (e afins) passam a usar o locale ativo do vue-i18n. Gráficos, eixos e legendas também.
+5. **`<html lang>`** acompanha o idioma selecionado.
+6. **Teste automatizado de paridade:**
+   - mesmas chaves nos 3 locales;
+   - toda chave usada no código existe;
+   - um teste de varredura que falha se surgir texto fixo nos templates.
+7. **Qualidade das traduções:**
+   - Revisão de es-ES e en-US com terminologia eleitoral consistente (por exemplo, BU, seção, turno, apuração).
+   - Glossário em `docs/design-system/i18n.md`.
+
+### Fluxo
+- O Sonnet implementa com a skill `impeccable`.
+- Validação com `npm test` no frontend e verificação visual nos 3 idiomas com o app rodando.
+- Um commit por etapa e push no fim.
