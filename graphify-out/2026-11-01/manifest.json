@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/corte.js": {
-    "mtime": 1793406667.5383475,
-    "seen": 1793406950.3168662,
-    "ast_hash": "82e6048e99d573369c069adae2e83e86",
+    "mtime": 1793497715.3754592,
+    "seen": 1793498114.347246,
+    "ast_hash": "26ca4cc6725959eb68fda1927a1c3e15",
     "semantic_hash": ""
   },
   "backend/src/modules/apuracao/progresso.js": {
@@ -372,9 +372,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/corte.test.js": {
-    "mtime": 1793482086.3352628,
-    "seen": 1793494426.2935574,
-    "ast_hash": "ca1a882d8543604d14672cda1b23c9d4",
+    "mtime": 1793497724.053529,
+    "seen": 1793498114.3473456,
+    "ast_hash": "15c71ad0711596dee273f14c00fd5d70",
     "semantic_hash": ""
   },
   "backend/tests/integration/db-roles.test.js": {
@@ -774,21 +774,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793496649.2034874,
-    "seen": 1793496707.7176661,
-    "ast_hash": "6f3c0598253d6c54109208cc5948ea98",
+    "mtime": 1793496961.2472472,
+    "seen": 1793498114.3475134,
+    "ast_hash": "5c21e611a4bf8085ce100ca0733d6a84",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793496649.3114884,
-    "seen": 1793496707.7176676,
-    "ast_hash": "1a88213e94f961b433b4cb11f82eb4d3",
+    "mtime": 1793496961.8012521,
+    "seen": 1793498114.3475153,
+    "ast_hash": "c3b2e15cff93c00374ee968e6a1e3485",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793496649.0794861,
-    "seen": 1793496707.7176695,
-    "ast_hash": "b5d6b5f43a75cb3f0bbf234b9601e165",
+    "mtime": 1793496961.091246,
+    "seen": 1793498114.347517,
+    "ast_hash": "59ddb81b3b057486067dd1b9eac97f19",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -810,9 +810,9 @@
     "semantic_hash": ""
   },
   "frontend/src/lib/status.js": {
-    "mtime": 1793496605.7530863,
-    "seen": 1793496707.717681,
-    "ast_hash": "436e2d01c1688c33641f2e77f996309d",
+    "mtime": 1793496929.3149726,
+    "seen": 1793498114.3475285,
+    "ast_hash": "64d451fe03acb09f29737c6c79bc1bb9",
     "semantic_hash": ""
   },
   "frontend/src/main.js": {
@@ -924,9 +924,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1793494028.9056356,
-    "seen": 1793494426.2938514,
-    "ast_hash": "1ff0cc4c8a6432b3a39016c92f239f08",
+    "mtime": 1793497715.6444614,
+    "seen": 1793498114.3475869,
+    "ast_hash": "5fccf59c48456cfb5505587fb3e55260",
     "semantic_hash": ""
   },
   "backend/tests/fixtures/bweb/bweb_1t_AC_14102014131600.txt": {
@@ -1038,9 +1038,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/CoberturaBlock.vue": {
-    "mtime": 1793394852.3874748,
-    "seen": 1793395538.2131767,
-    "ast_hash": "d38013ad145c0d8419fb0f165a966f1f",
+    "mtime": 1793496962.4142573,
+    "seen": 1793498114.3474655,
+    "ast_hash": "7bc5692b8e51f5e17b7a4ab83b844b4a",
     "semantic_hash": ""
   },
   "frontend/src/components/ComparacaoLocalPanel.vue": {
@@ -1404,9 +1404,9 @@
     "semantic_hash": ""
   },
   "frontend/tests/i18n-codigos-api.test.js": {
-    "mtime": 1793496623.5752513,
-    "seen": 1793496707.7177134,
-    "ast_hash": "16b853b45248208ab4497190f17012ed",
+    "mtime": 1793496942.466086,
+    "seen": 1793498114.3475633,
+    "ast_hash": "a432580231b2d21ee7f14bcf424d267f",
     "semantic_hash": ""
   },
   "frontend/tests/i18n-formato.test.js": {
@@ -1419,6 +1419,18 @@
     "mtime": 1793496699.4289448,
     "seen": 1793496707.717771,
     "ast_hash": "b428d9efdeb25f07ad948af14798ec8d",
+    "semantic_hash": ""
+  },
+  "backend/src/migrations/0013_boletim_versao_lote_idx.js": {
+    "mtime": 1793497715.5134604,
+    "seen": 1793498114.3472123,
+    "ast_hash": "6c74f15631f62e64f9229ceed078eb65",
+    "semantic_hash": ""
+  },
+  "frontend/tests/i18n-cobertura.test.js": {
+    "mtime": 1793496962.7482603,
+    "seen": 1793498114.3475614,
+    "ast_hash": "40654fc31cb8fe72a565e2603995c383",
     "semantic_hash": ""
   }
 }
