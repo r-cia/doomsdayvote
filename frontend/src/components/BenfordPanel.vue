@@ -44,7 +44,7 @@ function formatarMad(valor) {
     <header class="painel__cabecalho">
       <h2 id="benford-titulo">{{ $t('estatistica.benford') }}</h2>
       <p v-if="!loading && !error && dados" class="painel__meta">
-        <b>{{ formatarNumero(ativo?.n) }}</b> seções
+        <b>{{ formatarNumero(ativo?.n) }}</b> {{ $t('unidade.secao', ativo?.n ?? 0) }}
       </p>
     </header>
 
@@ -66,7 +66,7 @@ function formatarMad(valor) {
         <div
           class="benford__grafico"
           role="img"
-          :aria-label="`Distribuição do primeiro dígito dos votos de ${ativo?.nm_votavel} por seção, comparada à lei de Benford`"
+          :aria-label="$t('estatistica.distribuicaoBenford', { nome: ativo?.nm_votavel })"
         >
           <div
             v-for="digito in ativo?.digitos ?? []"
@@ -77,12 +77,12 @@ function formatarMad(valor) {
               <span
                 class="benford__obs"
                 :style="{ height: altura(digito.observado_percentual) }"
-                :title="`observado ${formatarMad(digito.observado_percentual)}%`"
+                :title="$t('estatistica.observado', { valor: formatarMad(digito.observado_percentual) })"
               />
               <span
                 class="benford__esp"
                 :style="{ height: altura(digito.esperado_percentual) }"
-                :title="`esperado ${formatarMad(digito.esperado_percentual)}%`"
+                :title="$t('estatistica.esperado', { valor: formatarMad(digito.esperado_percentual) })"
               />
             </div>
             <span class="benford__digito">{{ digito.digito }}</span>
@@ -92,7 +92,7 @@ function formatarMad(valor) {
         <TabelaScroll class="benford__tabela" :atualizando="atualizando">
           <table>
             <caption class="sr-only">
-              Aderência à lei de Benford por candidato no corte atual
+              {{ $t('estatistica.aderenciaBenford') }}
             </caption>
             <thead>
               <tr>
@@ -126,7 +126,7 @@ function formatarMad(valor) {
 
       <div class="benford__rodape">
         <p class="nota">
-          <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> seções abaixo do mínimo
+          <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> {{ $t('estatistica.abaixoMinimo', ativo?.secoes_abaixo_minimo ?? 0) }}
         </p>
       </div>
     </template>

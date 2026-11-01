@@ -107,8 +107,8 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <StateBlock
     v-if="store.governadorSemUf"
     estado="vazio"
-    titulo="Selecione um estado"
-    descricao="Resultados de governador são específicos por estado."
+    :titulo="$t('comum.selecioneEstado')"
+    :descricao="$t('comum.governadorPorEstado')"
   />
 
   <StateBlock

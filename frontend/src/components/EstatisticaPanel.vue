@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import TabelaScroll from './TabelaScroll.vue'
 import { useEstatisticas } from '../composables/queries'
@@ -11,6 +12,7 @@ const props = defineProps({
   electionId: { type: String, default: '' },
 })
 
+const { t } = useI18n()
 const escopo = ref('turno')
 const { alternar, ariaSort, seta, params } = useOrdenacao()
 const estatisticasQuery = useEstatisticas(escopo, params)
@@ -26,7 +28,7 @@ const numero = (valor) => formatarDecimal(valor, 0, 1)
 function erroMensagem(erro) {
   if (!erro) return ''
   if (typeof erro === 'string') return erro
-  return erro.message || 'Erro ao carregar estatísticas'
+  return erro.message || t('estatistica.erroCarregar')
 }
 </script>
 
@@ -76,11 +78,11 @@ function erroMensagem(erro) {
         class="estatistica-bloco"
       >
         <header class="estatistica-bloco__cabecalho">
-          <h3>Turno {{ bloco.nr_turno }} · {{ bloco.ano_eleicao }}</h3>
-          <p>{{ formatarNumero(bloco.comparecimento.secoes) }} seções</p>
+          <h3>{{ $t('estatistica.turnoAno', { turno: bloco.nr_turno, ano: bloco.ano_eleicao }) }}</h3>
+          <p>{{ formatarNumero(bloco.comparecimento.secoes) }} {{ $t('unidade.secao', bloco.comparecimento.secoes ?? 0) }}</p>
         </header>
 
-        <section class="estatistica-tabela-wrap" aria-label="Comparecimento por seção">
+        <section class="estatistica-tabela-wrap" :aria-label="$t('estatistica.comparecimentoPorSecao')">
           <TabelaScroll :atualizando="estatisticasQuery.isFetching.value">
           <table class="tabela">
             <thead>
@@ -105,7 +107,7 @@ function erroMensagem(erro) {
           </TabelaScroll>
         </section>
 
-        <section class="estatistica-tabela-wrap" aria-label="Votos por seção por candidato">
+        <section class="estatistica-tabela-wrap" :aria-label="$t('estatistica.votosPorSecaoCandidato')">
           <TabelaScroll :atualizando="estatisticasQuery.isFetching.value">
           <table class="tabela">
             <thead>

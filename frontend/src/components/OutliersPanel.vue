@@ -27,8 +27,8 @@ function score(valor) {
     <header class="painel__cabecalho">
       <h2 id="outliers-titulo">{{ $t('estatistica.isolamento') }}</h2>
       <p class="painel__meta">
-        <b>{{ dados?.total_secoes ?? 0 }}</b> seções · amostra LOF {{ parametros.lof?.amostra ?? dados?.lof?.amostra ?? 0 }}
-        <template v-if="parametros.lof?.limitado ?? dados?.lof?.limitado"> (limitada)</template>
+        <b>{{ dados?.total_secoes ?? 0 }}</b> {{ $t('unidade.secao', dados?.total_secoes ?? 0) }} · {{ $t('estatistica.amostraLof') }} {{ parametros.lof?.amostra ?? dados?.lof?.amostra ?? 0 }}
+        <template v-if="parametros.lof?.limitado ?? dados?.lof?.limitado"> {{ $t('estatistica.limitada') }}</template>
       </p>
     </header>
 
@@ -39,17 +39,17 @@ function score(valor) {
     <TabelaScroll v-else :atualizando="atualizando">
       <table>
         <caption class="sr-only">
-          Seções com maior score de anomalia
+          {{ $t('estatistica.maiorScore') }}
         </caption>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_municipio')"><button type="button" @click="alternar('nm_municipio')">Município{{ seta('nm_municipio') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_zona')"><button type="button" @click="alternar('nr_zona')">Zona{{ seta('nr_zona') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_secao')"><button type="button" @click="alternar('nr_secao')">Seção{{ seta('nr_secao') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_municipio')"><button type="button" @click="alternar('nm_municipio')">{{ $t('tabela.municipio') }}{{ seta('nm_municipio') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_zona')"><button type="button" @click="alternar('nr_zona')">{{ $t('tabela.zona') }}{{ seta('nr_zona') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_secao')"><button type="button" @click="alternar('nr_secao')">{{ $t('tabela.secao') }}{{ seta('nr_secao') }}</button></th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('score_if')"><button type="button" @click="alternar('score_if')">IF{{ seta('score_if') }}</button></th>
             <th scope="col" class="num ordenavel" :aria-sort="ariaSort('score_lof')"><button type="button" @click="alternar('score_lof')">LOF{{ seta('score_lof') }}</button></th>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSort('candidato')"><button type="button" @click="alternar('candidato')">Candidato{{ seta('candidato') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('candidato')"><button type="button" @click="alternar('candidato')">{{ $t('tabela.candidato') }}{{ seta('candidato') }}</button></th>
           </tr>
         </thead>
         <tbody>

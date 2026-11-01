@@ -167,7 +167,7 @@ const candidatoSelecionado = computed(() => {
   )
 })
 const rotuloNivel = computed(() =>
-  props.nivel === 'uf' ? 'UF' : 'Município',
+  props.nivel === 'uf' ? t('mapa.nivelUf') : t('mapa.nivelMunicipio'),
 )
 
 function primeiroValor(propriedades, campos) {
@@ -229,17 +229,17 @@ async function carregarMalha(nivel) {
     const tipo = resposta.headers?.get?.('content-type') ?? ''
     if (!resposta.ok) {
       throw new Error(
-        `Arquivo /geo/${arquivoMalha(nivel)} não encontrado (HTTP ${resposta.status}).`,
+        t('mapa.erroArquivo', { arquivo: arquivoMalha(nivel), status: resposta.status }),
       )
     }
     if (tipo && !tipo.includes('json')) {
       throw new Error(
-        `O caminho /geo/${arquivoMalha(nivel)} não devolveu um GeoJSON.`,
+        t('mapa.erroNaoGeoJson', { arquivo: arquivoMalha(nivel) }),
       )
     }
     const dados = await resposta.json()
     if (!Array.isArray(dados?.features) || dados.features.length === 0) {
-      throw new Error(`O arquivo /geo/${arquivoMalha(nivel)} não contém feições.`)
+      throw new Error(t('mapa.erroSemFeicoes', { arquivo: arquivoMalha(nivel) }))
     }
     if (token !== tokenMalha) return
     cacheMalhas.set(nivel, dados)
@@ -328,7 +328,7 @@ function atualizarFonte() {
     })
   } catch (erro) {
     malhaMensagem.value =
-      erro instanceof Error ? erro.message : 'Falha ao preparar a malha.'
+      erro instanceof Error ? erro.message : t('mapa.erroPrepararMalha')
   }
 }
 
@@ -403,6 +403,10 @@ function criarMapa() {
     dragRotate: false,
     touchPitch: false,
     attributionControl: false,
+    locale: {
+      'NavigationControl.ZoomIn': t('mapa.ampliar'),
+      'NavigationControl.ZoomOut': t('mapa.reduzir'),
+    },
   })
   mapa.value.addControl(
     new NavigationControl({ showCompass: false }),
@@ -422,7 +426,7 @@ function criarMapa() {
   mapa.value.on('click', aoClicar)
   mapa.value.on('error', (evento) => {
     malhaMensagem.value =
-      evento?.error?.message ?? 'Falha ao desenhar o mapa.'
+      evento?.error?.message ?? t('mapa.erroDesenhar')
   })
 }
 
@@ -437,35 +441,35 @@ function areaDaFeicao(feature) {
 function linhasTooltip(area, feature) {
   const linhas = []
   if (!area) {
-    linhas.push({ rotulo: 'Situação', valor: t('comum.semDados') })
+    linhas.push({ rotulo: t('mapa.situacao'), valor: t('comum.semDados') })
     return linhas
   }
   linhas.push({
-    rotulo: 'Votos',
+    rotulo: t('tabela.votos'),
     valor: formatarNumero(area.total_votos),
   })
   linhas.push({
-    rotulo: 'Válidos',
+    rotulo: t('tabela.validos'),
     valor: formatarNumero(area.votos_validos),
   })
   if (area.lider) {
     const candidato = partidoPorNumero.value.get(area.lider.nr_votavel)
     linhas.push({
-      rotulo: 'Líder',
-      valor: `${candidato?.nm_votavel ?? `Candidato ${area.lider.nr_votavel}`} (${candidato?.sg_partido ?? '—'}) · ${formatarPercentual(area.lider.percentual)}`,
+      rotulo: t('tabela.lider'),
+      valor: `${candidato?.nm_votavel ?? t('mapa.candidatoN', { n: area.lider.nr_votavel })} (${candidato?.sg_partido ?? '—'}) · ${formatarPercentual(area.lider.percentual)}`,
     })
   } else {
-    linhas.push({ rotulo: 'Líder', valor: t('comum.semDados') })
+    linhas.push({ rotulo: t('tabela.lider'), valor: t('comum.semDados') })
   }
   const candidatoArea = candidatoDaArea(area, props.candidato)
   if (props.candidato && candidatoArea) {
     linhas.push({
-      rotulo: candidatoSelecionado.value?.nm_votavel ?? 'Candidato',
+      rotulo: candidatoSelecionado.value?.nm_votavel ?? t('tabela.candidato'),
       valor: `${formatarNumero(candidatoArea.qt_votos)} · ${formatarPercentual(candidatoArea.percentual)}`,
     })
   }
   if (feature?.properties?._rotulo) {
-    linhas.push({ rotulo: 'Código', valor: String(feature.properties._key || '—') })
+    linhas.push({ rotulo: t('mapa.codigo'), valor: String(feature.properties._key || '—') })
   }
   return linhas
 }
@@ -540,7 +544,7 @@ const itensGradiente = (sigla) =>
 const legenda = computed(() => {
   if (props.modo === 'percentual' && candidatoSelecionado.value) {
     return {
-      titulo: `Participação de ${candidatoSelecionado.value.nm_votavel}`,
+      titulo: t('mapa.participacaoDe', { nome: candidatoSelecionado.value.nm_votavel }),
       itens: itensGradiente(partidoPorNumero.value.get(props.candidato)?.sg_partido),
     }
   }
@@ -563,7 +567,7 @@ const legenda = computed(() => {
 
   if (props.modo === 'percentual') {
     return {
-      titulo: 'Participação do líder',
+      titulo: t('mapa.participacaoLider'),
       faixas: FAIXAS_PERCENTUAL.map((faixa) => faixa.rotulo),
       gradientes: lideres.map((item) => ({ sigla: item.sigla, itens: itensGradiente(item.siglaCor) })),
       itens: lideres,
@@ -571,7 +575,7 @@ const legenda = computed(() => {
   }
 
   return {
-    titulo: 'Líder por área',
+    titulo: t('mapa.liderPorArea'),
     itens: lideres.map((item) => ({
       rotulo: `${item.sigla} (${item.total})`,
       cor: item.cor,
@@ -713,7 +717,7 @@ onBeforeUnmount(() => {
         ref="container"
         class="mapa"
         role="img"
-        :aria-label="`Mapa por ${rotuloNivel.toLowerCase()} com ${areas.length} áreas`"
+        :aria-label="$t('mapa.ariaMapa', { nivel: rotuloNivel.toLowerCase(), n: areas.length }, areas.length)"
       ></div>
       <div
         v-if="tooltip.visivel"
@@ -735,9 +739,9 @@ onBeforeUnmount(() => {
       {{ malhaMensagem }}
     </p>
 
-    <div class="legenda" role="group" aria-label="Legenda do mapa">
+    <div class="legenda" role="group" :aria-label="$t('mapa.legenda')">
       <strong>{{ legenda.titulo }}</strong>
-      <span class="legenda__meta">{{ feicoesNaMalha }} feições</span>
+      <span class="legenda__meta">{{ feicoesNaMalha }} {{ $t('unidade.feicao', feicoesNaMalha) }}</span>
       <ul v-if="legenda.gradientes" class="legenda__gradientes">
         <li class="legenda__faixas">
           <span></span>

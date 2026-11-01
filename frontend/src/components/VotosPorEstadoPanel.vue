@@ -82,7 +82,7 @@ function deltaTotal(nrVotavel) {
             <th v-for="area in ufs" :key="area.sg_uf" scope="col" class="num">
               {{ area.sg_uf }}
             </th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('qt_votos')"><button type="button" @click="alternar('qt_votos')">Total{{ seta('qt_votos') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('qt_votos')"><button type="button" @click="alternar('qt_votos')">{{ $t('tabela.total') }}{{ seta('qt_votos') }}</button></th>
           </tr>
         </thead>
         <tbody>

@@ -83,7 +83,7 @@ function graficosDe(turno, posicao) {
 }
 
 function rotuloPosicao(turno, posicao) {
-  if (turno === 2) return t(posicao === 1 ? 'entreAnos.vencedor' : 'entreAnos.derrotado')
+  if (turno === 2) return posicao === 1 ? t('entreAnos.vencedor') : t('entreAnos.derrotado')
   return t('entreAnos.colocado', { n: posicao })
 }
 

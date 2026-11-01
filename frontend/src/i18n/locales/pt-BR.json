@@ -13,7 +13,14 @@
       "encerramento": "Encerramento",
       "relatorio": "Consistência"
     },
-    "idioma": "Idioma"
+    "idioma": "Idioma",
+    "irParaConteudo": "Ir para o conteúdo",
+    "marcaAria": "Doomsday Vote, painel de conferência de boletins de urna",
+    "abasAria": "Abas do sistema",
+    "tituloPagina": "Conferência de boletins de urna",
+    "abrindoSala": "Abrindo a sala",
+    "consultandoApi": "Consultando a API local.",
+    "semDadosCarga": "Carregue os BUs pelo backend e recarregue esta página."
   },
   "entreAnos": {
     "titulo": "Entre anos",
@@ -34,7 +41,6 @@
   "comum": {
     "carregando": "Carregando…",
     "erro": "Erro",
-    "vazio": "Sem dados",
     "todos": "Todos",
     "tentarNovamente": "Tentar novamente",
     "detalhe": "Detalhe",
@@ -47,10 +53,8 @@
     "semPartido": "Sem partido",
     "cliqueEstado": "Clique em um estado na tabela acima.",
     "cliqueMunicipio": "Clique em um município.",
-    "semDadosRecorte": "Sem dados para este recorte.",
     "semDadosBiometria": "Sem dados de biometria.",
     "semSecoes": "Sem seções suficientes para o cálculo no recorte.",
-    "atualizando": "Atualizando dados…",
     "linhaTempoIndisponivel": "Linha do tempo indisponível",
     "semGruposComparaveis": "Nenhum grupo comparável neste recorte.",
     "nenhumaSecaoRecorte": "Nenhuma seção neste recorte.",
@@ -64,7 +68,69 @@
     "carregandoMalha": "Carregando o mapa geográfico…",
     "acao": "Ação",
     "resumoCobertura": "Resumo da cobertura",
-    "votos": "votos"
+    "votos": "votos",
+    "avisos": "Avisos",
+    "selecionar": "Selecionar",
+    "selecioneEstado": "Selecione um estado",
+    "governadorPorEstado": "Resultados de governador são específicos por estado.",
+    "filtrosNaoInformados": "Filtros não informados"
+  },
+  "unidade": {
+    "candidato": "candidato | candidatos",
+    "secao": "seção | seções",
+    "grupo": "grupo | grupos",
+    "area": "área | áreas",
+    "linha": "linha | linhas",
+    "uf": "UF | UFs",
+    "feicao": "feição | feições"
+  },
+  "tabela": {
+    "candidato": "Candidato",
+    "secaoN": "Seção n",
+    "secaoMad": "Seção MAD",
+    "zonaN": "Zona n",
+    "zonaMad": "Zona MAD",
+    "municipioN": "Município n",
+    "municipioMad": "Município MAD",
+    "secoes": "Seções",
+    "municipio": "Município",
+    "local": "Local",
+    "zonas": "Zonas",
+    "numeros": "Números",
+    "votaveis": "Votáveis",
+    "aptos": "Aptos",
+    "sinalizadores": "Sinalizadores",
+    "validos": "Válidos",
+    "lider": "Líder",
+    "pctLider": "% líder",
+    "votosCandidato": "Votos do candidato",
+    "pctCandidato": "% do candidato",
+    "votos": "Votos",
+    "total": "Total",
+    "acoes": "Ações",
+    "partido": "Partido",
+    "pctValidos": "% válidos",
+    "status": "Status",
+    "municipioCodigo": "Município {codigo}",
+    "municipioMinusculo": "município {codigo}",
+    "zona": "Zona",
+    "secao": "Seção"
+  },
+  "paginacao": {
+    "pagina": "Página {atual} de {total}",
+    "anterior": "Anterior",
+    "proxima": "Próxima",
+    "primeira": "Primeira",
+    "ultima": "Última",
+    "porPagina": "Por página"
+  },
+  "regiao": {
+    "norte": "Norte",
+    "nordeste": "Nordeste",
+    "centroOeste": "Centro-Oeste",
+    "sudeste": "Sudeste",
+    "sul": "Sul",
+    "outros": "Outros"
   },
   "filtros": {
     "cargo": "Cargo",
@@ -73,18 +139,16 @@
     "candidato": "Candidato",
     "corte": "Corte do dia",
     "uf": "UF",
-    "municipio": "Município",
     "limparMunicipio": "Limpar município",
     "limpar": "Limpar filtros",
     "escopo": "Escopo",
     "turnoAtual": "Turno atual",
-    "anoCompleto": "Ano (1º e 2º)"
+    "anoCompleto": "Ano (1º e 2º)",
+    "aria": "Filtros da consulta"
   },
   "painel": {
-    "titulo": "Painel",
     "composicao": "Composição do recorte",
     "mesa": "Mesa de plotagem e placar",
-    "leituras": "Leituras",
     "plotDia": "Traçado do dia",
     "corteAs": "Corte às {time}",
     "placar": "Placar",
@@ -92,7 +156,11 @@
       "comparecimento": "Comparecimento",
       "secoesComBu": "Seções com BU",
       "votosValidos": "Votos válidos",
-      "ultimaCarga": "Última carga"
+      "ultimaCarga": "Última carga",
+      "aria": "Série do corte",
+      "dosAptos": "dos aptos",
+      "busNoCorte": "{n} BU no corte | {n} BUs no corte",
+      "nominaisLegenda": "nominais e de legenda"
     },
     "biometria": {
       "titulo": "Composição do recorte",
@@ -101,8 +169,23 @@
       "habilitados": "Habilitados por biometria",
       "naoHabilitada": "Com biometria não habilitada",
       "aptos": "Aptos",
-      "semComposicao": "Sem composição para o recorte."
+      "semComposicao": "Sem composição para o recorte.",
+      "ariaBarra": "Comparecimento de {comparecimento}: {habilitados} habilitados por biometria e {naoHabilitados} com biometria não habilitada",
+      "votosParticipacao": "{votos} votos — {pct}",
+      "secoesSemCampo": "{n} seções sem o campo (entram como zero)."
     }
+  },
+  "placar": {
+    "votosValidos": "votos válidos",
+    "partido": "partido",
+    "candidato": "candidato",
+    "pctValidosTotal": "% Válidos total",
+    "pctValidos": "% Válidos",
+    "tardios": "Tardios",
+    "pctValidosTardios": "% Válidos Tardios",
+    "deltaCorte": "Δ corte",
+    "aria": "{nome}, {partido}, {votos} votos, {pct} dos válidos",
+    "semPartido": "sem partido"
   },
   "mapa": {
     "titulo": "Mapa",
@@ -117,10 +200,67 @@
     "municipios": "Municípios",
     "lider": "Líder",
     "percentual": "Percentual",
-    "selecioneUfMunicipios": "Selecione uma UF para ver municípios"
+    "selecioneUfMunicipios": "Selecione uma UF para ver municípios",
+    "nivelUf": "UF",
+    "nivelMunicipio": "Município",
+    "erroArquivo": "Arquivo /geo/{arquivo} não encontrado (HTTP {status}).",
+    "erroNaoGeoJson": "O caminho /geo/{arquivo} não devolveu um GeoJSON.",
+    "erroSemFeicoes": "O arquivo /geo/{arquivo} não contém feições.",
+    "erroPrepararMalha": "Falha ao preparar a malha.",
+    "erroDesenhar": "Falha ao desenhar o mapa.",
+    "situacao": "Situação",
+    "candidatoN": "Candidato {n}",
+    "codigo": "Código",
+    "participacaoDe": "Participação de {nome}",
+    "participacaoLider": "Participação do líder",
+    "liderPorArea": "Líder por área",
+    "ariaMapa": "Mapa por {nivel} com {n} área | Mapa por {nivel} com {n} áreas",
+    "legenda": "Legenda do mapa",
+    "legendaTabela": "Votos por {nivel}, líder e participação",
+    "votosPorCandidatoEm": "Votos por candidato em {uf}",
+    "resumoPorRegiao": "Resumo de votos e líder por UF agrupado por região",
+    "resumoPorUf": "Resumo de votos e líder por UF",
+    "verMunicipios": "Ver municípios de {uf}",
+    "ampliar": "Ampliar",
+    "reduzir": "Reduzir"
+  },
+  "secoes": {
+    "noFiltro": "{n} seções no filtro.",
+    "escopo": "Escopo: {contexto}.",
+    "selecioneEstado": "Selecione um estado.",
+    "nome": "Nome",
+    "legendaTabela": "Seções eleitorais com status e horário de recebimento do BU",
+    "paginacaoAria": "Paginação das seções"
+  },
+  "secao": {
+    "extrato": "Extrato de teletipo · boletim de urna",
+    "irAoPainel": "Ir ao painel",
+    "identificacao": "Identificação",
+    "codigoMunicipio": "Código do município",
+    "localVotacao": "Local de votação",
+    "boletim": "Boletim de urna",
+    "tipoUrna": "Tipo de urna",
+    "versao": "Versão",
+    "emissaoBu": "Emissão do BU",
+    "recebimento": "Recebimento",
+    "biometriaNaoHabilitada": "Biometria não habilitada",
+    "versoesAnteriores": "Versões anteriores",
+    "lote": "Lote de importação",
+    "loteOrigem": "Origem do BU considerado neste corte.",
+    "arquivo": "Arquivo",
+    "resultados": "Resultados da seção",
+    "resultadosDescricao": "Votos por tipo de votável no BU ativo.",
+    "resultadosCaption": "Resultados por votável na seção",
+    "tipo": "Tipo",
+    "categoriaCol": "Categoria",
+    "categoria": {
+      "nominal": "Nominal",
+      "legenda": "Legenda",
+      "branco": "Branco",
+      "nulo": "Nulo"
+    }
   },
   "estatistica": {
-    "titulo": "Estatística",
     "descritiva": "Estatística descritiva",
     "subtitulo": "Média, mediana e desvio padrão por seção",
     "variavel": "Variável",
@@ -134,9 +274,29 @@
     "comparecimento": "Comparecimento",
     "benford": "Benford",
     "duplicacao": "Duplicação",
-    "isolamento": "Isolamento e LOF"
+    "isolamento": "Isolamento e LOF",
+    "aderenciaBenfordNiveis": "Aderência à lei de Benford por candidato em seção, zona e município",
+    "distribuicaoBenford": "Distribuição do primeiro dígito dos votos de {nome} por seção, comparada à lei de Benford",
+    "observado": "observado {valor}%",
+    "esperado": "esperado {valor}%",
+    "aderenciaBenford": "Aderência à lei de Benford por candidato no corte atual",
+    "abaixoMinimo": "seção abaixo do mínimo | seções abaixo do mínimo",
+    "escopo": "escopo",
+    "gruposVetor": "Grupos de seções com o mesmo vetor de votos",
+    "mesmaZona": "mesma zona",
+    "consecutivas": "consecutivas",
+    "mesmoMunicipio": "mesmo município",
+    "mesmoLocal": "mesmo local",
+    "turnoAno": "Turno {turno} · {ano}",
+    "comparecimentoPorSecao": "Comparecimento por seção",
+    "votosPorSecaoCandidato": "Votos por seção por candidato",
+    "amostraLof": "amostra LOF",
+    "limitada": "(limitada)",
+    "maiorScore": "Seções com maior score de anomalia",
+    "erroCarregar": "Erro ao carregar estatísticas"
   },
   "analiseUI": {
+    "titulo": "Análise",
     "consistencia": "Consistência aritmética",
     "divergencias": "divergências",
     "secoesConsideradas": "Seções consideradas",
@@ -219,17 +379,16 @@
     "pctComBiometria": "% com biometria",
     "votosNaoHabilitada": "Votos biometria não habilitada",
     "pctNaoHabilitada": "% não habilitada",
-    "agruparRegiao": "Agrupar por região",
     "semAgrupamento": "Sem agrupamento",
     "porRegiao": "Por região",
     "regiao": "Região",
     "municipios": "Municípios com maior biometria não habilitada",
-    "secoes": "Seções com maior % não habilitada"
+    "secoes": "Seções com maior % não habilitada",
+    "naoHabilitada": "Não habilitada"
   },
   "encerramento": {
     "titulo": "Encerramento",
     "urnas": "Urnas",
-    "uf": "UF",
     "numUrnas": "Nº de urnas",
     "ate1715": "Até 17:15",
     "pct1715": "% até 17:15",
@@ -239,15 +398,9 @@
     "pctApos1915": "% após 19:15",
     "municipios": "Municípios com maior % após 17:15",
     "secoes": "Seções com maior % após 17:15",
-    "total": "Total",
     "apos1715": "Após 17:15",
-    "percentual": "%",
     "encerramento": "Encerramento",
-    "partido": "Partido",
-    "votos": "Votos",
-    "pctVotos": "% Votos",
-    "zona": "Zona",
-    "secao": "Seção"
+    "pctVotos": "% Votos"
   },
   "relatorio": {
     "titulo": "Relatório de consistência",
@@ -258,7 +411,6 @@
     "selecioneUf": "Selecione uma UF para analisar governador.",
     "alvo": "Recorte avaliado",
     "referencia": "Referência histórica",
-    "ano": "Ano",
     "turno": "Turno",
     "eleicao": "Código da eleição",
     "bus": "BUs",
@@ -282,8 +434,6 @@
     "corteAte": "Corte até"
   },
   "status": {
-    "recebido": "BU recebido",
-    "pendente": "Pendente",
     "semBu": "Sem BU",
     "aguardandoBu": "Encerrada, aguardando BU",
     "buRecebido": "BU recebido",
@@ -298,6 +448,7 @@
     "corteInvalido": "O corte informado não pôde ser aplicado."
   },
   "avisos": {
+    "aviso": "Aviso",
     "precisaoInsuficiente": "Precisão insuficiente",
     "corteIndisponivel": "Corte indisponível",
     "metadadosDerivados": "Metadados derivados"

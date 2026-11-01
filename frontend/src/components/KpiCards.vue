@@ -31,21 +31,21 @@ const participacao = computed(() => {
 </script>
 
 <template>
-  <section class="kpis" aria-label="Série do corte">
+  <section class="kpis" :aria-label="$t('painel.kpi.aria')">
     <div>
       <span class="kpis__rotulo">{{ $t('painel.kpi.comparecimento') }}</span>
       <strong class="kpis__valor">{{ formatarNumero(resumo.metricas?.qt_comparecimento) }}</strong>
-      <span class="kpis__nota">{{ formatarPercentual(participacao) }} dos aptos</span>
+      <span class="kpis__nota">{{ formatarPercentual(participacao) }} {{ $t('painel.kpi.dosAptos') }}</span>
     </div>
     <div>
       <span class="kpis__rotulo">{{ $t('painel.kpi.secoesComBu') }}</span>
       <strong class="kpis__valor">{{ formatarNumero(resumo.secoes_com_bu) }}</strong>
-      <span class="kpis__nota">{{ formatarNumero(resumo.metricas?.bus_considerados) }} BUs no corte</span>
+      <span class="kpis__nota">{{ $t('painel.kpi.busNoCorte', { n: formatarNumero(resumo.metricas?.bus_considerados) }, resumo.metricas?.bus_considerados ?? 0) }}</span>
     </div>
     <div>
       <span class="kpis__rotulo">{{ $t('painel.kpi.votosValidos') }}</span>
       <strong class="kpis__valor">{{ formatarNumero(validos) }}</strong>
-      <span class="kpis__nota">nominais e de legenda</span>
+      <span class="kpis__nota">{{ $t('painel.kpi.nominaisLegenda') }}</span>
     </div>
     <div>
       <span class="kpis__rotulo">{{ $t('painel.kpi.ultimaCarga') }}</span>

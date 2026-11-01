@@ -25,7 +25,7 @@ const emit = defineEmits(['retry', 'retry-benford', 'select'])
 <template>
   <section id="analise" class="analise" aria-labelledby="analise-titulo">
     <header class="analise__cabecalho">
-      <h2 id="analise-titulo">Análise</h2>
+      <h2 id="analise-titulo">{{ $t('analiseUI.titulo') }}</h2>
     </header>
 
     <StateBlock

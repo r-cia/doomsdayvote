@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { api } from '../api/client'
 import { useOrdenacao } from '../composables/ordenacao'
 import { useSelecaoEleicao } from '../composables/selecao'
@@ -10,6 +11,7 @@ import TabelaScroll from '../components/TabelaScroll.vue'
 import SecaoView from './SecaoView.vue'
 
 const { store } = useSelecaoEleicao()
+const { t } = useI18n()
 const router = useRouter()
 
 const urnas = ref([])
@@ -95,7 +97,7 @@ async function carregarSecoes(municipio) {
 }
 
 function nomeMunicipio(m) {
-  return m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
+  return m.nm_municipio ?? t('tabela.municipioCodigo', { codigo: m.cd_municipio_tse })
 }
 
 const secaoModalId = ref(null)
@@ -141,13 +143,13 @@ watch(ordemSecoes.params, () => {
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ordemUrnas.ariaSort('sg_uf')"><button type="button" @click="ordemUrnas.alternar('sg_uf')">UF{{ ordemUrnas.seta('sg_uf') }}</button></th>
-            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('total')"><button type="button" @click="ordemUrnas.alternar('total')">Nº de urnas{{ ordemUrnas.seta('total') }}</button></th>
-            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('ate_1715')"><button type="button" @click="ordemUrnas.alternar('ate_1715')">Até 17:15{{ ordemUrnas.seta('ate_1715') }}</button></th>
-            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_1715')"><button type="button" @click="ordemUrnas.alternar('pct_1715')">% até 17:15{{ ordemUrnas.seta('pct_1715') }}</button></th>
-            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('ate_1915')"><button type="button" @click="ordemUrnas.alternar('ate_1915')">Até 19:15{{ ordemUrnas.seta('ate_1915') }}</button></th>
-            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_1915')"><button type="button" @click="ordemUrnas.alternar('pct_1915')">% até 19:15{{ ordemUrnas.seta('pct_1915') }}</button></th>
-            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('apos_1915')"><button type="button" @click="ordemUrnas.alternar('apos_1915')">Após 19:15{{ ordemUrnas.seta('apos_1915') }}</button></th>
-            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_apos_1915')"><button type="button" @click="ordemUrnas.alternar('pct_apos_1915')">% após 19:15{{ ordemUrnas.seta('pct_apos_1915') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('total')"><button type="button" @click="ordemUrnas.alternar('total')">{{ $t('encerramento.numUrnas') }}{{ ordemUrnas.seta('total') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('ate_1715')"><button type="button" @click="ordemUrnas.alternar('ate_1715')">{{ $t('encerramento.ate1715') }}{{ ordemUrnas.seta('ate_1715') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_1715')"><button type="button" @click="ordemUrnas.alternar('pct_1715')">{{ $t('encerramento.pct1715') }}{{ ordemUrnas.seta('pct_1715') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('ate_1915')"><button type="button" @click="ordemUrnas.alternar('ate_1915')">{{ $t('encerramento.ate1915') }}{{ ordemUrnas.seta('ate_1915') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_1915')"><button type="button" @click="ordemUrnas.alternar('pct_1915')">{{ $t('encerramento.pct1915') }}{{ ordemUrnas.seta('pct_1915') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('apos_1915')"><button type="button" @click="ordemUrnas.alternar('apos_1915')">{{ $t('encerramento.apos1915') }}{{ ordemUrnas.seta('apos_1915') }}</button></th>
+            <th scope="col" class="tabela__numero ordenavel" :aria-sort="ordemUrnas.ariaSort('pct_apos_1915')"><button type="button" @click="ordemUrnas.alternar('pct_apos_1915')">{{ $t('encerramento.pctApos1915') }}{{ ordemUrnas.seta('pct_apos_1915') }}</button></th>
           </tr>
         </thead>
         <tbody>
@@ -169,7 +171,7 @@ watch(ordemSecoes.params, () => {
   <div class="mesa">
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Municípios com maior % após 17:15</h2>
+        <h2>{{ $t('encerramento.municipios') }}</h2>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
@@ -187,13 +189,13 @@ watch(ordemSecoes.params, () => {
         <table>
           <thead>
             <tr>
-              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('nm_municipio')"><button type="button" @click="ordemMunicipios.alternar('nm_municipio')">Município{{ ordemMunicipios.seta('nm_municipio') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('total')"><button type="button" @click="ordemMunicipios.alternar('total')">Total{{ ordemMunicipios.seta('total') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('apos_1715')"><button type="button" @click="ordemMunicipios.alternar('apos_1715')">Após 17:15{{ ordemMunicipios.seta('apos_1715') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('nm_municipio')"><button type="button" @click="ordemMunicipios.alternar('nm_municipio')">{{ $t('tabela.municipio') }}{{ ordemMunicipios.seta('nm_municipio') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('total')"><button type="button" @click="ordemMunicipios.alternar('total')">{{ $t('tabela.total') }}{{ ordemMunicipios.seta('total') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('apos_1715')"><button type="button" @click="ordemMunicipios.alternar('apos_1715')">{{ $t('encerramento.apos1715') }}{{ ordemMunicipios.seta('apos_1715') }}</button></th>
               <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('pct_apos_1715')"><button type="button" @click="ordemMunicipios.alternar('pct_apos_1715')">%{{ ordemMunicipios.seta('pct_apos_1715') }}</button></th>
-              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('partido')"><button type="button" @click="ordemMunicipios.alternar('partido')">Partido{{ ordemMunicipios.seta('partido') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('votos')"><button type="button" @click="ordemMunicipios.alternar('votos')">Votos{{ ordemMunicipios.seta('votos') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('pct_votos')"><button type="button" @click="ordemMunicipios.alternar('pct_votos')">% Votos{{ ordemMunicipios.seta('pct_votos') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('partido')"><button type="button" @click="ordemMunicipios.alternar('partido')">{{ $t('tabela.partido') }}{{ ordemMunicipios.seta('partido') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('votos')"><button type="button" @click="ordemMunicipios.alternar('votos')">{{ $t('tabela.votos') }}{{ ordemMunicipios.seta('votos') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('pct_votos')"><button type="button" @click="ordemMunicipios.alternar('pct_votos')">{{ $t('encerramento.pctVotos') }}{{ ordemMunicipios.seta('pct_votos') }}</button></th>
             </tr>
           </thead>
           <tbody>
@@ -203,7 +205,7 @@ watch(ordemSecoes.params, () => {
               class="linha-clicavel"
               @click="carregarSecoes(m.cd_municipio_tse)"
             >
-              <td>{{ m.nm_municipio ?? 'Município ' + m.cd_municipio_tse }}</td>
+              <td>{{ nomeMunicipio(m) }}</td>
               <td class="num">{{ formatarNumero(m.total) }}</td>
               <td class="num">{{ formatarNumero(m.apos_1715) }}</td>
               <td class="num">{{ formatarPercentual(m.pct_apos_1715) }}</td>
@@ -218,7 +220,7 @@ watch(ordemSecoes.params, () => {
 
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Seções com maior % após 17:15</h2>
+        <h2>{{ $t('encerramento.secoes') }}</h2>
         <p v-if="municipioSelecionado" class="card__meta">
           {{ (municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}).nm_municipio }}
         </p>
@@ -238,12 +240,12 @@ watch(ordemSecoes.params, () => {
         <table>
           <thead>
             <tr>
-              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_zona')"><button type="button" @click="ordemSecoes.alternar('nr_zona')">Zona{{ ordemSecoes.seta('nr_zona') }}</button></th>
-              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_secao')"><button type="button" @click="ordemSecoes.alternar('nr_secao')">Seção{{ ordemSecoes.seta('nr_secao') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('dt_encerramento')"><button type="button" @click="ordemSecoes.alternar('dt_encerramento')">Encerramento{{ ordemSecoes.seta('dt_encerramento') }}</button></th>
-              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('partido')"><button type="button" @click="ordemSecoes.alternar('partido')">Partido{{ ordemSecoes.seta('partido') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('votos')"><button type="button" @click="ordemSecoes.alternar('votos')">Votos{{ ordemSecoes.seta('votos') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('pct_votos')"><button type="button" @click="ordemSecoes.alternar('pct_votos')">% Votos{{ ordemSecoes.seta('pct_votos') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_zona')"><button type="button" @click="ordemSecoes.alternar('nr_zona')">{{ $t('tabela.zona') }}{{ ordemSecoes.seta('nr_zona') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_secao')"><button type="button" @click="ordemSecoes.alternar('nr_secao')">{{ $t('tabela.secao') }}{{ ordemSecoes.seta('nr_secao') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('dt_encerramento')"><button type="button" @click="ordemSecoes.alternar('dt_encerramento')">{{ $t('encerramento.encerramento') }}{{ ordemSecoes.seta('dt_encerramento') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('partido')"><button type="button" @click="ordemSecoes.alternar('partido')">{{ $t('tabela.partido') }}{{ ordemSecoes.seta('partido') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('votos')"><button type="button" @click="ordemSecoes.alternar('votos')">{{ $t('tabela.votos') }}{{ ordemSecoes.seta('votos') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('pct_votos')"><button type="button" @click="ordemSecoes.alternar('pct_votos')">{{ $t('encerramento.pctVotos') }}{{ ordemSecoes.seta('pct_votos') }}</button></th>
               <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>

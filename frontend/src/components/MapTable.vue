@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -21,6 +22,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['select', 'retry'])
+
+const { t } = useI18n()
 
 const tabela = ref(null)
 const pagina = ref(1)
@@ -55,7 +58,7 @@ const linhas = computed(() =>
     return {
       chave,
       area,
-      rotulo: props.nivel === 'uf' ? area.sg_uf : (area.nm_municipio || `Município ${chave}`),
+      rotulo: props.nivel === 'uf' ? area.sg_uf : (area.nm_municipio || t('tabela.municipioCodigo', { codigo: chave })),
       total: Number(area.total_votos ?? 0),
       validos: Number(area.votos_validos ?? 0),
       liderNome: lider ? nomeCandidato(lider.nr_votavel) : '—',
@@ -123,7 +126,7 @@ function aoClicarLinha(linha) {
       <div>
         <h2 id="tabela-mapa-titulo">{{ $t("comum.detalhe") }}</h2>
       </div>
-      <span class="contador">{{ linhas.length }} áreas</span>
+      <span class="contador">{{ linhas.length }} {{ $t('unidade.area', linhas.length) }}</span>
     </div>
 
     <StateBlock
@@ -146,18 +149,18 @@ function aoClicarLinha(linha) {
     <TabelaScroll v-else :atualizando="atualizando">
       <table ref="tabela">
         <caption class="sr-only">
-          Votos por {{ nivel === 'uf' ? 'UF' : 'município' }}, líder e participação
+          {{ $t('mapa.legendaTabela', { nivel: nivel === 'uf' ? $t('mapa.nivelUf') : $t('tabela.municipio').toLowerCase() }) }}
         </caption>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSort(colunaRotulo)"><button type="button" @click="alternar(colunaRotulo)">{{ nivel === 'uf' ? 'UF' : 'Município' }}{{ seta(colunaRotulo) }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">Votos{{ seta('total_votos') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('votos_validos')"><button type="button" @click="alternar('votos_validos')">Válidos{{ seta('votos_validos') }}</button></th>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">Líder{{ seta('lider_nome') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">% líder{{ seta('lider_percentual') }}</button></th>
-            <th v-if="candidato" scope="col" class="num ordenavel" :aria-sort="ariaSort('candidato_votos')"><button type="button" @click="alternar('candidato_votos')">Votos do candidato{{ seta('candidato_votos') }}</button></th>
-            <th v-if="candidato" scope="col" class="num ordenavel" :aria-sort="ariaSort('candidato_percentual')"><button type="button" @click="alternar('candidato_percentual')">% do candidato{{ seta('candidato_percentual') }}</button></th>
-            <th scope="col"><span class="sr-only">Ação</span></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort(colunaRotulo)"><button type="button" @click="alternar(colunaRotulo)">{{ nivel === 'uf' ? $t('mapa.nivelUf') : $t('tabela.municipio') }}{{ seta(colunaRotulo) }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">{{ $t('tabela.votos') }}{{ seta('total_votos') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('votos_validos')"><button type="button" @click="alternar('votos_validos')">{{ $t('tabela.validos') }}{{ seta('votos_validos') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">{{ $t('tabela.lider') }}{{ seta('lider_nome') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">{{ $t('tabela.pctLider') }}{{ seta('lider_percentual') }}</button></th>
+            <th v-if="candidato" scope="col" class="num ordenavel" :aria-sort="ariaSort('candidato_votos')"><button type="button" @click="alternar('candidato_votos')">{{ $t('tabela.votosCandidato') }}{{ seta('candidato_votos') }}</button></th>
+            <th v-if="candidato" scope="col" class="num ordenavel" :aria-sort="ariaSort('candidato_percentual')"><button type="button" @click="alternar('candidato_percentual')">{{ $t('tabela.pctCandidato') }}{{ seta('candidato_percentual') }}</button></th>
+            <th scope="col"><span class="sr-only">{{ $t('comum.acao') }}</span></th>
           </tr>
         </thead>
         <tbody @keydown="navegarLinhas">
@@ -199,10 +202,10 @@ function aoClicarLinha(linha) {
                 type="button"
                 class="button button--ghost button--compacto"
                 :data-area-btn="linha.chave"
-                :aria-label="`Selecionar ${linha.rotulo}`"
+                :aria-label="`${$t('comum.selecionar')} ${linha.rotulo}`"
                 @click="aoClicarLinha(linha)"
               >
-                Selecionar
+                {{ $t('comum.selecionar') }}
               </button>
             </td>
           </tr>
@@ -211,7 +214,7 @@ function aoClicarLinha(linha) {
     </TabelaScroll>
 
     <footer v-if="linhas.length > porPagina" class="paginacao">
-      <span>Página {{ pagina }} de {{ totalPaginas }} · {{ linhas.length }} áreas</span>
+      <span>{{ $t('paginacao.pagina', { atual: pagina, total: totalPaginas }) }} · {{ linhas.length }} {{ $t('unidade.area', linhas.length) }}</span>
       <div class="paginacao__botoes">
         <button
           type="button"
@@ -219,7 +222,7 @@ function aoClicarLinha(linha) {
           :disabled="pagina === 1"
           @click="irPara(pagina - 1)"
         >
-          Anterior
+          {{ $t('paginacao.anterior') }}
         </button>
         <button
           type="button"
@@ -227,7 +230,7 @@ function aoClicarLinha(linha) {
           :disabled="pagina === totalPaginas"
           @click="irPara(pagina + 1)"
         >
-          Próxima
+          {{ $t('paginacao.proxima') }}
         </button>
       </div>
     </footer>

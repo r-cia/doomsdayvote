@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import SecaoView from './SecaoView.vue'
 import { api } from '../api/client'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -13,6 +14,7 @@ import TabelaScroll from '../components/TabelaScroll.vue'
 const secaoModalId = ref(null)
 
 const { store } = useSelecaoEleicao()
+const { t } = useI18n()
 const ordemUf = useOrdenacao('biometria_uf')
 const ordemMunicipios = useOrdenacao()
 const ordemSecoes = useOrdenacao()
@@ -81,7 +83,7 @@ watch(ordemSecoes.params, () => {
 })
 
 function nomeMunicipio(m) {
-  return m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
+  return m.nm_municipio ?? t('tabela.municipioCodigo', { codigo: m.cd_municipio_tse })
 }
 
 function abrirSecao(item) {
@@ -103,7 +105,7 @@ function abrirSecao(item) {
   <div class="mesa">
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Municípios com maior biometria não habilitada</h2>
+        <h2>{{ $t('biometria.municipios') }}</h2>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('comum.cliqueEstado') }}</div>
@@ -121,8 +123,8 @@ function abrirSecao(item) {
         <table>
           <thead>
             <tr>
-              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('nm_municipio')"><button type="button" @click="ordemMunicipios.alternar('nm_municipio')">Município{{ ordemMunicipios.seta('nm_municipio') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('qt_nao_habilitada')"><button type="button" @click="ordemMunicipios.alternar('qt_nao_habilitada')">Não habilitada{{ ordemMunicipios.seta('qt_nao_habilitada') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemMunicipios.ariaSort('nm_municipio')"><button type="button" @click="ordemMunicipios.alternar('nm_municipio')">{{ $t('tabela.municipio') }}{{ ordemMunicipios.seta('nm_municipio') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('qt_nao_habilitada')"><button type="button" @click="ordemMunicipios.alternar('qt_nao_habilitada')">{{ $t('biometria.naoHabilitada') }}{{ ordemMunicipios.seta('qt_nao_habilitada') }}</button></th>
               <th scope="col" class="num ordenavel" :aria-sort="ordemMunicipios.ariaSort('percentual_nao_habilitada')"><button type="button" @click="ordemMunicipios.alternar('percentual_nao_habilitada')">%{{ ordemMunicipios.seta('percentual_nao_habilitada') }}</button></th>
             </tr>
           </thead>
@@ -144,12 +146,12 @@ function abrirSecao(item) {
 
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Seções com maior % não habilitada</h2>
+        <h2>{{ $t('biometria.secoes') }}</h2>
         <p v-if="municipioSelecionado" class="card__meta">
           {{ nomeMunicipio(municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}) }}
         </p>
       </div>
-      <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') || 'Clique em um município.' }}</div>
+      <div v-if="!municipioSelecionado" class="vazio">{{ $t('comum.cliqueMunicipio') }}</div>
       <div v-else-if="carregandoSecoes && secoes.length === 0" class="vazio">{{ $t('comum.carregando') }}</div>
       <StateBlock
         v-else-if="erroSecoes"
@@ -164,9 +166,9 @@ function abrirSecao(item) {
         <table>
           <thead>
             <tr>
-              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_zona')"><button type="button" @click="ordemSecoes.alternar('nr_zona')">Zona{{ ordemSecoes.seta('nr_zona') }}</button></th>
-              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_secao')"><button type="button" @click="ordemSecoes.alternar('nr_secao')">Seção{{ ordemSecoes.seta('nr_secao') }}</button></th>
-              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('qt_nao_habilitada')"><button type="button" @click="ordemSecoes.alternar('qt_nao_habilitada')">Não habilitada{{ ordemSecoes.seta('qt_nao_habilitada') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_zona')"><button type="button" @click="ordemSecoes.alternar('nr_zona')">{{ $t('tabela.zona') }}{{ ordemSecoes.seta('nr_zona') }}</button></th>
+              <th scope="col" class="ordenavel" :aria-sort="ordemSecoes.ariaSort('nr_secao')"><button type="button" @click="ordemSecoes.alternar('nr_secao')">{{ $t('tabela.secao') }}{{ ordemSecoes.seta('nr_secao') }}</button></th>
+              <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('qt_nao_habilitada')"><button type="button" @click="ordemSecoes.alternar('qt_nao_habilitada')">{{ $t('biometria.naoHabilitada') }}{{ ordemSecoes.seta('qt_nao_habilitada') }}</button></th>
               <th scope="col" class="num ordenavel" :aria-sort="ordemSecoes.ariaSort('percentual_nao_habilitada')"><button type="button" @click="ordemSecoes.alternar('percentual_nao_habilitada')">%{{ ordemSecoes.seta('percentual_nao_habilitada') }}</button></th>
               <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>

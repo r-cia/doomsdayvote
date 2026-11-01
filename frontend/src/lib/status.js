@@ -53,7 +53,7 @@ export function motivoSecao(motivo) {
 export function avisoInfo(codigo) {
   const base = AVISOS[codigo] ?? { tom: 'info' }
   const key = `avisos.${codigo}`
-  let rotulo = codigo || 'Aviso'
+  let rotulo = codigo || i18n.global.t('avisos.aviso')
   try {
     const t = i18n.global.t(key)
     if (t && t !== key) rotulo = t

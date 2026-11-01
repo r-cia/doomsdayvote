@@ -24,7 +24,7 @@ function mad(nivel) {
     <header class="painel__cabecalho">
       <h2 id="benford-niveis-titulo">{{ $t('estatistica.benford') }}</h2>
       <p class="painel__meta">
-        <b>{{ candidatos.length }}</b> candidatos
+        <b>{{ candidatos.length }}</b> {{ $t('unidade.candidato', candidatos.length) }}
       </p>
     </header>
 
@@ -35,17 +35,17 @@ function mad(nivel) {
     <TabelaScroll v-else :atualizando="atualizando">
       <table>
         <caption class="sr-only">
-          Aderência à lei de Benford por candidato em seção, zona e município
+          {{ $t('estatistica.aderenciaBenfordNiveis') }}
         </caption>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">Candidato{{ seta('nm_votavel') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_n')"><button type="button" @click="alternar('secao_n')">Seção n{{ seta('secao_n') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_mad')"><button type="button" @click="alternar('secao_mad')">Seção MAD{{ seta('secao_mad') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_n')"><button type="button" @click="alternar('zona_n')">Zona n{{ seta('zona_n') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_mad')"><button type="button" @click="alternar('zona_mad')">Zona MAD{{ seta('zona_mad') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_n')"><button type="button" @click="alternar('municipio_n')">Município n{{ seta('municipio_n') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_mad')"><button type="button" @click="alternar('municipio_mad')">Município MAD{{ seta('municipio_mad') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">{{ $t('tabela.candidato') }}{{ seta('nm_votavel') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_n')"><button type="button" @click="alternar('secao_n')">{{ $t('tabela.secaoN') }}{{ seta('secao_n') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('secao_mad')"><button type="button" @click="alternar('secao_mad')">{{ $t('tabela.secaoMad') }}{{ seta('secao_mad') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_n')"><button type="button" @click="alternar('zona_n')">{{ $t('tabela.zonaN') }}{{ seta('zona_n') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('zona_mad')"><button type="button" @click="alternar('zona_mad')">{{ $t('tabela.zonaMad') }}{{ seta('zona_mad') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_n')"><button type="button" @click="alternar('municipio_n')">{{ $t('tabela.municipioN') }}{{ seta('municipio_n') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('municipio_mad')"><button type="button" @click="alternar('municipio_mad')">{{ $t('tabela.municipioMad') }}{{ seta('municipio_mad') }}</button></th>
           </tr>
         </thead>
         <tbody>

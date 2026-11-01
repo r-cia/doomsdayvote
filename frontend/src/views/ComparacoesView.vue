@@ -14,8 +14,8 @@ const comparacaoLocalQuery = useComparacaoLocal()
   <StateBlock
     v-if="store.governadorSemUf"
     estado="vazio"
-    titulo="Selecione um estado"
-    descricao="Resultados de governador são específicos por estado."
+    :titulo="$t('comum.selecioneEstado')"
+    :descricao="$t('comum.governadorPorEstado')"
   />
 
   <ComparacaoLocalPanel

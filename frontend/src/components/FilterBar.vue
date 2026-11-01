@@ -30,7 +30,7 @@ const municipioAtivo = computed(() => props.filtros.municipio)
 </script>
 
 <template>
-  <section class="comando" aria-label="Filtros da consulta">
+  <section class="comando" :aria-label="$t('filtros.aria')">
     <label class="campo campo--cargo">
       <span class="campo__rotulo">{{ $t('filtros.cargo') }}</span>
       <select
@@ -91,7 +91,7 @@ const municipioAtivo = computed(() => props.filtros.municipio)
         :value="filtros.uf ?? ''"
         @change="emit('update:uf', $event.target.value)"
       >
-        <option value="">Brasil</option>
+        <option value="">{{ $t('comum.brasil') }}</option>
         <option v-for="uf in UFS" :key="uf" :value="uf">{{ uf }}</option>
       </select>
     </label>
@@ -103,10 +103,10 @@ const municipioAtivo = computed(() => props.filtros.municipio)
         class="button button--ghost button--compacto"
         @click="emit('clear-municipio')"
       >
-        Limpar município
+        {{ $t('filtros.limparMunicipio') }}
       </button>
       <button type="button" class="button button--ghost button--compacto" @click="emit('clear')">
-        Limpar filtros
+        {{ $t('filtros.limpar') }}
       </button>
     </div>
   </section>

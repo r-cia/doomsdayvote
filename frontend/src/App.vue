@@ -33,14 +33,14 @@ const candidatos = computed(() =>
 </script>
 
 <template>
-  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <a class="skip-link" href="#conteudo">{{ $t('app.irParaConteudo') }}</a>
 
   <div class="topo">
     <header class="faixa">
       <RouterLink
         class="marca"
         to="/painel"
-        aria-label="Doomsday Vote, painel de conferência de boletins de urna"
+        :aria-label="$t('app.marcaAria')"
       >
         <img
           class="marca__logo"
@@ -49,12 +49,12 @@ const candidatos = computed(() =>
           aria-hidden="true"
         />
         <span class="marca__texto">
-          <strong>Doomsday Vote</strong>
-          <small>conferência de boletins de urna</small>
+          <strong>{{ $t('app.titulo') }}</strong>
+          <small>{{ $t('app.subtitulo') }}</small>
         </span>
       </RouterLink>
 
-      <nav class="nav" aria-label="Abas do sistema">
+      <nav class="nav" :aria-label="$t('app.abasAria')">
         <RouterLink to="/painel">{{ $t('app.abas.painel') }}</RouterLink>
         <RouterLink to="/mapa">{{ $t('app.abas.mapa') }}</RouterLink>
         <RouterLink to="/analise">{{ $t('app.abas.estatistica') }}</RouterLink>
@@ -70,6 +70,7 @@ const candidatos = computed(() =>
       </p>
       <select
         class="uf-ordenacao"
+        :aria-label="$t('app.idioma')"
         :value="$i18n.locale"
         @change="definirLocale($event.target.value)"
       >
@@ -100,13 +101,13 @@ const candidatos = computed(() =>
 
   <main id="conteudo">
     <div class="sala">
-      <h1 class="sr-only">Conferência de boletins de urna</h1>
+      <h1 class="sr-only">{{ $t('app.tituloPagina') }}</h1>
 
       <StateBlock
         v-if="eleicoesQuery.isLoading.value"
         estado="carregando"
-        titulo="Abrindo a sala"
-        descricao="Consultando a API local."
+        :titulo="$t('app.abrindoSala')"
+        :descricao="$t('app.consultandoApi')"
       />
       <StateBlock
         v-else-if="eleicoesQuery.error.value"
@@ -120,7 +121,7 @@ const candidatos = computed(() =>
         v-else-if="eleicoesDisponiveis.length === 0"
         estado="vazio"
         :titulo="$t('comum.semDados')"
-        descricao="Carregue os BUs pelo backend e recarregue esta página."
+        :descricao="$t('app.semDadosCarga')"
       />
 
       <RouterView v-else />

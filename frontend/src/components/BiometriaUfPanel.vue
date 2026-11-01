@@ -16,13 +16,15 @@ const props = defineProps({
 const emit = defineEmits(['select', 'retry'])
 
 const REGIAO = {
-  AC: 'Norte', AM: 'Norte', AP: 'Norte', PA: 'Norte', RO: 'Norte', RR: 'Norte', TO: 'Norte',
-  AL: 'Nordeste', BA: 'Nordeste', CE: 'Nordeste', MA: 'Nordeste', PB: 'Nordeste',
-  PE: 'Nordeste', PI: 'Nordeste', RN: 'Nordeste', SE: 'Nordeste',
-  DF: 'Centro-Oeste', GO: 'Centro-Oeste', MS: 'Centro-Oeste', MT: 'Centro-Oeste',
-  ES: 'Sudeste', MG: 'Sudeste', RJ: 'Sudeste', SP: 'Sudeste',
-  PR: 'Sul', RS: 'Sul', SC: 'Sul',
+  AC: 'norte', AM: 'norte', AP: 'norte', PA: 'norte', RO: 'norte', RR: 'norte', TO: 'norte',
+  AL: 'nordeste', BA: 'nordeste', CE: 'nordeste', MA: 'nordeste', PB: 'nordeste',
+  PE: 'nordeste', PI: 'nordeste', RN: 'nordeste', SE: 'nordeste',
+  DF: 'centroOeste', GO: 'centroOeste', MS: 'centroOeste', MT: 'centroOeste',
+  ES: 'sudeste', MG: 'sudeste', RJ: 'sudeste', SP: 'sudeste',
+  PR: 'sul', RS: 'sul', SC: 'sul',
 }
+
+const CODIGOS_REGIAO = new Set(Object.values(REGIAO))
 
 const agrupar = ref('nenhum')
 const agruparRegiao = computed(() => agrupar.value === 'regiao')
@@ -113,7 +115,7 @@ const linhas = agregado
         </thead>
         <tbody>
           <tr v-for="linha in linhas" :key="linha.sg_uf" class="linha-clicavel" @click="emit('select', linha.sg_uf)">
-            <td>{{ linha.sg_uf }}</td>
+            <td>{{ CODIGOS_REGIAO.has(linha.sg_uf) ? $t(`regiao.${linha.sg_uf}`) : linha.sg_uf }}</td>
             <td class="tabela__numero">
               {{ formatarNumero(linha.qt_habilitados_por_biometria) }}
             </td>

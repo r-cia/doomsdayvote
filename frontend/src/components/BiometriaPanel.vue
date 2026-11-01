@@ -71,7 +71,7 @@ const participacao = computed(() => {
       <div
         class="biometria__barra"
         role="img"
-        :aria-label="`Comparecimento de ${formatarNumero(biometria.qt_comparecimento)}: ${formatarNumero(biometria.qt_habilitados_por_biometria)} habilitados por biometria e ${formatarNumero(biometria.qt_biometria_nao_habilitada)} com biometria não habilitada`"
+        :aria-label="$t('painel.biometria.ariaBarra', { comparecimento: formatarNumero(biometria.qt_comparecimento), habilitados: formatarNumero(biometria.qt_habilitados_por_biometria), naoHabilitados: formatarNumero(biometria.qt_biometria_nao_habilitada) })"
       >
         <span
           v-for="fatia in fatias"
@@ -119,10 +119,10 @@ const participacao = computed(() => {
 
       <p v-if="votosCandidato !== null || biometria.secoes_sem_campo > 0" class="nota">
         <template v-if="votosCandidato !== null">
-          <b>{{ nomeCandidato }}</b>: {{ formatarNumero(votosCandidato) }} votos — {{ formatarPercentual(participacao) }}
+          <b>{{ nomeCandidato }}</b>: {{ $t('painel.biometria.votosParticipacao', { votos: formatarNumero(votosCandidato), pct: formatarPercentual(participacao) }) }}
         </template>
         <template v-if="biometria.secoes_sem_campo > 0">
-          {{ formatarNumero(biometria.secoes_sem_campo) }} seções sem o campo (entram como zero).
+          {{ $t('painel.biometria.secoesSemCampo', { n: formatarNumero(biometria.secoes_sem_campo) }, biometria.secoes_sem_campo) }}
         </template>
       </p>
     </div>

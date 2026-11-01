@@ -30,18 +30,18 @@ const {
 } = props.ordenacaoVotos
 
 const REGIOES = {
-  Norte: ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
-  Nordeste: ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE'],
-  'Centro-Oeste': ['DF', 'GO', 'MT', 'MS'],
-  Sudeste: ['ES', 'MG', 'RJ', 'SP'],
-  Sul: ['PR', 'RS', 'SC'],
+  norte: ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
+  nordeste: ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE'],
+  centroOeste: ['DF', 'GO', 'MT', 'MS'],
+  sudeste: ['ES', 'MG', 'RJ', 'SP'],
+  sul: ['PR', 'RS', 'SC'],
 }
 
 function regiaoDe(uf) {
   for (const [nome, lista] of Object.entries(REGIOES)) {
     if (lista.includes(uf)) return nome
   }
-  return 'Outros'
+  return 'outros'
 }
 
 const partidoPorNumero = computed(() => {
@@ -73,7 +73,7 @@ const linhas = computed(() => {
 
 const grupos = computed(() => {
   if (agrupar.value !== 'regiao' || props.ufSelecionada) return null
-  const ordem = ['Norte', 'Nordeste', 'Centro-Oeste', 'Sudeste', 'Sul', 'Outros']
+  const ordem = ['norte', 'nordeste', 'centroOeste', 'sudeste', 'sul', 'outros']
   const mapa = new Map()
   for (const linha of linhas.value) {
     if (!mapa.has(linha.regiao)) mapa.set(linha.regiao, [])
@@ -98,7 +98,7 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
       <div class="uf-painel__acoes">
         <select v-if="!ufSelecionada" v-model="agrupar" class="uf-ordenacao">
           <option value="nenhum">{{ $t("biometria.semAgrupamento") }}</option>
-          <option value="regiao">Por região</option>
+          <option value="regiao">{{ $t('biometria.porRegiao') }}</option>
         </select>
         <button
           v-if="ufSelecionada"
@@ -106,17 +106,17 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
           class="button button--ghost button--compacto"
           @click="$emit('municipios', ufSelecionada)"
         >
-          Municípios
+          {{ $t('comum.municipios') }}
         </button>
         <button
           type="button"
           class="button button--ghost button--compacto"
           @click="$emit('limpar')"
         >
-          Brasil
+          {{ $t('comum.brasil') }}
         </button>
         <span class="contador">
-          {{ ufSelecionada ? `${votosUf.length} candidatos` : `${linhas.length} UFs` }}
+          {{ ufSelecionada ? `${votosUf.length} ${$t('unidade.candidato', votosUf.length)}` : `${linhas.length} ${$t('unidade.uf', linhas.length)}` }}
         </span>
       </div>
     </div>
@@ -137,13 +137,13 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
 
     <TabelaScroll v-else-if="ufSelecionada" class="uf-painel__scroll" :atualizando="atualizando">
       <table>
-        <caption class="sr-only">Votos por candidato em {{ ufSelecionada }}</caption>
+        <caption class="sr-only">{{ $t('mapa.votosPorCandidatoEm', { uf: ufSelecionada }) }}</caption>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSortVotos('nm_votavel')"><button type="button" @click="alternarVotos('nm_votavel')">Candidato{{ setaVotos('nm_votavel') }}</button></th>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSortVotos('sg_partido')"><button type="button" @click="alternarVotos('sg_partido')">Partido{{ setaVotos('sg_partido') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSortVotos('qt_votos')"><button type="button" @click="alternarVotos('qt_votos')">Votos{{ setaVotos('qt_votos') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSortVotos('percentual')"><button type="button" @click="alternarVotos('percentual')">% válidos{{ setaVotos('percentual') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSortVotos('nm_votavel')"><button type="button" @click="alternarVotos('nm_votavel')">{{ $t('tabela.candidato') }}{{ setaVotos('nm_votavel') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSortVotos('sg_partido')"><button type="button" @click="alternarVotos('sg_partido')">{{ $t('tabela.partido') }}{{ setaVotos('sg_partido') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSortVotos('qt_votos')"><button type="button" @click="alternarVotos('qt_votos')">{{ $t('tabela.votos') }}{{ setaVotos('qt_votos') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSortVotos('percentual')"><button type="button" @click="alternarVotos('percentual')">{{ $t('tabela.pctValidos') }}{{ setaVotos('percentual') }}</button></th>
           </tr>
         </thead>
         <tbody>
@@ -172,20 +172,20 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
 
     <TabelaScroll v-else-if="agrupar === 'regiao' && grupos" class="uf-painel__scroll" :atualizando="atualizando">
       <table>
-        <caption class="sr-only">Resumo de votos e líder por UF agrupado por região</caption>
+        <caption class="sr-only">{{ $t('mapa.resumoPorRegiao') }}</caption>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">Votos{{ seta('total_votos') }}</button></th>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">Líder{{ seta('lider_nome') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">% líder{{ seta('lider_percentual') }}</button></th>
-            <th scope="col"><span class="sr-only">Ações</span></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">{{ $t('tabela.votos') }}{{ seta('total_votos') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">{{ $t('tabela.lider') }}{{ seta('lider_nome') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">{{ $t('tabela.pctLider') }}{{ seta('lider_percentual') }}</button></th>
+            <th scope="col"><span class="sr-only">{{ $t('tabela.acoes') }}</span></th>
           </tr>
         </thead>
         <tbody>
           <template v-for="grupo in grupos" :key="grupo.nome">
             <tr>
-              <th colspan="5" class="uf-grupo">{{ grupo.nome }}</th>
+              <th colspan="5" class="uf-grupo">{{ $t(`regiao.${grupo.nome}`) }}</th>
             </tr>
             <tr
               v-for="linha in grupo.itens"
@@ -218,7 +218,7 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
                       color: corTextoContraste(corPartido(linha.liderSigla)),
                     }"
                   >{{ linha.liderSigla }}</span>
-                  {{ linha.liderNome ?? `Candidato ${linha.lider.nr_votavel}` }}
+                  {{ linha.liderNome ?? $t('mapa.candidatoN', { n: linha.lider.nr_votavel }) }}
                 </span>
                 <span v-else>—</span>
               </td>
@@ -227,10 +227,10 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
                 <button
                   type="button"
                   class="button button--ghost button--compacto"
-                  :aria-label="`Ver municípios de ${linha.uf}`"
+                  :aria-label="$t('mapa.verMunicipios', { uf: linha.uf })"
                   @click="$emit('municipios', linha.uf)"
                 >
-                  Municípios
+                  {{ $t('comum.municipios') }}
                 </button>
               </td>
             </tr>
@@ -241,14 +241,14 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
 
     <TabelaScroll v-else class="uf-painel__scroll" :atualizando="atualizando">
       <table>
-        <caption class="sr-only">Resumo de votos e líder por UF</caption>
+        <caption class="sr-only">{{ $t('mapa.resumoPorUf') }}</caption>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">Votos{{ seta('total_votos') }}</button></th>
-            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">Líder{{ seta('lider_nome') }}</button></th>
-            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">% líder{{ seta('lider_percentual') }}</button></th>
-            <th scope="col"><span class="sr-only">Ações</span></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('total_votos')"><button type="button" @click="alternar('total_votos')">{{ $t('tabela.votos') }}{{ seta('total_votos') }}</button></th>
+            <th scope="col" class="ordenavel" :aria-sort="ariaSort('lider_nome')"><button type="button" @click="alternar('lider_nome')">{{ $t('tabela.lider') }}{{ seta('lider_nome') }}</button></th>
+            <th scope="col" class="num ordenavel" :aria-sort="ariaSort('lider_percentual')"><button type="button" @click="alternar('lider_percentual')">{{ $t('tabela.pctLider') }}{{ seta('lider_percentual') }}</button></th>
+            <th scope="col"><span class="sr-only">{{ $t('tabela.acoes') }}</span></th>
           </tr>
         </thead>
         <tbody>
@@ -283,7 +283,7 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
                     color: corTextoContraste(corPartido(linha.liderSigla)),
                   }"
                 >{{ linha.liderSigla }}</span>
-                {{ linha.liderNome ?? `Candidato ${linha.lider.nr_votavel}` }}
+                {{ linha.liderNome ?? $t('mapa.candidatoN', { n: linha.lider.nr_votavel }) }}
               </span>
               <span v-else>—</span>
             </td>
@@ -292,10 +292,10 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
               <button
                 type="button"
                 class="button button--ghost button--compacto"
-                :aria-label="`Ver municípios de ${linha.uf}`"
+                :aria-label="$t('mapa.verMunicipios', { uf: linha.uf })"
                 @click="$emit('municipios', linha.uf)"
               >
-                Municípios
+                {{ $t('comum.municipios') }}
               </button>
             </td>
           </tr>
