@@ -6,7 +6,7 @@
 - Zero não é tratado como ausência: campo ausente vira `null` e é contado em `bus_sem_*`.
 - Resultados são descritivos; não há rótulo de fraude, conformidade ou não conformidade.
 - Benford é leitura exploratória em validação.
-- Benford inclui p-valor exploratório por Monte Carlo: 10.000 amostras multinomiais sob a distribuição de Benford, condicionadas a `n`, comparadas pelo MAD observado. Não há ajuste por múltiplas comparações nem interpretação como evidência de fraude.
+- Benford inclui p-valor exploratório por Monte Carlo: 10.000 amostras multinomiais sob a distribuição de Benford, condicionadas a `n`, comparadas pelo MAD observado. Não há ajuste por múltiplas comparações nem interpretação como evidência de fraude. As mesmas amostras dão, por dígito, a faixa de 95% (quantis de 2,5% e 97,5% da proporção simulada), exibida no gráfico de Benford junto do observado e do esperado, com seletor de nível (seção, zona, município); a faixa é marginal por dígito e não é um teste.
 - Consistência aritmética só sinaliza divergências quando os campos necessários existem.
 - Na consistência, cada BU conta no máximo uma vez; é avaliável quando ao menos uma regra é verificável. Ausências são mostradas na cobertura.
 - Benford, duplicação, outliers, concentração e comparações comportamentais são informativos e não pontuam sem calibração validada. A literatura documenta limites de Benford em contagens eleitorais: [Mebane, 2006](https://authors.library.caltech.edu/records/5jbtk-8wn05).
