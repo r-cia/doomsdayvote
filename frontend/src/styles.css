@@ -1331,6 +1331,15 @@ select {
   margin: 0;
 }
 
+.cobertura-block__titulo {
+  margin: 0 0 8px;
+  padding: 10px 12px 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .cobertura-block__item {
   align-items: flex-start;
 }

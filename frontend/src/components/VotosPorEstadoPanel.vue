@@ -55,10 +55,7 @@ function deltaTotal(nrVotavel) {
 <template>
   <section class="painel" aria-labelledby="votos-estado-titulo">
     <header class="painel__cabecalho">
-      <div>
-        <p class="painel__etiqueta">{{ $t('mapa.votosPorEstado') }}</p>
-        <h2 id="votos-estado-titulo">{{ $t('mapa.votosPorEstado') }}</h2>
-      </div>
+      <h2 id="votos-estado-titulo">{{ $t('mapa.votosPorEstado') }}</h2>
     </header>
 
     <StateBlock v-if="loading && (ufs.length === 0 || listaCandidatos.length === 0)" estado="carregando" :titulo="$t('comum.carregando')" />

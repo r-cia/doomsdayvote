@@ -50,6 +50,7 @@ const entradas = computed(() => {
     class="cobertura-block"
     data-test="cobertura-block"
   >
+    <h3 class="cobertura-block__titulo">{{ $t('comum.resumoCobertura') }}</h3>
     <dl class="painel-resumo">
       <div
         v-for="[chave, valor] in entradas"
