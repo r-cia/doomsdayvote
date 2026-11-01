@@ -90,6 +90,29 @@ export function aplicarFiltroCorte(qb, corte) {
   return consulta;
 }
 
+// Mesma regra de aplicarFiltroCorte, sobre as colunas de mv_secao_candidato_final (que já traz ativo, urna 1 e cargo).
+export function condicaoCorteMv(corte, alias = null) {
+  const coluna = (nome) => sql.ref(alias ? `${alias}.${nome}` : nome);
+
+  if (corte.tipo === 'recebimento_intradiario') {
+    return sql`(${coluna('precisao_dt_bu_recebido')} = 'DATA_HORA' AND ${coluna('dt_bu_recebido_ts')} <= ${corte.instante})`;
+  }
+
+  if (corte.tipo === 'recebimento_diario') {
+    return sql`(
+      (${coluna('precisao_dt_bu_recebido')} = 'DATA_HORA' AND (${coluna('dt_bu_recebido_ts')} AT TIME ZONE ${FUSO_EXIBICAO})::date <= ${corte.data})
+      OR (${coluna('precisao_dt_bu_recebido')} = 'DATA' AND ${coluna('dt_bu_recebido_data')} <= ${corte.data})
+    )`;
+  }
+
+  return null;
+}
+
+export function aplicarCorteMv(qb, corte, alias = null) {
+  const condicao = condicaoCorteMv(corte, alias);
+  return condicao ? qb.where(condicao) : qb;
+}
+
 function baseEscopo(db, { eleicaoId, cargo, escopo = {} }) {
   let qb = db
     .selectFrom('boletim_versao as bv')

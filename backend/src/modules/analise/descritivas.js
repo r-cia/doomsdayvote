@@ -1,5 +1,5 @@
 import { sql } from 'kysely';
-import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
+import { aplicarCorteMv, aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 
 function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
   const qb = db
@@ -44,8 +44,8 @@ export async function eleicoesDoAno(db, { eleicao, cargo }) {
   return [...porTurno.values()];
 }
 
-// No corte final, a view já traz os votos por seção e votável: ler dela evita juntar milhões de linhas de resultado_votavel.
-function candidatosPelaMv(db, { eleicaoId, cargo, escopo }) {
+// A view traz os votos por seção e votável (e o recebimento do BU): ler dela evita juntar milhões de linhas de resultado_votavel.
+function candidatosPelaMv(db, { eleicaoId, cargo, corte, escopo }) {
   let consulta = db
     .selectFrom('mv_secao_candidato_final')
     .select([
@@ -65,31 +65,7 @@ function candidatosPelaMv(db, { eleicaoId, cargo, escopo }) {
   if (escopo.cdMunicipio) consulta = consulta.where('cd_municipio_tse', '=', escopo.cdMunicipio);
   if (escopo.nrZona) consulta = consulta.where('nr_zona', '=', escopo.nrZona);
   if (escopo.secaoId) consulta = consulta.where('secao_id', '=', escopo.secaoId);
-  return consulta.groupBy('nr_votavel').orderBy(sql`avg(votos) desc`).execute();
-}
-
-function candidatosPelasTabelas(db, recorte, eleicao) {
-  return base(db, recorte)
-    .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .select([
-      'rv.nr_votavel',
-      sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
-      sql`count(*)::int`.as('secoes'),
-      sql`count(*) filter (where rv.qt_votos > 0)::int`.as('secoes_com_voto'),
-      sql`avg(rv.qt_votos)`.as('media'),
-      sql`percentile_cont(0.5) within group (order by rv.qt_votos)`.as('mediana'),
-      sql`stddev_pop(rv.qt_votos)`.as('desvio'),
-    ])
-    // Redundantes com a junção; permitem ao planejador usar o índice (ano, turno, cargo) em vez de varrer todas as eleições.
-    .where('rv.ano_eleicao', '=', eleicao.ano_eleicao)
-    .where('rv.nr_turno', '=', eleicao.nr_turno)
-    .where('rv.cd_cargo_pergunta', '=', recorte.cargo)
-    .where('rv.categoria', '=', 'nominal')
-    .where('rv.qt_votos', 'is not', null)
-    .groupBy('rv.nr_votavel')
-    .orderBy(sql`avg(rv.qt_votos) desc`)
-    .execute();
+  return aplicarCorteMv(consulta, corte).groupBy('nr_votavel').orderBy(sql`avg(votos) desc`).execute();
 }
 
 export async function estatisticasDaEleicao(
@@ -104,9 +80,7 @@ export async function estatisticasDaEleicao(
     .groupBy('bv.secao_id');
 
   const [candidatos, comparecimento] = await Promise.all([
-    corte.tipo === 'final'
-      ? candidatosPelaMv(db, { eleicaoId: eleicao.id, cargo, escopo })
-      : candidatosPelasTabelas(db, recorte, eleicao),
+    candidatosPelaMv(db, { eleicaoId: eleicao.id, cargo, corte, escopo }),
     db
       .selectFrom(secoes.as('t'))
       .select([

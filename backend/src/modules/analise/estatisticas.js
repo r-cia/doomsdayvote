@@ -91,82 +91,15 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
 }
 
 async function consultarBaseSecaoCandidato(db, { eleicaoId, cargo, corte, escopo = {} }) {
-  if (corte.tipo === 'final') {
-    return linhasDeSecoesCompactas(
-      await secoesCompactas(db, {
-        eleicaoId,
-        cargo,
-        escopo: { sgUf: escopo.sgUf, cdMunicipio: escopo.cdMunicipio },
-        categorias: ['nominal'],
-      }),
-    );
-  }
-
-  const porVotavel = base(db, { eleicaoId, cargo, corte, escopo })
-    .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .leftJoin('localidade as l', (join) =>
-      join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
-    )
-    .select([
-      'rv.nr_votavel',
-      sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
-      'bv.secao_id',
-      sql`max(s.sg_uf)`.as('sg_uf'),
-      sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
-      sql`max(l.nm_municipio)`.as('nm_municipio'),
-      sql`max(s.nr_zona)`.as('nr_zona'),
-      sql`max(s.nr_secao)`.as('nr_secao'),
-      sql`max(bv.qt_aptos)`.as('qt_aptos'),
-      sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
-      sql`max(bv.qt_abstencoes)`.as('qt_abstencoes'),
-      sql`max(bv.qt_elei_biom_sem_habilitacao)`.as('qt_biom'),
-      sql`max(bv.dt_bu_recebido_ts)`.as('dt_bu_recebido_ts'),
-      sql`sum(rv.qt_votos)`.as('votos'),
-    ])
-    .where('rv.categoria', '=', 'nominal')
-    .where('rv.qt_votos', 'is not', null)
-    .groupBy([
-      'rv.nr_votavel',
-      'bv.secao_id',
-    ])
-
-  // Uma linha por seção, com os votos em arrays (mesmo formato de `secoesCompactas`).
-  const { rows } = await sql`
-    with por_votavel as (${porVotavel}),
-    dic as (
-      select nm_votavel, sg_partido, (row_number() over (order by nm_votavel nulls first, sg_partido nulls first) - 1)::int as ref
-      from (select distinct nm_votavel, sg_partido from por_votavel) distintos
-    )
-    select
-      p.secao_id,
-      max(p.sg_uf) as sg_uf,
-      max(p.cd_municipio_tse) as cd_municipio_tse,
-      max(p.nm_municipio) as nm_municipio,
-      max(p.nr_zona) as nr_zona,
-      max(p.nr_secao) as nr_secao,
-      max(p.qt_aptos) as qt_aptos,
-      max(p.qt_comparecimento) as qt_comparecimento,
-      max(p.qt_abstencoes) as qt_abstencoes,
-      max(p.qt_biom) as qt_biom,
-      max(p.dt_bu_recebido_ts) as dt_bu_recebido_ts,
-      array_agg(p.nr_votavel order by p.nr_votavel)::int[] as nrs,
-      array_agg(p.votos order by p.nr_votavel)::int[] as votos,
-      array_agg(d.ref order by p.nr_votavel)::int[] as refs,
-      null::jsonb as dicionario
-    from por_votavel p
-    join dic d on p.nm_votavel is not distinct from d.nm_votavel and p.sg_partido is not distinct from d.sg_partido
-    group by p.secao_id
-    union all
-    select
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-      (select jsonb_agg(jsonb_build_object('nm_votavel', nm_votavel, 'sg_partido', sg_partido) order by ref) from dic)
-    order by secao_id nulls last
-  `.execute(db)
-
-  const secoes = rows.filter((linha) => linha.secao_id !== null)
-  const votaveis = rows.find((linha) => linha.secao_id === null)?.dicionario ?? []
-  return linhasDeSecoesCompactas({ secoes, votaveis })
+  return linhasDeSecoesCompactas(
+    await secoesCompactas(db, {
+      eleicaoId,
+      cargo,
+      corte,
+      escopo: { sgUf: escopo.sgUf, cdMunicipio: escopo.cdMunicipio },
+      categorias: ['nominal'],
+    }),
+  )
 }
 
 export async function baseSecaoCandidato(db, escopo = {}) {

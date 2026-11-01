@@ -2,6 +2,9 @@ import { DummyDriver, Kysely, PostgresAdapter, PostgresIntrospector, PostgresQue
 import { describe, expect, it } from 'vitest';
 import { baseSecaoCandidato } from '../../../src/modules/analise/estatisticas.js';
 
+// secoesCompactas lê as seções e o dicionário de votáveis em duas consultas.
+const QUERIES_POR_CARGA = 2;
+
 function bancoQueContaConsultas() {
   const consultas = [];
   const db = new Kysely({
@@ -32,7 +35,7 @@ describe('baseSecaoCandidato', () => {
     const segunda = baseSecaoCandidato(db, { ...escopo, corte: { ...escopo.corte, instante: new Date(escopo.corte.instante) } });
 
     const [resultadoPrimeiro, resultadoSegundo] = await Promise.all([primeira, segunda]);
-    expect(consultas).toHaveLength(1);
+    expect(consultas).toHaveLength(QUERIES_POR_CARGA);
     expect(resultadoPrimeiro).toBe(resultadoSegundo);
     expect([...resultadoPrimeiro]).toEqual([]);
   });
@@ -43,6 +46,6 @@ describe('baseSecaoCandidato', () => {
 
     await baseSecaoCandidato(db, escopo);
     await baseSecaoCandidato(db, escopo);
-    expect(consultas).toHaveLength(2);
+    expect(consultas).toHaveLength(2 * QUERIES_POR_CARGA);
   });
 });

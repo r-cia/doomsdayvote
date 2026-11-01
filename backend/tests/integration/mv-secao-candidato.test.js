@@ -1,25 +1,30 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { sql } from 'kysely';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { criarDb } from '../../src/db/index.js';
 import { comparacaoLocal } from '../../src/modules/analise/comparacao-local.js';
 import { concentracao } from '../../src/modules/analise/concentracao.js';
+import { estatisticasDaEleicao } from '../../src/modules/analise/descritivas.js';
 import { duplicacaoPorAssinatura } from '../../src/modules/analise/duplicacao.js';
+import { baseSecaoCandidato } from '../../src/modules/analise/estatisticas.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
 import { caminhoFixture } from '../helpers/fixtures.js';
+import {
+  baseSecaoCandidatoPelasTabelas,
+  candidatosPelasTabelas,
+  comparacaoLocalPelasTabelas,
+  concentracaoPelasTabelas,
+  duplicacaoPelasTabelas,
+} from '../helpers/cortes-por-tabelas.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-const FINAL = { tipo: 'final' };
-// Mesmo conjunto do corte final (todos os BUs do fixture têm recebimento com hora), mas lido das tabelas.
-const POR_TABELAS = { tipo: 'recebimento_intradiario', instante: new Date('2030-01-01T00:00:00Z') };
-
-let storageDir;
-let alvo;
+const FUSO = 'America/Sao_Paulo';
 
 // A ordem de soma de ponto flutuante muda entre as duas leituras.
 const arredondar = (valor) =>
@@ -40,61 +45,146 @@ function ordenarListas(valor) {
   return valor;
 }
 
-const normalizarGrupos = (grupos) => ordenarListas(grupos);
+const normalizar = (valor) => arredondar(ordenarListas(valor));
 
-describe('corte final lido da view materializada equivale às tabelas', () => {
+const CAMPOS_BASE = [
+  'secao_id', 'sg_uf', 'cd_municipio_tse', 'nm_municipio', 'nr_zona', 'nr_secao', 'qt_aptos',
+  'qt_comparecimento', 'qt_abstencoes', 'qt_biom', 'dt_bu_recebido_ts', 'nr_votavel', 'nm_votavel', 'sg_partido', 'votos',
+];
+
+const reduzirBase = (linhas) =>
+  [...linhas]
+    .map((linha) => Object.fromEntries(CAMPOS_BASE.map((campo) => [campo, campo === 'votos' ? Number(linha[campo]) : linha[campo]])))
+    .sort((a, b) => String(a.secao_id).localeCompare(String(b.secao_id)) || a.nr_votavel - b.nr_votavel);
+
+const reduzirCandidatos = (candidatos) =>
+  candidatos.map((linha) => ({
+    nr_votavel: linha.nr_votavel,
+    nm_votavel: linha.nm_votavel,
+    sg_partido: linha.sg_partido,
+    secoes: Number(linha.secoes),
+    secoes_com_voto: Number(linha.secoes_com_voto ?? 0),
+    media: linha.media === null ? null : Number(linha.media),
+    mediana: linha.mediana === null ? null : Number(linha.mediana),
+    desvio: linha.desvio === null ? null : Number(linha.desvio),
+  }));
+
+async function cortesDoFixture() {
+  const { rows } = await sql`
+    select
+      percentile_disc(0.5) within group (order by dt_bu_recebido_ts) as instante,
+      percentile_disc(0.5) within group (order by coalesce(((dt_bu_recebido_ts at time zone ${FUSO})::date)::text, dt_bu_recebido_data::text)) as data
+    from boletim_versao
+    where ativo
+  `.execute(db);
+  const instante = rows[0].instante ?? new Date('2014-10-05T20:00:00Z');
+  const data = rows[0].data ?? '2014-10-05';
+  return [
+    ['final', { tipo: 'final' }],
+    ['intradiário no meio', { tipo: 'recebimento_intradiario', instante }],
+    ['intradiário depois de tudo', { tipo: 'recebimento_intradiario', instante: new Date('2030-01-01T00:00:00Z') }],
+    ['diário no meio', { tipo: 'recebimento_diario', data }],
+    ['diário depois de tudo', { tipo: 'recebimento_diario', data: '2030-01-01' }],
+  ];
+}
+
+afterAll(async () => {
+  await db.destroy();
+});
+
+describe.each([
+  ['2014', 'bweb_1t_AC_14102014131600.txt'],
+  ['2018', 'bweb_1t_AC_101020181938.csv'],
+  ['2026', 'bweb-1t_ac_2026.csv'],
+])('cortes lidos da view materializada equivalem às tabelas (%s)', (ano, nome) => {
+  let storageDir;
+  let alvo;
+  let eleicao;
+  let cortes;
+
   beforeAll(async () => {
     storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-mv-'));
     await limparBanco(db);
-    const nome = 'bweb-1t_ac_2026.csv';
     await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
     await atualizarViews();
     const linha = await db
-      .selectFrom('boletim_versao')
-      .select(['eleicao_id', 'cd_cargo_pergunta'])
-      .where('ds_cargo_pergunta', '=', 'Presidente')
+      .selectFrom('boletim_versao as bv')
+      .innerJoin('eleicao as e', 'e.id', 'bv.eleicao_id')
+      .select(['bv.eleicao_id', 'bv.cd_cargo_pergunta', 'e.ano_eleicao', 'e.nr_turno'])
+      .where(sql`lower(bv.ds_cargo_pergunta)`, '=', 'presidente')
       .executeTakeFirstOrThrow();
     alvo = { eleicaoId: linha.eleicao_id, cargo: linha.cd_cargo_pergunta };
+    eleicao = { id: linha.eleicao_id, ano_eleicao: linha.ano_eleicao, nr_turno: linha.nr_turno };
+    cortes = await cortesDoFixture();
   }, 120000);
 
   afterAll(async () => {
     await limparBanco(db);
-    await db.destroy();
     await rm(storageDir, { recursive: true, force: true });
   });
 
   it('concentração', async () => {
-    const limite = 100;
-    const pelaMv = await concentracao(db, { ...alvo, corte: FINAL, limite });
-    const pelasTabelas = await concentracao(db, { ...alvo, corte: POR_TABELAS, limite });
-    expect(pelaMv.cobertura.consideradas).toBeGreaterThan(0);
-    expect(pelaMv.cobertura).toEqual(pelasTabelas.cobertura);
-    expect(pelaMv.total).toBe(pelasTabelas.total);
-    const chave = (item) => item.secao.id;
-    expect(pelaMv.top_margem.map((item) => item.margem_absoluta)).toEqual(
-      pelasTabelas.top_margem.map((item) => item.margem_absoluta),
-    );
-    const todas = await Promise.all(
-      [FINAL, POR_TABELAS].map((corte) => concentracao(db, { ...alvo, corte, limite: 100000 })),
-    );
-    const [a, b] = todas.map((resultado) => [...resultado.top_share].sort(porTexto(chave)));
-    expect(arredondar(ordenarListas(a))).toEqual(arredondar(ordenarListas(b)));
+    for (const [, corte] of cortes) {
+      const pelaMv = await concentracao(db, { ...alvo, corte, limite: 100000 });
+      const pelasTabelas = await concentracaoPelasTabelas(db, { ...alvo, corte, limite: 100000 });
+      expect(pelaMv.cobertura).toEqual(pelasTabelas.cobertura);
+      expect(pelaMv.total).toBe(pelasTabelas.total);
+      expect(normalizar(pelaMv)).toEqual(normalizar(pelasTabelas));
+    }
   }, 120000);
 
   it('comparação local', async () => {
-    const pelaMv = await comparacaoLocal(db, { ...alvo, corte: FINAL });
-    const pelasTabelas = await comparacaoLocal(db, { ...alvo, corte: POR_TABELAS });
-    expect(pelaMv.grupos.length).toBeGreaterThan(0);
-    expect(arredondar(normalizarGrupos(pelaMv.grupos))).toEqual(arredondar(normalizarGrupos(pelasTabelas.grupos)));
+    for (const [, corte] of cortes) {
+      const pelaMv = await comparacaoLocal(db, { ...alvo, corte });
+      const pelasTabelas = await comparacaoLocalPelasTabelas(db, { ...alvo, corte });
+      expect(normalizar(pelaMv)).toEqual(normalizar(pelasTabelas));
+    }
   }, 120000);
 
   it('duplicação por assinatura', async () => {
-    const pelaMv = await duplicacaoPorAssinatura(db, { ...alvo, corte: FINAL, limite: 1000 });
-    const pelasTabelas = await duplicacaoPorAssinatura(db, { ...alvo, corte: POR_TABELAS, limite: 1000 });
-    expect(pelaMv.total_secoes_escopo).toBeGreaterThan(0);
-    expect(pelaMv.total_grupos).toBe(pelasTabelas.total_grupos);
-    expect(pelaMv.total_secoes).toBe(pelasTabelas.total_secoes);
-    expect(pelaMv.total_secoes_escopo).toBe(pelasTabelas.total_secoes_escopo);
-    expect(arredondar(normalizarGrupos(pelaMv.grupos))).toEqual(arredondar(normalizarGrupos(pelasTabelas.grupos)));
+    for (const [, corte] of cortes) {
+      const pelaMv = await duplicacaoPorAssinatura(db, { ...alvo, corte, limite: 1000 });
+      const pelasTabelas = await duplicacaoPelasTabelas(db, { ...alvo, corte, limite: 1000 });
+      expect(pelaMv.total_secoes_escopo).toBe(pelasTabelas.total_secoes_escopo);
+      expect(pelaMv.total_grupos).toBe(pelasTabelas.total_grupos);
+      expect(pelaMv.total_secoes).toBe(pelasTabelas.total_secoes);
+      expect(normalizar(pelaMv.grupos)).toEqual(normalizar(pelasTabelas.grupos));
+    }
+  }, 120000);
+
+  it('base seção × candidato (anomalias, Benford, isolamento)', async () => {
+    for (const [, corte] of cortes) {
+      for (const escopo of [{}, { sgUf: 'AC' }, { sgUf: 'SP' }]) {
+        const pelaMv = reduzirBase(await baseSecaoCandidato(db, { ...alvo, corte, escopo }));
+        const pelasTabelas = reduzirBase(await baseSecaoCandidatoPelasTabelas(db, { ...alvo, corte, escopo }));
+        expect(pelaMv).toEqual(pelasTabelas);
+      }
+    }
+  }, 120000);
+
+  it('estatística descritiva por candidato', async () => {
+    for (const [, corte] of cortes) {
+      const pelaMv = await estatisticasDaEleicao(db, { eleicao, cargo: alvo.cargo, corte });
+      const pelasTabelas = await candidatosPelasTabelas(db, { ...alvo, corte, escopo: {} }, eleicao);
+      expect(arredondar(reduzirCandidatos(pelaMv.candidatos))).toEqual(arredondar(reduzirCandidatos(pelasTabelas)));
+    }
+  }, 120000);
+
+  it('o corte depois de tudo devolve o mesmo que o final, e o do meio nunca devolve mais seções', async () => {
+    const [[, final], , [, tarde], [, diarioMeio], [, diarioTarde]] = cortes;
+    const total = async (corte) => (await duplicacaoPorAssinatura(db, { ...alvo, corte, limite: 1 })).total_secoes_escopo;
+    const secoesFinal = await total(final);
+    expect(secoesFinal).toBeGreaterThan(0);
+    for (const corte of [tarde, diarioTarde]) {
+      const secoes = await total(corte);
+      if (secoes > 0) expect(secoes).toBe(secoesFinal);
+    }
+    const meio = await total(diarioMeio);
+    expect(meio).toBeLessThanOrEqual(secoesFinal);
+    if (ano === '2026') {
+      const intradiario = await total(cortes[1][1]);
+      expect(intradiario).toBeGreaterThan(0);
+      expect(intradiario).toBeLessThan(secoesFinal);
+    }
   }, 120000);
 });

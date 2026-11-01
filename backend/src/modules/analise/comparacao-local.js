@@ -1,6 +1,3 @@
-import { sql } from 'kysely';
-import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
-
 import { expandirSecao, secoesCompactas } from './mv-secao-candidato.js';
 import { criarPercentilRank, media, mediana, toNumberOrNull } from './estatistica-basica.js';
 
@@ -288,8 +285,8 @@ export function agruparSecoes(secoes = [], { minimoGrupo = 5 } = {}) {
   };
 }
 
-async function secoesPelaMv(db, { eleicaoId, cargo, escopo }) {
-  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, escopo, categorias: ['nominal'] });
+async function secoesPelaMv(db, { eleicaoId, cargo, corte, escopo }) {
+  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, corte, escopo, categorias: ['nominal'] });
   return secoes.map((secao) => {
     const grupo = expandirSecao(secao, votaveis);
     const primeira = grupo[0];
@@ -315,76 +312,5 @@ async function secoesPelaMv(db, { eleicaoId, cargo, escopo }) {
 }
 
 export async function comparacaoLocal(db, { eleicaoId, cargo, corte, escopo = {} }) {
-  const corteEfetivo = corte ?? { tipo: 'final' };
-
-  if (corteEfetivo.tipo === 'final') {
-    return agruparSecoes(await secoesPelaMv(db, { eleicaoId, cargo, escopo }), { minimoGrupo: 5 });
-  }
-
-  let qb = db
-    .selectFrom('boletim_versao as bv')
-    .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
-    .leftJoin('localidade as l', (join) =>
-      join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
-    )
-    .where('bv.eleicao_id', '=', eleicaoId)
-    .where('bv.cd_cargo_pergunta', '=', cargo);
-
-  qb = aplicarFiltroCorte(qb, corteEfetivo);
-  qb = aplicarEscopo(qb, escopo ?? {});
-
-  const linhas = await qb
-    .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .select([
-      'bv.secao_id as secao_id',
-      sql`max(s.sg_uf)`.as('sg_uf'),
-      sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
-      sql`max(s.nr_zona)`.as('nr_zona'),
-      sql`max(s.nr_secao)`.as('nr_secao'),
-      sql`max(s.nr_local_votacao)`.as('nr_local_votacao'),
-      sql`max(l.nm_municipio)`.as('nm_municipio'),
-      sql`max(bv.qt_aptos)`.as('qt_aptos'),
-      sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
-      sql`max(bv.qt_abstencoes)`.as('qt_abstencoes'),
-      'rv.nr_votavel',
-      sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
-      sql`sum(rv.qt_votos)`.as('votos'),
-    ])
-    .where('rv.categoria', '=', 'nominal')
-    .where('rv.qt_votos', 'is not', null)
-    .groupBy([
-      'bv.secao_id',
-      'rv.nr_votavel',
-    ])
-    .execute();
-
-  const porSecao = new Map();
-  for (const linha of linhas) {
-    if (!porSecao.has(linha.secao_id)) {
-      porSecao.set(linha.secao_id, {
-        id: linha.secao_id,
-        sg_uf: linha.sg_uf,
-        cd_municipio_tse: linha.cd_municipio_tse,
-        nm_municipio: linha.nm_municipio,
-        nr_zona: linha.nr_zona,
-        nr_secao: linha.nr_secao,
-        nr_local_votacao: linha.nr_local_votacao,
-        qt_aptos: toNumberOrNull(linha.qt_aptos),
-        qt_comparecimento: toNumberOrNull(linha.qt_comparecimento),
-        qt_abstencoes: toNumberOrNull(linha.qt_abstencoes),
-        candidatos: [],
-      });
-    }
-    const secao = porSecao.get(linha.secao_id);
-    secao.candidatos.push({
-      nr_votavel: linha.nr_votavel,
-      nm_votavel: linha.nm_votavel,
-      sg_partido: linha.sg_partido,
-      qt_votos: toNumberOrNull(linha.votos),
-    });
-  }
-
-  const secoes = [...porSecao.values()];
-  return agruparSecoes(secoes, { minimoGrupo: 5 });
+  return agruparSecoes(await secoesPelaMv(db, { eleicaoId, cargo, corte: corte ?? { tipo: 'final' }, escopo }), { minimoGrupo: 5 });
 }

@@ -1,4 +1,5 @@
 import { sql } from 'kysely';
+import { condicaoCorteMv } from '../apuracao/corte.js';
 
 export const CATEGORIAS_MV = [
   'nominal',
@@ -16,8 +17,10 @@ const CODIGO_CATEGORIA = sql`case m.categoria
 
 // Uma linha por seção, com os votos em arrays paralelos ordenados por (cd_tipo_votavel, nr_votavel). Nomes e partidos
 // vêm de um dicionário pequeno (`votaveis`, indexado por `refs`), para não repetir texto em cada seção × votável.
-export async function secoesCompactas(db, { eleicaoId, cargo, escopo = {}, categorias = null }) {
+export async function secoesCompactas(db, { eleicaoId, cargo, corte = { tipo: 'final' }, escopo = {}, categorias = null }) {
   const filtros = [sql`m.eleicao_id = ${eleicaoId}`, sql`m.cargo = ${cargo}`];
+  const recorte = condicaoCorteMv(corte, 'm');
+  if (recorte) filtros.push(recorte);
   if (categorias) filtros.push(sql`m.categoria in (${sql.join(categorias)})`);
   if (escopo.sgUf) filtros.push(sql`m.sg_uf = ${escopo.sgUf}`);
   if (escopo.cdMunicipio) filtros.push(sql`m.cd_municipio_tse = ${escopo.cdMunicipio}`);

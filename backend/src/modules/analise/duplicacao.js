@@ -1,5 +1,3 @@
-import { sql } from 'kysely'
-import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js'
 import { ordenarLista } from '../../lib/ordenacao.js'
 import { expandirSecao, secoesCompactas } from './mv-secao-candidato.js'
 
@@ -106,7 +104,7 @@ export function agruparAssinaturas(secoes = [], limite = 50, ordenacao = null) {
   }
 }
 
-function agruparComVencedorDeZona(linhas, vencedorPorZona, limite, ordenacao) {
+export function agruparComVencedorDeZona(linhas, vencedorPorZona, limite, ordenacao) {
   const linhasAjustadas = linhas.map((linha) => {
     const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`
     const vencedorZona = vencedorPorZona.get(chave)
@@ -133,8 +131,8 @@ function vencedorDaSecao(grupo) {
   }, null)
 }
 
-async function duplicacaoPelaMv(db, { eleicaoId, cargo, escopo, limite, ordenacao }) {
-  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, escopo })
+export async function duplicacaoPorAssinatura(db, { eleicaoId, cargo, corte = { tipo: 'final' }, escopo = {}, limite = 50, ordenacao = null }) {
+  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, corte, escopo })
   const linhas = secoes.map((secao) => {
     const grupo = expandirSecao(secao, votaveis)
     const primeira = grupo[0]
@@ -167,105 +165,6 @@ async function duplicacaoPelaMv(db, { eleicaoId, cargo, escopo, limite, ordenaca
   for (const [chave, vencedores] of vencedoresPorZona) {
     const unico = Number(vencedores[0])
     vencedorPorZona.set(chave, vencedores.every((v) => v !== null && v !== undefined && Number(v) === unico) ? unico : null)
-  }
-
-  return agruparComVencedorDeZona(linhas, vencedorPorZona, limite, ordenacao)
-}
-
-export async function duplicacaoPorAssinatura(
-  db,
-  { eleicaoId, cargo, corte, escopo = {}, limite = 50, ordenacao = null },
-) {
-  if (corte.tipo === 'final') {
-    return duplicacaoPelaMv(db, { eleicaoId, cargo, escopo, limite, ordenacao })
-  }
-
-  let consulta = db
-    .selectFrom('boletim_versao as bv')
-    .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
-    .leftJoin('localidade as l', (join) =>
-      join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
-    )
-    .where('bv.eleicao_id', '=', eleicaoId)
-    .where('bv.cd_cargo_pergunta', '=', cargo)
-
-  consulta = aplicarFiltroCorte(consulta, corte)
-  consulta = aplicarEscopo(consulta, escopo)
-
-  const ordemVencedor = sql`order by rv.qt_votos desc, rv.nr_votavel asc`
-  const linhas = await consulta
-    .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .select([
-      'bv.secao_id as id',
-      sql`max(s.sg_uf)`.as('sg_uf'),
-      sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
-      sql`max(s.nr_zona)`.as('nr_zona'),
-      sql`max(s.nr_secao)`.as('nr_secao'),
-      sql`max(s.nr_local_votacao)`.as('nr_local_votacao'),
-      sql`max(l.nm_municipio)`.as('nm_municipio'),
-      sql`max(bv.qt_aptos)`.as('qt_aptos'),
-      sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
-      sql`(array_agg(rv.nr_votavel ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_nr'),
-      sql`(array_agg(rv.nm_votavel ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_nm'),
-      sql`(array_agg(coalesce(rv.sg_partido, rv.nm_partido) ${ordemVencedor}) filter (where rv.categoria = 'nominal'))[1]`.as('vencedor_sg'),
-      sql`md5(string_agg(rv.cd_tipo_votavel::text || ':' || rv.nr_votavel::text || ':' || coalesce(rv.qt_votos, 0)::text, '|' order by rv.cd_tipo_votavel, rv.nr_votavel))`.as(
-        'assinatura',
-      ),
-      sql`count(*)`.as('votaveis'),
-    ])
-    .where('rv.qt_votos', 'is not', null)
-    .groupBy('bv.secao_id')
-    .execute()
-
-  // Garante que o vencedor só é exibido se ele venceu em TODAS as seções
-  // de TODAS as zonas envolvidas (não apenas nas seções duplicadas).
-  const zonasUnicas = [
-    ...new Set(linhas.map((linha) => `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`)),
-  ]
-  const vencedorPorZona = new Map()
-  if (zonasUnicas.length > 0) {
-    let consultaZonas = db
-      .selectFrom('boletim_versao as bv')
-      .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
-      .leftJoin('localidade as l', (join) =>
-        join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
-      )
-      .where('bv.eleicao_id', '=', eleicaoId)
-      .where('bv.cd_cargo_pergunta', '=', cargo)
-    consultaZonas = aplicarFiltroCorte(consultaZonas, corte)
-    consultaZonas = aplicarEscopo(consultaZonas, escopo)
-    consultaZonas = consultaZonas
-      .leftJoin('resultado_votavel as rv', (join) =>
-        join
-          .onRef('rv.boletim_versao_id', '=', 'bv.id')
-          .on('rv.categoria', '=', 'nominal')
-          .on('rv.qt_votos', 'is not', null),
-      )
-      .select([
-        sql`max(s.sg_uf)`.as('sg_uf'),
-        sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
-        sql`max(s.nr_zona)`.as('nr_zona'),
-        sql`(array_agg(rv.nr_votavel order by rv.qt_votos desc, rv.nr_votavel asc) filter (where rv.nr_votavel is not null))[1]`.as(
-          'vencedor_nr',
-        ),
-      ])
-      .groupBy('bv.id')
-
-    const linhasZonas = await consultaZonas.execute()
-    const porZona = new Map()
-    for (const linha of linhasZonas) {
-      const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}|${linha.nr_zona}`
-      if (!porZona.has(chave)) porZona.set(chave, [])
-      porZona.get(chave).push(linha.vencedor_nr)
-    }
-    for (const [chave, vencedores] of porZona) {
-      const validos = vencedores.filter((v) => v !== null && v !== undefined)
-      if (validos.length === vencedores.length && validos.length > 0 && validos.every((v) => Number(v) === Number(validos[0]))) {
-        vencedorPorZona.set(chave, Number(validos[0]))
-      } else {
-        vencedorPorZona.set(chave, null)
-      }
-    }
   }
 
   return agruparComVencedorDeZona(linhas, vencedorPorZona, limite, ordenacao)

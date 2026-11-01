@@ -3,7 +3,6 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { criarDb } from '../../src/db/index.js';
-import { baseSecaoCandidato } from '../../src/modules/analise/estatisticas.js';
 import { expandirSecao, secoesCompactas } from '../../src/modules/analise/mv-secao-candidato.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
@@ -84,32 +83,12 @@ describe('seções compactas equivalem à leitura seção × votável da view', 
         const esperado = [...antigas.get(secao.secao_id)].sort(porVotavel).map(normalizar);
         const obtido = expandirSecao(secao, votaveis).map(normalizar);
         expect(obtido).toEqual(esperado.map((linha) => {
-          const { eleicao_id, cargo, ...resto } = linha;
+          const { eleicao_id, cargo, precisao_dt_bu_recebido, dt_bu_recebido_data, ...resto } = linha;
           return resto;
         }));
       }
     });
   }
-
-  it('o corte parcial (tabelas) devolve as mesmas linhas nominais que o corte final (view)', async () => {
-    const final = [...(await baseSecaoCandidato(db, { ...alvo, corte: { tipo: 'final' } }))];
-    const parcial = [
-      ...(await baseSecaoCandidato(db, {
-        ...alvo,
-        corte: { tipo: 'recebimento_intradiario', instante: new Date('2030-01-01T00:00:00Z') },
-      })),
-    ];
-    const campos = [
-      'secao_id', 'sg_uf', 'cd_municipio_tse', 'nm_municipio', 'nr_zona', 'nr_secao', 'qt_aptos',
-      'qt_comparecimento', 'qt_abstencoes', 'qt_biom', 'dt_bu_recebido_ts', 'nr_votavel', 'nm_votavel', 'sg_partido', 'votos',
-    ];
-    const reduzir = (linhas) =>
-      linhas
-        .map((linha) => Object.fromEntries(campos.map((campo) => [campo, campo === 'votos' ? Number(linha[campo]) : linha[campo]])))
-        .sort((a, b) => String(a.secao_id).localeCompare(String(b.secao_id)) || a.nr_votavel - b.nr_votavel);
-    expect(final.length).toBeGreaterThan(0);
-    expect(reduzir(parcial)).toEqual(reduzir(final));
-  });
 
   it('uma seção sem votos em um dos votáveis e nomes ausentes mantêm os valores por seção', async () => {
     const { secoes, votaveis } = await secoesCompactas(db, { ...alvo });

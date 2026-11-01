@@ -1,5 +1,3 @@
-import { sql } from 'kysely';
-import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 import { agruparSecoes } from './comparacao-local.js';
 import { ordenarLista } from '../../lib/ordenacao.js';
 import { expandirSecao, secoesCompactas } from './mv-secao-candidato.js';
@@ -321,8 +319,8 @@ export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4
   };
 }
 
-async function secoesPelaMv(db, { eleicaoId, cargo, escopo }) {
-  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, escopo, categorias: ['nominal', 'legenda'] });
+async function secoesPelaMv(db, { eleicaoId, cargo, corte, escopo }) {
+  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, corte, escopo, categorias: ['nominal', 'legenda'] });
   return secoes.map((secao) => {
     const grupo = expandirSecao(secao, votaveis);
     const primeira = grupo[0];
@@ -349,95 +347,6 @@ async function secoesPelaMv(db, { eleicaoId, cargo, escopo }) {
 }
 
 export async function concentracao(db, { eleicaoId, cargo, corte, escopo = {}, limite = 20, ordenacaoShare, ordenacaoMargem } = {}) {
-  const corteEfetivo = corte ?? { tipo: 'final' };
-
-  if (corteEfetivo.tipo === 'final') {
-    const secoes = await secoesPelaMv(db, { eleicaoId, cargo, escopo });
-    return concentracaoPura(secoes, { top: limite, ordenacaoShare, ordenacaoMargem });
-  }
-
-  let qb = db
-    .selectFrom('boletim_versao as bv')
-    .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
-    .leftJoin('localidade as l', (join) =>
-      join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
-    )
-    .where('bv.eleicao_id', '=', eleicaoId)
-    .where('bv.cd_cargo_pergunta', '=', cargo);
-
-  qb = aplicarFiltroCorte(qb, corteEfetivo);
-  qb = aplicarEscopo(qb, escopo ?? {});
-
-  const linhas = await qb
-    .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .select([
-      'bv.secao_id as secao_id',
-      sql`max(s.sg_uf)`.as('sg_uf'),
-      sql`max(s.cd_municipio_tse)`.as('cd_municipio_tse'),
-      sql`max(s.nr_zona)`.as('nr_zona'),
-      sql`max(s.nr_secao)`.as('nr_secao'),
-      sql`max(s.nr_local_votacao)`.as('nr_local_votacao'),
-      sql`max(l.nm_municipio)`.as('nm_municipio'),
-      sql`max(bv.qt_aptos)`.as('qt_aptos'),
-      'rv.nr_votavel',
-      sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(coalesce(rv.sg_partido, rv.nm_partido))`.as('sg_partido'),
-      'rv.categoria',
-      sql`sum(rv.qt_votos)`.as('votos'),
-    ])
-    .where('rv.categoria', 'in', ['nominal', 'legenda'])
-    .where('rv.qt_votos', 'is not', null)
-    .groupBy([
-      'bv.secao_id',
-      'rv.nr_votavel',
-      'rv.categoria',
-    ])
-    .execute();
-
-  const porSecao = new Map();
-  for (const linha of linhas) {
-    if (!porSecao.has(linha.secao_id)) {
-      porSecao.set(linha.secao_id, {
-        id: linha.secao_id,
-        sg_uf: linha.sg_uf,
-        cd_municipio_tse: linha.cd_municipio_tse,
-        nm_municipio: linha.nm_municipio,
-        nr_zona: linha.nr_zona,
-        nr_secao: linha.nr_secao,
-        nr_local_votacao: linha.nr_local_votacao,
-        aptos: toNumberOrNull(linha.qt_aptos),
-        validos: 0,
-        candidatos: [],
-      });
-    }
-    const secao = porSecao.get(linha.secao_id);
-    const votos = toNumberOrNull(linha.votos);
-    if (votos === null) continue;
-    if (linha.categoria === 'nominal' || linha.categoria === 'legenda') {
-      secao.validos += votos;
-    }
-    if (linha.categoria === 'nominal') {
-      secao.candidatos.push({
-        nr_votavel: linha.nr_votavel,
-        nm_votavel: linha.nm_votavel,
-        sg_partido: linha.sg_partido,
-        qt_votos: votos,
-      });
-    }
-  }
-
-  const secoes = [...porSecao.values()].map((s) => ({
-    id: s.id,
-    sg_uf: s.sg_uf,
-    cd_municipio_tse: s.cd_municipio_tse,
-    nm_municipio: s.nm_municipio,
-    nr_zona: s.nr_zona,
-    nr_secao: s.nr_secao,
-    nr_local_votacao: s.nr_local_votacao,
-    qt_aptos: s.aptos,
-    qt_votos_validos: s.validos,
-    candidatos: s.candidatos,
-  }));
-
+  const secoes = await secoesPelaMv(db, { eleicaoId, cargo, corte: corte ?? { tipo: 'final' }, escopo });
   return concentracaoPura(secoes, { top: limite, ordenacaoShare, ordenacaoMargem });
 }
