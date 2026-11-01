@@ -171,7 +171,7 @@ export function localOutlierFactor(dados, { k = 10, limiar = 2 } = {}) {  const 
   return { scores, k: vizinhosK, limiar }
 }
 
-export function amostraLof(total, scores, limite = 2000, semente = 42) {
+export function amostraLof(total, scores, limite = 5000, semente = 42) {
   if (total <= limite) return Array.from({ length: total }, (_, indice) => indice)
 
   const rng = mulberry32(semente)
