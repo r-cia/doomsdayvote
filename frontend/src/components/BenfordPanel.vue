@@ -15,12 +15,13 @@ const props = defineProps({
   error: { type: String, default: '' },
   niveis: { type: Object, default: null },
   niveisCarregando: { type: Boolean, default: false },
+  niveisError: { type: String, default: '' },
   ordenacao: { type: Object, default: () => useOrdenacao() },
 })
 
 const { alternar, ariaSort, seta } = props.ordenacao
 
-const emit = defineEmits(['select', 'retry'])
+const emit = defineEmits(['select', 'retry', 'retry-niveis'])
 
 const minimo = computed(() => props.dados?.minimo_votos ?? 10)
 const candidatos = computed(() => props.dados?.candidatos ?? [])
@@ -96,6 +97,14 @@ function formatarMad(valor) {
             v-if="nivelAtivo !== 'secao' && niveisCarregando && !dadosDoNivel"
             estado="carregando"
             :titulo="$t('comum.carregando')"
+          />
+          <StateBlock
+            v-else-if="nivelAtivo !== 'secao' && niveisError"
+            estado="erro"
+            :titulo="$t('comum.erro')"
+            :descricao="niveisError"
+            :acao="$t('comum.tentarNovamente')"
+            @acao="emit('retry-niveis')"
           />
           <BenfordFaixa
             v-else-if="dadosDoNivel"

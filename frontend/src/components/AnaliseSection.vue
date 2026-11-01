@@ -37,20 +37,22 @@ const emit = defineEmits(['retry', 'retry-benford', 'select'])
       @acao="emit('retry')"
     />
 
-    <template v-else>
-      <BenfordPanel
-        :dados="benford"
-        :selecionado="selecionado"
-        :loading="benfordLoading"
-        :atualizando="benfordAtualizando"
-        :error="benfordError"
-        :niveis="anomalias?.benford_niveis ?? null"
-        :niveis-carregando="loading"
-        :ordenacao="ordenacoes.benford"
-        @select="emit('select', $event)"
-        @retry="emit('retry-benford')"
-      />
+    <BenfordPanel
+      :dados="benford"
+      :selecionado="selecionado"
+      :loading="benfordLoading"
+      :atualizando="benfordAtualizando"
+      :error="benfordError"
+      :niveis="anomalias?.benford_niveis ?? null"
+      :niveis-carregando="loading"
+      :niveis-error="error"
+      :ordenacao="ordenacoes.benford"
+      @select="emit('select', $event)"
+      @retry="emit('retry-benford')"
+      @retry-niveis="emit('retry')"
+    />
 
+    <template v-if="!error">
       <template v-if="anomalias">
         <BenfordNiveisPanel :dados="anomalias.benford_niveis" :atualizando="atualizando" :ordenacao="ordenacoes.niveis" />
         <div class="auditoria-grade">

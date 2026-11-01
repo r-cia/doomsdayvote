@@ -96,6 +96,25 @@ describe('BenfordPanel: gráfico por nível', () => {
     expect(wrapper.findAll('rect.benford-faixa__faixa').filter((item) => item.attributes('x'))).toHaveLength(0)
   })
 
+  it('com erro nas anomalias, zona e município mostram o erro com nova tentativa e a seção segue no gráfico', async () => {
+    const wrapper = mount(BenfordPanel, { props: { dados, niveis: null, niveisError: 'Falha ao consultar a API (500)' } })
+    const botoes = wrapper.findAll('.segmented button')
+
+    expect(wrapper.find('.benford__visual [role="alert"]').exists()).toBe(false)
+    expect(wrapper.findAll('rect.benford-faixa__barra').length).toBeGreaterThan(0)
+
+    await botoes[1].trigger('click')
+    const alerta = wrapper.get('.benford__visual [role="alert"]')
+    expect(alerta.text()).toContain('Falha ao consultar a API (500)')
+    expect(wrapper.text()).not.toContain('Sem dados.')
+
+    await alerta.get('button').trigger('click')
+    expect(wrapper.emitted('retry-niveis')).toHaveLength(1)
+
+    await botoes[2].trigger('click')
+    expect(wrapper.get('.benford__visual [role="alert"]').exists()).toBe(true)
+  })
+
   it('mostra carregando enquanto as anomalias não chegam e vazio quando não há nível', async () => {
     const carregando = mount(BenfordPanel, { props: { dados, niveis: null, niveisCarregando: true } })
     await carregando.findAll('.segmented button')[1].trigger('click')
