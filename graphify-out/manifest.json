@@ -132,15 +132,15 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/duplicacao.js": {
-    "mtime": 1793480166.4930518,
-    "seen": 1793480618.0508153,
-    "ast_hash": "72cec734b534f51c892e7b19f5c16724",
+    "mtime": 1793501521.0044105,
+    "seen": 1793503233.8108692,
+    "ast_hash": "8107fa0d490b941d082806e07dd9a25b",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/estatisticas.js": {
-    "mtime": 1793480166.0440466,
-    "seen": 1793480618.050821,
-    "ast_hash": "9418decda1a44ecdf6b42d846093693b",
+    "mtime": 1793501945.5541823,
+    "seen": 1793503233.8108823,
+    "ast_hash": "b55cab1d23c949bcd00627cbd4764d84",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/outliers.js": {
@@ -1002,15 +1002,15 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/comparacao-local.js": {
-    "mtime": 1793480166.1860483,
-    "seen": 1793480618.0508077,
-    "ast_hash": "dbeb3979112bd84743826a38fd457da5",
+    "mtime": 1793502803.7982323,
+    "seen": 1793503233.8108504,
+    "ast_hash": "5a5d912b97c3cd98d0d6845d76b11266",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/concentracao.js": {
-    "mtime": 1793480166.33205,
-    "seen": 1793480618.0508099,
-    "ast_hash": "eb030ea826650fdc0ea1442d61ded4e1",
+    "mtime": 1793502394.1712415,
+    "seen": 1793503233.8108554,
+    "ast_hash": "79629ff1301a10bdbde1ce3e39524f78",
     "semantic_hash": ""
   },
   "backend/tests/integration/comparacao-local.test.js": {
@@ -1056,9 +1056,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793499145.3496027,
-    "seen": 1793500927.720965,
-    "ast_hash": "9e6fc67a2eb64574541153cc852debc7",
+    "mtime": 1793502804.026235,
+    "seen": 1793503233.8116806,
+    "ast_hash": "e1b92d8a22e240542d057c43586653cc",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
@@ -1080,9 +1080,9 @@
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/estatisticas.test.js": {
-    "mtime": 1793373161.0312822,
-    "seen": 1793373217.6448612,
-    "ast_hash": "19b7e4b0f779d4dd48c38998a979a934",
+    "mtime": 1793501956.3333402,
+    "seen": 1793503233.811247,
+    "ast_hash": "04a79c785c2e40f5fdc6a63407526266",
     "semantic_hash": ""
   },
   ".codex/hooks.json": {
@@ -1188,9 +1188,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/mv-secao-candidato.js": {
-    "mtime": 1793413758.0504355,
-    "seen": 1793419495.4580152,
-    "ast_hash": "266464b53ead0e8c9c8d80e84e738951",
+    "mtime": 1793502803.9132338,
+    "seen": 1793503233.8108864,
+    "ast_hash": "9f6fa4202734393d7ac2e5bf256279cb",
     "semantic_hash": ""
   },
   "backend/tests/integration/mv-secao-candidato.test.js": {
@@ -1326,9 +1326,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/CurvasAnos.vue": {
-    "mtime": 1793500850.4121003,
-    "seen": 1793500927.7208443,
-    "ast_hash": "7997295f6e4d43607b9e996df1b7e926",
+    "mtime": 1793502190.3555987,
+    "seen": 1793503233.8114116,
+    "ast_hash": "83c0acebb3f90c146e9e5b341eed0106",
     "semantic_hash": ""
   },
   "frontend/src/views/EntreAnosView.vue": {
@@ -1338,21 +1338,21 @@
     "semantic_hash": ""
   },
   "frontend/tests/entre-anos.test.js": {
-    "mtime": 1793500878.8584144,
-    "seen": 1793500927.7209246,
-    "ast_hash": "8c1ad1e369599bfa9cd61e61c4c16c93",
+    "mtime": 1793502190.674603,
+    "seen": 1793503233.811594,
+    "ast_hash": "20302c98e2411ea0db84bea5d532439a",
     "semantic_hash": ""
   },
   "docs/design-system/entre-anos.md": {
-    "mtime": 1793474256.8827405,
-    "seen": 1793474264.2406855,
-    "ast_hash": "c396920fcc9535857ec7336f08f588e8",
+    "mtime": 1793500928.6179628,
+    "seen": 1793503233.8117113,
+    "ast_hash": "765dd531416be51c3b9b593b91a3f272",
     "semantic_hash": ""
   },
   "frontend/src/lib/entre-anos.js": {
-    "mtime": 1793500850.5591018,
-    "seen": 1793500927.720892,
-    "ast_hash": "ede958c31666fbaa4c6e38d6e9acbc4d",
+    "mtime": 1793502178.630442,
+    "seen": 1793503233.8115208,
+    "ast_hash": "b4bb59fd29420327a56030cc8b55113a",
     "semantic_hash": ""
   },
   "backend/src/migrations/0011_sg_partido_2014.js": {
@@ -1431,6 +1431,12 @@
     "mtime": 1793496962.7482603,
     "seen": 1793498114.3475614,
     "ast_hash": "40654fc31cb8fe72a565e2603995c383",
+    "semantic_hash": ""
+  },
+  "backend/tests/integration/mv-compacto.test.js": {
+    "mtime": 1793501969.4465308,
+    "seen": 1793503233.8111606,
+    "ast_hash": "30c79303af39cc4a489e9f529da1f0f2",
     "semantic_hash": ""
   }
 }

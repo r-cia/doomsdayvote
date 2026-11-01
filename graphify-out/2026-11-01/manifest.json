@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/consistencia.js": {
-    "mtime": 1793453447.7716467,
-    "seen": 1793461606.9739654,
-    "ast_hash": "bba18f95253e07c5c46650a4d612982b",
+    "mtime": 1793500313.7430246,
+    "seen": 1793500927.7205884,
+    "ast_hash": "6a50b2d7506900cb8d624bab445cd0c2",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/descritivas.js": {
@@ -366,9 +366,9 @@
     "semantic_hash": ""
   },
   "backend/tests/integration/consistencia.test.js": {
-    "mtime": 1793395017.1522694,
-    "seen": 1793395538.2130647,
-    "ast_hash": "d81a6056eda80fd7307de1e82494582a",
+    "mtime": 1793499221.7684674,
+    "seen": 1793500927.7207057,
+    "ast_hash": "30df2f61b1083a60e2fafab0d6b390de",
     "semantic_hash": ""
   },
   "backend/tests/integration/corte.test.js": {
@@ -948,9 +948,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793469886.1546743,
-    "seen": 1793470272.9623196,
-    "ast_hash": "25d37f6e2f7a3725580c74fc156cda56",
+    "mtime": 1793499145.8116078,
+    "seen": 1793500927.720963,
+    "ast_hash": "c0f434aa28753ae767fa6c6673e6294c",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -1056,9 +1056,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793469886.400677,
-    "seen": 1793470272.9623225,
-    "ast_hash": "621249c73c96c66322a9818dbaa898cd",
+    "mtime": 1793499145.3496027,
+    "seen": 1793500927.720965,
+    "ast_hash": "9e6fc67a2eb64574541153cc852debc7",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
@@ -1242,9 +1242,9 @@
     "semantic_hash": ""
   },
   "backend/src/routes/analise.js": {
-    "mtime": 1793461221.5967023,
-    "seen": 1793461606.9740322,
-    "ast_hash": "0a443c3db40df9beb540007ae56704c1",
+    "mtime": 1793499121.095326,
+    "seen": 1793500927.7206576,
+    "ast_hash": "883ef91e669f655ce76a300b426f7a6d",
     "semantic_hash": ""
   },
   "backend/src/routes/apuracao.js": {
@@ -1326,9 +1326,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/CurvasAnos.vue": {
-    "mtime": 1793474211.5002544,
-    "seen": 1793474264.2405555,
-    "ast_hash": "4044bb86130609efc98a2e219de48566",
+    "mtime": 1793500850.4121003,
+    "seen": 1793500927.7208443,
+    "ast_hash": "7997295f6e4d43607b9e996df1b7e926",
     "semantic_hash": ""
   },
   "frontend/src/views/EntreAnosView.vue": {
@@ -1338,9 +1338,9 @@
     "semantic_hash": ""
   },
   "frontend/tests/entre-anos.test.js": {
-    "mtime": 1793474242.3215845,
-    "seen": 1793474264.2406414,
-    "ast_hash": "42fa814e74f0fcb154e3e88e52eaa620",
+    "mtime": 1793500878.8584144,
+    "seen": 1793500927.7209246,
+    "ast_hash": "8c1ad1e369599bfa9cd61e61c4c16c93",
     "semantic_hash": ""
   },
   "docs/design-system/entre-anos.md": {
@@ -1350,9 +1350,9 @@
     "semantic_hash": ""
   },
   "frontend/src/lib/entre-anos.js": {
-    "mtime": 1793474211.7172568,
-    "seen": 1793474264.2406082,
-    "ast_hash": "793527e465e1ddd23241276d859d924e",
+    "mtime": 1793500850.5591018,
+    "seen": 1793500927.720892,
+    "ast_hash": "ede958c31666fbaa4c6e38d6e9acbc4d",
     "semantic_hash": ""
   },
   "backend/src/migrations/0011_sg_partido_2014.js": {
