@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { CORES_PADRAO, dominioLog, margemEsquerda } from '../lib/entre-anos'
+import { CORES_PADRAO, DOMINIO_X, dominioLog, margemEsquerda } from '../lib/entre-anos'
 import { formatarDecimal, formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
@@ -29,8 +29,12 @@ onBeforeUnmount(() => observador?.disconnect())
 
 const log = computed(() => props.escala === 'log')
 
+const dentroDoDominio = (ponto) => ponto.minuto >= DOMINIO_X.min && ponto.minuto <= DOMINIO_X.max
+
 const valores = computed(() =>
-  props.series.flatMap((serie) => serie.pontos.map((ponto) => ponto.valor)).filter((valor) => valor !== null),
+  props.series
+    .flatMap((serie) => serie.pontos.filter(dentroDoDominio).map((ponto) => ponto.valor))
+    .filter((valor) => valor !== null),
 )
 
 const dominioY = computed(() => {
@@ -55,15 +59,11 @@ function formatarY(valor) {
 
 const margemEsq = computed(() => margemEsquerda(dominioY.value.marcas.map(formatarY)))
 
-const limitesX = computed(() => {
-  const minutos = props.series.flatMap((serie) => serie.pontos.map((ponto) => ponto.minuto))
-  if (minutos.length === 0) return { min: 0, max: 1 }
-  return { min: Math.min(...minutos), max: Math.max(...minutos) }
-})
+const limitesX = DOMINIO_X
 
 const x = (minuto) =>
   margemEsq.value +
-  ((minuto - limitesX.value.min) / Math.max(1, limitesX.value.max - limitesX.value.min)) *
+  ((minuto - limitesX.min) / (limitesX.max - limitesX.min)) *
     (largura.value - margemEsq.value - MARGEM.dir)
 
 function y(valor) {
@@ -83,9 +83,8 @@ const horaDe = (minuto) => {
 
 const marcasX = computed(() => {
   const marcas = []
-  const inicio = Math.ceil(limitesX.value.min / 60) * 60
-  const passo = Math.ceil((limitesX.value.max - inicio) / 60 / 8) * 60 || 60
-  for (let minuto = inicio; minuto <= limitesX.value.max; minuto += passo) marcas.push(minuto)
+  const passo = largura.value >= 520 ? 60 : 120
+  for (let minuto = limitesX.min; minuto <= limitesX.max; minuto += passo) marcas.push(minuto)
   return marcas
 })
 
@@ -96,6 +95,7 @@ const linhaZero = computed(
 function caminhoDe(pontos) {
   let anterior = false
   return pontos
+    .filter(dentroDoDominio)
     .map((ponto) => {
       if (!desenhavel(ponto.valor)) {
         anterior = false

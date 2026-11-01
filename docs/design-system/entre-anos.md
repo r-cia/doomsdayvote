@@ -23,6 +23,8 @@ Cores e traços (`lib/entre-anos.js`):
 - Mesmo candidato em anos diferentes no mesmo gráfico: mesma cor, traço fixo por ano (`TRACOS_ANOS`: contínuo, `8 4`, `2 3`, `10 3 2 3`, `4 4`, `1 3`), na ordem crescente dos anos selecionados e igual em todos os gráficos. O ano aparece na legenda (`ano · candidato (partido)`) com a amostra da cor e do traço.
 - Gráficos de diferença: paleta própria, disjunta da dos candidatos (`PALETA_DIFERENCAS`: `#ff7ac6`, `#2ed3c4`, `#f2efe4`, `#c4e04a`, `#d98c5f`, `#8f9bff`), uma cor por par de anos (pares em ordem crescente), igual em todos os gráficos de diferença, traço contínuo.
 
+Eixo X fixo: todos os gráficos (curvas sobrepostas e diferenças, nas duas abas de turno) usam o domínio `DOMINIO_X` de `lib/entre-anos.js`, 15:00 até 03:00 do dia seguinte (`minuto` de 900 a 1620, minutos desde 00:00 do dia do pleito em -03), qualquer que seja a faixa dos dados. É só exibição: a API, as correlações e os p-valores não mudam. Pontos fora do domínio não são desenhados (recorte, sem reescalar) e não entram na escala do eixo Y. Os rótulos continuam HH:MM, de hora em hora (de duas em duas horas em largura menor que 520px); depois da meia-noite são as horas do dia seguinte (00:00, 01:00, 02:00, 03:00).
+
 A margem esquerda do SVG é calculada pelo maior rótulo do eixo Y, para que nenhum rótulo seja cortado.
 
 ## Tabela de correlação

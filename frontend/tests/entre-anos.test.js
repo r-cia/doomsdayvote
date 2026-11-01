@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import CurvasAnos from '../src/components/CurvasAnos.vue'
 import {
+  DOMINIO_X,
   diferenca,
   PALETA_CANDIDATOS,
   PALETA_DIFERENCAS,
@@ -133,9 +134,9 @@ describe('CurvasAnos', () => {
             chave: 'a',
             rotulo: 'a',
             pontos: [
-              { minuto: 0, valor: 10 },
-              { minuto: 5, valor: 0 },
-              { minuto: 10, valor: 5000 },
+              { minuto: 1000, valor: 10 },
+              { minuto: 1005, valor: 0 },
+              { minuto: 1010, valor: 5000 },
             ],
           },
         ],
@@ -152,7 +153,7 @@ describe('CurvasAnos', () => {
     const wrapper = mount(CurvasAnos, {
       props: {
         titulo: 't',
-        series: [{ chave: 'a', rotulo: '2022 · LULA', cor: '#123456', tracejado: '8 4', pontos: [{ minuto: 0, valor: 1 }, { minuto: 5, valor: 2 }] }],
+        series: [{ chave: 'a', rotulo: '2022 · LULA', cor: '#123456', tracejado: '8 4', pontos: [{ minuto: 1000, valor: 1 }, { minuto: 1005, valor: 2 }] }],
       },
     })
 
@@ -167,7 +168,7 @@ describe('CurvasAnos', () => {
       props: {
         titulo: 't',
         formato: 'pontos',
-        series: [{ chave: 'd', rotulo: '2018 − 2022', pontos: [{ minuto: 0, valor: -3 }, { minuto: 5, valor: 4 }] }],
+        series: [{ chave: 'd', rotulo: '2018 − 2022', pontos: [{ minuto: 1000, valor: -3 }, { minuto: 1005, valor: 4 }] }],
       },
     })
 
@@ -178,5 +179,48 @@ describe('CurvasAnos', () => {
     const wrapper = mount(CurvasAnos, { props: { titulo: 't', series } })
 
     expect(wrapper.text()).toContain('17:00')
+  })
+
+  it('o eixo x é fixo de 15:00 a 03:00 do dia seguinte, qualquer que seja a faixa dos dados', () => {
+    expect(DOMINIO_X).toEqual({ min: 900, max: 1620 })
+
+    const cedo = mount(CurvasAnos, {
+      props: { titulo: 't', series: [{ chave: 'a', rotulo: 'a', pontos: [{ minuto: 1000, valor: 1 }, { minuto: 1010, valor: 2 }] }] },
+    })
+    const tarde = mount(CurvasAnos, {
+      props: { titulo: 't', series: [{ chave: 'a', rotulo: 'a', pontos: [{ minuto: 1000, valor: 9 }, { minuto: 1500, valor: 3 }] }] },
+    })
+    const xInicial = (wrapper) => wrapper.get('path').attributes('d').match(/^M([\d.]+)/)[1]
+    expect(xInicial(cedo)).toBe(xInicial(tarde))
+
+    for (const wrapper of [cedo, tarde]) {
+      const rotulos = wrapper.findAll('.curvas__grade text').map((item) => item.text())
+      expect(rotulos).toContain('15:00')
+      expect(rotulos).toContain('03:00')
+    }
+    const horas = cedo.findAll('.curvas__grade text').map((item) => item.text())
+    expect(horas).toEqual(expect.arrayContaining(['23:00', '00:00', '01:00', '02:00']))
+  })
+
+  it('pontos fora de 15:00–03:00 não são desenhados nem alteram a escala', () => {
+    const wrapper = mount(CurvasAnos, {
+      props: {
+        titulo: 't',
+        series: [
+          {
+            chave: 'a',
+            rotulo: 'a',
+            pontos: [
+              { minuto: 800, valor: 1000000 },
+              { minuto: 1000, valor: 5 },
+              { minuto: 1700, valor: 1000000 },
+            ],
+          },
+        ],
+      },
+    })
+
+    expect(wrapper.get('path').attributes('d').match(/[ML]/g)).toHaveLength(1)
+    expect(wrapper.text()).not.toContain('1.000.000')
   })
 })
