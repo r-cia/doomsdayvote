@@ -23,10 +23,11 @@ export async function preencherSiglaExterior(db) {
   `.execute(db);
 }
 
+// REFRESH sem CONCURRENTLY bloqueia as leituras da API durante todo o refresh, que leva minutos no HDD.
 async function atualizarViews(db) {
-  await sql`refresh materialized view mv_votos_final`.execute(db);
-  await sql`refresh materialized view mv_totais_area`.execute(db);
-  await sql`refresh materialized view mv_secao_candidato_final`.execute(db);
+  await sql`refresh materialized view concurrently mv_votos_final`.execute(db);
+  await sql`refresh materialized view concurrently mv_totais_area`.execute(db);
+  await sql`refresh materialized view concurrently mv_secao_candidato_final`.execute(db);
 }
 
 export async function up(db) {
