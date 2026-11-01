@@ -78,6 +78,7 @@ function municipio(secao) {
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('share_lider')"><button type="button" @click="alternarShare('share_lider')">{{ $t('analiseUI.participacaoLider') }}{{ setaShare('share_lider') }}</button></th>
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('margem_absoluta')"><button type="button" @click="alternarShare('margem_absoluta')">{{ $t('analiseUI.margemVotos') }}{{ setaShare('margem_absoluta') }}</button></th>
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSortShare('share_lider_percentil')"><button type="button" @click="alternarShare('share_lider_percentil')">{{ $t('analiseUI.percentil') }}{{ setaShare('share_lider_percentil') }}</button></th>
+                <th scope="col">{{ $t('tabela.candidato') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -90,6 +91,7 @@ function municipio(secao) {
                 <td class="num">{{ percentualRazao(item.share_lider) }}</td>
                 <td class="num">{{ formatarNumero(item.margem_absoluta) }}</td>
                 <td class="num">{{ percentual(item.contexto?.share_lider_percentil) }}</td>
+                <td>{{ item.lider?.nm_votavel || '—' }}</td>
               </tr>
             </tbody>
           </table>
@@ -112,6 +114,7 @@ function municipio(secao) {
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('margem_absoluta')"><button type="button" @click="alternarMargem('margem_absoluta')">{{ $t('analiseUI.margemVotos') }}{{ setaMargem('margem_absoluta') }}</button></th>
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('margem_pp')"><button type="button" @click="alternarMargem('margem_pp')">{{ $t('analiseUI.margemPontos') }}{{ setaMargem('margem_pp') }}</button></th>
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSortMargem('share_lider')"><button type="button" @click="alternarMargem('share_lider')">{{ $t('analiseUI.participacaoLider') }}{{ setaMargem('share_lider') }}</button></th>
+                <th scope="col">{{ $t('tabela.candidato') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -124,6 +127,7 @@ function municipio(secao) {
                 <td class="num">{{ formatarNumero(item.margem_absoluta) }}</td>
                 <td class="num">{{ pontosPercentuais(item.margem_pp) }}</td>
                 <td class="num">{{ percentualRazao(item.share_lider) }}</td>
+                <td>{{ item.lider?.nm_votavel || '—' }}</td>
               </tr>
             </tbody>
           </table>
