@@ -1,3 +1,4 @@
+import { watch } from 'vue'
 import { createI18n } from 'vue-i18n'
 import ptBR from './locales/pt-BR.json'
 import enUS from './locales/en-US.json'
@@ -25,6 +26,15 @@ const i18n = createI18n({
     'es-ES': esES,
   },
 })
+
+watch(
+  i18n.global.locale,
+  (locale) => {
+    document.documentElement.lang = locale
+    document.title = i18n.global.t('app.tituloDocumento')
+  },
+  { immediate: true },
+)
 
 export function definirLocale(locale) {
   if (!SUPORTADOS.includes(locale)) return

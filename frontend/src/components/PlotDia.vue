@@ -338,6 +338,8 @@ watch(
   () => animar(),
   { deep: true },
 )
+
+watch(locale, () => desenhar())
 </script>
 
 <template>
