@@ -34,7 +34,8 @@ function distribuicaoMonteCarlo(n) {
     acumuladas.push(acumulado)
   }
 
-  const mads = Array.from({ length: SIMULACOES_BENFORD }, () => {
+  const proporcoes = DIGITOS.map(() => new Float64Array(SIMULACOES_BENFORD))
+  const mads = Array.from({ length: SIMULACOES_BENFORD }, (_, simulacao) => {
     const observadas = Array(9).fill(0)
     for (let indice = 0; indice < n; indice += 1) {
       const sorteio = aleatorio()
@@ -47,6 +48,9 @@ function distribuicaoMonteCarlo(n) {
       }
       observadas[inicio] += 1
     }
+    observadas.forEach((quantidade, indice) => {
+      proporcoes[indice][simulacao] = quantidade / n
+    })
     return observadas.reduce(
       (total, quantidade, indice) =>
         total + Math.abs(quantidade / n - ESPERADO_BENFORD[indice]),
@@ -54,16 +58,28 @@ function distribuicaoMonteCarlo(n) {
     ) / DIGITOS.length
   }).sort((a, b) => a - b)
 
-  distribuicoesMonteCarlo.set(n, mads)
+  const posicaoInferior = Math.ceil(0.025 * SIMULACOES_BENFORD) - 1
+  const posicaoSuperior = Math.ceil(0.975 * SIMULACOES_BENFORD) - 1
+  const faixa = proporcoes.map((valores, indice) => {
+    valores.sort()
+    return {
+      digito: DIGITOS[indice],
+      p025: valores[posicaoInferior] * 100,
+      p975: valores[posicaoSuperior] * 100,
+    }
+  })
+
+  const distribuicao = { mads, faixa }
+  distribuicoesMonteCarlo.set(n, distribuicao)
   // shortcut: 64 tamanhos limitam o cache a ~5 MB; elevar se uma resposta repetir n após a 64ª chave.
   if (distribuicoesMonteCarlo.size > 64) {
     distribuicoesMonteCarlo.delete(distribuicoesMonteCarlo.keys().next().value)
   }
-  return mads
+  return distribuicao
 }
 
 function pValorMonteCarlo(n, mad) {
-  const mads = distribuicaoMonteCarlo(n)
+  const { mads } = distribuicaoMonteCarlo(n)
   let inicio = 0
   let fim = mads.length
   while (inicio < fim) {
@@ -105,7 +121,7 @@ export function calcularBenford(contagens = []) {
       n: 0,
       mad: null,
       classificacao: null,
-      monte_carlo: { simulacoes: SIMULACOES_BENFORD, p_valor: null },
+      monte_carlo: { simulacoes: SIMULACOES_BENFORD, p_valor: null, faixa_digitos: null },
       digitos: DIGITOS.map((digito, indice) => ({
         digito,
         observado: 0,
@@ -127,7 +143,11 @@ export function calcularBenford(contagens = []) {
     n,
     mad,
     classificacao: classificarMad(mad),
-    monte_carlo: { simulacoes: SIMULACOES_BENFORD, p_valor: pValorMonteCarlo(n, mad) },
+    monte_carlo: {
+      simulacoes: SIMULACOES_BENFORD,
+      p_valor: pValorMonteCarlo(n, mad),
+      faixa_digitos: distribuicaoMonteCarlo(n).faixa,
+    },
     digitos: DIGITOS.map((digito, indice) => ({
       digito,
       observado: observadas[indice],

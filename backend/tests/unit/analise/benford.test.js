@@ -92,6 +92,33 @@ describe('calcularBenford', () => {
     expect(soma).toBeCloseTo(1, 10);
   });
 
+  it('devolve a faixa de 95% por dígito, em percentual, determinística e ordenada', () => {
+    const valores = Array.from({ length: 300 }, (_, indice) => 10 + indice);
+    const { monte_carlo: primeira, digitos } = calcularBenford(valores);
+    const { monte_carlo: segunda } = calcularBenford(valores);
+
+    expect(primeira.faixa_digitos).toEqual(segunda.faixa_digitos);
+    expect(primeira.faixa_digitos.map((faixa) => faixa.digito)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    primeira.faixa_digitos.forEach((faixa, indice) => {
+      expect(faixa.p025).toBeLessThan(faixa.p975);
+      expect(faixa.p025).toBeLessThan(digitos[indice].esperado_percentual);
+      expect(faixa.p975).toBeGreaterThan(digitos[indice].esperado_percentual);
+      expect(faixa.p025).toBeGreaterThanOrEqual(0);
+      expect(faixa.p975).toBeLessThanOrEqual(100);
+    });
+  });
+
+  it('a faixa estreita quando n cresce', () => {
+    const faixa = (n) => calcularBenford(Array.from({ length: n }, (_, indice) => 10 + indice)).monte_carlo.faixa_digitos[0];
+    const pequena = faixa(100);
+    const grande = faixa(2000);
+    expect(grande.p975 - grande.p025).toBeLessThan(pequena.p975 - pequena.p025);
+  });
+
+  it('não há faixa quando n é zero', () => {
+    expect(calcularBenford([]).monte_carlo.faixa_digitos).toBeNull();
+  });
+
   it('reproduz o mesmo p-valor para o mesmo n e distribuição', () => {
     const valores = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     expect(calcularBenford(valores).monte_carlo).toEqual(

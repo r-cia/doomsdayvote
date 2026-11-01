@@ -42,6 +42,7 @@ describe('benfordDosNiveis', () => {
       expect(nivel.monte_carlo.simulacoes).toBe(10_000);
       expect(nivel.monte_carlo.p_valor).toBeGreaterThan(0);
       expect(nivel.monte_carlo.p_valor).toBeLessThanOrEqual(1);
+      expect(nivel.monte_carlo.faixa_digitos).toHaveLength(9);
     }
   });
 
