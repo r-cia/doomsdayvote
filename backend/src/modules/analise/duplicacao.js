@@ -1,7 +1,7 @@
 import { sql } from 'kysely'
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js'
 import { ordenarLista } from '../../lib/ordenacao.js'
-import { agruparPorSecao, linhasMvSecaoCandidato } from './mv-secao-candidato.js'
+import { expandirSecao, secoesCompactas } from './mv-secao-candidato.js'
 
 function chaveZona(secao) {
   return `${secao.sg_uf}|${secao.cd_municipio_tse}|${secao.nr_zona}`
@@ -134,8 +134,9 @@ function vencedorDaSecao(grupo) {
 }
 
 async function duplicacaoPelaMv(db, { eleicaoId, cargo, escopo, limite, ordenacao }) {
-  const linhasMv = await linhasMvSecaoCandidato(db, { eleicaoId, cargo, escopo })
-  const linhas = [...agruparPorSecao(linhasMv).values()].map((grupo) => {
+  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, escopo })
+  const linhas = secoes.map((secao) => {
+    const grupo = expandirSecao(secao, votaveis)
     const primeira = grupo[0]
     const vencedor = vencedorDaSecao(grupo)
     return {
