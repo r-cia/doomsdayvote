@@ -1,5 +1,13 @@
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, te } = useI18n()
+
+function rotulo(campo) {
+  const chave = `cobertura.campos.${campo}`
+  return te(chave) ? t(chave) : campo
+}
 
 const props = defineProps({
   cobertura: { type: Object, default: null },
@@ -29,7 +37,7 @@ const entradas = computed(() => {
         :key="chave"
         class="cobertura-block__item"
       >
-        <dt>{{ chave }}</dt>
+        <dt>{{ rotulo(chave) }}</dt>
         <dd>
           {{
             typeof valor === 'object' && valor !== null

@@ -76,6 +76,18 @@
     "governadorPorEstado": "Los resultados de gobernador son específicos de cada estado.",
     "filtrosNaoInformados": "Filtros no informados"
   },
+  "cobertura": {
+    "campos": {
+      "consideradas": "Secciones consideradas",
+      "benford_abaixo_minimo": "Registros candidato-sección por debajo del mínimo (Benford)",
+      "duplicacao_grupos": "Grupos de duplicación",
+      "duplicacao_secoes": "Secciones en grupos de duplicación",
+      "duplicacao_secoes_escopo": "Secciones en el alcance de la duplicación",
+      "com_grupo": "Secciones con grupo",
+      "sem_grupo": "Secciones sin grupo",
+      "grupos": "Grupos"
+    }
+  },
   "unidade": {
     "candidato": "candidato | candidatos",
     "secao": "sección | secciones",

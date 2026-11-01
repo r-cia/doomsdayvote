@@ -76,6 +76,18 @@
     "governadorPorEstado": "Governor results are specific to each state.",
     "filtrosNaoInformados": "Filters not provided"
   },
+  "cobertura": {
+    "campos": {
+      "consideradas": "Sections considered",
+      "benford_abaixo_minimo": "Candidate-section records below the minimum (Benford)",
+      "duplicacao_grupos": "Duplication groups",
+      "duplicacao_secoes": "Sections in duplication groups",
+      "duplicacao_secoes_escopo": "Sections in the duplication scope",
+      "com_grupo": "Sections with group",
+      "sem_grupo": "Sections without group",
+      "grupos": "Groups"
+    }
+  },
   "unidade": {
     "candidato": "candidate | candidates",
     "secao": "section | sections",
