@@ -2,7 +2,7 @@ import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js';
 import { agruparSecoes } from './comparacao-local.js';
 import { ordenarLista } from '../../lib/ordenacao.js';
-import { agruparPorSecao, linhasMvSecaoCandidato } from './mv-secao-candidato.js';
+import { expandirSecao, secoesCompactas } from './mv-secao-candidato.js';
 import { criarPercentilRank, desvioPadrao, media, toNumberOrNull } from './estatistica-basica.js';
 
 export const COLUNAS_CONCENTRACAO = {
@@ -322,8 +322,9 @@ export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4
 }
 
 async function secoesPelaMv(db, { eleicaoId, cargo, escopo }) {
-  const linhas = await linhasMvSecaoCandidato(db, { eleicaoId, cargo, escopo, categorias: ['nominal', 'legenda'] });
-  return [...agruparPorSecao(linhas).values()].map((grupo) => {
+  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, escopo, categorias: ['nominal', 'legenda'] });
+  return secoes.map((secao) => {
+    const grupo = expandirSecao(secao, votaveis);
     const primeira = grupo[0];
     return {
       id: primeira.secao_id,
