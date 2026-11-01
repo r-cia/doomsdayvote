@@ -18,4 +18,24 @@ describe('CoberturaBlock', () => {
     await nextTick()
     expect(rotulos()).toEqual(['Sections considered', 'Sections with group', 'campo_novo'])
   })
+
+  it('formata números e mostra objetos aninhados como subitens rotulados, nunca como JSON', () => {
+    const wrapper = mount(CoberturaBlock, {
+      props: {
+        cobertura: {
+          consideradas: 1234567,
+          sem_campo_por_regra: { comparecimento_vs_votos: 3000, comparecimento_vs_aptos: 0 },
+          divergencias_por_regra: { biometria_vs_comparecimento: 12 },
+        },
+      },
+    })
+    const texto = wrapper.text()
+    expect(texto).toContain('1.234.567')
+    expect(texto).toContain('Sem campo por regra')
+    expect(texto).toContain('Comparecimento vs. soma dos votos')
+    expect(texto).toContain('3.000')
+    expect(texto).not.toMatch(/[{}"]/)
+    expect(wrapper.find('.painel-resumo').exists()).toBe(true)
+    expect(wrapper.findAll('.cobertura-block__sub')).toHaveLength(2)
+  })
 })

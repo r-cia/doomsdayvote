@@ -1327,6 +1327,76 @@ select {
   font-variant-numeric: tabular-nums;
 }
 
+.cobertura-block {
+  margin: 0;
+}
+
+.cobertura-block__item {
+  align-items: flex-start;
+}
+
+.cobertura-block__sub {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.cobertura-block__sub div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cobertura-block__sub dt {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 10px;
+}
+
+.cobertura-block__sub dd {
+  margin: 0;
+  color: var(--amber);
+}
+
+.avisos {
+  display: grid;
+  gap: 8px;
+}
+
+.versoes-lista {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.versao-item {
+  border-bottom: 1px dotted var(--paper-line);
+  padding-bottom: 8px;
+}
+
+.versao-item__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px 0;
+}
+
+.comparacao {
+  margin-top: 12px;
+}
+
+.mapa-tooltip dl {
+  margin: 0;
+}
+
+.mapa-tooltip dd {
+  margin: 0;
+}
+
 .grupos {
   display: grid;
   gap: 8px;

@@ -85,7 +85,12 @@
       "duplicacao_secoes_escopo": "Seções no escopo da duplicação",
       "com_grupo": "Seções com grupo",
       "sem_grupo": "Seções sem grupo",
-      "grupos": "Grupos"
+      "grupos": "Grupos",
+      "com_divergencia": "Seções com divergência",
+      "avaliadas": "Seções avaliadas",
+      "sem_divergencia": "Seções sem divergência",
+      "sem_campo_por_regra": "Sem campo por regra",
+      "divergencias_por_regra": "Divergências por regra"
     }
   },
   "unidade": {

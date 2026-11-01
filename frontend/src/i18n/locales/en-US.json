@@ -85,7 +85,12 @@
       "duplicacao_secoes_escopo": "Sections in the duplication scope",
       "com_grupo": "Sections with group",
       "sem_grupo": "Sections without group",
-      "grupos": "Groups"
+      "grupos": "Groups",
+      "com_divergencia": "Sections with discrepancies",
+      "avaliadas": "Sections assessed",
+      "sem_divergencia": "Sections without discrepancies",
+      "sem_campo_por_regra": "Missing field by rule",
+      "divergencias_por_regra": "Discrepancies by rule"
     }
   },
   "unidade": {

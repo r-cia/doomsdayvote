@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { formatarDataHora } from '../lib/format'
+import { formatarDataHora, formatarNumero } from '../lib/format'
 import StateBlock from './StateBlock.vue'
 import TabelaScroll from './TabelaScroll.vue'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -47,9 +47,9 @@ const comparacao = computed(() => props.dados?.comparacao ?? null)
             <div><dt>{{ $t('versoesBU.abertura') }}</dt><dd>{{ formatarDataHora(v.dt_abertura) }}</dd></div>
             <div><dt>{{ $t('versoesBU.encerramento') }}</dt><dd>{{ formatarDataHora(v.dt_encerramento) }}</dd></div>
             <div><dt>{{ $t('versoesBU.emissao') }}</dt><dd>{{ formatarDataHora(v.dt_emissao_bu) }}</dd></div>
-            <div><dt>{{ $t('versoesBU.aptos') }}</dt><dd>{{ v.qt_aptos ?? '—' }}</dd></div>
-            <div><dt>{{ $t('versoesBU.comparecimento') }}</dt><dd>{{ v.qt_comparecimento ?? '—' }}</dd></div>
-            <div><dt>{{ $t('versoesBU.abstencoes') }}</dt><dd>{{ v.qt_abstencoes ?? '—' }}</dd></div>
+            <div><dt>{{ $t('versoesBU.aptos') }}</dt><dd>{{ formatarNumero(v.qt_aptos) }}</dd></div>
+            <div><dt>{{ $t('versoesBU.comparecimento') }}</dt><dd>{{ formatarNumero(v.qt_comparecimento) }}</dd></div>
+            <div><dt>{{ $t('versoesBU.abstencoes') }}</dt><dd>{{ formatarNumero(v.qt_abstencoes) }}</dd></div>
             <div><dt>{{ $t('versoesBU.lote') }}</dt><dd>{{ v.lote?.nome_arquivo ?? '—' }}</dd></div>
             <div><dt>{{ $t('versoesBU.hashConteudo') }}</dt><dd class="mono">{{ v.conteudo_sha256 ?? '—' }}</dd></div>
           </dl>

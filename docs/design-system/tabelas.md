@@ -19,6 +19,12 @@ Todo bloco ligado a uma consulta (tabela, painel, gráfico, mapa) resolve o esta
 
 Quando mais de uma consulta alimenta o bloco, qualquer falha mostra o erro. Chamadas diretas à API (sem `useQuery`) guardam a mensagem de erro em um ref e não a trocam por lista vazia. Falha ao carregar a malha do mapa também é erro, não "Sem dados".
 
+## Blocos de resumo
+
+Contagens e totais de cobertura usam o estilo compartilhado `.painel-resumo` / `.painel-resumo__item` (`dt` rótulo, `dd` valor em âmbar, números formatados por `lib/format.js`), como em Consistência, Concentração, Comparação local e `CoberturaBlock`. Nunca lista, `dl` ou `ul` com o estilo padrão do navegador, e nunca JSON na tela: objeto aninhado vira subitens rotulados (`.cobertura-block__sub`), com rótulo de i18n e, para chave desconhecida, o nome bruto.
+
+Guarda permanente: `tests/estilo-classes.test.js` falha se um `ul`, `ol`, `dl`, `li`, `div`, `section` ou similar usar uma classe sem regra em `styles.css` (ou `<style>` de componente), se uma lista não tiver classe nem seletor de descendente no CSS, ou se um template tiver `JSON.stringify`. Raízes de bloco BEM que só estilizam os filhos ficam na lista `PERMITIDAS` do teste.
+
 ## Valor nulo
 
 Valor nulo ou ausente em célula ou painel é exibido como travessão (`—`) em todas as telas. Use os formatadores de `frontend/src/lib/format.js` (`formatarNumero`, `formatarDecimal`, `formatarPercentual`, etc.), que já devolvem `—` para nulo, indefinido, vazio ou não numérico; painéis não definem helper próprio com outra regra. Zero é exibido como `0`.
