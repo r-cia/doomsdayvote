@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "backend/src/modules/analise/benford.js": {
-    "mtime": 1793507207.461023,
-    "seen": 1793507220.266264,
-    "ast_hash": "70d29538c050bfca64596e8309512b4a",
+    "mtime": 1793542087.2030034,
+    "seen": 1793542685.4499786,
+    "ast_hash": "256f63f89014374a9b74dbb31e00ccb2",
     "semantic_hash": ""
   },
   "backend/src/modules/analise/consistencia.js": {
@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/benford.test.js": {
-    "mtime": 1793507079.142516,
-    "seen": 1793507162.0655916,
-    "ast_hash": "4e7cb64f640eaea59976b8c565728c5f",
+    "mtime": 1793542095.191962,
+    "seen": 1793542685.450311,
+    "ast_hash": "b08268e60677ab28601b739bcaa6a8e2",
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/consistencia.test.js": {
@@ -486,9 +486,9 @@
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/niveis.test.js": {
-    "mtime": 1793507138.621215,
-    "seen": 1793507162.0656211,
-    "ast_hash": "076019fd55d9b3cfe2e252de91cd1931",
+    "mtime": 1793542095.3859613,
+    "seen": 1793542685.450339,
+    "ast_hash": "25e36874f704c4d6a5e5ef1051ad9de8",
     "semantic_hash": ""
   },
   "backend/tests/unit/analise/outliers.test.js": {
@@ -630,9 +630,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/AnaliseSection.vue": {
-    "mtime": 1793495797.9969275,
-    "seen": 1793496560.99663,
-    "ast_hash": "02687203edfaeb452156ae911539008a",
+    "mtime": 1793542172.3390515,
+    "seen": 1793542685.4504404,
+    "ast_hash": "56df052d2f400ac6d6ede31fd4829942",
     "semantic_hash": ""
   },
   "frontend/src/components/AvisoBanner.vue": {
@@ -648,9 +648,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/BenfordPanel.vue": {
-    "mtime": 1793507093.3146827,
-    "seen": 1793507162.0657475,
-    "ast_hash": "4712ca238343294a6402381b036034fb",
+    "mtime": 1793542182.649123,
+    "seen": 1793542685.4504569,
+    "ast_hash": "424e2f9fadb5866bb7a1cef73058b846",
     "semantic_hash": ""
   },
   "frontend/src/components/BiometriaPanel.vue": {
@@ -774,21 +774,21 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/en-US.json": {
-    "mtime": 1793507104.2658114,
-    "seen": 1793507162.0658827,
-    "ast_hash": "045114e51cca7b3b436e16cf59746224",
+    "mtime": 1793542203.0723,
+    "seen": 1793542685.4505615,
+    "ast_hash": "2b168ea9e59be01cb3be580db9f84adf",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/es-ES.json": {
-    "mtime": 1793507104.2668114,
-    "seen": 1793507162.0658865,
-    "ast_hash": "d2af6d2a0199349f9b59df5d3a02a02d",
+    "mtime": 1793542203.2003012,
+    "seen": 1793542685.4505649,
+    "ast_hash": "bd015172829c7481ede7ca188d423df2",
     "semantic_hash": ""
   },
   "frontend/src/i18n/locales/pt-BR.json": {
-    "mtime": 1793507104.2638113,
-    "seen": 1793507162.065891,
-    "ast_hash": "8d625f1164c9e1722126bfe69356191d",
+    "mtime": 1793542202.9442987,
+    "seen": 1793542685.450568,
+    "ast_hash": "2220f7567b7f51985d544091cdc2ba9c",
     "semantic_hash": ""
   },
   "frontend/src/lib/agregacoes.js": {
@@ -948,9 +948,9 @@
     "semantic_hash": ""
   },
   "docs/API.md": {
-    "mtime": 1793507104.2678115,
-    "seen": 1793507162.0660598,
-    "ast_hash": "03f240af3fcfdc5118adeefce254ffc6",
+    "mtime": 1793542253.6039221,
+    "seen": 1793542685.4507246,
+    "ast_hash": "3d87eb024c37fa5c670f0f7ff27c4476",
     "semantic_hash": ""
   },
   "docs/buweb-2014.md": {
@@ -1056,15 +1056,15 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1793507104.2688115,
-    "seen": 1793507162.066064,
-    "ast_hash": "d7377d0e5f740089360ec4c89d737a16",
+    "mtime": 1793541939.2734559,
+    "seen": 1793542685.450728,
+    "ast_hash": "25bab96cddac1dc25ff42736aab20699",
     "semantic_hash": ""
   },
   "docs/blueprint.md": {
-    "mtime": 1793507104.2678115,
-    "seen": 1793507162.0660675,
-    "ast_hash": "ed19e7fb92b81537abe25ea31576b1c9",
+    "mtime": 1793542253.720924,
+    "seen": 1793542685.4507313,
+    "ast_hash": "b31898e7cbe0b448b50c3021a00b80e4",
     "semantic_hash": ""
   },
   "backend/src/migrations/0006_mv_votos_final_splits.js": {
@@ -1443,6 +1443,24 @@
     "mtime": 1793504586.56706,
     "seen": 1793507162.0659747,
     "ast_hash": "8859f092db9bc65cdbd3f6d73333059c",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/BenfordFaixa.vue": {
+    "mtime": 1793542151.775948,
+    "seen": 1793542685.4504488,
+    "ast_hash": "f3b134afc3809f8e1400bebf0aecad93",
+    "semantic_hash": ""
+  },
+  "frontend/tests/benford-faixa.test.js": {
+    "mtime": 1793542203.286302,
+    "seen": 1793542685.4506388,
+    "ast_hash": "133781163ce33d70c6e09ce29dbc36d6",
+    "semantic_hash": ""
+  },
+  "docs/design-system/benford.md": {
+    "mtime": 1793542253.792925,
+    "seen": 1793542685.4507523,
+    "ast_hash": "d7c62f3ff9a8a3bbb5901b29764bc426",
     "semantic_hash": ""
   }
 }
