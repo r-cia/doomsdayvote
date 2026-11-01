@@ -11,7 +11,7 @@
       "entreAnos": "Entre años",
       "biometria": "Biometría",
       "encerramento": "Cierre",
-      "relatorio": "Consistencia"
+      "relatorio": "Informe"
     },
     "idioma": "Idioma",
     "tituloDocumento": "Doomsday Vote · Auditoría de BU",
@@ -212,7 +212,6 @@
   "mapa": {
     "titulo": "Mapa",
     "malha": "Mapa y lectura por estado",
-    "ufPainel": "Panel por estado",
     "votosPorEstado": "Votos por estado",
     "secoes": "Secciones electorales",
     "semDadosUf": "Ningún estado con datos para los filtros actuales.",
@@ -411,8 +410,8 @@
     "semAgrupamento": "Sin agrupación",
     "porRegiao": "Por región",
     "regiao": "Región",
-    "municipios": "Municipios con mayor biometría no habilitada",
-    "secoes": "Secciones con mayor % no habilitada",
+    "municipios": "Municipios · biometría no habilitada",
+    "secoes": "Secciones · % no habilitada",
     "naoHabilitada": "No habilitada"
   },
   "encerramento": {
@@ -425,8 +424,8 @@
     "pct1915": "% hasta las 19:15",
     "apos1915": "Después de las 19:15",
     "pctApos1915": "% después de las 19:15",
-    "municipios": "Municipios con mayor % después de las 17:15",
-    "secoes": "Secciones con mayor % después de las 17:15",
+    "municipios": "Municipios · % después de las 17:15",
+    "secoes": "Secciones · % después de las 17:15",
     "apos1715": "Después de las 17:15",
     "encerramento": "Cierre",
     "pctVotos": "% Votos"

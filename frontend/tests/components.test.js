@@ -463,7 +463,7 @@ describe('UfPanel', () => {
       },
     })
 
-    expect(wrapper.text()).toContain('Painel por UF')
+    expect(wrapper.text()).toContain('Votos por estado')
     expect(wrapper.text()).toContain('AC')
     expect(wrapper.text()).toContain('Candidato A')
 

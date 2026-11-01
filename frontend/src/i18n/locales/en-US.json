@@ -11,7 +11,7 @@
       "entreAnos": "Between years",
       "biometria": "Biometrics",
       "encerramento": "Closing",
-      "relatorio": "Consistency"
+      "relatorio": "Report"
     },
     "idioma": "Language",
     "tituloDocumento": "Doomsday Vote · BU audit",
@@ -212,7 +212,6 @@
   "mapa": {
     "titulo": "Map",
     "malha": "Map and state reading",
-    "ufPainel": "State panel",
     "votosPorEstado": "Votes by state",
     "secoes": "Polling sections",
     "semDadosUf": "No state with data for current filters.",
@@ -411,8 +410,8 @@
     "semAgrupamento": "No grouping",
     "porRegiao": "By region",
     "regiao": "Region",
-    "municipios": "Municipalities with highest non-enabled biometrics",
-    "secoes": "Sections with highest % non-enabled",
+    "municipios": "Municipalities · non-enabled biometrics",
+    "secoes": "Sections · % non-enabled",
     "naoHabilitada": "Not enabled"
   },
   "encerramento": {
@@ -425,8 +424,8 @@
     "pct1915": "% until 19:15",
     "apos1915": "After 19:15",
     "pctApos1915": "% after 19:15",
-    "municipios": "Municipalities with highest % after 17:15",
-    "secoes": "Sections with highest % after 17:15",
+    "municipios": "Municipalities · % after 17:15",
+    "secoes": "Sections · % after 17:15",
     "apos1715": "After 17:15",
     "encerramento": "Closing",
     "pctVotos": "% Votes"

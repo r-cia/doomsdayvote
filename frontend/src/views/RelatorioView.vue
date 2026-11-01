@@ -71,6 +71,7 @@ function identificador(linha) {
 
     <template v-if="alvo && !relatorio.isError.value">
       <section class="relatorio__indice">
+        <h3>{{ $t('relatorio.cobertura') }}</h3>
         <dl v-if="cobertura" class="relatorio__medidas">
           <div>
             <dt>{{ $t('relatorio.avaliadas') }}</dt>
