@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -80,6 +81,29 @@ describe('API de leitura', () => {
       });
       expect(timeline.statusCode).toBe(200);
       expect(timeline.json().pontos.length).toBeGreaterThan(0);
+    },
+    { timeout: 120000 },
+  );
+
+  it(
+    'lista cargo em maiúsculas na eleição',
+    async () => {
+      const base = await db.selectFrom('boletim_versao').selectAll().executeTakeFirstOrThrow();
+      await db
+        .insertInto('boletim_versao')
+        .values({
+          ...base,
+          id: randomUUID(),
+          cd_cargo_pergunta: 9,
+          ds_cargo_pergunta: 'PRESIDENTE',
+        })
+        .execute();
+
+      const eleicoes = await app.inject({ method: 'GET', url: '/api/elections' });
+      expect(eleicoes.statusCode).toBe(200);
+      const eleicao = eleicoes.json().eleicoes.find((item) => item.id === base.eleicao_id);
+      expect(eleicao).toBeTruthy();
+      expect(eleicao.cargos).toContainEqual({ cd_cargo_pergunta: 9, ds_cargo_pergunta: 'PRESIDENTE' });
     },
     { timeout: 120000 },
   );

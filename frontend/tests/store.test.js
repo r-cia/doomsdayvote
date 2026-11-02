@@ -58,6 +58,23 @@ describe('filters store', () => {
     expect(store.cargo).toBe(1)
   })
 
+  it('seleciona Governador quando só há cargo em maiusculas', () => {
+    const store = useFiltersStore()
+    store.inicializar([
+      {
+        id: 'e14',
+        ano_eleicao: 2014,
+        nr_turno: 1,
+        cargos: [
+          { cd_cargo_pergunta: 3, ds_cargo_pergunta: 'GOVERNADOR' },
+          { cd_cargo_pergunta: 5, ds_cargo_pergunta: 'VEREADOR' },
+        ],
+      },
+    ])
+    expect(store.electionId).toBe('e14')
+    expect(store.cargo).toBe(3)
+  })
+
   it('converte o corte e limpa filtros', () => {
     const store = useFiltersStore()
     store.inicializar(eleicoes)
