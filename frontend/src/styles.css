@@ -2077,3 +2077,8 @@ tr.linha--ativa th {
     transition-duration: 0.001ms !important;
   }
 }
+
+.atualizando {
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}

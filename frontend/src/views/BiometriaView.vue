@@ -6,6 +6,7 @@ import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
+import BiometriaFaixasPanel from '../components/BiometriaFaixasPanel.vue'
 
 const secaoModalId = ref(null)
 
@@ -79,6 +80,8 @@ function abrirSecao(item) {
 </script>
 
 <template>
+  <BiometriaFaixasPanel />
+
   <BiometriaUfPanel
     :dados="analiseQuery.data.value?.biometria_uf ?? []"
     @select="carregarMunicipios"

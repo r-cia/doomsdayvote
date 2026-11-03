@@ -119,3 +119,15 @@ export function truncar(texto, tamanho = 60) {
   const valor = String(texto)
   return valor.length > tamanho ? `${valor.slice(0, tamanho)}…` : valor
 }
+
+export function formatarDuracao(ms) {
+  if (ms === null || ms === undefined || ms === '') return '—'
+  const total = Number(ms)
+  if (!Number.isFinite(total)) return '—'
+  const segundos = total / 1000
+  if (segundos < 60) {
+    return `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(segundos)} s`
+  }
+  const minutos = Math.floor(segundos / 60)
+  return `${minutos} min ${Math.round(segundos - minutos * 60)} s`
+}

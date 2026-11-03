@@ -1,6 +1,7 @@
 <script setup>
 import AnaliseSection from '../components/AnaliseSection.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
+import TempoVotoPanel from '../components/TempoVotoPanel.vue'
 import { ref, watch } from 'vue'
 import { useAnalise, useAnomalias } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
@@ -27,6 +28,8 @@ watch(
     :eleicoes-disponiveis="eleicoesDisponiveis"
     :election-id="store.electionId"
   />
+
+  <TempoVotoPanel />
 
   <AnaliseSection
     :benford="analiseQuery.data.value?.benford ?? null"
