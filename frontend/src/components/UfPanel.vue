@@ -136,8 +136,14 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
     />
 
     <TabelaScroll v-else-if="ufSelecionada" class="uf-painel__scroll" :atualizando="atualizando">
-      <table>
+      <table class="tabela-fixa">
         <caption class="sr-only">{{ $t('mapa.votosPorCandidatoEm', { uf: ufSelecionada }) }}</caption>
+        <colgroup>
+          <col style="width: 40%" />
+          <col style="width: 16%" />
+          <col style="width: 22%" />
+          <col style="width: 22%" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ariaSortVotos('nm_votavel')"><button type="button" @click="alternarVotos('nm_votavel')">{{ $t('tabela.candidato') }}{{ setaVotos('nm_votavel') }}</button></th>
@@ -148,8 +154,8 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
         </thead>
         <tbody>
           <tr v-for="candidato in votosUf" :key="candidato.nr_votavel">
-            <td>{{ candidato.nm_votavel }}</td>
-            <td>
+            <td :title="candidato.nm_votavel">{{ candidato.nm_votavel }}</td>
+            <td :title="candidato.sg_partido">
               <span
                 class="party-dot party-dot--mini"
                 :style="{
@@ -171,8 +177,15 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
     </p>
 
     <TabelaScroll v-else-if="agrupar === 'regiao' && grupos" class="uf-painel__scroll" :atualizando="atualizando">
-      <table>
+      <table class="tabela-fixa">
         <caption class="sr-only">{{ $t('mapa.resumoPorRegiao') }}</caption>
+        <colgroup>
+          <col style="width: 8%" />
+          <col style="width: 20%" />
+          <col style="width: 34%" />
+          <col style="width: 20%" />
+          <col style="width: 18%" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
@@ -208,7 +221,7 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
                   <span :style="{ width: `${linha.largura}%` }"></span>
                 </span>
               </td>
-              <td>
+              <td :title="linha.liderNome">
                 <span v-if="linha.lider" class="lider">
                   <span
                     v-if="linha.liderSigla"
@@ -240,8 +253,15 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
     </TabelaScroll>
 
     <TabelaScroll v-else class="uf-painel__scroll" :atualizando="atualizando">
-      <table>
+      <table class="tabela-fixa">
         <caption class="sr-only">{{ $t('mapa.resumoPorUf') }}</caption>
+        <colgroup>
+          <col style="width: 8%" />
+          <col style="width: 20%" />
+          <col style="width: 34%" />
+          <col style="width: 20%" />
+          <col style="width: 18%" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
@@ -273,7 +293,7 @@ const votosUf = computed(() => nominaisNaOrdemDoServidor(props.votos))
                 <span :style="{ width: `${linha.largura}%` }"></span>
               </span>
             </td>
-            <td>
+            <td :title="linha.liderNome">
               <span v-if="linha.lider" class="lider">
                 <span
                   v-if="linha.liderSigla"

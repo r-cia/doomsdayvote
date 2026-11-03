@@ -69,8 +69,18 @@ const nivel = computed(
         @acao="consulta.refetch()"
       />
       <TabelaScroll v-else :atualizando="consulta.isFetching.value">
-        <table class="analise-tabela">
+        <table class="analise-tabela tabela-fixa">
           <caption class="sr-only">{{ $t('analiseUI.secoesGrupo', { level: nivel }) }}</caption>
+          <colgroup>
+            <col style="width: 6%" />
+            <col style="width: 26%" />
+            <col style="width: 8%" />
+            <col style="width: 8%" />
+            <col style="width: 13%" />
+            <col style="width: 13%" />
+            <col style="width: 13%" />
+            <col style="width: 13%" />
+          </colgroup>
           <thead>
             <tr>
               <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
@@ -86,7 +96,7 @@ const nivel = computed(
           <tbody>
             <tr v-for="item in secoes" :key="item.secao.id">
               <td>{{ item.secao.sg_uf || '—' }}</td>
-              <td>{{ municipio(item.secao) }}</td>
+              <td :title="municipio(item.secao)">{{ municipio(item.secao) }}</td>
               <td class="num">{{ formatarNumero(item.secao.nr_zona) }}</td>
               <td class="num">{{ formatarNumero(item.secao.nr_secao) }}</td>
               <td class="num">{{ percentual(item.metricas.participacao) }}</td>

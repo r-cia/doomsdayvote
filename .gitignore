@@ -4,6 +4,9 @@ coverage/
 frontend/dist/
 .impeccable/review/
 /files/
+/bu/
+/bweb/
+/.codex/
 /data/
 /ibge/
 *.log

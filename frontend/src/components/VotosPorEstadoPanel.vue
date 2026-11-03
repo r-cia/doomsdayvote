@@ -72,7 +72,12 @@ function deltaTotal(nrVotavel) {
     </div>
 
     <TabelaScroll v-else :atualizando="atualizando">
-      <table class="tabela-votos-estado">
+      <table class="tabela-votos-estado tabela-fixa">
+        <colgroup>
+          <col style="width: 16rem" />
+          <col v-for="area in ufs" :key="area.sg_uf" style="width: 6rem" />
+          <col style="width: 8rem" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" :aria-sort="ariaSort('nm_votavel')"><button type="button" @click="alternar('nm_votavel')">{{ $t('filtros.candidato') }}{{ seta('nm_votavel') }}</button></th>
@@ -84,7 +89,7 @@ function deltaTotal(nrVotavel) {
         </thead>
         <tbody>
           <tr v-for="candidato in listaCandidatos" :key="candidato.nr_votavel">
-            <th scope="row">
+            <th scope="row" :title="candidato.nm_votavel">
               <div class="votos-estado-candidato">
                 <strong>{{ candidato.nm_votavel }}</strong>
                 <small>{{ candidato.sg_partido }} {{ candidato.nr_votavel }}</small>
