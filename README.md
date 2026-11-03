@@ -4,267 +4,237 @@
 
 # Doomsday Vote
 
-Conferência **offline** de Boletins de Urna (BUs) do TSE para os cargos **Presidente** e **Governador**. 
+Conferência **offline** de Boletins de Urna do Tribunal Superior Eleitoral para os cargos **Presidente** e **Governador**.
 
-O sistema reconstrói o dia pelo horário oficial de recebimento (`DT_BU_RECEBIDO`), permite consultar por corte temporal, analisa biometria, testa Benford, identifica padrões de duplicação/proximidade, calcula estatísticas descritivas por seção e exibe tudo em abas (`Painel`, `Mapa`, `Análise`).
+O sistema reconstrói o dia pelo horário de recebimento do Boletim de Urna, permite consultar por corte temporal, analisa biometria, aplica Benford, identifica padrões de duplicação e proximidade, calcula estatísticas por seção, confere a apuração contra os pacotes de totalização (Boletim de Urna, Registro Digital do Voto e log da urna) e exibe tudo em abas.
 
-> **Importante:** Não é totalização oficial, não é tempo real, não é um sistema de apuração. É uma ferramenta de conferência auditável com base nos BUs carregados.
+> **Importante:** não é totalização oficial, não é tempo real e não substitui a apuração do Tribunal Superior Eleitoral. É uma ferramenta de conferência com base nos arquivos carregados.
+
+A documentação de regras de negócio, API e arquitetura fica nos documentos do Jiraya (`docs/blueprint.md`, `docs/API.md` e `docs/architecture.md`). Este arquivo cobre apenas como rodar o projeto.
 
 ## 1. Stack
 
 | Camada | Tecnologias |
 | :-- | :-- |
-| **Backend** | Node.js 22 (ESM), Fastify 5, Kysely, PostgreSQL, Redis (opcional), Pino, Zod, pg-copy-streams |
-| **Frontend** | Vue 3, Vite 8, Pinia, Vue Query (TanStack), MapLibre GL, TypeScript/JS vanilla |
-| **Dados** | BUs do TSE (formatos BWEB 2014/2018/2022/2026), malhas IBGE locais em `frontend/public/geo/` |
-| **Portas** | API: `http://localhost:7000` \| Frontend: `http://localhost:7010` |
+| Backend | Node.js 22 (ESM), Fastify 5, Kysely, PostgreSQL, Redis (opcional), Pino, Zod, pg-copy-streams |
+| Frontend | Vue 3, Vite, Pinia, TanStack Query (Vue), Chart.js, MapLibre GL |
+| Dados | Arquivos de Boletim de Urna na web (leiautes 2014, 2018, 2022 e 2026), pacotes de totalização por unidade da federação e malhas do IBGE em `frontend/public/geo/` |
+| Portas | API em `http://localhost:7000`; frontend em `http://localhost:7010` |
 
 ## 2. Pré-requisitos
 
-Antes de começar, garanta que tem instalado:
-
 | Ferramenta | Versão mínima | Observação |
 | :-- | :-- | :-- |
-| [Node.js](https://nodejs.org/) | `22.x` | Obrigatório |
-| [PostgreSQL](https://www.postgresql.org/) | `15.x` | Obrigatório |
-| [Redis](https://redis.io/) | `7.x` | Opcional. O backend funciona com *fail-open* (se indisponível, ignora cache e segue normalmente) |
+| [Node.js](https://nodejs.org/) | 22.x | Obrigatório |
+| [PostgreSQL](https://www.postgresql.org/) | 15.x | Obrigatório |
+| [Redis](https://redis.io/) | 7.x | Opcional. Se estiver indisponível, o backend ignora o cache e segue |
+| `7z` (p7zip) | Qualquer recente | Necessário para ler arquivos `.7z` |
 | [Git](https://git-scm.com/) | Qualquer recente | Para clonar o repositório |
 
-## 3. Clonar o projeto
+## 3. Configurar variáveis de ambiente
 
-```bash
-git clone https://github.com/SEU_USUARIO/doomsdayvote.git
-cd doomsdayvote
-```
-
-## 4. Configurar variáveis de ambiente
-
-### 4.1 Backend
-
-Copie o exemplo e preencha com seus dados:
+Copie o exemplo e ajuste os valores:
 
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-Edite `backend/.env` com o seguinte conteúdo mínimo:
+Variáveis principais (todas documentadas em `backend/.env.example`):
 
-```env
-# Banco principal
-DATABASE_URL=postgres://usuario:senha@localhost:5432/doomsdayvote
+| Variável | Uso |
+| :-- | :-- |
+| `DATABASE_URL` | Banco usado pela API e pelas cargas (papel de aplicação) |
+| `DATABASE_MIGRATION_URL` | Migrações e atualização das views materializadas (papel dono do banco) |
+| `REDIS_URL` | Cache (opcional) |
+| `PORT` | Porta da API (padrão 7000) |
+| `BWEB_INPUT_DIR` | Pasta com os arquivos de Boletim de Urna na web |
+| `TEST_DATABASE_URL` e `TEST_DATABASE_MIGRATION_URL` | Banco dos testes de integração |
 
-# Banco para testes de integração
-TEST_DATABASE_URL=postgres://usuario:senha@localhost:5432/doomsdayvote_test
+O frontend aponta para `http://localhost:7000`. Para alterar, crie `frontend/.env` com `VITE_API_BASE`.
 
-# Redis (opcional)
-REDIS_URL=redis://127.0.0.1:6379
-
-# Porta da API
-PORT=7000
-
-# Pasta com arquivos BWEB (.csv, .txt, .csv.gz, .txt.gz)
-BWEB_INPUT_DIR=/caminho/absoluto/para/pasta/com/bus
-```
-
-> **Dica:** Crie os bancos `doomsdayvote` e `doomsdayvote_test` no PostgreSQL antes de rodar as migrações.
-
-### 4.2 Frontend
-
-O frontend já aponta para `http://localhost:7000` por padrão. Caso precise alterar, crie `frontend/.env`:
-
-```env
-VITE_API_BASE=http://localhost:7000
-```
-
-## 5. Instalar dependências
+## 4. Instalar dependências
 
 ```bash
-# Backend
-cd backend
-npm install
-
-# Frontend
-cd ../frontend
-npm install
+cd backend && npm install
+cd ../frontend && npm install
 ```
 
-## 6. Preparar banco de dados
+## 5. Preparar o banco
 
 ```bash
 cd backend
-# Rodar migrações
 npm run migrate
 ```
 
-Caso precise resetar completamente o banco em ambiente local:
+Há uma única migração, `0001_schema_inicial`, que cria todas as tabelas. Para reaplicar do zero em ambiente local (apaga os dados):
 
 ```bash
 npm run migrate:reset
 npm run migrate
 ```
 
-## 7. Carregar dados (BUs, malhas e cores)
+## 6. Carregar dados
 
-### 7.1 Adicionar arquivos BWEB
+### 6.1 Boletins de Urna na web
 
-Coloque todos os arquivos de Boletins de Urna do TSE na pasta apontada por `BWEB_INPUT_DIR`. 
+Coloque os arquivos na pasta apontada por `BWEB_INPUT_DIR`. Formatos aceitos: `.csv`, `.txt`, `.csv.gz`, `.txt.gz`, `.csv.7z` e `.txt.7z`.
 
-Formatos aceitos:
-
-- `.csv`
-- `.txt`
-- `.csv.gz`
-- `.txt.gz`
-
-O importador faz cópia para `storage/` com hash, usa `COPY` + staging `UNLOGGED`, é idempotente e suporta arquivos fora de ordem.
-
-### 7.2 Carregar BUs
+O importador lê direto da pasta, sem copiar o arquivo, usa `COPY` em tabela de passagem, é idempotente pelo hash do arquivo e aceita arquivos fora de ordem. Só importa Presidente e Governador.
 
 ```bash
 cd backend
 npm run carga
 ```
 
-### 7.3 Carregar malhas geográficas (IBGE)
+Ao terminar, a carga atualiza as views materializadas e invalida o cache. Só uma carga roda por vez.
 
-As malhas `br-uf.geojson` e `br-municipios.geojson` já vêm versionadas em `frontend/public/geo/`. Mesmo assim, é recomendado rodar para sincronizar `localidade.geom_id` e atualizar o manifesto:
+### 6.2 Pacotes de totalização
+
+Pacotes `.zip` ou `.7z` por unidade da federação, nomeados `bu_imgbu_logjez_rdv_vscmr_<ano>_<turno>t_<UF>`.
+
+```bash
+cd backend
+npm run totalizacao:carregar -- --pasta <diretório> [--arquivo <nome.zip|nome.7z>] [--falhar-rapido]
+```
+
+- Processa só `-bu.dat`, `-rdv.dat` e `-log.jez` de cada seção.
+- Cada seção é uma transação; erro em uma seção não derruba o arquivo e deixa o lote `parcial`.
+- Lote repetido é ignorado pelo hash; lote incompleto é retomado pulando as seções já gravadas.
+- Um lote novo substitui o anterior da mesma unidade, ano e turno.
+
+Para consultar o estado das cargas:
+
+```bash
+npm run carga:status -- [--lote <id>] [--json]
+```
+
+### 6.3 Malhas geográficas
 
 ```bash
 cd backend
 npm run geo:carregar
 ```
 
-### 7.4 Carregar cores dos partidos
+### 6.4 Cores dos partidos
 
 ```bash
 cd backend
 npm run seed:cores
-```
-
-Se houver pendências:
-
-```bash
 npm run cores:pendentes
 ```
 
-## 8. Rodar a aplicação
+## 7. Rodar a aplicação
 
-Abra **dois terminais** na raiz do projeto.
-
-**Terminal 1 - API (Backend)**
+Em dois terminais, a partir da raiz do projeto:
 
 ```bash
+# Terminal 1 — API
 cd backend
-npm run dev
-# ou em produção
-# npm start
-```
+npm run dev     # ou npm start
 
-API disponível em: [http://localhost:7000](http://localhost:7000)
-
-**Terminal 2 - Frontend**
-
-```bash
+# Terminal 2 — Frontend
 cd frontend
 npm run dev
 ```
 
-Aplicação disponível em: [http://localhost:7010](http://localhost:7010)
+A API sobe em `http://localhost:7000` e recusa iniciar se houver migração pendente. O frontend sobe em `http://localhost:7010`.
 
-## 9. Usando a aplicação
+## 8. Usando a aplicação
 
-Após abrir o frontend:
+Use a barra de filtros (cargo, ano, turno, corte temporal e unidade da federação) para definir o recorte. Os filtros são compartilhados entre as abas.
 
-1. Aguarde o carregamento das eleições disponíveis
-2. Use a **barra de comando fixa** (Cargo / Ano / Turno / Corte temporal / UF) para definir o recorte
-3. Navegue pelas abas:
-   - **Painel**: KPIs, linha do tempo, placar, biometria do recorte
-   - **Mapa**: mapa coroplético, painel por UF/município, "Detalhes" paginado e tabela de seções (carrega apenas ao selecionar um município)
-   - **Análise**: Estatística descritiva (média/mediana/desvio populacional por seção), Benford, duplicação e proximidade, isolamento/LOF
+| Aba | Conteúdo |
+| :-- | :-- |
+| Painel | Indicadores, linha do tempo do dia, placar e votos por estado |
+| Mapa | Mapa por unidade da federação e município, painel de detalhes e tabela de seções |
+| Estatística | Estatísticas descritivas, Benford, duplicação e proximidade, outliers |
+| Biometria | Biometria por unidade da federação, município e seção |
+| Encerramento | Urnas por faixa de horário de encerramento |
 
-Os filtros são compartilhados entre abas. Trocar de aba preserva o recorte e aproveita o cache.
+O backend também expõe a totalização, a consistência aritmética, a concentração, a comparação local, o relatório, a comparação entre anos e as versões do Boletim de Urna; essas telas ainda não existem no frontend.
 
-## 10. Scripts úteis
+## 9. Scripts
 
 ### Backend
 
 | Script | Descrição |
 | :-- | :-- |
-| `npm run dev` | API em modo desenvolvimento com watch |
-| `npm start` | API em modo produção |
-| `npm run migrate` | Aplica migrações pendentes |
-| `npm run migrate:reset` | Reseta e reaplica migrações (apaga dados!) |
-| `npm run carga` | Importa BUs da pasta `BWEB_INPUT_DIR` |
-| `npm run geo:carregar` | Sincroniza malhas IBGE e correspondência TSE/IBGE |
-| `npm run seed:cores` | Popula cores dos partidos |
-| `npm run cores:pendentes` | Lista partidos sem cor definida |
+| `npm run dev` | API em desenvolvimento, com reinício automático |
+| `npm start` | API em produção |
+| `npm run migrate` | Aplica as migrações pendentes |
+| `npm run migrate:reset` | Reaplica as migrações do zero (apaga os dados) |
+| `npm run carga` | Importa os Boletins de Urna da pasta `BWEB_INPUT_DIR` |
+| `npm run totalizacao:carregar` | Importa pacotes de totalização |
+| `npm run carga:status` | Mostra o estado dos lotes |
+| `npm run geo:carregar` | Sincroniza as malhas do IBGE |
+| `npm run seed:cores` | Cadastra as cores dos partidos |
+| `npm run cores:pendentes` | Lista partidos sem cor |
 | `npm test` | Testes unitários |
-| `npm run test:integration` | Testes de integração (requer `TEST_DATABASE_URL`) |
+| `npm run test:coverage` | Testes unitários com cobertura |
+| `npm run test:integration` | Testes de integração (exigem `TEST_DATABASE_URL`) |
 
 ### Frontend
 
 | Script | Descrição |
 | :-- | :-- |
-| `npm run dev` | Servidor Vite em `http://localhost:7010` |
+| `npm run dev` | Servidor de desenvolvimento |
 | `npm run build` | Build de produção |
-| `npm run preview` | Preview do build gerado |
-| `npm test` | Testes com Vitest |
+| `npm run preview` | Visualiza o build |
+| `npm test` | Testes |
 
-## 11. Estrutura do projeto
+## 10. Estrutura
 
 ```text
 doomsdayvote/
 ├── backend/
+│   ├── data/                 # cadastro de municípios e cores de partidos
 │   ├── src/
+│   │   ├── db/               # conexão, migrações e views materializadas
+│   │   ├── lib/              # cache, ordenação, erros, datas, logs de carga
+│   │   ├── migrations/       # 0001_schema_inicial
 │   │   ├── modules/
-│   │   │   ├── importacao/  # Parsers BWEB, validação, staging COPY, persistência
-│   │   │   ├── apuracao/    # Corte temporal, somas, totais por área
-│   │   │   └── analise/     # Biometria, Benford, duplicação, outliers, estatísticas
-│   │   ├── routes/          # Rotas REST da API
-│   │   ├── lib/             # Cache Redis, utils
-│   │   └── scripts/         # carga, geo:carregar, seed:cores
-│   └── tests/               # unitários e integração
+│   │   │   ├── apuracao/         # corte temporal, seções, linha do tempo, totais
+│   │   │   ├── analise/          # Benford, biometria, duplicação, outliers e demais análises
+│   │   │   ├── comparacao-anos/  # curvas e estatística da comparação entre anos
+│   │   │   ├── importacao/       # leiautes, validações, lotes e persistência
+│   │   │   └── totalizacao/      # Boletim, Registro Digital do Voto, log, conferências, agregação
+│   │   ├── routes/           # rotas HTTP por domínio
+│   │   └── scripts/          # cargas, migrações e utilitários de linha de comando
+│   └── tests/                # unitários e de integração
 ├── frontend/
-│   ├── src/
-│   │   ├── components/      # UI reutilizável (mapa, tabelas, painéis)
-│   │   ├── views/           # Páginas/abas (Painel, Mapa, Análise, Seção)
-│   │   ├── composables/     # Queries Vue Query
-│   │   ├── stores/          # Pinia (filtros)
-│   │   └── lib/             # Formatação, agregações, cores
-│   └── public/geo/          # Malhas IBGE (br-uf.geojson, br-municipios.geojson)
-├── docs/                    # Documentação (API, formatos BWEB, arquitetura)
-├── fixtures/                # Fixtures para testes
+│   ├── public/geo/           # malhas do IBGE
+│   └── src/                  # views, components, composables, stores e lib
+├── docs/                     # imagem do projeto
 └── README.md
 ```
 
-## 12. Troubleshooting
-
-| Problema | Solução |
-| :-- | :-- |
-| **Erro de conexão com Postgres** | Verifique `DATABASE_URL`/`TEST_DATABASE_URL`, se o serviço está rodando e se os bancos foram criados. |
-| **Redis não conecta** | Normal. O cache é *fail-open*. Se quiser usar cache, suba o Redis e aponte `REDIS_URL`. |
-| **Arquivos BWEB não importam** | Confirme `BWEB_INPUT_DIR` com caminho absoluto, permissões de leitura e formatos suportados (`.csv/.txt/.gz`). |
-| **Mapa sem geometrias** | Rode `npm run geo:carregar` no backend. Os arquivos já existem em `frontend/public/geo/`, mas o script sincroniza `localidade.geom_id`. |
-| **Nomes de municípios errados/códigos** | Rode `npm run geo:carregar`. Ele usa `backend/data/geo/municipios-tse-ibge.csv` para casar TSE ↔ IBGE. |
-| **Porta em uso (7000/7010)** | Altere `PORT` no backend ou use outra porta no Vite. |
-| **Cache desatualizado após mudanças** | Em dev, rode `redis-cli FLUSHALL` ou aguarde o TTL (300s). Em produção, o `dv:versao` invalida automaticamente na carga. |
-
-## 13. Testes
+## 11. Testes
 
 ```bash
-# Backend unitários
+# Backend, unitários
 cd backend && npm test
 
-# Backend integração (precisa de TEST_DATABASE_URL e Postgres limpo)
+# Backend, integração (exige Postgres e TEST_DATABASE_URL)
 cd backend && npm run test:integration
 
 # Frontend
 cd frontend && npm test
 ```
 
-## 14. Licença e observações
+## 12. Problemas comuns
 
-- **Uso:** Projeto voltado à conferência e auditoria offline de BUs. 
-- **Dados:** Os arquivos BWEB são públicos do TSE, mas não são versionados neste repositório. Você deve obtê-los por conta própria.
-- **Não oficial:** Este projeto **não** é oficial do TSE e **não** substitui a totalização oficial.
-- **Privacidade:** Tudo roda localmente. Nenhum dado é enviado para terceiros.
+| Problema | Solução |
+| :-- | :-- |
+| Erro de conexão com o Postgres | Confira `DATABASE_URL`, o serviço e a existência dos bancos |
+| API não sobe e registra `MIGRACOES_PENDENTES` | Rode `npm run migrate` |
+| Carga encerra com `CARGA_EM_ANDAMENTO` | Já existe uma carga em execução; aguarde o término |
+| Arquivo `.7z` não abre | Instale o `7z` (p7zip) |
+| Redis não conecta | Normal: o cache é opcional |
+| Mapa sem geometrias | Rode `npm run geo:carregar` |
+| Porta em uso | Altere `PORT` no backend ou a porta do Vite |
+
+## 13. Observações
+
+- Os arquivos do Tribunal Superior Eleitoral são públicos, mas não são versionados neste repositório.
+- O projeto não é oficial e não substitui a totalização oficial.
+- Tudo roda localmente; nenhum dado é enviado a terceiros.
