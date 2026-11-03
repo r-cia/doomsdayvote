@@ -2165,3 +2165,55 @@ th .ordenavel:focus-visible {
   background: var(--amber);
   opacity: 0.35;
 }
+
+.curvas {
+  margin: 0;
+  padding: 8px 14px;
+}
+
+.curvas__svg {
+  width: 100%;
+  height: auto;
+}
+
+.curvas__grade {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.curvas__rotulo {
+  fill: var(--ink-dim);
+  font-size: 9px;
+}
+
+.curvas__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.abas {
+  display: flex;
+  gap: 4px;
+  padding: 0 14px;
+}
+
+.abas button {
+  all: unset;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-bottom: 2px solid transparent;
+}
+
+.abas button.ativo {
+  border-bottom-color: var(--amber);
+  color: var(--amber);
+}
+
+.abas button:focus-visible {
+  outline: 2px solid var(--amber);
+}
