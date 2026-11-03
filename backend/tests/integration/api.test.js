@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -6,8 +7,8 @@ import { buildApp } from '../../src/app.js';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
-import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
+import { CENARIO, NOME_2026, escreverArquivo, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,21 +20,28 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+const SECOES = 12;
+let diretorio;
 let alvo;
 
-async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  const resultado = await importarArquivo({ db, caminho, nomeArquivo: nome });
+  await atualizarViews(db);
+  return resultado;
 }
 
 describe('API de leitura', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-api-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-api-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    await importar('bweb-1t_ac_2026.csv');
+    await importar(
+      NOME_2026,
+      gerarBwebMulti(secoes2026(SECOES, { nomeMunicipio: 'RIO BRANCO' })),
+    );
     const linha = await db
       .selectFrom('boletim_versao')
       .select(['eleicao_id', 'cd_cargo_pergunta'])
@@ -45,7 +53,7 @@ describe('API de leitura', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
@@ -62,9 +70,9 @@ describe('API de leitura', () => {
       });
       expect(resumo.statusCode).toBe(200);
       const corpo = resumo.json();
-      expect(corpo.secoes_com_bu).toBeGreaterThan(0);
+      expect(corpo.secoes_com_bu).toBe(SECOES);
       expect(corpo.votos.length).toBeGreaterThan(0);
-      expect(corpo.metricas.bus_considerados).toBeGreaterThan(0);
+      expect(corpo.metricas.bus_considerados).toBe(SECOES);
 
       const antes = await app.inject({
         method: 'GET',
@@ -83,6 +91,29 @@ describe('API de leitura', () => {
   );
 
   it(
+    'lista cargo em maiúsculas na eleição',
+    async () => {
+      const base = await db.selectFrom('boletim_versao').selectAll().executeTakeFirstOrThrow();
+      await db
+        .insertInto('boletim_versao')
+        .values({
+          ...base,
+          id: randomUUID(),
+          cd_cargo_pergunta: 9,
+          ds_cargo_pergunta: 'PRESIDENTE',
+        })
+        .execute();
+
+      const eleicoes = await app.inject({ method: 'GET', url: '/api/elections' });
+      expect(eleicoes.statusCode).toBe(200);
+      const eleicao = eleicoes.json().eleicoes.find((item) => item.id === base.eleicao_id);
+      expect(eleicao).toBeTruthy();
+      expect(eleicao.cargos).toContainEqual({ cd_cargo_pergunta: 9, ds_cargo_pergunta: 'PRESIDENTE' });
+    },
+    { timeout: 120000 },
+  );
+
+  it(
     'mapa, seções e detalhe',
     async () => {
       const mapa = await app.inject({
@@ -90,7 +121,7 @@ describe('API de leitura', () => {
         url: `/api/map?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&level=uf`,
       });
       expect(mapa.statusCode).toBe(200);
-      expect(mapa.json().areas.length).toBeGreaterThan(0);
+      expect(mapa.json().areas.length).toBe(1);
 
       const secoes = await app.inject({
         method: 'GET',
@@ -98,14 +129,14 @@ describe('API de leitura', () => {
       });
       expect(secoes.statusCode).toBe(200);
       const corpo = secoes.json();
-      expect(corpo.total).toBeGreaterThan(0);
+      expect(corpo.total).toBe(SECOES);
       expect(corpo.items).toHaveLength(10);
 
       const busca = await app.inject({
         method: 'GET',
         url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&busca=rio`,
       });
-      expect(busca.json().total).toBeGreaterThan(0);
+      expect(busca.json().total).toBe(SECOES);
 
       const detalhe = await app.inject({
         method: 'GET',
@@ -118,17 +149,17 @@ describe('API de leitura', () => {
       const primeiro = corpo.items[0];
       const porSecao = await app.inject({
         method: 'GET',
-        url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&uf=AC&zona=${primeiro.nr_zona}&secao=${primeiro.nr_secao}`,
+        url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&uf=${CENARIO.uf}&zona=${primeiro.nr_zona}&secao=${primeiro.nr_secao}`,
       });
       expect(porSecao.statusCode).toBe(200);
       expect(porSecao.json().items).toHaveLength(1);
 
       const porMunicipio = await app.inject({
         method: 'GET',
-        url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&uf=AC&municipio_nome=${encodeURIComponent(primeiro.nm_municipio)}`,
+        url: `/api/sections?election_id=${alvo.eleicaoId}&cargo=${alvo.cargo}&uf=${CENARIO.uf}&municipio_nome=${encodeURIComponent(primeiro.nm_municipio)}`,
       });
       expect(porMunicipio.statusCode).toBe(200);
-      expect(porMunicipio.json().total).toBeGreaterThan(0);
+      expect(porMunicipio.json().total).toBe(SECOES);
     },
     { timeout: 120000 },
   );
@@ -143,7 +174,7 @@ describe('API de leitura', () => {
       expect(analise.statusCode).toBe(200);
       const corpo = analise.json();
 
-      expect(corpo.biometria.secoes).toBeGreaterThan(0);
+      expect(corpo.biometria.secoes).toBe(SECOES);
       expect(corpo.biometria.qt_comparecimento).toBeGreaterThanOrEqual(0);
       expect(
         corpo.biometria.qt_habilitados_por_biometria +
@@ -202,8 +233,8 @@ describe('API de leitura', () => {
       expect(corpo.duplicacao.total_grupos).toBeGreaterThanOrEqual(0);
       expect(Array.isArray(corpo.duplicacao.grupos)).toBe(true);
 
-      expect(corpo.outliers.features).toHaveLength(7);
-      expect(corpo.outliers.total_secoes).toBeGreaterThan(0);
+      expect(corpo.outliers.features).toHaveLength(6);
+      expect(corpo.outliers.total_secoes).toBe(SECOES);
       expect(corpo.outliers.secoes.length).toBeGreaterThan(0);
       expect(corpo.outliers.secoes[0].score_if).toBeGreaterThanOrEqual(0);
       expect(corpo.outliers.secoes[0].score_if).toBeLessThanOrEqual(1);

@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 const nodeEnv = z.enum(['development', 'test', 'production']).default('development');
 const logLevel = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info');
-const booleanEnv = z.enum(['true', 'false']).default('false').transform((valor) => valor === 'true');
+const databaseEnv = {
+  DB_POOL_MAX: z.coerce.number().int().min(1).max(32).default(20),
+  DB_WORK_MEM_MB: z.coerce.number().int().min(8).max(64).default(64),
+};
 
 const apiSchema = z
   .object({
@@ -11,6 +14,7 @@ const apiSchema = z
     PORT: z.coerce.number().int().min(1).max(65535),
     LOG_LEVEL: logLevel,
     DATABASE_URL: z.string().min(1),
+    ...databaseEnv,
     REDIS_URL: z.string().min(1).optional(),
     SECTIONS_PAGE_SIZE_DEFAULT: z.coerce.number().int().positive(),
     SECTIONS_PAGE_SIZE_MAX: z.coerce.number().int().positive(),
@@ -29,15 +33,27 @@ const workerSchema = z.object({
   NODE_ENV: nodeEnv,
   LOG_LEVEL: logLevel,
   DATABASE_URL: z.string().min(1),
+  DATABASE_MIGRATION_URL: z.string().min(1),
+  ...databaseEnv,
   REDIS_URL: z.string().min(1).optional(),
   BWEB_INPUT_DIR: z.string().min(1),
-  BWEB_STORAGE_DIR: z.string().min(1),
-  BWEB_SKIP_CARGOS_LEGISLATIVOS: booleanEnv,
 });
 
 const migrateSchema = z.object({
   NODE_ENV: nodeEnv,
   DATABASE_MIGRATION_URL: z.string().min(1),
+});
+
+const totalizacaoSchema = z.object({
+  NODE_ENV: nodeEnv,
+  LOG_LEVEL: logLevel,
+  DATABASE_URL: z.string().min(1),
+  DATABASE_MIGRATION_URL: z.string().min(1),
+  ...databaseEnv,
+});
+
+const statusSchema = z.object({
+  DATABASE_URL: z.string().min(1),
 });
 
 function carregar(schema, origem) {
@@ -58,4 +74,12 @@ export function loadWorkerEnv(origem = process.env) {
 
 export function loadMigrateEnv(origem = process.env) {
   return carregar(migrateSchema, origem);
+}
+
+export function loadTotalizacaoEnv(origem = process.env) {
+  return carregar(totalizacaoSchema, origem);
+}
+
+export function loadStatusEnv(origem = process.env) {
+  return carregar(statusSchema, origem);
 }

@@ -1,32 +1,31 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { criarDb } from '../../src/db/index.js';
 import { carregarPasta } from '../../src/modules/importacao/carregar-pasta.js';
 import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture, LINHAS_POR_FIXTURE } from '../helpers/fixtures.js';
+import { gerarBweb } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-const NOME = 'bweb-1t_ac_2026.csv.gz';
+const NOME = 'bweb-sintetico-2026.csv.gz';
 
 let base;
 let inputDir;
-let storageDir;
+let conteudo;
+let comprimido;
 
 describe('carga de CSV comprimido', () => {
   beforeAll(async () => {
     base = await mkdtemp(path.join(tmpdir(), 'bweb-gzip-carga-'));
     inputDir = path.join(base, 'entrada');
-    storageDir = path.join(base, 'storage');
-    await writeFile(
-      path.join(base, NOME),
-      gzipSync(await readFile(caminhoFixture('bweb-1t_ac_2026.csv')), { level: 9 }),
-    );
+    conteudo = Buffer.from(gerarBweb(), 'latin1');
+    comprimido = gzipSync(conteudo, { level: 9 });
+    await writeFile(path.join(base, NOME), comprimido);
   });
 
   beforeEach(async () => {
@@ -43,14 +42,14 @@ describe('carga de CSV comprimido', () => {
   });
 
   it(
-    'importa o .gz, guarda o comprimido e ignora a repetição',
+    'importa o .gz e ignora a repetição',
     async () => {
-      const resumo = await carregarPasta({ db, inputDir, storageDir });
+      const resumo = await carregarPasta({ db, inputDir });
 
       expect(resumo.arquivos).toBe(1);
       expect(resumo.importados).toBe(1);
       expect(resumo.falhas).toBe(0);
-      expect(resumo.lotes[0].linhas).toBe(LINHAS_POR_FIXTURE['bweb-1t_ac_2026.csv']);
+      expect(resumo.lotes[0].linhas).toBe(6);
 
       const lote = await db
         .selectFrom('lote_importacao')
@@ -60,18 +59,16 @@ describe('carga de CSV comprimido', () => {
 
       expect(lote.status).toBe('concluido');
       expect(lote.leiaute).toBe('BWEB_45');
-      expect(lote.caminho_armazenado.endsWith('.gz')).toBe(true);
-      expect(Number(lote.tamanho_bytes)).toBeLessThan(
-        Number((await readFile(caminhoFixture('bweb-1t_ac_2026.csv'))).length),
-      );
+      expect(Number(lote.tamanho_bytes)).toBe(comprimido.length);
+      expect(Number(lote.tamanho_bytes)).toBeLessThan(conteudo.length);
 
       const secoes = await db
         .selectFrom('boletim_versao')
         .select(({ fn }) => fn.countAll().as('total'))
         .executeTakeFirstOrThrow();
-      expect(Number(secoes.total)).toBeGreaterThan(0);
+      expect(Number(secoes.total)).toBe(2);
 
-      const repetido = await carregarPasta({ db, inputDir, storageDir });
+      const repetido = await carregarPasta({ db, inputDir });
       expect(repetido.ignorados).toBe(1);
       expect(repetido.importados).toBe(0);
     },

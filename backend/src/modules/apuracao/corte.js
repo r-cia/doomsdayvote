@@ -4,6 +4,8 @@ import { validar } from '../../lib/validar.js';
 
 const FUSO_EXIBICAO = 'America/Sao_Paulo';
 
+export const CARGO_EM_ESCOPO = sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`;
+
 const corteSchema = z
   .object({
     as_of: z.string().optional(),
@@ -70,7 +72,7 @@ export function aplicarFiltroCorte(qb, corte) {
   let consulta = qb
     .where('bv.ativo', '=', true)
     .where('bv.cd_tipo_urna', '=', 1)
-    .where(sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`);
+    .where(CARGO_EM_ESCOPO);
 
   if (corte.tipo === 'recebimento_intradiario') {
     consulta = consulta
@@ -88,13 +90,36 @@ export function aplicarFiltroCorte(qb, corte) {
   return consulta;
 }
 
+// Mesma regra de aplicarFiltroCorte, sobre as colunas de mv_secao_candidato_final (que já traz ativo, urna 1 e cargo).
+export function condicaoCorteMv(corte, alias = null) {
+  const coluna = (nome) => sql.ref(alias ? `${alias}.${nome}` : nome);
+
+  if (corte.tipo === 'recebimento_intradiario') {
+    return sql`(${coluna('precisao_dt_bu_recebido')} = 'DATA_HORA' AND ${coluna('dt_bu_recebido_ts')} <= ${corte.instante})`;
+  }
+
+  if (corte.tipo === 'recebimento_diario') {
+    return sql`(
+      (${coluna('precisao_dt_bu_recebido')} = 'DATA_HORA' AND (${coluna('dt_bu_recebido_ts')} AT TIME ZONE ${FUSO_EXIBICAO})::date <= ${corte.data})
+      OR (${coluna('precisao_dt_bu_recebido')} = 'DATA' AND ${coluna('dt_bu_recebido_data')} <= ${corte.data})
+    )`;
+  }
+
+  return null;
+}
+
+export function aplicarCorteMv(qb, corte, alias = null) {
+  const condicao = condicaoCorteMv(corte, alias);
+  return condicao ? qb.where(condicao) : qb;
+}
+
 function baseEscopo(db, { eleicaoId, cargo, escopo = {} }) {
   let qb = db
     .selectFrom('boletim_versao as bv')
     .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
     .where('bv.ativo', '=', true)
     .where('bv.cd_tipo_urna', '=', 1)
-    .where(sql`lower(bv.ds_cargo_pergunta) in ('presidente', 'governador')`)
+    .where(CARGO_EM_ESCOPO)
     .where('bv.eleicao_id', '=', eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', cargo);
   return aplicarEscopo(qb, escopo);
@@ -158,18 +183,25 @@ export async function avisosCorte(db, escopo, corte) {
 }
 
 export async function metadadosCorte(db, escopo, corte) {
-  let qb = db
+  const filtroEscopo = escopo.escopo ?? {};
+  const comSecao = Boolean(filtroEscopo.sgUf || filtroEscopo.cdMunicipio || filtroEscopo.nrZona || filtroEscopo.secaoId);
+
+  let bus = db
     .selectFrom('boletim_versao as bv')
-    .innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id')
-    .innerJoin('lote_importacao as l', 'l.id', 'bv.lote_id')
-    .select(['l.id', 'l.nome_arquivo', 'l.sha256', 'l.dt_geracao_arquivo', 'l.captured_at'])
+    .select(sql`1`.as('existe'))
+    .whereRef('bv.lote_id', '=', 'l.id')
     .where('bv.eleicao_id', '=', escopo.eleicaoId)
     .where('bv.cd_cargo_pergunta', '=', escopo.cargo);
+  if (comSecao) bus = bus.innerJoin('secao_eleitoral as s', 's.id', 'bv.secao_id');
 
-  qb = aplicarFiltroCorte(qb, corte);
-  qb = aplicarEscopo(qb, escopo.escopo ?? {});
+  bus = aplicarFiltroCorte(bus, corte);
+  bus = aplicarEscopo(bus, filtroEscopo);
 
-  const linhas = await qb.execute();
+  const linhas = await db
+    .selectFrom('lote_importacao as l')
+    .select(['l.id', 'l.nome_arquivo', 'l.sha256', 'l.dt_geracao_arquivo', 'l.captured_at'])
+    .where((eb) => eb.exists(bus))
+    .execute();
   const lotes = new Map();
   let source = null;
   let captured = null;

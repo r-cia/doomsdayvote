@@ -1,23 +1,21 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { sql } from 'kysely';
 import { criarDb } from '../../src/db/index.js';
 import { dividirLinhaBweb } from '../../src/modules/importacao/bweb/leitor.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { gerarRelatorioLote } from '../../src/modules/importacao/relatorio.js';
+import { NOME_2026, escreverArquivo, gerarBweb } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
-const fixture = fileURLToPath(new URL('../fixtures/bweb/bweb-1t_ac_2026.csv', import.meta.url));
-const SHA = '2996a34dfe22cc3a9a06589b82631144eb98f5b391ef9ab6689b97b8cf9c864c';
-
 const db = criarDb({ connectionString: url });
-let storageDir;
+let diretorio;
+let conteudo;
+let fixture;
 
 function juntar(campos) {
   return campos.map((campo) => `"${String(campo).replace(/"/g, '""')}"`).join(';');
@@ -41,19 +39,18 @@ async function contar(tabela) {
 }
 
 async function copiaAlterada(nome, alterar) {
-  const conteudo = await readFile(fixture, 'latin1');
   const linhas = conteudo.split(/\r?\n/);
   const header = dividirLinhaBweb(linhas[0]);
   const corpo = linhas.slice(1).filter((linha) => linha !== '');
   const alteradas = corpo.map((linha) => juntar(alterar(dividirLinhaBweb(linha), header)));
-  const destino = path.join(storageDir, nome);
-  await writeFile(destino, `${linhas[0]}\n${alteradas.join('\n')}\n`, 'latin1');
-  return destino;
+  return escreverArquivo(diretorio, nome, `${linhas[0]}\n${alteradas.join('\n')}\n`);
 }
 
 describe('importação idempotente e versionada', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-lote-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-lote-'));
+    conteudo = gerarBweb();
+    fixture = await escreverArquivo(diretorio, NOME_2026, conteudo);
   });
 
   beforeEach(async () => {
@@ -63,28 +60,28 @@ describe('importação idempotente e versionada', () => {
   afterAll(async () => {
     await limpar();
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
-  it('importa, guarda o original e é idempotente', async () => {
-    const primeiro = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), storageDir });
+  it('importa e é idempotente', async () => {
+    const primeiro = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture) });
 
     expect(primeiro.ignorado).toBe(false);
     expect(primeiro.lote.status).toBe('concluido');
-    expect(primeiro.lote.sha256).toBe(SHA);
-    expect(primeiro.lote.qt_linhas).toBe(1529);
-    expect(existsSync(path.join(storageDir, 'originais', `${SHA}.csv`))).toBe(true);
+    expect(primeiro.lote.sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(primeiro.lote.qt_linhas).toBe(6);
+    expect(primeiro.lote.qt_linhas_importadas).toBe(6);
 
     const versoes = await contar('boletim_versao');
     const resultados = await contar('resultado_votavel');
-    expect(versoes).toBeGreaterThan(0);
-    expect(resultados).toBe(1529);
+    expect(versoes).toBe(2);
+    expect(resultados).toBe(6);
 
     const relatorio = await gerarRelatorioLote(db, primeiro.lote.id);
     expect(relatorio.lote.id).toBe(primeiro.lote.id);
     expect(Array.isArray(relatorio.porCodigo)).toBe(true);
 
-    const segundo = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), storageDir });
+    const segundo = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture) });
     expect(segundo.ignorado).toBe(true);
     expect(await contar('boletim_versao')).toBe(versoes);
     expect(await contar('resultado_votavel')).toBe(resultados);
@@ -92,7 +89,7 @@ describe('importação idempotente e versionada', () => {
   });
 
   it('cria versão 2 ativa e mantém a 1 inativa quando o BU muda', async () => {
-    const primeiro = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), storageDir });
+    await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture) });
     const ativasAntes = await db
       .selectFrom('boletim_versao')
       .select(({ fn }) => fn.countAll().as('total'))
@@ -100,7 +97,7 @@ describe('importação idempotente e versionada', () => {
       .executeTakeFirstOrThrow();
 
     let primeira = true;
-    const alterado = await copiaAlterada('bweb-1t_ac_2026-qt.csv', (campos, header) => {
+    const alterado = await copiaAlterada('bweb-sintetico-2026-qt.csv', (campos, header) => {
       const indice = header.indexOf('QT_VOTOS');
       if (primeira) {
         campos[indice] = String(Number(campos[indice]) + 1);
@@ -109,7 +106,7 @@ describe('importação idempotente e versionada', () => {
       return campos;
     });
 
-    const segundo = await importarArquivo({ db, caminho: alterado, nomeArquivo: path.basename(alterado), storageDir });
+    const segundo = await importarArquivo({ db, caminho: alterado, nomeArquivo: path.basename(alterado) });
     expect(segundo.ignorado).toBe(false);
 
     const v2 = await db.selectFrom('boletim_versao').selectAll().where('versao', '=', 2).where('ativo', '=', true).execute();
@@ -136,16 +133,16 @@ describe('importação idempotente e versionada', () => {
   });
 
   it('não cria versão quando só DT_GERACAO muda', async () => {
-    await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), storageDir });
+    await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture) });
     const versoes = await contar('boletim_versao');
 
-    const alterado = await copiaAlterada('bweb-1t_ac_2026-geracao.csv', (campos, header) => {
+    const alterado = await copiaAlterada('bweb-sintetico-2026-geracao.csv', (campos, header) => {
       campos[header.indexOf('DT_GERACAO')] = '05/10/2026';
       campos[header.indexOf('HH_GERACAO')] = '10:00:00';
       return campos;
     });
 
-    const segundo = await importarArquivo({ db, caminho: alterado, nomeArquivo: path.basename(alterado), storageDir });
+    const segundo = await importarArquivo({ db, caminho: alterado, nomeArquivo: path.basename(alterado) });
     expect(segundo.lote.status).toBe('concluido');
     expect(await contar('boletim_versao')).toBe(versoes);
   });
@@ -156,35 +153,41 @@ describe('importação idempotente e versionada', () => {
     };
 
     await expect(
-      importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), storageDir, persistir: falha }),
+      importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), persistir: falha }),
     ).rejects.toThrow('falha simulada');
 
-    const loteFalhou = await db.selectFrom('lote_importacao').selectAll().where('sha256', '=', SHA).executeTakeFirstOrThrow();
+    const loteFalhou = await db.selectFrom('lote_importacao').selectAll().executeTakeFirstOrThrow();
     expect(loteFalhou.status).toBe('falhou');
     expect(loteFalhou.erro_codigo).toBe('ERRO_INTERNO');
     expect(await contar('boletim_versao')).toBe(0);
 
-    const retomada = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture), storageDir });
+    const retomada = await importarArquivo({ db, caminho: fixture, nomeArquivo: path.basename(fixture) });
     expect(retomada.lote.id).toBe(loteFalhou.id);
     expect(retomada.lote.status).toBe('concluido');
   });
 
   it('falha antes de criar lote quando o arquivo não existe', async () => {
     await expect(
-      importarArquivo({ db, caminho: path.join(storageDir, 'nao-existe.csv'), nomeArquivo: 'nao-existe.csv', storageDir }),
+      importarArquivo({
+        db,
+        caminho: path.join(diretorio, 'nao-existe.csv'),
+        nomeArquivo: 'nao-existe.csv',
+      }),
     ).rejects.toBeTruthy();
     expect(await contar('lote_importacao')).toBe(0);
   });
 
   it('marca falha de leiaute sem importar dados', async () => {
-    const conteudo = await readFile(fixture, 'latin1');
     const linhas = conteudo.split(/\r?\n/);
-    linhas[0] = linhas[0].replace('"NR_TURMA_APURADORA"', '"NR_TURMA"');
-    const destino = path.join(storageDir, 'bweb-1t_ac_2026-cabecalho.csv');
-    await writeFile(destino, linhas.join('\n'), 'latin1');
+    linhas[0] = linhas[0].replace('NR_TURMA_APURADORA', 'NR_TURMA');
+    const destino = await escreverArquivo(
+      diretorio,
+      'bweb-sintetico-2026-cabecalho.csv',
+      linhas.join('\n'),
+    );
 
     await expect(
-      importarArquivo({ db, caminho: destino, nomeArquivo: path.basename(destino), storageDir }),
+      importarArquivo({ db, caminho: destino, nomeArquivo: path.basename(destino) }),
     ).rejects.toMatchObject({ codigo: 'MUDANCA_LEIAUTE' });
 
     const lote = await db

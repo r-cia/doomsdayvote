@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import pino from 'pino';
 import { z } from 'zod';
 import { buildApp } from '../../src/app.js';
 import { validar } from '../../src/lib/validar.js';
@@ -18,6 +19,29 @@ describe('buildApp', () => {
     expect(resposta.json()).toEqual({
       error: { code: 'NOT_FOUND', message: 'Rota não encontrada' },
     });
+  });
+
+  it('registra reqId, status e responseTime em cada requisição', async () => {
+    const linhas = [];
+    const logger = pino({ level: 'info' }, { write: (texto) => linhas.push(texto) });
+    const app = buildApp({
+      deps: { logger },
+      rotas: (escopo) => {
+        escopo.get('/api/ping', async () => ({ ok: true }));
+      },
+    });
+
+    await app.inject({ method: 'GET', url: '/api/ping' });
+
+    const evento = linhas
+      .map((linha) => JSON.parse(linha))
+      .find((linha) => linha.msg === 'http_resposta');
+
+    expect(evento.reqId).toBeTruthy();
+    expect(evento.status).toBe(200);
+    expect(typeof evento.responseTime).toBe('number');
+    expect(evento).not.toHaveProperty('authorization');
+    expect(evento).not.toHaveProperty('req');
   });
 
   it('não vaza detalhe interno em produção', async () => {

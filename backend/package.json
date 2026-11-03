@@ -7,18 +7,19 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "node --max-old-space-size=30720 --stack-size=32000 --env-file-if-exists=.env --watch src/server.js",
-    "start": "node --max-old-space-size=30720 --stack-size=32000 --env-file-if-exists=.env src/server.js",
+    "dev": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env --watch src/server.js",
+    "start": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/server.js",
     "migrate": "node --env-file-if-exists=.env src/scripts/migrate.js",
     "migrate:reset": "node --env-file-if-exists=.env src/scripts/migrate.js --reset",
     "test": "vitest run",
-    "purge:originais": "node --env-file-if-exists=.env src/scripts/purge-originais.js",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:integration": "vitest run --config vitest.integration.config.js",
-    "carga": "node --max-old-space-size=30720 --stack-size=32000 --env-file-if-exists=.env src/scripts/carregar-pasta.js",
+    "test:integration": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run --config vitest.integration.config.js",
+    "carga": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/scripts/carregar-pasta.js",
+    "totalizacao:carregar": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/scripts/totalizacao-carregar.js",
     "seed:cores": "node --env-file-if-exists=.env src/scripts/seed-cores.js",
     "cores:pendentes": "node --env-file-if-exists=.env src/scripts/cores-pendentes.js",
+    "carga:status": "node --env-file-if-exists=.env src/scripts/carga-status.js",
     "geo:carregar": "node --env-file-if-exists=.env src/scripts/geo-carregar.js"
   },
   "dependencies": {

@@ -1,8 +1,5 @@
 import { createHash } from 'node:crypto';
-import { constants } from 'node:fs';
-import { copyFile, mkdir } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
-import path from 'node:path';
 import { instanteOrigemSql } from '../../lib/datas.js';
 
 export function calcularSha256(caminho) {
@@ -15,22 +12,7 @@ export function calcularSha256(caminho) {
   });
 }
 
-export async function armazenarOriginal(caminho, sha256, storageDir) {
-  const diretorio = path.join(storageDir, 'originais');
-  await mkdir(diretorio, { recursive: true });
-  const extensao = path.extname(caminho).toLowerCase();
-  const destino = path.join(diretorio, `${sha256}${extensao}`);
-
-  try {
-    await copyFile(caminho, destino, constants.COPYFILE_EXCL);
-  } catch (erro) {
-    if (erro.code !== 'EEXIST') throw erro;
-  }
-
-  return destino;
-}
-
-export async function iniciarLote(db, { nomeArquivo, caminhoArmazenado, sha256, tamanhoBytes, capturedAt }) {
+export async function iniciarLote(db, { nomeArquivo, sha256, tamanhoBytes, capturedAt }) {
   const existente = await db
     .selectFrom('lote_importacao')
     .selectAll()
@@ -66,7 +48,6 @@ export async function iniciarLote(db, { nomeArquivo, caminhoArmazenado, sha256, 
     .insertInto('lote_importacao')
     .values({
       nome_arquivo: nomeArquivo,
-      caminho_armazenado: caminhoArmazenado,
       sha256,
       tamanho_bytes: tamanhoBytes,
       captured_at: capturedAt,
@@ -99,7 +80,7 @@ export async function concluirLote(db, loteId, { leiaute, dtGeracaoArquivo, qtLi
     .executeTakeFirstOrThrow();
 }
 
-export async function falharLote(db, loteId, { codigo, mensagem }) {
+export async function falharLote(db, loteId, { codigo, mensagem, duracaoMs }) {
   return db
     .updateTable('lote_importacao')
     .set({
@@ -107,6 +88,7 @@ export async function falharLote(db, loteId, { codigo, mensagem }) {
       erro_codigo: codigo,
       erro_mensagem: mensagem,
       imported_at: new Date(),
+      duracao_ms: duracaoMs ?? null,
     })
     .where('id', '=', loteId)
     .returningAll()

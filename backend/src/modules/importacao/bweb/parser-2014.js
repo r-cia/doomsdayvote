@@ -17,7 +17,13 @@ export function parsearRegistro2014(campos, nrLinha, derivados) {
   registro.valores.NR_TURNO = derivados.turno;
   delete registro.ausencias.NR_TURNO;
 
-  if (registro.valores.SG_UF && registro.valores.SG_UF !== derivados.uf) {
+  // O leiaute de 2014 não tem SG_PARTIDO; NM_PARTIDO já traz a sigla.
+  if (registro.valores.NM_PARTIDO) {
+    registro.valores.SG_PARTIDO = registro.valores.NM_PARTIDO;
+    delete registro.ausencias.SG_PARTIDO;
+  }
+
+  if (registro.valores.SG_UF &&registro.valores.SG_UF !== derivados.uf) {
     alertar(registro, 'SG_UF', `UF do nome (${derivados.uf}) difere da linha (${registro.valores.SG_UF})`);
   }
 

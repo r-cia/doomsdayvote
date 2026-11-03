@@ -1,6 +1,8 @@
+import { mediana } from './estatistica-basica.js'
+import { featuresDasSecoes } from './estatisticas.js'
+
 export const FEATURES = Object.freeze([
   'participacao',
-  'abstencao',
   'biometria',
   'hora',
   'tamanho',
@@ -103,15 +105,7 @@ export function isolationForest(dados, { arvores = 100, amostra = 256, semente =
   return { scores, arvores, amostra: tamanhoAmostra, limiar: 0.6 }
 }
 
-function mediana(valores) {
-  const ordenados = [...valores].sort((a, b) => a - b)
-  const meio = Math.floor(ordenados.length / 2)
-  return ordenados.length % 2 === 0
-    ? (ordenados[meio - 1] + ordenados[meio]) / 2
-    : ordenados[meio]
-}
-
-export function padronizarRobusto(dados) {
+function padronizarRobusto(dados) {
   if (dados.length === 0) return { padronizados: [], medianas: [], iqrs: [] }
   const colunas = dados[0].map((_, indice) => dados.map((linha) => linha[indice]))
   const medianas = colunas.map(mediana)
@@ -177,21 +171,28 @@ export function localOutlierFactor(dados, { k = 10, limiar = 2 } = {}) {  const 
   return { scores, k: vizinhosK, limiar }
 }
 
-export function amostraLof(total, scores, limite = 2000) {
+export function amostraLof(total, scores, limite = 5000, semente = 42) {
   if (total <= limite) return Array.from({ length: total }, (_, indice) => indice)
 
+  const rng = mulberry32(semente)
   const ordem = Array.from({ length: total }, (_, indice) => indice).sort(
     (a, b) => scores[b] - scores[a],
   )
   const escolhidos = ordem.slice(0, Math.min(500, total))
   const conjunto = new Set(escolhidos)
-  const restante = limite - escolhidos.length
 
-  for (let i = 0; i < restante; i += 1) {
-    const indice = Math.floor((i * total) / restante)
-    if (conjunto.has(indice)) continue
-    conjunto.add(indice)
-    escolhidos.push(indice)
+  const candidatos = Array.from({ length: total }, (_, indice) => indice).filter(
+    (indice) => !conjunto.has(indice),
+  )
+  for (let i = candidatos.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1))
+    ;[candidatos[i], candidatos[j]] = [candidatos[j], candidatos[i]]
+  }
+
+  const faltam = limite - escolhidos.length
+  for (let i = 0; i < faltam && i < candidatos.length; i += 1) {
+    conjunto.add(candidatos[i])
+    escolhidos.push(candidatos[i])
   }
 
   if (escolhidos.length < limite) {
@@ -203,4 +204,72 @@ export function amostraLof(total, scores, limite = 2000) {
   }
 
   return escolhidos
+}
+
+export function vencedoresPorMunicipio(linhas) {
+  const votosPorMunicipio = new Map()
+  for (const linha of linhas) {
+    const chave = `${linha.sg_uf}|${linha.cd_municipio_tse}`
+    if (!votosPorMunicipio.has(chave)) {
+      votosPorMunicipio.set(chave, new Map())
+    }
+    const candidatos = votosPorMunicipio.get(chave)
+    const atual = candidatos.get(linha.nr_votavel) ?? {
+      nr_votavel: linha.nr_votavel,
+      nm_votavel: linha.nm_votavel,
+      sg_partido: linha.sg_partido,
+      votos: 0,
+    }
+    atual.votos += Number(linha.votos ?? 0)
+    candidatos.set(linha.nr_votavel, atual)
+  }
+  const vencedorCidade = new Map()
+  for (const [chave, candidatos] of votosPorMunicipio) {
+    let vencedor = null
+    for (const candidato of candidatos.values()) {
+      if (!vencedor || candidato.votos > vencedor.votos) {
+        vencedor = candidato
+      }
+    }
+    if (vencedor) {
+      vencedorCidade.set(chave, {
+        nr_votavel: vencedor.nr_votavel,
+        nm_votavel: vencedor.nm_votavel,
+        sg_partido: vencedor.sg_partido,
+      })
+    }
+  }
+  return vencedorCidade
+}
+
+export function pontuarOutliers(linhas) {
+  const secoes = featuresDasSecoes(linhas)
+  const matriz = secoes.map((secao) =>
+    FEATURES.map((feature) => secao[feature]),
+  )
+  const isolamento = isolationForest(matriz, { semente: 42 })
+  const indices = amostraLof(secoes.length, isolamento.scores)
+  const lof = localOutlierFactor(
+    indices.map((indice) => matriz[indice]),
+    { k: 10 },
+  )
+  const scoreLof = new Map(
+    indices.map((indice, posicao) => [indice, lof.scores[posicao]]),
+  )
+
+  const vencedorCidade = vencedoresPorMunicipio(linhas)
+  const pontuadas = secoes
+    .map((secao, indice) => {
+      const chave = `${secao.sg_uf}|${secao.cd_municipio_tse}`
+      const vencedor = vencedorCidade.get(chave) ?? null
+      return {
+        ...secao,
+        score_if: isolamento.scores[indice],
+        score_lof: scoreLof.get(indice) ?? null,
+        vencedor,
+      }
+    })
+    .sort((a, b) => b.score_if - a.score_if)
+
+  return { total: secoes.length, isolamento, lof, amostraLof: indices.length, pontuadas }
 }

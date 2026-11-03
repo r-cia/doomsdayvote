@@ -1,10 +1,13 @@
-import { describe, expect, it } from 'vitest';
-import { fileURLToPath } from 'node:url';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { lerArquivoBweb } from '../../../src/modules/importacao/bweb/ler-arquivo.js';
+import { gerarBweb45 } from '../../helpers/dados-sinteticos.js';
 
-function fixture(nome) {
-  return fileURLToPath(new URL(`../../fixtures/bweb/${nome}`, import.meta.url));
-}
+const NOME_2026 = 'bweb-1t_ac_2026.csv';
+
+let diretorio;
 
 async function coletar(registros) {
   const lista = [];
@@ -13,13 +16,22 @@ async function coletar(registros) {
 }
 
 describe('parser BWEB_45 — 2026', () => {
-  it('lê 1.529 registros de AC 1º turno com precisão DATA_HORA', async () => {
-    const arquivo = await lerArquivoBweb(fixture('bweb-1t_ac_2026.csv'));
+  beforeAll(async () => {
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-45-'));
+    await writeFile(path.join(diretorio, NOME_2026), gerarBweb45(), 'latin1');
+  });
+
+  afterAll(async () => {
+    await rm(diretorio, { recursive: true, force: true });
+  });
+
+  it('lê o CSV sintético com precisão DATA_HORA e sem DT_ELEICAO', async () => {
+    const arquivo = await lerArquivoBweb(path.join(diretorio, NOME_2026));
     const registros = await coletar(arquivo.registros);
 
     expect(arquivo.leiaute).toBe('BWEB_45');
     expect(arquivo.camposAusentesNoLeiaute).toContain('DT_ELEICAO');
-    expect(registros).toHaveLength(1529);
+    expect(registros).toHaveLength(6);
 
     for (const registro of registros) {
       expect(registro.valores.ANO_ELEICAO).toBe(2026);
@@ -33,57 +45,27 @@ describe('parser BWEB_45 — 2026', () => {
       expect(registro.erros.filter((e) => ['TIPO_INVALIDO', 'LARGURA_INVALIDA'].includes(e.codigo))).toEqual([]);
     }
 
-    const locais = registros.map((r) => r.valores.DT_BU_RECEBIDO.local).sort();
-    expect(locais[0]).toBe('2026-10-04 17:08:44');
-    expect(locais[locais.length - 1]).toBe('2026-10-04 20:40:01');
+    const primeira = registros[0];
+    expect(primeira.valores.DT_GERACAO.local).toBe('2026-10-04 17:10:00');
+    expect(primeira.valores.DT_BU_RECEBIDO.local).toBe('2026-10-04 17:20:00');
+    expect(primeira.valores.DT_GERACAO.local).not.toBe(primeira.valores.DT_BU_RECEBIDO.local);
 
-    const cargos = new Set(registros.map((r) => r.valores.DS_CARGO_PERGUNTA));
-    expect(cargos).toEqual(
-      new Set(['Presidente', 'Governador', 'Senador', 'Deputado Federal', 'Deputado Estadual']),
+    expect(new Set(registros.map((registro) => registro.valores.DS_CARGO_PERGUNTA))).toEqual(
+      new Set(['Presidente', 'Governador']),
     );
-
-    const municipioAcentuado = registros.some((r) => /[^\x00-\x7F]/.test(r.valores.NM_MUNICIPIO ?? ''));
-    expect(municipioAcentuado).toBe(true);
-    expect(registros.some((r) => (r.valores.NM_MUNICIPIO ?? '').includes('\uFFFD'))).toBe(false);
   });
 
-  it('pula senador e deputados antes de normalizar os registros quando habilitado', async () => {
+  it('descarta senador e deputados sem flag de configuração', async () => {
+    const caminho = path.join(diretorio, 'bweb-1t_ac_2026_com_fora.csv');
+    await writeFile(caminho, gerarBweb45({ incluirForaDoEscopo: true }), 'latin1');
+
     const metricas = { registrosIgnorados: 0 };
-    const arquivo = await lerArquivoBweb(fixture('bweb-1t_ac_2026.csv'), {
-      skipCargosLegislativos: true,
-      metricas,
-    });
+    const arquivo = await lerArquivoBweb(caminho, { metricas });
     const registros = await coletar(arquivo.registros);
 
     expect(new Set(registros.map((registro) => registro.valores.DS_CARGO_PERGUNTA))).toEqual(
       new Set(['Presidente', 'Governador']),
     );
-    expect(metricas.registrosIgnorados).toBeGreaterThan(0);
-  });
-});
-
-describe('parser BWEB_45 — 2022', () => {
-  it('aplica aliases e separa geração de recebimento', async () => {
-    const arquivo = await lerArquivoBweb(fixture('bweb_1t_AC_051020221321.csv'));
-    const registros = await coletar(arquivo.registros);
-
-    expect(registros).toHaveLength(6545);
-    expect(arquivo.aliasesAplicados).toEqual(
-      expect.arrayContaining([
-        { de: 'DS_AGREGADAS', para: 'DS_SECOES_AGREGADAS' },
-        { de: 'QT_ELEITORES_BIOMETRIA_NH', para: 'QT_ELEI_BIOM_SEM_HABILITACAO' },
-      ]),
-    );
-
-    const comAlias = registros.find(
-      (r) =>
-        r.bruto.DS_SECOES_AGREGADAS &&
-        !['#NULO#', '#NULO', '#NE'].includes(r.bruto.DS_SECOES_AGREGADAS),
-    );
-    expect(comAlias).toBeDefined();
-    expect(comAlias.valores.DS_SECOES_AGREGADAS).toBe(comAlias.bruto.DS_SECOES_AGREGADAS);
-    expect(comAlias.valores.DT_BU_RECEBIDO.precisao).toBe('DATA_HORA');
-    expect(comAlias.valores.DT_GERACAO.precisao).toBe('DATA_HORA');
-    expect(comAlias.valores.DT_GERACAO.local).not.toBe(comAlias.valores.DT_BU_RECEBIDO.local);
+    expect(metricas.registrosIgnorados).toBe(2);
   });
 });

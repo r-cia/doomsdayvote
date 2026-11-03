@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { criarDb } from '../../src/db/index.js';
@@ -8,21 +8,33 @@ import { contarSecoesComBu } from '../../src/modules/apuracao/progresso.js';
 import { somarMetricasSecao, somarVotos } from '../../src/modules/apuracao/totais.js';
 import { dividirLinhaBweb } from '../../src/modules/importacao/bweb/leitor.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
-import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
+import {
+  NOME_2018,
+  NOME_2026,
+  escreverArquivo,
+  gerarBweb2018Multi,
+  gerarBwebMulti,
+  secoes2018,
+  secoes2026,
+} from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+const SECOES = 6;
+let diretorio;
 
 function juntar(campos) {
   return campos.map((campo) => `"${String(campo).replace(/"/g, '""')}"`).join(';');
 }
 
-async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  const resultado = await importarArquivo({ db, caminho, nomeArquivo: nome });
+  await atualizarViews(db);
+  return resultado;
 }
 
 async function alvoCargo(nome) {
@@ -36,7 +48,7 @@ async function alvoCargo(nome) {
 
 describe('regressão da apuração', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-regressao-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-regressao-'));
   });
 
   beforeEach(async () => {
@@ -46,13 +58,14 @@ describe('regressão da apuração', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
     'idempotência, corte, versão única e métricas',
     async () => {
-      await importar('bweb-1t_ac_2026.csv');
+      const conteudo = gerarBwebMulti(secoes2026(SECOES));
+      await importar(NOME_2026, conteudo);
       const { eleicaoId, cargo } = await alvoCargo('Presidente');
       const final = resolverCorte({});
 
@@ -71,17 +84,15 @@ describe('regressão da apuração', () => {
         corte: resolverCorte({ as_of: '2026-10-04T17:08:43-03:00' }),
       })).toBe(0);
 
-      const repetido = await importar('bweb-1t_ac_2026.csv');
+      const repetido = await importar(NOME_2026, conteudo);
       expect(repetido.ignorado).toBe(true);
       expect(await somarVotos(db, { eleicaoId, cargo, corte: final })).toEqual(votosAntes);
       expect(await somarMetricasSecao(db, { eleicaoId, cargo, corte: final })).toEqual(metricasAntes);
 
-      const conteudo = await readFile(caminhoFixture('bweb-1t_ac_2026.csv'), 'latin1');
       const linhas = conteudo.split(/\r?\n/);
       const header = dividirLinhaBweb(linhas[0]);
       const indiceCargo = header.indexOf('DS_CARGO_PERGUNTA');
       const indiceVotos = header.indexOf('QT_VOTOS');
-      const indiceNr = header.indexOf('NR_VOTAVEL');
       let alterado = false;
       const corpo = linhas.slice(1).filter(Boolean).map((linha) => {
         const campos = dividirLinhaBweb(linha);
@@ -93,9 +104,13 @@ describe('regressão da apuração', () => {
       });
       expect(alterado).toBe(true);
 
-      const destino = path.join(storageDir, 'bweb-1t_ac_2026-versao.csv');
-      await writeFile(destino, `${linhas[0]}\n${corpo.join('\n')}\n`, 'latin1');
-      await importarArquivo({ db, caminho: destino, nomeArquivo: path.basename(destino), storageDir });
+      const destino = await escreverArquivo(
+        diretorio,
+        'bweb-sintetico-2026-versao.csv',
+        `${linhas[0]}\n${corpo.join('\n')}\n`,
+      );
+      await importarArquivo({ db, caminho: destino, nomeArquivo: path.basename(destino) });
+      await atualizarViews(db);
 
       const votosDepois = await somarVotos(db, { eleicaoId, cargo, corte: final });
       const totalAntes = votosAntes.reduce((total, item) => total + item.qt_votos, 0);
@@ -108,7 +123,7 @@ describe('regressão da apuração', () => {
         .where('ativo', '=', true)
         .executeTakeFirstOrThrow();
       expect(Number(versoesDepois.total)).toBe(Number(versoesAntes.total));
-      expect(secoesAntes).toBeGreaterThan(0);
+      expect(secoesAntes).toBe(SECOES);
     },
     { timeout: 180000 },
   );
@@ -116,10 +131,10 @@ describe('regressão da apuração', () => {
   it(
     '2018 não entra em corte temporal',
     async () => {
-      await importar('bweb_2t_AC_301020181744.csv');
+      await importar(NOME_2018, gerarBweb2018Multi(secoes2018(SECOES)));
       const { eleicaoId, cargo } = await alvoCargo('Presidente');
       const final = await contarSecoesComBu(db, { eleicaoId, cargo, corte: { tipo: 'final' } });
-      expect(final).toBeGreaterThan(0);
+      expect(final).toBe(SECOES);
       expect(
         await contarSecoesComBu(db, {
           eleicaoId,

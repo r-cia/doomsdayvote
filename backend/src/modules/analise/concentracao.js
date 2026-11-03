@@ -1,0 +1,352 @@
+import { agruparSecoes } from './comparacao-local.js';
+import { ordenarLista } from '../../lib/ordenacao.js';
+import { expandirSecao, secoesCompactas } from './mv-secao-candidato.js';
+import { criarPercentilRank, desvioPadrao, media, toNumberOrNull } from './estatistica-basica.js';
+
+export const COLUNAS_CONCENTRACAO = {
+  sg_uf: (i) => i.secao?.sg_uf,
+  nm_municipio: (i) => i.secao?.nm_municipio,
+  nr_zona: (i) => i.secao?.nr_zona,
+  nr_secao: (i) => i.secao?.nr_secao,
+  share_lider: (i) => i.share_lider,
+  margem_absoluta: (i) => i.margem_absoluta,
+  margem_pp: (i) => i.margem_pp,
+  share_lider_percentil: (i) => i.contexto?.share_lider_percentil,
+};
+
+function normalizarSecao(secao) {
+  const candidatos = (secao?.candidatos ?? []).map((c) => ({
+    nr_votavel: c?.nr_votavel ?? null,
+    nm_votavel: c?.nm_votavel ?? null,
+    sg_partido: c?.sg_partido ?? null,
+    votos: toNumberOrNull(c?.qt_votos),
+  }));
+
+  return {
+    id: secao?.id ?? null,
+    sg_uf: secao?.sg_uf ?? null,
+    cd_municipio_tse: secao?.cd_municipio_tse ?? null,
+    nm_municipio: secao?.nm_municipio ?? null,
+    nr_zona: secao?.nr_zona ?? null,
+    nr_secao: secao?.nr_secao ?? null,
+    nr_local_votacao: secao?.nr_local_votacao ?? null,
+    aptos: toNumberOrNull(secao?.qt_aptos),
+    validos: toNumberOrNull(secao?.qt_votos_validos),
+    candidatos,
+  };
+}
+
+function metricasSecao(secao) {
+  const candidatos = secao.candidatos
+    .map((c) => ({
+      nr_votavel: c.nr_votavel,
+      nm_votavel: c.nm_votavel,
+      sg_partido: c.sg_partido,
+      votos: c.votos,
+    }))
+    .filter((c) => c.votos !== null);
+
+  const validosCalculado = candidatos.reduce((soma, c) => soma + (c.votos ?? 0), 0);
+  const validos =
+    secao.validos !== null && secao.validos !== undefined
+      ? secao.validos
+      : validosCalculado > 0
+        ? validosCalculado
+        : null;
+
+  const ordenados = [...candidatos].sort((a, b) => {
+    const diff = (b.votos ?? 0) - (a.votos ?? 0);
+    if (diff !== 0) return diff;
+    return Number(a.nr_votavel ?? 0) - Number(b.nr_votavel ?? 0);
+  });
+
+  const lider = ordenados[0] ?? null;
+  const segundo = ordenados[1] ?? null;
+
+  const shareLider =
+    validos !== null && validos > 0 && lider ? lider.votos / validos : null;
+  const shareSegundo =
+    validos !== null && validos > 0 && segundo ? segundo.votos / validos : null;
+  const margemAbsoluta =
+    lider && segundo ? lider.votos - segundo.votos : null;
+  const margemPp =
+    shareLider !== null && shareSegundo !== null
+      ? (shareLider - shareSegundo) * 100
+      : null;
+
+  return {
+    secao: {
+      id: secao.id,
+      sg_uf: secao.sg_uf,
+      cd_municipio_tse: secao.cd_municipio_tse,
+      nm_municipio: secao.nm_municipio,
+      nr_zona: secao.nr_zona,
+      nr_secao: secao.nr_secao,
+      nr_local_votacao: secao.nr_local_votacao,
+    },
+    aptos: secao.aptos,
+    validos,
+    candidatos: candidatos.map((c) => ({
+      nr_votavel: c.nr_votavel,
+      nm_votavel: c.nm_votavel,
+      sg_partido: c.sg_partido,
+      votos: c.votos,
+      share: validos && validos > 0 && c.votos !== null ? c.votos / validos : null,
+    })),
+    lider: lider
+      ? {
+          nr_votavel: lider.nr_votavel,
+          nm_votavel: lider.nm_votavel,
+          sg_partido: lider.sg_partido,
+          votos: lider.votos,
+          share: shareLider,
+        }
+      : null,
+    segundo: segundo
+      ? {
+          nr_votavel: segundo.nr_votavel,
+          nm_votavel: segundo.nm_votavel,
+          sg_partido: segundo.sg_partido,
+          votos: segundo.votos,
+          share: shareSegundo,
+        }
+      : null,
+    share_lider: shareLider,
+    share_segundo: shareSegundo,
+    margem_absoluta: margemAbsoluta,
+    margem_pp: margemPp,
+  };
+}
+
+function enriquecerGrupo(lista, grupoInfo, origem, minimoGrupo) {
+  const shares = lista.map((s) => s.share_lider).filter((v) => typeof v === 'number' && Number.isFinite(v));
+  const margens = lista.map((s) => s.margem_absoluta).filter((v) => typeof v === 'number' && Number.isFinite(v));
+
+  const mediaShare = media(shares);
+  const desvioShare = desvioPadrao(shares);
+  const mediaMargem = media(margens);
+  const desvioMargem = desvioPadrao(margens);
+
+  const ok = lista.length >= minimoGrupo && shares.length >= 2;
+  const rankShare = criarPercentilRank(shares);
+  const rankMargem = criarPercentilRank(margens);
+
+  return lista.map((s) => ({
+    ...s,
+    contexto: {
+      origem,
+      grupo: {
+        nivel: grupoInfo?.nivel ?? null,
+        chave: grupoInfo?.chave ?? null,
+        tamanho: grupoInfo?.tamanho ?? lista.length,
+      },
+      share_lider_percentil: ok ? rankShare(s.share_lider) : null,
+      share_lider_z:
+        ok && desvioShare && desvioShare > 0
+          ? (s.share_lider - mediaShare) / desvioShare
+          : null,
+      margem_percentil: ok ? rankMargem(s.margem_absoluta) : null,
+      margem_z:
+        ok && desvioMargem && desvioMargem > 0
+          ? (s.margem_absoluta - mediaMargem) / desvioMargem
+          : null,
+      media_share: mediaShare,
+      desvio_share: desvioShare,
+      media_margem: mediaMargem,
+      desvio_margem: desvioMargem,
+      estado: ok ? 'ok' : 'dados_insuficientes',
+    },
+  }));
+}
+
+function agruparPorFaixaAptos(lista, { bandas, minimoGrupo }) {
+  const comAptos = lista.filter((s) => s.aptos !== null);
+  const semAptos = lista.filter((s) => s.aptos === null);
+  const resultado = [];
+
+  if (comAptos.length === 0) {
+    if (lista.length > 0) resultado.push(lista);
+    return resultado;
+  }
+
+  const ordenados = [...comAptos].sort((a, b) => a.aptos - b.aptos);
+  const n = ordenados.length;
+  const grupos = Math.max(1, Math.min(bandas, Math.floor(n / Math.max(1, minimoGrupo)) || 1));
+  const tamanhoBase = Math.floor(n / grupos);
+  let inicio = 0;
+  for (let i = 0; i < grupos; i += 1) {
+    const fim = i === grupos - 1 ? n : inicio + tamanhoBase;
+    resultado.push(ordenados.slice(inicio, fim));
+    inicio = fim;
+  }
+  if (semAptos.length > 0) resultado.push(semAptos);
+  return resultado;
+}
+
+function faixaChave(banda) {
+  const aptos = banda.map((s) => s.aptos).filter((v) => v !== null);
+  if (aptos.length === 0) return 'sem_aptos';
+  const minimo = aptos.reduce((min, v) => Math.min(min, v), Infinity);
+  const maximo = aptos.reduce((max, v) => Math.max(max, v), -Infinity);
+  return `aptos ${minimo}-${maximo}`;
+}
+
+export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4, ordenacaoShare, ordenacaoMargem } = {}) {
+  const normalizadas = secoes.map(normalizarSecao);
+  const metricas = normalizadas.map(metricasSecao);
+
+  const secoesParaGrupo = normalizadas.map((s) => ({
+    id: s.id,
+    sg_uf: s.sg_uf,
+    cd_municipio_tse: s.cd_municipio_tse,
+    nm_municipio: s.nm_municipio,
+    nr_zona: s.nr_zona,
+    nr_secao: s.nr_secao,
+    nr_local_votacao: s.nr_local_votacao,
+    qt_aptos: s.aptos,
+    candidatos: s.candidatos.map((c) => ({
+      nr_votavel: c.nr_votavel,
+      nm_votavel: c.nm_votavel,
+      sg_partido: c.sg_partido,
+      qt_votos: c.votos,
+    })),
+  }));
+
+  const gruposComp = agruparSecoes(secoesParaGrupo, { minimoGrupo });
+
+  const enriquecidosPorId = new Map();
+  const metricasPorId = new Map(metricas.map((m) => [m.secao.id, m]));
+  const paresDe = (ids) => [...ids].map((id) => metricasPorId.get(id)).filter(Boolean);
+
+  for (const grupo of gruposComp.grupos ?? []) {
+    const ids = new Set((grupo.secoes ?? []).map((item) => item?.secao?.id ?? item?.id));
+    const peers = paresDe(ids);
+    if (peers.length === 0) continue;
+    const enriched = enriquecerGrupo(
+      peers,
+      {
+        nivel: grupo.nivel,
+        chave: grupo.chave ?? null,
+        tamanho: grupo.tamanho ?? peers.length,
+      },
+      'grupo_comparavel',
+      minimoGrupo,
+    );
+    for (const e of enriched) enriquecidosPorId.set(e.secao.id, e);
+  }
+
+  const fallbackMetricas = metricas.filter((m) => !enriquecidosPorId.has(m.secao.id));
+  let faixasUtilizadas = 0;
+  if (fallbackMetricas.length > 0) {
+    const normalizadasPorId = new Map(normalizadas.map((n) => [n.id, n]));
+    const fallbackNormalizadas = fallbackMetricas.map((m) => normalizadasPorId.get(m.secao.id));
+    const bandasAgrupadas = agruparPorFaixaAptos(fallbackNormalizadas, { bandas, minimoGrupo });
+    faixasUtilizadas = bandasAgrupadas.length;
+    for (const banda of bandasAgrupadas) {
+      const peers = paresDe(new Set(banda.map((s) => s.id)));
+      if (peers.length === 0) continue;
+      const enriched = enriquecerGrupo(
+        peers,
+        {
+          nivel: 'faixa_aptos',
+          chave: faixaChave(banda),
+          tamanho: peers.length,
+        },
+        'faixa_aptos',
+        minimoGrupo,
+      );
+      for (const e of enriched) enriquecidosPorId.set(e.secao.id, e);
+    }
+  }
+
+  for (const m of metricas) {
+    if (enriquecidosPorId.has(m.secao.id)) continue;
+    enriquecidosPorId.set(m.secao.id, {
+      ...m,
+      contexto: {
+        origem: null,
+        grupo: null,
+        share_lider_percentil: null,
+        share_lider_z: null,
+        margem_percentil: null,
+        margem_z: null,
+        media_share: null,
+        desvio_share: null,
+        media_margem: null,
+        desvio_margem: null,
+        estado: 'dados_insuficientes',
+      },
+    });
+  }
+
+  const secoesFinais = metricas.map((m) => enriquecidosPorId.get(m.secao.id));
+
+  const topShare = ordenarLista(
+    [...secoesFinais]
+      .filter((s) => s.share_lider !== null)
+      .sort((a, b) => {
+        const diff = (b.share_lider ?? 0) - (a.share_lider ?? 0);
+        if (diff !== 0) return diff;
+        return (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0);
+      }),
+    COLUNAS_CONCENTRACAO,
+    ordenacaoShare,
+  ).slice(0, top);
+
+  const topMargem = ordenarLista(
+    [...secoesFinais]
+      .filter((s) => s.margem_absoluta !== null)
+      .sort((a, b) => (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0)),
+    COLUNAS_CONCENTRACAO,
+    ordenacaoMargem,
+  ).slice(0, top);
+
+  const comContexto = secoesFinais.filter((s) => s.contexto?.estado === 'ok').length;
+
+  return {
+    top_share: topShare,
+    top_margem: topMargem,
+    cobertura: {
+      consideradas: metricas.length,
+      com_contexto: comContexto,
+      sem_contexto: metricas.length - comContexto,
+      grupos: gruposComp.grupos?.length ?? 0,
+      grupos_insuficientes:
+        (gruposComp.grupos ?? []).filter((g) => g.dados_insuficientes).length,
+      faixas_aptos: faixasUtilizadas,
+    },
+    total: secoesFinais.length,
+  };
+}
+
+async function secoesPelaMv(db, { eleicaoId, cargo, corte, escopo }) {
+  const { secoes, votaveis } = await secoesCompactas(db, { eleicaoId, cargo, corte, escopo, categorias: ['nominal', 'legenda'] });
+  return secoes.map((secao) => {
+    const grupo = expandirSecao(secao, votaveis);
+    const primeira = grupo[0];
+    return {
+      id: primeira.secao_id,
+      sg_uf: primeira.sg_uf,
+      cd_municipio_tse: primeira.cd_municipio_tse,
+      nm_municipio: primeira.nm_municipio,
+      nr_zona: primeira.nr_zona,
+      nr_secao: primeira.nr_secao,
+      nr_local_votacao: primeira.nr_local_votacao,
+      qt_aptos: toNumberOrNull(primeira.qt_aptos),
+      qt_votos_validos: toNumberOrNull(primeira.validos) ?? 0,
+      candidatos: grupo
+        .filter((linha) => linha.categoria === 'nominal')
+        .map((linha) => ({
+          nr_votavel: linha.nr_votavel,
+          nm_votavel: linha.nm_votavel,
+          sg_partido: linha.sg_partido,
+          qt_votos: toNumberOrNull(linha.votos),
+        })),
+    };
+  });
+}
+
+export async function concentracao(db, { eleicaoId, cargo, corte, escopo = {}, limite = 20, ordenacaoShare, ordenacaoMargem } = {}) {
+  const secoes = await secoesPelaMv(db, { eleicaoId, cargo, corte: corte ?? { tipo: 'final' }, escopo });
+  return concentracaoPura(secoes, { top: limite, ordenacaoShare, ordenacaoMargem });
+}

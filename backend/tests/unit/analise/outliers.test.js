@@ -3,7 +3,6 @@ import {
   amostraLof,
   isolationForest,
   localOutlierFactor,
-  padronizarRobusto,
 } from '../../../src/modules/analise/outliers.js';
 
 function gerador(semente = 7) {
@@ -62,21 +61,6 @@ describe('localOutlierFactor', () => {
   it('devolve score 1 quando não há vizinhança suficiente', () => {
     const { scores } = localOutlierFactor([[0], [1]], { k: 5 });
     expect(scores).toEqual([1, 1]);
-  });
-});
-
-describe('padronizarRobusto', () => {
-  it('centraliza na mediana e escala pelo IQR', () => {
-    const { padronizados, medianas } = padronizarRobusto([
-      [1, 10],
-      [2, 20],
-      [3, 30],
-      [4, 40],
-      [100, 50],
-    ]);
-    expect(medianas).toEqual([3, 30]);
-    expect(padronizados[2]).toEqual([0, 0]);
-    expect(Math.abs(padronizados[4][0])).toBeGreaterThan(10);
   });
 });
 

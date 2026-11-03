@@ -1,0 +1,355 @@
+import { z } from 'zod';
+import { AppError } from '../lib/erros.js';
+import { corteResposta, resolverCorte } from '../modules/apuracao/corte.js';
+import { baseSecaoCandidato, benfordDosNiveis, benfordPorCandidato, biometriaPorUf, composicaoBiometria } from '../modules/analise/estatisticas.js';
+import { eleicoesDoAno, estatisticasDaEleicao } from '../modules/analise/descritivas.js';
+import { COLUNAS_DUPLICACAO, duplicacaoPorAssinatura } from '../modules/analise/duplicacao.js';
+import { COLUNAS_CONSISTENCIA, consistenciaPorSecao } from '../modules/analise/consistencia.js';
+import { comparacaoLocal } from '../modules/analise/comparacao-local.js';
+import { COLUNAS_CONCENTRACAO, concentracao } from '../modules/analise/concentracao.js';
+import { FEATURES, pontuarOutliers } from '../modules/analise/outliers.js';
+import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
+import { TTL_CACHE_ESTATICO, baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos, tamanhoPagina } from './comum.js';
+
+const COLUNAS_BENFORD = {
+  nm_votavel: (c) => c.nm_votavel,
+  n: (c) => c.n,
+  mad: (c) => c.mad,
+};
+
+const COLUNAS_BENFORD_NIVEIS = {
+  nm_votavel: (c) => c.nm_votavel,
+  secao_n: (c) => c.niveis.secao.n,
+  secao_mad: (c) => c.niveis.secao.mad,
+  zona_n: (c) => c.niveis.zona.n,
+  zona_mad: (c) => c.niveis.zona.mad,
+  municipio_n: (c) => c.niveis.municipio.n,
+  municipio_mad: (c) => c.niveis.municipio.mad,
+};
+
+const COLUNAS_BIOMETRIA_UF = {
+  sg_uf: (u) => u.sg_uf,
+  qt_habilitados_por_biometria: (u) => u.qt_habilitados_por_biometria,
+  percentual_habilitada: (u) => u.percentual_habilitada,
+  qt_biometria_nao_habilitada: (u) => u.qt_biometria_nao_habilitada,
+  percentual_nao_habilitada: (u) => u.percentual_nao_habilitada,
+};
+
+const COLUNAS_OUTLIERS = {
+  sg_uf: (s) => s.sg_uf,
+  nm_municipio: (s) => s.nm_municipio,
+  nr_zona: (s) => s.nr_zona,
+  nr_secao: (s) => s.nr_secao,
+  score_if: (s) => s.score_if,
+  score_lof: (s) => s.score_lof,
+  candidato: (s) => s.vencedor?.nm_votavel,
+};
+
+const COLUNAS_ESTATISTICAS = {
+  nm_votavel: (c) => c.nm_votavel,
+  sg_partido: (c) => c.sg_partido,
+  secoes: (c) => c.secoes,
+  secoes_zero: null,
+  media: (c) => c.media,
+  mediana: (c) => c.mediana,
+  desvio: (c) => c.desvio,
+};
+
+const COLUNAS_COMPARACAO_LOCAL = {
+  sg_uf: (i) => i.secao.sg_uf,
+  nm_municipio: (i) => i.secao.nm_municipio,
+  nr_zona: (i) => i.secao.nr_zona,
+  nr_secao: (i) => i.secao.nr_secao,
+  participacao: (i) => i.metricas?.participacao,
+  abstencao: (i) => i.metricas?.abstencao,
+  participacao_pp: (i) => i.distancia_pp?.participacao_pp,
+  abstencao_pp: (i) => i.distancia_pp?.abstencao_pp,
+};
+
+export function registrarAnalise({ app, db, cache, cacheado }) {
+  app.get('/api/analysis', cacheado('analysis', TTL_CACHE_ESTATICO, baseSchema.extend({
+    ...ordenacaoSchema(Object.keys(COLUNAS_BENFORD)),
+    ...ordenacaoSchema(Object.keys(COLUNAS_BIOMETRIA_UF), '_biometria_uf'),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const escopo = {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    };
+
+    const [biometria, biometriaUf, benford, [metadados, avisos]] = await Promise.all([
+      composicaoBiometria(db, escopo),
+      biometriaPorUf(db, escopo),
+      benfordPorCandidato(db, escopo),
+      metadadosEAvisos(cache, db, query, escopo, corte),
+    ]);
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      biometria,
+      biometria_uf: ordenarLista(biometriaUf, COLUNAS_BIOMETRIA_UF, lerOrdenacao(query, '_biometria_uf')),
+      benford: {
+        minimo_votos: benford.minimo_votos,
+        candidatos: ordenarLista(
+          benford.candidatos.map(({ niveis, ...candidato }) => ({
+            ...candidato,
+            ...niveis.secao,
+          })),
+          COLUNAS_BENFORD,
+          lerOrdenacao(query),
+        ),
+      },
+      cobertura: {
+        consideradas: biometria.secoes,
+        bus_sem_aptos: biometria.bus_sem_aptos,
+        bus_sem_comparecimento: biometria.bus_sem_comparecimento,
+        bus_sem_abstencoes: biometria.bus_sem_abstencoes,
+        bus_sem_biometria: biometria.bus_sem_biometria,
+        secoes_abaixo_minimo_benford: benford.candidatos.reduce(
+          (total, candidato) => total + (candidato.secoes_abaixo_minimo ?? 0),
+          0,
+        ),
+      },
+    };
+  }));
+
+  app.get('/api/anomalies', cacheado('anomalies', TTL_CACHE_ESTATICO, baseSchema.extend({
+    ...ordenacaoSchema(Object.keys(COLUNAS_OUTLIERS)),
+    ...ordenacaoSchema(Object.keys(COLUNAS_DUPLICACAO), '_duplicacao'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_BENFORD_NIVEIS), '_benford'),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const escopo = {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    };
+
+    const [linhas, duplicacao, [metadados, avisos]] = await Promise.all([
+      baseSecaoCandidato(db, escopo),
+      duplicacaoPorAssinatura(db, { ...escopo, ordenacao: lerOrdenacao(query, '_duplicacao') }),
+      metadadosEAvisos(cache, db, query, escopo, corte),
+    ]);
+
+    const benfordBase = benfordDosNiveis(linhas);
+    const benford = {
+      ...benfordBase,
+      candidatos: ordenarLista(benfordBase.candidatos, COLUNAS_BENFORD_NIVEIS, lerOrdenacao(query, '_benford')),
+    };
+    const outliers = pontuarOutliers(linhas);
+    const ranking = ordenarLista(outliers.pontuadas, COLUNAS_OUTLIERS, lerOrdenacao(query)).slice(0, 20);
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      benford_niveis: benford,
+      duplicacao,
+      outliers: {
+        features: FEATURES,
+        parametros: {
+          isolamento: {
+            arvores: outliers.isolamento.arvores,
+            amostra: outliers.isolamento.amostra,
+          },
+          lof: {
+            k: outliers.lof.k,
+            amostra: outliers.amostraLof,
+            limitado: outliers.total > outliers.amostraLof,
+          },
+        },
+        total_secoes: outliers.total,
+        secoes: ranking,
+      },
+      cobertura: {
+        consideradas: outliers.total,
+        benford_abaixo_minimo: benford.candidatos.reduce(
+          (total, candidato) => total + (candidato.niveis?.secao?.secoes_abaixo_minimo ?? 0),
+          0,
+        ),
+        duplicacao_grupos: duplicacao.total_grupos ?? 0,
+        duplicacao_secoes: duplicacao.total_secoes ?? 0,
+        duplicacao_secoes_escopo: duplicacao.total_secoes_escopo ?? 0,
+      },
+    };
+  }));
+
+  app.get('/api/estatisticas', cacheado('estatisticas', TTL_CACHE_ESTATICO, baseSchema.extend({
+    escopo: z.enum(['turno', 'ano']).default('turno'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_ESTATISTICAS)),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const irmaos = await eleicoesDoAno(db, { eleicao, cargo: query.cargo });
+    const alvos = query.escopo === 'ano' && irmaos.length > 0 ? irmaos : [eleicao];
+    const recorte = { cargo: query.cargo, corte, escopo: escopoDe(query) };
+
+    const blocos = [];
+    for (const alvo of alvos) {
+      const bloco = await estatisticasDaEleicao(db, { eleicao: alvo, ...recorte });
+      const colunas = {
+        ...COLUNAS_ESTATISTICAS,
+        secoes_zero: (c) => bloco.comparecimento.secoes - (c.secoes_com_voto ?? 0),
+      };
+      blocos.push({ ...bloco, candidatos: ordenarLista(bloco.candidatos, colunas, lerOrdenacao(query)) });
+    }
+
+    const secoesConsideradas = blocos.reduce(
+      (total, bloco) => total + Number(bloco.comparecimento?.secoes ?? 0),
+      0,
+    );
+
+    return {
+      corte: corteResposta(corte),
+      escopo: query.escopo,
+      turnos_disponiveis: irmaos.map((irmao) => irmao.nr_turno),
+      blocos,
+      cobertura: {
+        consideradas: secoesConsideradas,
+        blocos: blocos.length,
+      },
+    };
+  }));
+
+  app.get('/api/consistencia', cacheado('consistencia', TTL_CACHE_ESTATICO, baseSchema.extend({
+    regra: z.enum([
+      'comparecimento_vs_votos',
+      'aptos_vs_comparecimento_abstencao',
+      'comparecimento_vs_aptos',
+      'biometria_vs_comparecimento',
+    ]).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+    ...ordenacaoSchema(COLUNAS_CONSISTENCIA),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const pageSize = tamanhoPagina(app, query);
+
+    const resultado = await consistenciaPorSecao(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+      regra: query.regra,
+      ordenacao: lerOrdenacao(query),
+      limite: pageSize,
+      deslocamento: (query.page - 1) * pageSize,
+    });
+
+    const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      page: query.page,
+      page_size: pageSize,
+      total: resultado.total,
+      itens: resultado.itens,
+    };
+  }));
+
+  app.get('/api/comparacao-local', cacheado('comparacao-local', TTL_CACHE_ESTATICO, baseSchema.extend({
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+    ...ordenacaoSchema(Object.keys(COLUNAS_COMPARACAO_LOCAL)),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const pageSize = tamanhoPagina(app, query);
+
+    const resultado = await comparacaoLocal(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+    });
+
+    const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
+
+    const grupos = resultado.grupos ?? [];
+    const inicio = (query.page - 1) * pageSize;
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      page: query.page,
+      page_size: pageSize,
+      total: grupos.length,
+      grupos: grupos.slice(inicio, inicio + pageSize).map(({ secoes, ...grupo }) => grupo),
+    };
+  }));
+
+  app.get('/api/comparacao-local/secoes', cacheado('comparacao-local-secoes', TTL_CACHE_ESTATICO, baseSchema.extend({
+    chave: z.string().regex(/^(local|zona|municipio):[A-Z]{2}\|\d+(\|\d+)?$/),
+    ...ordenacaoSchema(Object.keys(COLUNAS_COMPARACAO_LOCAL)),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const [, uf, municipio] = /^\w+:([A-Z]{2})\|(\d+)/.exec(query.chave);
+
+    const resultado = await comparacaoLocal(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: { sgUf: uf, cdMunicipio: Number(municipio) },
+    });
+
+    const grupo = (resultado.grupos ?? []).find((item) => item.chave === query.chave);
+    if (!grupo) throw new AppError('NOT_FOUND', 404, 'Grupo não encontrado');
+
+    return {
+      corte: corteResposta(corte),
+      chave: grupo.chave,
+      secoes: ordenarLista(grupo.secoes, COLUNAS_COMPARACAO_LOCAL, lerOrdenacao(query)),
+    };
+  }));
+
+  app.get('/api/concentracao', cacheado('concentracao', TTL_CACHE_ESTATICO, baseSchema.extend({
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).optional(),
+    ...ordenacaoSchema(Object.keys(COLUNAS_CONCENTRACAO), '_share'),
+    ...ordenacaoSchema(Object.keys(COLUNAS_CONCENTRACAO), '_margem'),
+  }), async (query) => {
+    const corte = resolverCorte(query);
+    const eleicao = await buscarEleicao(db, query.election_id);
+    const pageSize = tamanhoPagina(app, query);
+
+    const resultado = await concentracao(db, {
+      eleicaoId: eleicao.id,
+      cargo: query.cargo,
+      corte,
+      escopo: escopoDe(query),
+      limite: query.limit,
+      ordenacaoShare: lerOrdenacao(query, '_share'),
+      ordenacaoMargem: lerOrdenacao(query, '_margem'),
+    });
+
+    const [metadados, avisos] = await metadadosEAvisos(cache, db, query, escopoDaEleicao(query, eleicao, corte), corte);
+
+    const inicio = (query.page - 1) * pageSize;
+
+    return {
+      corte: corteResposta(corte),
+      ...metadados,
+      avisos,
+      cobertura: resultado.cobertura,
+      page: query.page,
+      page_size: pageSize,
+      total: resultado.top_share.length,
+      top_share: resultado.top_share.slice(inicio, inicio + pageSize),
+      top_margem: resultado.top_margem.slice(inicio, inicio + pageSize),
+    };
+  }));
+}

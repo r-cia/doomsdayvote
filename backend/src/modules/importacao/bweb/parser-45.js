@@ -97,10 +97,10 @@ export function parsearRegistro45(campos, headerMap, nrLinha) {
   return parsearRegistro(campos, headerMap, nrLinha);
 }
 
-const CARGOS_LEGISLATIVOS = new Set(['senador', 'deputado federal', 'deputado estadual']);
+const CARGOS_ACEITOS = new Set(['presidente', 'governador']);
 
-export function ehCargoLegislativoIgnorado(valor) {
-  return CARGOS_LEGISLATIVOS.has(
+export function cargoForaDoEscopo(valor) {
+  return !CARGOS_ACEITOS.has(
     String(valor ?? '')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')

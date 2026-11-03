@@ -1,8 +1,16 @@
 import { sql } from 'kysely'
 import { aplicarEscopo, aplicarFiltroCorte } from '../apuracao/corte.js'
 import { calcularBenford } from './benford.js'
+import { linhasDeSecoesCompactas, secoesCompactas } from './mv-secao-candidato.js'
 
 export const MINIMO_VOTOS_BENFORD = 10
+
+const consultasBaseSecaoEmVoo = new WeakMap()
+
+function semClassificacao(resultado) {
+  const { classificacao, ...resto } = resultado
+  return resto
+}
 
 function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
   let qb = db
@@ -50,6 +58,10 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
       sql`coalesce(sum(bv.qt_comparecimento), 0)`.as('qt_comparecimento'),
       sql`coalesce(sum(bv.qt_elei_biom_sem_habilitacao), 0)`.as('qt_nao_habilitada'),
       sql`count(*)`.as('secoes'),
+      sql`count(*) filter (where bv.qt_aptos is null)`.as('bus_sem_aptos'),
+      sql`count(*) filter (where bv.qt_comparecimento is null)`.as('bus_sem_comparecimento'),
+      sql`count(*) filter (where bv.qt_abstencoes is null)`.as('bus_sem_abstencoes'),
+      sql`count(*) filter (where bv.qt_elei_biom_sem_habilitacao is null)`.as('bus_sem_biometria'),
       sql`count(*) filter (where bv.qt_elei_biom_sem_habilitacao is null)`.as('secoes_sem_campo'),
     ])
     .executeTakeFirstOrThrow()
@@ -62,6 +74,10 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
   return {
     secoes: Number(linha.secoes),
     secoes_sem_campo: Number(linha.secoes_sem_campo),
+    bus_sem_aptos: Number(linha.bus_sem_aptos),
+    bus_sem_comparecimento: Number(linha.bus_sem_comparecimento),
+    bus_sem_abstencoes: Number(linha.bus_sem_abstencoes),
+    bus_sem_biometria: Number(linha.bus_sem_biometria),
     qt_aptos: aptos,
     qt_comparecimento: comparecimento,
     qt_habilitados_por_biometria: habilitada,
@@ -74,43 +90,47 @@ export async function composicaoBiometria(db, { eleicaoId, cargo, corte, escopo 
   }
 }
 
-export async function baseSecaoCandidato(
-  db,
-  { eleicaoId, cargo, corte, escopo = {} },
-) {
-  return base(db, { eleicaoId, cargo, corte, escopo })
-    .innerJoin('resultado_votavel as rv', 'rv.boletim_versao_id', 'bv.id')
-    .leftJoin('localidade as l', (join) =>
-      join.onRef('l.sg_uf', '=', 's.sg_uf').onRef('l.cd_municipio_tse', '=', 's.cd_municipio_tse'),
-    )
-    .select([
-      'rv.nr_votavel',
-      sql`max(rv.nm_votavel)`.as('nm_votavel'),
-      sql`max(rv.sg_partido)`.as('sg_partido'),
-      'bv.secao_id',
-      's.sg_uf',
-      's.cd_municipio_tse',
-      sql`max(l.nm_municipio)`.as('nm_municipio'),
-      's.nr_zona',
-      's.nr_secao',
-      sql`max(bv.qt_aptos)`.as('qt_aptos'),
-      sql`max(bv.qt_comparecimento)`.as('qt_comparecimento'),
-      sql`max(bv.qt_abstencoes)`.as('qt_abstencoes'),
-      sql`max(bv.qt_elei_biom_sem_habilitacao)`.as('qt_biom'),
-      sql`max(bv.dt_bu_recebido_ts)`.as('dt_bu_recebido_ts'),
-      sql`sum(rv.qt_votos)`.as('votos'),
-    ])
-    .where('rv.categoria', '=', 'nominal')
-    .where('rv.qt_votos', 'is not', null)
-    .groupBy([
-      'rv.nr_votavel',
-      'bv.secao_id',
-      's.sg_uf',
-      's.cd_municipio_tse',
-      's.nr_zona',
-      's.nr_secao',
-    ])
-    .execute()
+async function consultarBaseSecaoCandidato(db, { eleicaoId, cargo, corte, escopo = {} }) {
+  return linhasDeSecoesCompactas(
+    await secoesCompactas(db, {
+      eleicaoId,
+      cargo,
+      corte,
+      escopo: { sgUf: escopo.sgUf, cdMunicipio: escopo.cdMunicipio },
+      categorias: ['nominal'],
+    }),
+  )
+}
+
+export async function baseSecaoCandidato(db, escopo = {}) {
+  const corte = escopo.corte ?? { tipo: 'final' }
+  const instante = corte.instante instanceof Date ? corte.instante.toISOString() : corte.instante ?? null
+  const chave = JSON.stringify([
+    escopo.eleicaoId,
+    escopo.cargo,
+    corte.tipo,
+    instante,
+    corte.data ?? null,
+    escopo.escopo?.sgUf ?? null,
+    escopo.escopo?.cdMunicipio ?? null,
+  ])
+  let consultas = consultasBaseSecaoEmVoo.get(db)
+  if (!consultas) {
+    consultas = new Map()
+    consultasBaseSecaoEmVoo.set(db, consultas)
+  }
+
+  let consulta = consultas.get(chave)
+  if (!consulta) {
+    consulta = consultarBaseSecaoCandidato(db, { ...escopo, corte })
+    consultas.set(chave, consulta)
+  }
+
+  try {
+    return await consulta
+  } finally {
+    if (consultas.get(chave) === consulta) consultas.delete(chave)
+  }
 }
 
 export function benfordDosNiveis(linhas, minimoVotos = MINIMO_VOTOS_BENFORD) {
@@ -161,15 +181,18 @@ export function benfordDosNiveis(linhas, minimoVotos = MINIMO_VOTOS_BENFORD) {
         total_votos: candidato.total_votos,
         secoes_abaixo_minimo: candidato.secoes.length - secoes.length,
         niveis: {
-          secao: calcularBenford(secoes),
-          zona: calcularBenford(zonas),
-          municipio: calcularBenford(municipios),
+          secao: semClassificacao(calcularBenford(secoes)),
+          zona: semClassificacao(calcularBenford(zonas)),
+          municipio: semClassificacao(calcularBenford(municipios)),
         },
       }
     })
     .sort((a, b) => b.total_votos - a.total_votos)
 
-  return { minimo_votos: minimoVotos, candidatos }
+  return {
+    minimo_votos: minimoVotos,
+    candidatos,
+  }
 }
 
 export async function benfordPorCandidato(db, escopo) {
@@ -217,7 +240,7 @@ export function featuresDasSecoes(linhas) {
 
   return secoes.map((secao) => {
     const total = secao.votos.reduce((soma, votos) => soma + votos, 0)
-    const maior = Math.max(...secao.votos)
+    const maior = secao.votos.reduce((max, votos) => (votos > max ? votos : max), -Infinity)
     const concentracao =
       total > 0
         ? secao.votos.reduce((soma, votos) => soma + (votos / total) ** 2, 0)

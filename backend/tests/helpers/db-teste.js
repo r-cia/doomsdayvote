@@ -1,4 +1,32 @@
+import pg from 'pg';
 import { sql } from 'kysely';
+import { atualizarViewsMaterializadas } from '../../src/db/views.js';
+
+function nomeDoBanco(url) {
+  try {
+    return new URL(url).pathname.replace(/^\//, '');
+  } catch {
+    return null;
+  }
+}
+
+const URL_TESTE = process.env.TEST_DATABASE_URL;
+const URL_PROD = process.env.DATABASE_URL;
+if (!URL_TESTE) throw new Error('TEST_DATABASE_URL não definida');
+if (URL_TESTE === URL_PROD || (URL_PROD && nomeDoBanco(URL_TESTE) === nomeDoBanco(URL_PROD))) {
+  throw new Error('TEST_DATABASE_URL não pode apontar para o banco de produção');
+}
+
+// REFRESH MATERIALIZED VIEW exige o dono da view; o papel da aplicação não tem essa permissão.
+export async function atualizarViews() {
+  const cliente = new pg.Client({ connectionString: process.env.TEST_DATABASE_MIGRATION_URL });
+  await cliente.connect();
+  try {
+    await atualizarViewsMaterializadas((texto) => cliente.query(texto));
+  } finally {
+    await cliente.end();
+  }
+}
 
 export async function limparBanco(db) {
   await sql`DELETE FROM bweb_staging`.execute(db);

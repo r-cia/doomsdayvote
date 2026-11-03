@@ -1,12 +1,15 @@
-import { describe, expect, it } from 'vitest';
-import { fileURLToPath } from 'node:url';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { CAMPOS_2018_42 } from '../../../src/modules/importacao/bweb/campos.js';
 import { lerArquivoBweb } from '../../../src/modules/importacao/bweb/ler-arquivo.js';
 import { validarCabecalho2018 } from '../../../src/modules/importacao/bweb/parser-2018.js';
+import { gerarBweb2018 } from '../../helpers/dados-sinteticos.js';
 
-function fixture(nome) {
-  return fileURLToPath(new URL(`../../fixtures/bweb/${nome}`, import.meta.url));
-}
+const NOME_2018 = 'bweb_2t_AC_301020181744.csv';
+
+let diretorio;
 
 async function coletar(registros) {
   const lista = [];
@@ -15,15 +18,24 @@ async function coletar(registros) {
 }
 
 describe('parser BWEB_2018_42', () => {
-  it('lê 2.973 registros de AC 2º turno com aliases e recebimento ausente', async () => {
-    const arquivo = await lerArquivoBweb(fixture('bweb_2t_AC_301020181744.csv'));
+  beforeAll(async () => {
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-2018-'));
+    await writeFile(path.join(diretorio, NOME_2018), gerarBweb2018(), 'latin1');
+  });
+
+  afterAll(async () => {
+    await rm(diretorio, { recursive: true, force: true });
+  });
+
+  it('lê o CSV sintético com aliases e recebimento ausente', async () => {
+    const arquivo = await lerArquivoBweb(path.join(diretorio, NOME_2018));
     const registros = await coletar(arquivo.registros);
 
     expect(arquivo.leiaute).toBe('BWEB_2018_42');
     expect(arquivo.camposAusentesNoLeiaute).toEqual(
       expect.arrayContaining(['DT_BU_RECEBIDO', 'DT_EMISSAO_BU', 'CD_TIPO_ELEICAO', 'NM_TIPO_ELEICAO']),
     );
-    expect(registros).toHaveLength(2973);
+    expect(registros).toHaveLength(4);
     expect(arquivo.aliasesAplicados).toEqual(
       expect.arrayContaining([
         { de: 'SG_ UF', para: 'SG_UF' },
@@ -49,9 +61,7 @@ describe('parser BWEB_2018_42', () => {
       expect(registro.erros.filter((e) => e.codigo === 'LARGURA_INVALIDA')).toEqual([]);
     }
 
-    const comAgregadas = registros.find(
-      (r) => r.bruto.DS_SECOES_AGREGADAS && !['#NULO#', '#NULO', '#NE'].includes(r.bruto.DS_SECOES_AGREGADAS),
-    );
+    const comAgregadas = registros.find((r) => r.bruto.DS_SECOES_AGREGADAS);
     expect(comAgregadas.valores.DS_SECOES_AGREGADAS).toBe(comAgregadas.bruto.DS_SECOES_AGREGADAS);
 
     const comBiometria = registros.find((r) => r.bruto.QT_ELEI_BIOM_SEM_HABILITACAO);
@@ -72,15 +82,17 @@ describe('parser BWEB_2018_42', () => {
     }
   });
 
-  it('lê o subset de AC 1º turno', async () => {
-    const arquivo = await lerArquivoBweb(fixture('bweb_1t_AC_101020181938.csv'));
+  it('descarta cargos fora do escopo', async () => {
+    const caminho = path.join(diretorio, 'bweb_2t_AC_301020181744_fora.csv');
+    await writeFile(caminho, gerarBweb2018({ incluirForaDoEscopo: true }), 'latin1');
+
+    const metricas = { registrosIgnorados: 0 };
+    const arquivo = await lerArquivoBweb(caminho, { metricas });
     const registros = await coletar(arquivo.registros);
 
-    expect(registros).toHaveLength(300);
-    for (const registro of registros) {
-      expect(registro.valores.ANO_ELEICAO).toBe(2018);
-      expect(registro.valores.NR_TURNO).toBe(1);
-      expect(registro.valores.SG_UF).toBe('AC');
-    }
+    expect(new Set(registros.map((registro) => registro.valores.DS_CARGO_PERGUNTA))).toEqual(
+      new Set(['Presidente', 'Governador']),
+    );
+    expect(metricas.registrosIgnorados).toBe(2);
   });
 });

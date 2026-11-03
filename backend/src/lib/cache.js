@@ -51,27 +51,62 @@ export function criarCache({ url, logger, cliente: fornecido } = {}) {
 
   async function obter(rota, params, ttl, fn) {
     let chave;
+    const inicio = performance.now();
 
     try {
+      if (cliente.status !== 'ready') throw new Error('redis_nao_pronto');
       const versao = (await cliente.get(CHAVE_VERSAO)) ?? '0';
       chave = `dv:v${versao}:${rota}:${hash(params)}`;
 
       const bruto = await cliente.get(chave);
-      if (bruto !== null) return { valor: JSON.parse(bruto), cache: 'hit' };
+      if (bruto !== null) {
+        const duracao = Number((performance.now() - inicio).toFixed(2));
+        logger?.info({ rota, cache: 'hit', duracao_ms: duracao }, 'cache_obter');
+        return { valor: JSON.parse(bruto), cache: 'hit' };
+      }
     } catch {
-      return { valor: await fn(), cache: 'off' };
+      const chaveLocal = `off:${rota}:${hash(params)}`;
+      const pendente = emVoo.get(chaveLocal);
+      if (pendente) {
+        const valor = await pendente;
+        logger?.info(
+          { rota, cache: 'off', duracao_ms: Number((performance.now() - inicio).toFixed(2)), dedup: true },
+          'cache_obter',
+        );
+        return { valor, cache: 'off' };
+      }
+
+      const execucao = Promise.resolve().then(fn);
+      emVoo.set(chaveLocal, execucao);
+      let valor;
+      try {
+        valor = await execucao;
+      } finally {
+        if (emVoo.get(chaveLocal) === execucao) emVoo.delete(chaveLocal);
+      }
+      const duracao = Number((performance.now() - inicio).toFixed(2));
+      logger?.info({ rota, cache: 'off', duracao_ms: duracao }, 'cache_obter');
+      return { valor, cache: 'off' };
     }
 
     const pendente = emVoo.get(chave);
-    if (pendente) return { valor: await pendente, cache: 'miss' };
+    if (pendente) {
+      const valor = await pendente;
+      const duracao = Number((performance.now() - inicio).toFixed(2));
+      logger?.info({ rota, cache: 'miss', duracao_ms: duracao, dedup: true }, 'cache_obter');
+      return { valor, cache: 'miss' };
+    }
 
+    const inicioFn = performance.now();
     const execucao = (async () => {
       const valor = await fn();
+      const duracaoFn = Number((performance.now() - inicioFn).toFixed(2));
       try {
         await cliente.set(chave, JSON.stringify(valor), 'EX', ttl);
       } catch {
         logger?.debug({ chave }, 'cache_nao_gravado');
       }
+      logger?.info({ rota, cache: 'miss', duracao_ms: Number((performance.now() - inicio).toFixed(2)), duracao_fn_ms: duracaoFn }, 'cache_obter');
       return valor;
     })();
 
@@ -85,7 +120,11 @@ export function criarCache({ url, logger, cliente: fornecido } = {}) {
   }
 
   async function invalidar() {
-    await cliente.incr(CHAVE_VERSAO);
+    try {
+      await cliente.incr(CHAVE_VERSAO);
+    } catch (erro) {
+      logger?.warn({ err: erro }, 'cache_nao_invalidado');
+    }
   }
 
   async function fechar() {

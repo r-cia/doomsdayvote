@@ -183,12 +183,6 @@ export const ALIASES = {
   CD_FLASCARD_URNA_EFETIVADA: 'CD_FLASHCARD_URNA_EFETIVADA',
 };
 
-export const LEIAUTES = {
-  BWEB_45: CAMPOS_45,
-  BWEB_2018_42: CAMPOS_2018_42,
-  BWEB_2014_31: CAMPOS_2014_31,
-};
-
 export function tipoDoCampo(nome) {
   return TIPOS[nome] ?? 'texto';
 }
