@@ -2082,3 +2082,12 @@ tr.linha--ativa th {
   opacity: 0.55;
   transition: opacity 0.15s;
 }
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+}

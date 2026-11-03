@@ -17,6 +17,7 @@ export async function montar(componente, { props = {}, filtros = {} } = {}) {
   const wrapper = mount(componente, {
     props,
     global: {
+      config: { errorHandler: () => {} },
       plugins: [pinia, router, [VueQueryPlugin, { queryClient: new QueryClient({ defaultOptions: { queries: { retry: false } } }) }]],
     },
   })

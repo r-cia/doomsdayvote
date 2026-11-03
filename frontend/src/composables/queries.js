@@ -232,11 +232,12 @@ export function useComparacaoAnos(anos) {
   })
 }
 
-function totalizacao(nome, chamar, opcoes) {
+function totalizacao(nome, chamar, opcoes, habilitado) {
   return consulta(nome, chamar, {
     base: baseDaTotalizacao,
     pronto: prontoDaTotalizacao,
     extra: () => valores(opcoes),
+    habilitado,
   })
 }
 
@@ -244,10 +245,10 @@ export function useTotalizacaoMetricas(opcoes = {}) {
   return totalizacao('totalizacao-metricas', api.totalizacaoMetricas, opcoes)
 }
 
-export function useTotalizacaoIncidentes(opcoes = {}) {
-  return totalizacao('totalizacao-incidentes', api.totalizacaoIncidentes, opcoes)
+export function useTotalizacaoIncidentes(opcoes = {}, habilitado = null) {
+  return totalizacao('totalizacao-incidentes', api.totalizacaoIncidentes, opcoes, habilitado)
 }
 
-export function useTotalizacaoDivergencias(opcoes = {}) {
-  return totalizacao('totalizacao-divergencias', api.totalizacaoDivergencias, opcoes)
+export function useTotalizacaoDivergencias(opcoes = {}, habilitado = null) {
+  return totalizacao('totalizacao-divergencias', api.totalizacaoDivergencias, opcoes, habilitado)
 }
