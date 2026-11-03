@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import FilterBar from '../src/components/FilterBar.vue'
 import KpiCards from '../src/components/KpiCards.vue'
 import MapPanel from '../src/components/MapPanel.vue'
@@ -12,6 +13,9 @@ import PlacarRanking from '../src/components/PlacarRanking.vue'
 import BiometriaPanel from '../src/components/BiometriaPanel.vue'
 import BenfordPanel from '../src/components/BenfordPanel.vue'
 import TabelaScroll from '../src/components/TabelaScroll.vue'
+import TempoBiometriaPanel from '../src/components/TempoBiometriaPanel.vue'
+import IncidentesPanel from '../src/components/IncidentesPanel.vue'
+import DivergenciasPanel from '../src/components/DivergenciasPanel.vue'
 
 vi.mock('vue-chartjs', () => ({
   Line: {
@@ -280,6 +284,7 @@ describe('PlotDia', () => {
     })
 
     expect(wrapper.find('input[type="range"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="chart"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('1.500')
     expect(wrapper.text()).toContain('8')
 
@@ -288,6 +293,34 @@ describe('PlotDia', () => {
 
     await wrapper.setProps({ corte: '2022-10-02T18:00:00.000Z' })
     expect(wrapper.text()).toContain('1.000')
+  })
+
+  it('alterna entre votos e seções no gráfico', async () => {
+    const wrapper = mount(PlotDia, {
+      props: {
+        pontos,
+        series: [
+          {
+            nr_votavel: 13,
+            nm_votavel: 'Candidato A',
+            pontos: [
+              { t: '2022-10-02T21:00:00.000Z', votos_acumulados: 600 },
+              { t: '2022-10-02T21:05:00.000Z', votos_acumulados: 900 },
+            ],
+          },
+        ],
+        candidatos,
+      },
+    })
+
+    const grafico = wrapper.findComponent({ name: 'Line' })
+    expect(grafico.props('data').datasets[0].label).toBe('Candidato A')
+
+    await wrapper.findAll('.tracado__modos button')[1].trigger('click')
+    const dados = wrapper.findComponent({ name: 'Line' }).props('data')
+    expect(dados.datasets).toHaveLength(1)
+    expect(dados.datasets[0].label).toBe('Seções eleitorais')
+    expect(dados.datasets[0].data).toEqual([5, 8])
   })
 
   it('avisa quando a fonte não permite linha do tempo', () => {
@@ -305,6 +338,9 @@ describe('PlotDia', () => {
     })
 
     expect(wrapper.text()).toContain('Linha do tempo indisponível')
+    expect(wrapper.find('[role="status"]').text()).toContain(
+      'A fonte deste ano não permite linha do tempo por horário',
+    )
     expect(wrapper.find('input[type="range"]').exists()).toBe(false)
   })
 })
@@ -487,6 +523,8 @@ describe('SectionsTable', () => {
         nr_local_votacao: 100,
         status: 'bu_recebido',
         motivo: null,
+        dt_abertura: '2022-10-02T11:00:00.000Z',
+        dt_encerramento: '2022-10-02T21:00:00.000Z',
         dt_bu_recebido: '2022-10-02T21:00:00.000Z',
         precisao_dt_bu_recebido: 'DATA_HORA',
       },
@@ -499,6 +537,8 @@ describe('SectionsTable', () => {
         nr_local_votacao: 200,
         status: 'sem_bu',
         motivo: null,
+        dt_abertura: null,
+        dt_encerramento: null,
         dt_bu_recebido: null,
         precisao_dt_bu_recebido: null,
       },
@@ -517,6 +557,11 @@ describe('SectionsTable', () => {
     })
 
     expect(wrapper.findAll('[data-secao-btn]')).toHaveLength(2)
+    expect(wrapper.text()).toContain('Abertura')
+    expect(wrapper.text()).toContain('Encerramento')
+    expect(wrapper.text()).toContain('02/10/2022')
+    expect(wrapper.text()).toContain('08:00')
+    expect(wrapper.text()).toContain('18:00')
 
     await wrapper.findAll('button').find((botao) => botao.text() === 'Próxima').trigger('click')
     expect(wrapper.emitted('update:page')[0]).toEqual([2])
@@ -640,6 +685,85 @@ describe('MapPanel', () => {
 
     expect(wrapper.emitted('select')[0][0]).toEqual({ tipo: 'uf', valor: 'SP' })
   })
+
+  it('mostra UF, seções com BU e corte no tooltip e navega por teclado', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          features: [
+            {
+              type: 'Feature',
+              properties: { CD_MUN: '3550308', SIGLA_UF: 'SP', NM_UF: 'São Paulo' },
+              geometry: null,
+            },
+          ],
+        }),
+      }),
+    )
+
+    const wrapper = mount(MapPanel, {
+      props: {
+        areas: [
+          {
+            sg_uf: 'SP',
+            cd_municipio_tse: 3550308,
+            nm_municipio: 'São Paulo',
+            geom_id: '3550308',
+            total_votos: 100,
+            votos_validos: 90,
+            lider: { nr_votavel: 13, qt_votos: 60, percentual: 66.67 },
+            candidatos: [],
+          },
+        ],
+        nivel: 'municipio',
+        uf: 'SP',
+        modo: 'lider',
+        candidato: null,
+        candidatos,
+        corte: { tipo: 'final' },
+        secoesComBu: 42,
+        semGeometria: [{ sg_uf: 'SP', cd_municipio_tse: 1, nm_municipio: 'X' }],
+      },
+      attachTo: document.body,
+    })
+    await flushPromises()
+
+    const { Map: MapaFalso } = await import('maplibre-gl')
+    const mapa = MapaFalso.ultimo
+    mapa.features = [
+      {
+        properties: {
+          SIGLA_UF: 'SP',
+          NM_UF: 'São Paulo',
+          CD_MUN: '3550308',
+          _key: '3550308',
+          _rotulo: 'São Paulo',
+        },
+      },
+    ]
+    mapa.handlers.mousemove({ point: { x: 1, y: 1 } })
+    await nextTick()
+
+    const tooltip = wrapper.find('.mapa-tooltip')
+    expect(tooltip.text()).toContain('SP')
+    expect(tooltip.text()).toContain('Seções com BU')
+    expect(tooltip.text()).toContain('42')
+    expect(tooltip.text()).toContain('Corte final')
+    expect(wrapper.text()).toContain('1 localidade sem malha geográfica')
+
+    const mapaEl = wrapper.find('.mapa')
+    expect(mapaEl.attributes('tabindex')).toBe('0')
+    await mapaEl.trigger('keydown', { key: 'ArrowRight' })
+    expect(wrapper.find('.mapa-tooltip').text()).toContain('3550308')
+    await mapaEl.trigger('keydown', { key: 'Enter' })
+    expect(wrapper.emitted('select')[0][0]).toEqual({
+      tipo: 'municipio',
+      valor: 3550308,
+      uf: 'SP',
+    })
+  })
 })
 
 describe('TabelaScroll', () => {
@@ -658,5 +782,182 @@ describe('TabelaScroll', () => {
 
     expect(wrapper.find('.tabela-scroll').attributes('aria-busy')).toBeUndefined()
     expect(wrapper.find('.tabela-carga__spinner').exists()).toBe(false)
+  })
+})
+
+describe('TempoBiometriaPanel', () => {
+  const metricas = {
+    escopo: 'municipio',
+    tempo: {
+      quantidade: 192,
+      mediaMs: 81000,
+      medianaMs: 38000,
+      maisRapidoMs: 12500,
+      maisDemoradoMs: 90000,
+    },
+    biometria: {
+      falhou1: 6,
+      falhou2: 3,
+      falhou3: 1,
+      falhou4: 0,
+      manual: 2,
+    },
+  }
+
+  it('formata as durações em segundos legíveis e lista as faixas de biometria', () => {
+    const wrapper = mount(TempoBiometriaPanel, { props: { metricas } })
+    const texto = wrapper.text()
+
+    expect(wrapper.findAll('.kpis--quatro > div')).toHaveLength(4)
+    expect(texto).toContain('1 min 21 s')
+    expect(texto).toContain('38 s')
+    expect(texto).toContain('1 min 30 s')
+    expect(texto).toContain('13 s')
+    expect(texto).toContain('Falhou 4 ou mais tentativas')
+    expect(texto).toContain('Habilitação manual')
+    expect(texto).toContain('192 eleitores')
+  })
+
+  it('mantém os cards com travessão quando não há duração medida', () => {
+    const wrapper = mount(TempoBiometriaPanel, {
+      props: {
+        metricas: {
+          tempo: {
+            quantidade: 0,
+            mediaMs: null,
+            medianaMs: null,
+            maisRapidoMs: null,
+            maisDemoradoMs: null,
+          },
+          biometria: metricas.biometria,
+        },
+      },
+    })
+
+    expect(wrapper.findAll('.kpis__valor').map((item) => item.text())).toEqual([
+      '—',
+      '—',
+      '—',
+      '—',
+    ])
+  })
+
+  it('mostra o erro no padrão StateBlock e permite tentar novamente', async () => {
+    const wrapper = mount(TempoBiometriaPanel, { props: { error: 'falha na totalização' } })
+
+    expect(wrapper.find('.state--erro').exists()).toBe(true)
+    expect(wrapper.text()).toContain('falha na totalização')
+
+    await wrapper.find('.state--erro button').trigger('click')
+    expect(wrapper.emitted('retry')).toHaveLength(1)
+  })
+})
+
+describe('IncidentesPanel', () => {
+  const dados = {
+    itens: [
+      {
+        instante: '2026-10-04T16:05:33.000Z',
+        nivel: 'ALERTA',
+        tipo: 'URNA',
+        texto_original: 'Falha de comunicação com a urna',
+        sg_uf: 'RR',
+        cd_municipio_tse: 3050,
+        nr_zona: 3,
+        nr_secao: 241,
+      },
+    ],
+    total: 60,
+    pagina: 2,
+    tamanho: 25,
+  }
+
+  it('lista instante, nível, seção e texto original com paginação', async () => {
+    const wrapper = mount(IncidentesPanel, { props: { dados, tamanho: 25 } })
+    const texto = wrapper.text()
+
+    expect(texto).toContain('ALERTA')
+    expect(texto).toContain('URNA')
+    expect(texto).toContain('RR · 3050 · 3/241')
+    expect(texto).toContain('Falha de comunicação com a urna')
+    expect(texto).toContain('Página 2 de 3')
+
+    await wrapper.findAll('.paginacao__botoes button')[2].trigger('click')
+    expect(wrapper.emitted('update:page')[0]).toEqual([3])
+  })
+
+  it('usa StateBlock no vazio sem renderizar a tabela', () => {
+    const wrapper = mount(IncidentesPanel, {
+      props: { dados: { itens: [], total: 0, pagina: 1, tamanho: 25 } },
+    })
+
+    expect(wrapper.find('.state--vazio').exists()).toBe(true)
+    expect(wrapper.find('table').exists()).toBe(false)
+  })
+})
+
+describe('DivergenciasPanel', () => {
+  const dados = {
+    itens: [
+      {
+        id: 1,
+        fonte: 'rdv',
+        campo: 'votos',
+        sg_uf: 'RR',
+        cd_municipio_tse: 3050,
+        nr_zona: 3,
+        nr_secao: 241,
+        cd_cargo_pergunta: 1,
+        nr_votavel: 13,
+        valor_esperado: '192',
+        valor_encontrado: '191',
+      },
+      {
+        id: 2,
+        fonte: 'log',
+        campo: null,
+        sg_uf: 'RR',
+        cd_municipio_tse: 3050,
+        nr_zona: 3,
+        nr_secao: 242,
+        cd_cargo_pergunta: null,
+        nr_votavel: null,
+        valor_esperado: null,
+        valor_encontrado: '0',
+      },
+    ],
+    total: 2,
+    pagina: 1,
+    tamanho: 25,
+  }
+
+  it('começa com todas as fontes e exibe esperado e encontrado, sem filtro padrão', () => {
+    const wrapper = mount(DivergenciasPanel, { props: { dados } })
+    const linhas = wrapper.findAll('tbody tr')
+
+    expect(wrapper.find('select').element.value).toBe('')
+    expect(linhas).toHaveLength(2)
+    expect(linhas[0].text()).toContain('rdv')
+    expect(linhas[0].text()).toContain('192')
+    expect(linhas[0].text()).toContain('191')
+    expect(linhas[0].text()).toContain('1/13')
+    expect(linhas[1].text()).toContain('log')
+    expect(linhas[1].text()).toContain('—')
+  })
+
+  it('emite a fonte escolhida como filtro opcional', async () => {
+    const wrapper = mount(DivergenciasPanel, { props: { dados, fonte: '' } })
+
+    await wrapper.find('select').setValue('log')
+    expect(wrapper.emitted('update:fonte')[0]).toEqual(['log'])
+  })
+
+  it('usa StateBlock no vazio', () => {
+    const wrapper = mount(DivergenciasPanel, {
+      props: { dados: { itens: [], total: 0, pagina: 1, tamanho: 25 } },
+    })
+
+    expect(wrapper.find('.state--vazio').exists()).toBe(true)
+    expect(wrapper.find('table').exists()).toBe(false)
   })
 })

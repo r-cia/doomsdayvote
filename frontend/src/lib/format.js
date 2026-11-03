@@ -128,6 +128,22 @@ export function formatarCargo(valor) {
   return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
 }
 
+export function formatarDuracao(valorMs) {
+  if (valorMs === null || valorMs === undefined || valorMs === '') return '—'
+  const ms = Number(valorMs)
+  if (!Number.isFinite(ms)) return '—'
+  const total = Math.max(0, Math.round(ms / 1000))
+  if (total < 60) return i18n.global.t('format.duracaoSegundos', { segundos: total })
+  return i18n.global.t('format.duracaoMinutosSegundos', {
+    minutos: Math.floor(total / 60),
+    segundos: total % 60,
+  })
+}
+
+export function formatarValor(valor) {
+  return valor === null || valor === undefined || valor === '' ? '—' : String(valor)
+}
+
 export function truncar(texto, tamanho = 60) {
   if (!texto) return '—'
   const valor = String(texto)

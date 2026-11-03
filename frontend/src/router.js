@@ -10,6 +10,11 @@ const router = createRouter({
       component: () => import('./views/PainelView.vue'),
     },
     {
+      path: '/totalizacao',
+      name: 'totalizacao',
+      component: () => import('./views/TotalizacaoView.vue'),
+    },
+    {
       path: '/mapa',
       name: 'mapa',
       component: () => import('./views/MapaView.vue'),

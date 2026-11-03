@@ -328,3 +328,44 @@ export function useSecaoVersoes(id, ordem = null) {
     placeholderData: (anterior, consulta) => (consulta?.queryKey[1] === idEfetivo.value ? anterior : undefined),
   })
 }
+
+const recorteValido = (recorte) => Boolean(recorte?.ano && recorte?.turno)
+
+export function useTotalizacaoMetricas(recorte) {
+  const params = computed(() => toValue(recorte) ?? {})
+  return useQuery({
+    queryKey: computed(() => ['totalizacao-metricas', params.value]),
+    queryFn: ({ signal }) => api.totalizacaoMetricas(params.value, signal),
+    enabled: computed(() => recorteValido(params.value)),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useTotalizacaoIncidentes(recorte, opcoes = {}) {
+  const params = computed(() => ({
+    ...(toValue(recorte) ?? {}),
+    pagina: toValue(opcoes.pagina),
+    tamanho: toValue(opcoes.tamanho),
+  }))
+  return useQuery({
+    queryKey: computed(() => ['totalizacao-incidentes', params.value]),
+    queryFn: ({ signal }) => api.totalizacaoIncidentes(params.value, signal),
+    enabled: computed(() => recorteValido(params.value)),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useTotalizacaoDivergencias(recorte, opcoes = {}) {
+  const params = computed(() => ({
+    ...(toValue(recorte) ?? {}),
+    fonte: toValue(opcoes.fonte) || undefined,
+    pagina: toValue(opcoes.pagina),
+    tamanho: toValue(opcoes.tamanho),
+  }))
+  return useQuery({
+    queryKey: computed(() => ['totalizacao-divergencias', params.value]),
+    queryFn: ({ signal }) => api.totalizacaoDivergencias(params.value, signal),
+    enabled: computed(() => recorteValido(params.value)),
+    placeholderData: keepPreviousData,
+  })
+}

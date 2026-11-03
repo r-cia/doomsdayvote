@@ -4,13 +4,50 @@ import AnaliseCobertura from '../components/AnaliseCobertura.vue'
 import StateBlock from '../components/StateBlock.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import ConsistenciaPanel from '../components/ConsistenciaPanel.vue'
+import DivergenciasPanel from '../components/DivergenciasPanel.vue'
 import ConcentracaoPanel from '../components/ConcentracaoPanel.vue'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useOrdenacao } from '../composables/ordenacao'
-import { useAnalise, useAnomalias, useConsistencia, useConcentracao } from '../composables/queries'
+import {
+  useAnalise,
+  useAnomalias,
+  useConsistencia,
+  useConcentracao,
+  useTotalizacaoDivergencias,
+} from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 
-const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
+const { store, filtros, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
+
+const TAMANHO_DIVERGENCIAS = 25
+const paginaDivergencias = ref(1)
+const fonteDivergencias = ref('')
+
+const recorteDivergencias = computed(() => ({
+  ano: filtros.value.ano,
+  turno: filtros.value.turno,
+  uf: filtros.value.uf,
+  municipio: filtros.value.municipio,
+}))
+
+const divergenciasQuery = useTotalizacaoDivergencias(recorteDivergencias, {
+  fonte: fonteDivergencias,
+  pagina: paginaDivergencias,
+  tamanho: TAMANHO_DIVERGENCIAS,
+})
+
+function definirFonte(fonte) {
+  fonteDivergencias.value = fonte
+  paginaDivergencias.value = 1
+}
+
+watch(
+  recorteDivergencias,
+  () => {
+    paginaDivergencias.value = 1
+  },
+  { deep: true },
+)
 
 const ordenacoes = {
   benford: useOrdenacao(),
@@ -91,6 +128,18 @@ watch(
     :error="consistenciaQuery.error.value?.message ?? ''"
     :ordenacao="ordemConsistencia"
     @retry="consistenciaQuery.refetch()"
+  />
+
+  <DivergenciasPanel
+    :dados="divergenciasQuery.data.value ?? null"
+    :loading="divergenciasQuery.isLoading.value"
+    :atualizando="divergenciasQuery.isFetching.value"
+    :error="divergenciasQuery.error.value?.message ?? ''"
+    :fonte="fonteDivergencias"
+    :tamanho="TAMANHO_DIVERGENCIAS"
+    @retry="divergenciasQuery.refetch()"
+    @update:fonte="definirFonte"
+    @update:page="paginaDivergencias = $event"
   />
 
   <ConcentracaoPanel

@@ -56,6 +56,7 @@ const candidatos = computed(() =>
 
       <nav class="nav" :aria-label="$t('app.abasAria')">
         <RouterLink to="/painel">{{ $t('app.abas.painel') }}</RouterLink>
+        <RouterLink to="/totalizacao">{{ $t('app.abas.totalizacao') }}</RouterLink>
         <RouterLink to="/mapa">{{ $t('app.abas.mapa') }}</RouterLink>
         <RouterLink to="/analise">{{ $t('app.abas.estatistica') }}</RouterLink>
         <RouterLink to="/comparacoes">{{ $t('app.abas.comparacoes') }}</RouterLink>

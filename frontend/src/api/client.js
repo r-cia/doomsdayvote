@@ -63,4 +63,7 @@ export const api = {
   comparacaoLocalSecoes: (params, signal) => obter('/comparacao-local/secoes', params, signal),
   concentracao: (params, signal) => obter('/concentracao', params, signal),
   relatorio: (params, signal) => obter('/relatorio', params, signal),
+  totalizacaoMetricas: (params, signal) => obter('/totalizacao/metricas', params, signal),
+  totalizacaoIncidentes: (params, signal) => obter('/totalizacao/incidentes', params, signal),
+  totalizacaoDivergencias: (params, signal) => obter('/totalizacao/divergencias', params, signal),
 }
