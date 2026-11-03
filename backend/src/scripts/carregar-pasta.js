@@ -40,8 +40,6 @@ async function main() {
     const resumo = await carregarPasta({
       db,
       inputDir: env.BWEB_INPUT_DIR,
-      storageDir: env.BWEB_STORAGE_DIR,
-      skipCargosLegislativos: env.BWEB_SKIP_CARGOS_LEGISLATIVOS,
     });
     console.log(JSON.stringify(resumo, null, 2));
     await atualizarViewsMaterializadas((texto) => cliente.query(texto));

@@ -1,9 +1,9 @@
-import { mkdir, readdir, writeFile } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import path from 'node:path';
+import { registrarEventoCarga } from '../../lib/log-carga.js';
 import { importarArquivo } from './importar-arquivo.js';
-import { gerarRelatorioLote } from './relatorio.js';
 
-const EXTENSOES = /\.(csv|txt)(\.gz)?$/i;
+const EXTENSOES = /\.(csv|txt)(\.gz|\.7z)?$/i;
 
 function carimbo(data = new Date()) {
   const p = (n) => String(n).padStart(2, '0');
@@ -13,9 +13,8 @@ function carimbo(data = new Date()) {
 export async function carregarPasta({
   db,
   inputDir,
-  storageDir,
   now = new Date(),
-  skipCargosLegislativos = false,
+  registrarEvento = registrarEventoCarga,
 }) {
   const entradas = await readdir(inputDir, { withFileTypes: true });
   const arquivos = entradas
@@ -32,13 +31,12 @@ export async function carregarPasta({
     importados: 0,
     ignorados: 0,
     falhas: 0,
-    linhas_ignoradas_cargos_legislativos: 0,
+    linhas_ignoradas_fora_de_escopo: 0,
     ignorados_extensao: ignoradosExtensao,
     lotes: [],
   };
 
-  const relatoriosDir = path.join(storageDir, 'relatorios');
-  await mkdir(relatoriosDir, { recursive: true });
+  registrarEvento('carga_iniciada', { arquivos: arquivos.length });
 
   for (const [indice, nome] of arquivos.entries()) {
     const inicio = Date.now();
@@ -49,26 +47,25 @@ export async function carregarPasta({
         db,
         caminho: path.join(inputDir, nome),
         nomeArquivo: nome,
-        storageDir,
         now,
-        skipCargosLegislativos,
+        registrarEvento,
       });
 
       if (resultado.ignorado) {
         resumo.ignorados += 1;
         resumo.lotes.push({ arquivo: nome, lote_id: resultado.lote.id, status: 'ignorado_repetido' });
+        registrarEvento('lote_ignorado', {
+          arquivo: nome,
+          lote_id: resultado.lote.id,
+          motivo: 'repetido',
+          status: resultado.lote.status,
+        });
         console.error(`${prefixo()} ignorado_repetido em ${decorrido()}s`);
         continue;
       }
 
-      const relatorio = await gerarRelatorioLote(db, resultado.lote.id);
-      await writeFile(
-        path.join(relatoriosDir, `${resultado.lote.id}.json`),
-        JSON.stringify(relatorio, null, 2),
-      );
-
       resumo.importados += 1;
-      resumo.linhas_ignoradas_cargos_legislativos += resultado.qtLinhasIgnoradas;
+      resumo.linhas_ignoradas_fora_de_escopo += resultado.qtLinhasIgnoradas;
       resumo.lotes.push({
         arquivo: nome,
         lote_id: resultado.lote.id,
@@ -78,10 +75,10 @@ export async function carregarPasta({
         importadas: resultado.lote.qt_linhas_importadas,
         erros: resultado.lote.qt_erros,
         alertas: resultado.lote.qt_alertas,
-        linhas_ignoradas_cargos_legislativos: resultado.qtLinhasIgnoradas,
+        linhas_ignoradas_fora_de_escopo: resultado.qtLinhasIgnoradas,
       });
       console.error(
-        `${prefixo()} concluido em ${decorrido()}s | leiaute=${resultado.lote.leiaute} linhas=${resultado.lote.qt_linhas} importadas=${resultado.lote.qt_linhas_importadas} ignoradas_cargos_legislativos=${resultado.qtLinhasIgnoradas} erros=${resultado.lote.qt_erros} alertas=${resultado.lote.qt_alertas}`,
+        `${prefixo()} concluido em ${decorrido()}s | leiaute=${resultado.lote.leiaute} linhas=${resultado.lote.qt_linhas} importadas=${resultado.lote.qt_linhas_importadas} ignoradas_fora_de_escopo=${resultado.qtLinhasIgnoradas} erros=${resultado.lote.qt_erros} alertas=${resultado.lote.qt_alertas}`,
       );
     } catch (erro) {
       resumo.falhas += 1;
@@ -96,6 +93,13 @@ export async function carregarPasta({
       );
     }
   }
+
+  registrarEvento('carga_concluida', {
+    arquivos: resumo.arquivos,
+    importados: resumo.importados,
+    ignorados: resumo.ignorados,
+    falhas: resumo.falhas,
+  });
 
   return resumo;
 }
