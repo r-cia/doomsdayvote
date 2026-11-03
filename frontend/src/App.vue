@@ -58,6 +58,8 @@ const candidatos = computed(() =>
         <RouterLink to="/mapa">Mapa</RouterLink>
         <RouterLink to="/analise">Estatística</RouterLink>
         <RouterLink to="/biometria">Biometria</RouterLink>
+        <RouterLink to="/comparacoes">Comparações</RouterLink>
+        <RouterLink to="/relatorio">Relatório</RouterLink>
         <RouterLink to="/encerramento">Encerramento</RouterLink>
       </nav>
 
