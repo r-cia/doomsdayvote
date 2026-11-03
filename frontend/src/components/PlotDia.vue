@@ -14,9 +14,10 @@ const props = defineProps({
   candidato: { type: Number, default: null },
   candidatos: { type: Array, default: () => [] },
   avisos: { type: Array, default: () => [] },
+  granularidade: { type: String, default: '5m' },
 })
 
-const emit = defineEmits(['update:corte'])
+const emit = defineEmits(['update:corte', 'update:granularidade'])
 
 const canvas = ref(null)
 const area = ref(null)
@@ -341,6 +342,18 @@ watch(
   <section class="painel tracado" aria-labelledby="tracado-titulo">
     <header class="painel__cabecalho">
       <h2 id="tracado-titulo">Traçado do dia</h2>
+      <div class="segmented" role="group" aria-label="Granularidade">
+        <button
+          v-for="g in ['5m', '1m']"
+          :key="g"
+          type="button"
+          :aria-pressed="granularidade === g"
+          :class="{ ativo: granularidade === g }"
+          @click="emit('update:granularidade', g)"
+        >
+          {{ g === '5m' ? '5 min' : '1 min' }}
+        </button>
+      </div>
       <p class="painel__meta">
         <b>{{ formatarHora(pontoAtual?.t) }}</b> · corte<br />
         {{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }} seções ·
