@@ -7,7 +7,7 @@ import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { CENARIO, NOME_2026, escreverArquivo, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,7 +19,8 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+const SECOES = 12;
+let diretorio;
 let base;
 let uf;
 
@@ -35,13 +36,17 @@ async function json(rota, parametros = '') {
 
 describe('ordenação no servidor', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-ordenacao-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-ordenacao-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    const nome = 'bweb_1t_AC_101020181938.csv';
-    await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+    const caminho = await escreverArquivo(
+      diretorio,
+      NOME_2026,
+      gerarBwebMulti(secoes2026(SECOES, { nomeMunicipio: 'RIO BRANCO' })),
+    );
+    await importarArquivo({ db, caminho, nomeArquivo: NOME_2026 });
     await atualizarViews();
     const linha = await db
       .selectFrom('boletim_versao as bv')
@@ -57,7 +62,7 @@ describe('ordenação no servidor', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('rejeita coluna fora da lista e direção inválida com 400 VALIDATION', async () => {
@@ -71,16 +76,7 @@ describe('ordenação no servidor', () => {
   });
 
   it('mapa: devolve lider_nome e ordena por líder e por candidato selecionado', async () => {
-    const nome = 'bweb-1t_ac_2026.csv';
-    await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
-    const alvo = await db
-      .selectFrom('boletim_versao as bv')
-      .innerJoin('eleicao as e', 'e.id', 'bv.eleicao_id')
-      .select(['bv.eleicao_id', 'bv.cd_cargo_pergunta'])
-      .where('e.ano_eleicao', '=', 2026)
-      .where('bv.ativo', '=', true)
-      .executeTakeFirst();
-    const mapa = `/api/map?election_id=${alvo.eleicao_id}&cargo=${alvo.cd_cargo_pergunta}&as_of=2026-10-04T23:59:59-03:00&level=municipio`;
+    const mapa = `/api/map?election_id=${base.split('&')[0].split('=')[1]}&cargo=${base.split('&')[1].split('=')[1]}&as_of=2026-10-04T23:59:59-03:00&level=municipio`;
     const buscar = async (extra = '') => {
       const resposta = await app.inject({ method: 'GET', url: `${mapa}${extra}` });
       expect(resposta.statusCode).toBe(200);
@@ -91,7 +87,7 @@ describe('ordenação no servidor', () => {
     expect(areas.length).toBeGreaterThan(0);
     const nomes = (await buscar('&ordem=lider_nome&direcao=asc')).map((a) => a.lider_nome);
     const comNome = nomes.filter((n) => n !== null);
-    expect(comNome.length).toBeGreaterThan(0);
+    expect(comNome.length).toBe(areas.length);
     expect(nomes.length).toBe(areas.length);
     expect(comNome).toEqual([...comNome].sort((a, b) => a.localeCompare(b, 'pt-BR')));
     expect(nomes.slice(0, comNome.length)).toEqual(comNome);

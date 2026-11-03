@@ -11,7 +11,18 @@ import { duplicacaoPorAssinatura } from '../../src/modules/analise/duplicacao.js
 import { baseSecaoCandidato } from '../../src/modules/analise/estatisticas.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import {
+  NOME_2014_1T,
+  NOME_2018,
+  NOME_2026,
+  escreverArquivo,
+  gerarBweb2014Multi,
+  gerarBweb2018Multi,
+  gerarBwebMulti,
+  secoes2014,
+  secoes2018,
+  secoes2026,
+} from '../helpers/fixtures.js';
 import {
   baseSecaoCandidatoPelasTabelas,
   candidatosPelasTabelas,
@@ -25,6 +36,7 @@ if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
 const FUSO = 'America/Sao_Paulo';
+const SECOES = 12;
 
 // A ordem de soma de ponto flutuante muda entre as duas leituras.
 const arredondar = (valor) =>
@@ -69,7 +81,7 @@ const reduzirCandidatos = (candidatos) =>
     desvio: linha.desvio === null ? null : Number(linha.desvio),
   }));
 
-async function cortesDoFixture() {
+async function cortesDoCenario() {
   const { rows } = await sql`
     select
       percentile_disc(0.5) within group (order by dt_bu_recebido_ts) as instante,
@@ -77,8 +89,8 @@ async function cortesDoFixture() {
     from boletim_versao
     where ativo
   `.execute(db);
-  const instante = rows[0].instante ?? new Date('2014-10-05T20:00:00Z');
-  const data = rows[0].data ?? '2014-10-05';
+  const instante = rows[0].instante ?? new Date('2026-10-04T20:00:00Z');
+  const data = rows[0].data ?? '2026-10-04';
   return [
     ['final', { tipo: 'final' }],
     ['intradiário no meio', { tipo: 'recebimento_intradiario', instante }],
@@ -93,19 +105,20 @@ afterAll(async () => {
 });
 
 describe.each([
-  ['2014', 'bweb_1t_AC_14102014131600.txt'],
-  ['2018', 'bweb_1t_AC_101020181938.csv'],
-  ['2026', 'bweb-1t_ac_2026.csv'],
-])('cortes lidos da view materializada equivalem às tabelas (%s)', (ano, nome) => {
-  let storageDir;
+  ['2014', NOME_2014_1T, () => gerarBweb2014Multi(secoes2014(SECOES))],
+  ['2018', NOME_2018, () => gerarBweb2018Multi(secoes2018(SECOES))],
+  ['2026', NOME_2026, () => gerarBwebMulti(secoes2026(SECOES))],
+])('cortes lidos da view materializada equivalem às tabelas (%s)', (ano, nome, conteudo) => {
+  let diretorio;
   let alvo;
   let eleicao;
   let cortes;
 
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-mv-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-mv-'));
     await limparBanco(db);
-    await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+    const caminho = await escreverArquivo(diretorio, nome, conteudo());
+    await importarArquivo({ db, caminho, nomeArquivo: nome });
     await atualizarViews();
     const linha = await db
       .selectFrom('boletim_versao as bv')
@@ -115,12 +128,12 @@ describe.each([
       .executeTakeFirstOrThrow();
     alvo = { eleicaoId: linha.eleicao_id, cargo: linha.cd_cargo_pergunta };
     eleicao = { id: linha.eleicao_id, ano_eleicao: linha.ano_eleicao, nr_turno: linha.nr_turno };
-    cortes = await cortesDoFixture();
+    cortes = await cortesDoCenario();
   }, 120000);
 
   afterAll(async () => {
     await limparBanco(db);
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('concentração', async () => {

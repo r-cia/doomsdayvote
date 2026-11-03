@@ -8,7 +8,7 @@ import { REGRAS, consistenciaPorSecao, validarConsistenciaBu } from '../../src/m
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2026, escreverArquivo, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -20,22 +20,24 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+const SECOES = 12;
+let diretorio;
 let cargo;
 let eleicao;
 
-async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  return importarArquivo({ db, caminho, nomeArquivo: nome });
 }
 
 describe('consistência aritmética', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-consistencia-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-consistencia-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    await importar('bweb_1t_AC_14102014131600.txt');
+    await importar(NOME_2026, gerarBwebMulti(secoes2026(SECOES)));
 
     const linha = await db
       .selectFrom('boletim_versao as bv')
@@ -51,7 +53,7 @@ describe('consistência aritmética', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('retorna estrutura de cobertura e paginação', async () => {

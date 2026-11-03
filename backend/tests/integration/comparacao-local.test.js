@@ -7,7 +7,7 @@ import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2026, escreverArquivo, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,24 +19,26 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+const SECOES = 12;
+let diretorio;
 let cargo;
 let eleicao;
 
-async function importar(nome) {
-  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
-  await atualizarViews();
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  const resultado = await importarArquivo({ db, caminho, nomeArquivo: nome });
+  await atualizarViews(db);
   return resultado;
 }
 
 describe('comparação local', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-comparacao-local-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-comparacao-local-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    await importar('bweb_1t_AC_14102014131600.txt');
+    await importar(NOME_2026, gerarBwebMulti(secoes2026(SECOES)));
 
     const linha = await db
       .selectFrom('boletim_versao as bv')
@@ -52,7 +54,7 @@ describe('comparação local', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('retorna grupos, cobertura e limitações', async () => {
@@ -66,6 +68,7 @@ describe('comparação local', () => {
     expect(corpo.cobertura).toBeDefined();
     expect(typeof corpo.total).toBe('number');
     expect(corpo.grupos.length).toBeGreaterThan(0);
+    expect(corpo.cobertura.consideradas).toBe(SECOES);
     for (const grupo of corpo.grupos) expect(grupo).not.toHaveProperty('secoes');
   });
 
@@ -74,6 +77,8 @@ describe('comparação local', () => {
       await app.inject({ method: 'GET', url: `/api/comparacao-local?election_id=${eleicao}&cargo=${cargo}` })
     ).json();
     const grupo = lista.grupos[0];
+    expect(lista.grupos.length).toBeGreaterThan(0);
+    expect(grupo.tamanho).toBe(SECOES);
     const base = `/api/comparacao-local/secoes?election_id=${eleicao}&cargo=${cargo}&chave=${encodeURIComponent(grupo.chave)}`;
 
     const resposta = await app.inject({ method: 'GET', url: `${base}&ordem=nr_secao&direcao=desc` });

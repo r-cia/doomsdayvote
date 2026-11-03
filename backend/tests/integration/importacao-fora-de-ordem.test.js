@@ -1,29 +1,25 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { sql } from 'kysely';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2026, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-const fixture = caminhoFixture('bweb-1t_ac_2026.csv');
-
-let storageDir;
-let base;
+let diretorio;
 
 async function contar(tabela) {
   const { rows } = await sql`select count(*)::int as total from ${sql.table(tabela)}`.execute(db);
   return rows[0].total;
 }
 
-async function escreverEmbaralhado() {
-  const conteudo = await readFile(fixture, 'latin1');
+async function escreverEmbaralhado(conteudo) {
   const linhas = conteudo.split(/\r?\n/);
   const cabecalho = linhas[0];
   const corpo = linhas.slice(1).filter((linha) => linha !== '');
@@ -37,15 +33,14 @@ async function escreverEmbaralhado() {
     if (fim[i]) embaralhado.push(fim[i]);
   }
 
-  const destino = path.join(base, 'bweb-1t_ac_2026-embaralhado.csv');
+  const destino = path.join(diretorio, 'bweb-sintetico-2026-embaralhado.csv');
   await writeFile(destino, `${cabecalho}\n${embaralhado.join('\n')}\n`, 'latin1');
   return destino;
 }
 
 describe('importação fora de ordem', () => {
   beforeAll(async () => {
-    base = await mkdtemp(path.join(tmpdir(), 'bweb-fora-ordem-'));
-    storageDir = path.join(base, 'storage');
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-fora-ordem-'));
   });
 
   beforeEach(async () => {
@@ -55,17 +50,20 @@ describe('importação fora de ordem', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(base, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
     'produz os mesmos totais com as linhas intercaladas',
     async () => {
+      const conteudo = gerarBwebMulti(secoes2026(8));
+      const caminho = path.join(diretorio, NOME_2026);
+      await writeFile(caminho, conteudo, 'latin1');
+
       const normal = await importarArquivo({
         db,
-        caminho: fixture,
-        nomeArquivo: 'bweb-1t_ac_2026.csv',
-        storageDir,
+        caminho,
+        nomeArquivo: NOME_2026,
       });
 
       const versoes = await contar('boletim_versao');
@@ -77,9 +75,8 @@ describe('importação fora de ordem', () => {
 
       const foraDeOrdem = await importarArquivo({
         db,
-        caminho: await escreverEmbaralhado(),
-        nomeArquivo: 'bweb-1t_ac_2026-embaralhado.csv',
-        storageDir,
+        caminho: await escreverEmbaralhado(conteudo),
+        nomeArquivo: 'bweb-sintetico-2026-embaralhado.csv',
       });
 
       expect(foraDeOrdem.lote.qt_linhas).toBe(normal.lote.qt_linhas);

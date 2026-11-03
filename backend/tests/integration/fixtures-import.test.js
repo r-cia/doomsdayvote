@@ -5,17 +5,35 @@ import path from 'node:path';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { contar, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture, FIXTURES, LINHAS_POR_FIXTURE } from '../helpers/fixtures.js';
+import {
+  NOME_2014_1T,
+  NOME_2014_2T,
+  NOME_2018,
+  NOME_2022,
+  NOME_2026,
+  escreverArquivo,
+  gerarBweb,
+  gerarBweb2014,
+  gerarBweb2018,
+} from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+let diretorio;
 
-describe('importação dos fixtures com proveniência', () => {
+const ARQUIVOS = [
+  { nome: NOME_2026, conteudo: () => gerarBweb(), linhas: 6 },
+  { nome: NOME_2022, conteudo: () => gerarBweb({ ano: 2022, eleicao: 9602, pleito: 9602 }), linhas: 6 },
+  { nome: NOME_2018, conteudo: () => gerarBweb2018(), linhas: 4 },
+  { nome: NOME_2014_1T, conteudo: () => gerarBweb2014({ secao: 1 }), linhas: 4 },
+  { nome: NOME_2014_2T, conteudo: () => gerarBweb2014({ secao: 2 }), linhas: 4 },
+];
+
+describe('importação dos cenários sintéticos com proveniência', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-fixtures-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-fixtures-'));
   });
 
   beforeEach(async () => {
@@ -25,33 +43,33 @@ describe('importação dos fixtures com proveniência', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
-    'importa os fixtures disponíveis separados por ano, UF e turno',
+    'importa os cenários sintéticos separados por ano, UF e turno',
     async () => {
-      for (const nome of FIXTURES) {
+      for (const arquivo of ARQUIVOS) {
+        const caminho = await escreverArquivo(diretorio, arquivo.nome, arquivo.conteudo());
         const resultado = await importarArquivo({
           db,
-          caminho: caminhoFixture(nome),
-          nomeArquivo: nome,
-          storageDir,
+          caminho,
+          nomeArquivo: arquivo.nome,
         });
 
         expect(resultado.ignorado).toBe(false);
         expect(resultado.lote.status).toBe('concluido');
-        expect(resultado.lote.qt_linhas).toBe(LINHAS_POR_FIXTURE[nome]);
+        expect(resultado.lote.qt_linhas).toBe(arquivo.linhas);
         expect(resultado.lote.sha256).toMatch(/^[0-9a-f]{64}$/);
       }
 
-      expect(await contar(db, 'lote_importacao')).toBe(FIXTURES.length);
+      expect(await contar(db, 'lote_importacao')).toBe(ARQUIVOS.length);
       const eleicoes = await db
         .selectFrom('eleicao')
         .select(['ano_eleicao', 'nr_turno'])
         .distinct()
         .execute();
-      expect(eleicoes).toHaveLength(6);
+      expect(eleicoes).toHaveLength(5);
 
       const semOrigem = await db
         .selectFrom('resultado_votavel')
@@ -69,12 +87,11 @@ describe('importação dos fixtures com proveniência', () => {
 
       const segundo = await importarArquivo({
         db,
-        caminho: caminhoFixture(FIXTURES[0]),
-        nomeArquivo: FIXTURES[0],
-        storageDir,
+        caminho: path.join(diretorio, ARQUIVOS[0].nome),
+        nomeArquivo: ARQUIVOS[0].nome,
       });
       expect(segundo.ignorado).toBe(true);
-      expect(await contar(db, 'lote_importacao')).toBe(FIXTURES.length);
+      expect(await contar(db, 'lote_importacao')).toBe(ARQUIVOS.length);
     },
     { timeout: 180000 },
   );

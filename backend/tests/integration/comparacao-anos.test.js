@@ -7,7 +7,15 @@ import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import {
+  CENARIO,
+  NOME_2014_1T,
+  NOME_2022,
+  NOME_2026,
+  escreverArquivo,
+  gerarBweb,
+  gerarBweb2014,
+} from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,25 +27,30 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+let diretorio;
+
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  return importarArquivo({ db, caminho, nomeArquivo: nome });
+}
 
 describe('GET /api/comparacao-anos', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-comparacao-anos-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-comparacao-anos-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    for (const nome of ['bweb-1t_ac_2026.csv', 'bweb_1t_AC_051020221321.csv', 'bweb_1t_AC_14102014131600.txt']) {
-      await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
-    }
+    await importar(NOME_2014_1T, gerarBweb2014());
+    await importar(NOME_2022, gerarBweb({ ano: 2022, eleicao: 9602, pleito: 9602 }));
+    await importar(NOME_2026, gerarBweb());
     await atualizarViews(db);
   });
 
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
@@ -78,7 +91,7 @@ describe('GET /api/comparacao-anos', () => {
       }
       expect(corpo.pares.some((par) => par.ano_a === 2014 || par.ano_b === 2014)).toBe(false);
 
-      const repetida = await app.inject({ method: 'GET', url: '/api/comparacao-anos?anos=2026,2022&uf=AC' });
+      const repetida = await app.inject({ method: 'GET', url: `/api/comparacao-anos?anos=2026,2022&uf=${CENARIO.uf}` });
       const semUf = await app.inject({ method: 'GET', url: '/api/comparacao-anos?anos=2022,2026' });
       expect(repetida.statusCode).toBe(200);
       expect(repetida.json().pares).toEqual(semUf.json().pares);

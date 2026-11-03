@@ -6,14 +6,14 @@ import { criarDb } from '../../src/db/index.js';
 import { expandirSecao, secoesCompactas } from '../../src/modules/analise/mv-secao-candidato.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2026, escreverArquivo, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
 
-let storageDir;
+let diretorio;
 let alvo;
 
 function agruparPorSecao(linhas) {
@@ -47,10 +47,10 @@ const porVotavel = (a, b) => a.cd_tipo_votavel - b.cd_tipo_votavel || a.nr_votav
 
 describe('seções compactas equivalem à leitura seção × votável da view', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-mv-compacto-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-mv-compacto-'));
     await limparBanco(db);
-    const nome = 'bweb-1t_ac_2026.csv';
-    await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+    const caminho = await escreverArquivo(diretorio, NOME_2026, gerarBwebMulti(secoes2026(12)));
+    await importarArquivo({ db, caminho, nomeArquivo: NOME_2026 });
     await atualizarViews();
     const linha = await db
       .selectFrom('boletim_versao')
@@ -63,7 +63,7 @@ describe('seções compactas equivalem à leitura seção × votável da view', 
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   for (const [descricao, escopo, categorias] of [

@@ -7,16 +7,28 @@ import { criarDb } from '../../src/db/index.js';
 import { aplicarFiltroCorte, avisosCorte, metadadosCorte, resolverCorte } from '../../src/modules/apuracao/corte.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import {
+  NOME_2014_1T,
+  NOME_2018,
+  NOME_2026,
+  escreverArquivo,
+  gerarBweb2014,
+  gerarBweb2018Multi,
+  gerarBwebMulti,
+  secoes2018,
+  secoes2026,
+} from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+const SECOES = 8;
+let diretorio;
 
-async function importar(nome) {
-  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  const resultado = await importarArquivo({ db, caminho, nomeArquivo: nome });
   await atualizarViews(db);
   return resultado;
 }
@@ -63,7 +75,7 @@ function diaAnterior(data) {
 
 describe('corte temporal', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-corte-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-corte-'));
   });
 
   beforeEach(async () => {
@@ -73,18 +85,18 @@ describe('corte temporal', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
     'corta o dia de 2026 pelo recebimento e devolve metadados',
     async () => {
-      await importar('bweb-1t_ac_2026.csv');
+      await importar(NOME_2026, gerarBwebMulti(secoes2026(SECOES)));
       const eid = await eleicaoId(2026, 1);
       const cargo = await primeiroCargo(eid);
       const final = await contarCorte(eid, cargo, { tipo: 'final' });
 
-      expect(final).toBeGreaterThan(0);
+      expect(final).toBe(SECOES);
 
       const { primeiro, ultimo } = await db
         .selectFrom('boletim_versao')
@@ -98,6 +110,7 @@ describe('corte temporal', () => {
 
       expect(await contarCorte(eid, cargo, asOf(new Date(primeiro.getTime() - 1000)))).toBe(0);
       expect(await contarCorte(eid, cargo, asOf(primeiro))).toBeGreaterThanOrEqual(1);
+      expect(await contarCorte(eid, cargo, asOf(primeiro))).toBeLessThan(final);
       expect(await contarCorte(eid, cargo, asOf(ultimo))).toBe(final);
 
       const metadados = await metadadosCorte(db, { eleicaoId: eid, cargo }, { tipo: 'final' });
@@ -123,7 +136,7 @@ describe('corte temporal', () => {
   it(
     '2014 só aceita corte por dia e avisa que o horário é indisponível',
     async () => {
-      await importar('bweb_1t_AC_14102014131600.txt');
+      await importar(NOME_2014_1T, gerarBweb2014());
       const eid = await eleicaoId(2014, 1);
       const cargo = await primeiroCargo(eid);
       const final = await contarCorte(eid, cargo, { tipo: 'final' });
@@ -151,13 +164,13 @@ describe('corte temporal', () => {
   it(
     '2018 não tem ordem de recebimento e não entra em corte temporal',
     async () => {
-      await importar('bweb_2t_AC_301020181744.csv');
+      await importar(NOME_2018, gerarBweb2018Multi(secoes2018(SECOES)));
       const eid = await eleicaoId(2018, 2);
       const cargo = await primeiroCargo(eid);
       const final = await contarCorte(eid, cargo, { tipo: 'final' });
       const corte = resolverCorte({ as_of: '2018-10-30T12:00:00-03:00' });
 
-      expect(final).toBeGreaterThan(0);
+      expect(final).toBe(SECOES);
       expect(await contarCorte(eid, cargo, corte)).toBe(0);
       expect(await contarCorte(eid, cargo, resolverCorte({ as_of_date: '2018-10-30' }))).toBe(0);
 

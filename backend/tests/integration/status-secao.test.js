@@ -7,7 +7,15 @@ import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import {
+  NOME_2018,
+  NOME_2026,
+  escreverArquivo,
+  gerarBweb2018Multi,
+  gerarBwebMulti,
+  secoes2018,
+  secoes2026,
+} from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,12 +27,14 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+const SECOES = 12;
+let diretorio;
 let base;
 let bus;
 
-async function importar(nome) {
-  await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  await importarArquivo({ db, caminho, nomeArquivo: nome });
 }
 
 async function carregarAlvo() {
@@ -67,7 +77,7 @@ async function totalComStatus(status, parametros = '') {
 
 describe('status e motivo calculados em SQL', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-status-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-status-'));
   });
 
   beforeEach(async () => {
@@ -77,12 +87,12 @@ describe('status e motivo calculados em SQL', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   describe('2026 (recebimento com hora)', () => {
     beforeEach(async () => {
-      await importar('bweb-1t_ac_2026.csv');
+      await importar(NOME_2026, gerarBwebMulti(secoes2026(SECOES)));
       await carregarAlvo();
     });
 
@@ -167,10 +177,10 @@ describe('status e motivo calculados em SQL', () => {
 
   describe('2018 (recebimento ausente)', () => {
     it('intradiário é desconhecido por precisão insuficiente', async () => {
-      await importar('bweb_2t_AC_301020181744.csv');
+      await importar(NOME_2018, gerarBweb2018Multi(secoes2018(SECOES)));
       await carregarAlvo();
 
-      expect(bus.length).toBeGreaterThan(0);
+      expect(bus.length).toBe(SECOES);
       for (const bu of bus.slice(0, 3)) {
         expect(await itemDaSecao(bu.secao_id, '&as_of=2018-10-30T12:00:00-03:00')).toMatchObject({
           status: 'desconhecido',

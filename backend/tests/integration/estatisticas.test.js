@@ -7,7 +7,12 @@ import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import {
+  NOME_2014_1T,
+  NOME_2014_2T,
+  escreverArquivo,
+  gerarBweb2014,
+} from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,25 +24,26 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+let diretorio;
 let cargo;
 let eleicaoPrimeiroTurno;
 
-async function importar(nome) {
-  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  const resultado = await importarArquivo({ db, caminho, nomeArquivo: nome });
   await atualizarViews(db);
   return resultado;
 }
 
 describe('estatísticas descritivas', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-estatisticas-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-estatisticas-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    await importar('bweb_1t_AC_14102014131600.txt');
-    await importar('bweb_2t_AC_28102014114450.txt');
+    await importar(NOME_2014_1T, gerarBweb2014({ secao: 1 }));
+    await importar(NOME_2014_2T, gerarBweb2014({ secao: 2 }));
 
     const linhas = await db
       .selectFrom('boletim_versao as bv')
@@ -71,7 +77,7 @@ describe('estatísticas descritivas', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('devolve dois blocos lado a lado quando o ano tem dois turnos', async () => {

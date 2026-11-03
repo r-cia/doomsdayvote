@@ -8,16 +8,18 @@ import { contarSecoesComBu } from '../../src/modules/apuracao/progresso.js';
 import { lerArquivoBweb } from '../../src/modules/importacao/bweb/ler-arquivo.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2026, escreverArquivo, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+const SECOES = 8;
+let diretorio;
 
-async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  return importarArquivo({ db, caminho, nomeArquivo: nome });
 }
 
 async function alvoCargo(nome) {
@@ -31,7 +33,7 @@ async function alvoCargo(nome) {
 
 describe('seções com BU', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-progresso-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-progresso-'));
   });
 
   beforeEach(async () => {
@@ -41,17 +43,18 @@ describe('seções com BU', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
     'conta seções distintas por cargo e corte',
     async () => {
-      await importar('bweb-1t_ac_2026.csv');
+      const conteudo = gerarBwebMulti(secoes2026(SECOES));
+      await importar(NOME_2026, conteudo);
       const { eleicaoId, cargo } = await alvoCargo('Presidente');
 
       const secoes = new Set();
-      const arquivo = await lerArquivoBweb(caminhoFixture('bweb-1t_ac_2026.csv'));
+      const arquivo = await lerArquivoBweb(path.join(diretorio, NOME_2026));
       for await (const registro of arquivo.registros) {
         const v = registro.valores;
         if (v.DS_CARGO_PERGUNTA !== 'Presidente') continue;
@@ -60,6 +63,7 @@ describe('seções com BU', () => {
 
       const final = await contarSecoesComBu(db, { eleicaoId, cargo, corte: { tipo: 'final' } });
       expect(final).toBe(secoes.size);
+      expect(final).toBe(SECOES);
       expect(
         await contarSecoesComBu(db, {
           eleicaoId,

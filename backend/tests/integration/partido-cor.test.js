@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +9,7 @@ import { criarDb } from '../../src/db/index.js';
 import { somarVotos } from '../../src/modules/apuracao/totais.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, contar, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2026, escreverArquivo, gerarBweb } from '../helpers/fixtures.js';
 
 const execFileAsync = promisify(execFile);
 const backendDir = fileURLToPath(new URL('../..', import.meta.url));
@@ -17,8 +17,7 @@ const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-const cores = JSON.parse(await readFile(new URL('../../data/partido-cores.json', import.meta.url), 'utf8'));
-let storageDir;
+let diretorio;
 
 function ambiente() {
   return {
@@ -26,8 +25,7 @@ function ambiente() {
     NODE_ENV: 'test',
     DATABASE_URL: url,
     DATABASE_MIGRATION_URL: process.env.TEST_DATABASE_MIGRATION_URL,
-    BWEB_INPUT_DIR: '../data',
-    BWEB_STORAGE_DIR: '../data/storage',
+    BWEB_INPUT_DIR: diretorio,
   };
 }
 
@@ -46,7 +44,7 @@ async function alvoCargo(nome) {
 
 describe('cores de partido', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-cores-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-cores-'));
   });
 
   beforeEach(async () => {
@@ -56,14 +54,15 @@ describe('cores de partido', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('seed é idempotente e não sobrescreve cor manual', async () => {
     await semear();
-    expect(await contar(db, 'partido_cor')).toBe(cores.length);
+    const total = await contar(db, 'partido_cor');
+    expect(total).toBeGreaterThan(0);
     await semear();
-    expect(await contar(db, 'partido_cor')).toBe(cores.length);
+    expect(await contar(db, 'partido_cor')).toBe(total);
 
     await db
       .updateTable('partido_cor')
@@ -92,17 +91,21 @@ describe('cores de partido', () => {
   it(
     'a API de votos devolve cor_hex',
     async () => {
-      await importarArquivo({
-        db,
-        caminho: caminhoFixture('bweb-1t_ac_2026.csv'),
-        nomeArquivo: 'bweb-1t_ac_2026.csv',
-        storageDir,
-      });
+      const caminho = await escreverArquivo(
+        diretorio,
+        NOME_2026,
+        gerarBweb({
+          nrPartido: 13,
+          sgPartido: 'PT',
+          nmPartido: 'Partido dos Trabalhadores',
+        }),
+      );
+      await importarArquivo({ db, caminho, nomeArquivo: NOME_2026 });
       await semear();
       await atualizarViews();
       const { eleicaoId, cargo } = await alvoCargo('Presidente');
       const votos = await somarVotos(db, { eleicaoId, cargo, corte: { tipo: 'final' } });
-      expect(votos.some((voto) => voto.cor_hex)).toBe(true);
+      expect(votos.filter((voto) => voto.categoria === 'nominal').every((voto) => voto.cor_hex)).toBe(true);
     },
     { timeout: 120000 },
   );

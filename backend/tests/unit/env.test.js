@@ -54,24 +54,26 @@ describe('loadWorkerEnv', () => {
     DATABASE_URL: 'postgres://usuario:senha@localhost:5432/banco',
     DATABASE_MIGRATION_URL: 'postgres://dono:senha@localhost:5432/banco',
     BWEB_INPUT_DIR: '/dados/entrada',
-    BWEB_STORAGE_DIR: '/dados/storage',
   };
 
-  it('desativa o filtro por padrão e converte a flag para booleano', () => {
-    expect(loadWorkerEnv(ambienteValido).BWEB_SKIP_CARGOS_LEGISLATIVOS).toBe(false);
-    expect(
-      loadWorkerEnv({ ...ambienteValido, BWEB_SKIP_CARGOS_LEGISLATIVOS: 'true' })
-        .BWEB_SKIP_CARGOS_LEGISLATIVOS,
-    ).toBe(true);
-    expect(
-      loadWorkerEnv({ ...ambienteValido, BWEB_SKIP_CARGOS_LEGISLATIVOS: 'false' })
-        .BWEB_SKIP_CARGOS_LEGISLATIVOS,
-    ).toBe(false);
+  it('carrega a configuração do worker com os padrões de banco', () => {
+    const env = loadWorkerEnv(ambienteValido);
+
+    expect(env.BWEB_INPUT_DIR).toBe('/dados/entrada');
+    expect(env.DB_POOL_MAX).toBe(20);
+    expect(env.DB_WORK_MEM_MB).toBe(64);
   });
 
-  it('rejeita valores inválidos para a flag', () => {
-    expect(() =>
-      loadWorkerEnv({ ...ambienteValido, BWEB_SKIP_CARGOS_LEGISLATIVOS: 'yes' }),
-    ).toThrowError(/BWEB_SKIP_CARGOS_LEGISLATIVOS/);
+  it('lista todas as variáveis obrigatórias ausentes', () => {
+    let mensagem = '';
+    try {
+      loadWorkerEnv({ NODE_ENV: 'test' });
+    } catch (erro) {
+      mensagem = erro.message;
+    }
+
+    for (const nome of ['DATABASE_URL', 'DATABASE_MIGRATION_URL', 'BWEB_INPUT_DIR']) {
+      expect(mensagem).toContain(nome);
+    }
   });
 });

@@ -7,7 +7,7 @@ import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2026, escreverArquivo, gerarBwebMulti, secoes2026 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,24 +19,26 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+const SECOES = 12;
+let diretorio;
 let cargo;
 let eleicao;
 
-async function importar(nome) {
-  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
-  await atualizarViews();
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  const resultado = await importarArquivo({ db, caminho, nomeArquivo: nome });
+  await atualizarViews(db);
   return resultado;
 }
 
 describe('concentração e margem', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-concentracao-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-concentracao-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    await importar('bweb_1t_AC_14102014131600.txt');
+    await importar(NOME_2026, gerarBwebMulti(secoes2026(SECOES)));
 
     const linha = await db
       .selectFrom('boletim_versao as bv')
@@ -52,7 +54,7 @@ describe('concentração e margem', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('retorna top, cobertura e limitações', async () => {
@@ -66,5 +68,8 @@ describe('concentração e margem', () => {
     expect(Array.isArray(corpo.top_margem)).toBe(true);
     expect(corpo.cobertura).toBeDefined();
     expect(typeof corpo.total).toBe('number');
+    expect(corpo.total).toBe(SECOES);
+    expect(corpo.top_share).toHaveLength(SECOES);
+    expect(corpo.cobertura.consideradas).toBe(SECOES);
   });
 });

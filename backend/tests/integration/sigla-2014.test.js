@@ -7,24 +7,24 @@ import { criarDb } from '../../src/db/index.js';
 import { somarVotos } from '../../src/modules/apuracao/totais.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { CENARIO, NOME_2014_1T, escreverArquivo, gerarBweb2014 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+let diretorio;
 let alvo;
 
 describe('sigla do partido em 2014 sem sg_partido', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-sigla-2014-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-sigla-2014-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    const nome = 'bweb_1t_AC_14102014131600.txt';
-    await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+    const caminho = await escreverArquivo(diretorio, NOME_2014_1T, gerarBweb2014());
+    await importarArquivo({ db, caminho, nomeArquivo: NOME_2014_1T });
     await sql`update resultado_votavel set sg_partido = null where ano_eleicao = 2014`.execute(db);
     await atualizarViews();
     const linha = await db
@@ -38,7 +38,7 @@ describe('sigla do partido em 2014 sem sg_partido', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
@@ -50,7 +50,7 @@ describe('sigla do partido em 2014 sem sg_partido', () => {
       expect(final.length).toBeGreaterThan(0);
       for (const voto of final) expect(voto.sg_partido).toBe(voto.nm_partido);
 
-      const porUf = nominais(await somarVotos(db, { ...alvo, corte: { tipo: 'final' }, escopo: { sgUf: 'AC' } }));
+      const porUf = nominais(await somarVotos(db, { ...alvo, corte: { tipo: 'final' }, escopo: { sgUf: CENARIO.uf } }));
       expect(porUf.length).toBeGreaterThan(0);
       for (const voto of porUf) expect(voto.sg_partido).toBe(voto.nm_partido);
 

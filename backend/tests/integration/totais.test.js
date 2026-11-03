@@ -8,16 +8,23 @@ import { somarMetricasSecao, somarVotos } from '../../src/modules/apuracao/totai
 import { lerArquivoBweb } from '../../src/modules/importacao/bweb/ler-arquivo.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import {
+  NOME_2026,
+  escreverArquivo,
+  gerarBwebMulti,
+  secoes2026,
+} from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+const SECOES = 12;
+let diretorio;
 
-async function importar(nome) {
-  const resultado = await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  const resultado = await importarArquivo({ db, caminho, nomeArquivo: nome });
   await atualizarViews(db);
   return resultado;
 }
@@ -33,7 +40,7 @@ async function alvoCargo(nome) {
 
 describe('somas e métricas', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-totais-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-totais-'));
   });
 
   beforeEach(async () => {
@@ -43,20 +50,21 @@ describe('somas e métricas', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
     'soma votos por votável e consolida métricas sem inflar',
     async () => {
-      await importar('bweb-1t_ac_2026.csv');
+      const conteudo = gerarBwebMulti(secoes2026(SECOES));
+      await importar(NOME_2026, conteudo);
       const { eleicaoId, cargo } = await alvoCargo('Presidente');
 
       const esperado = new Map();
       const secoes = new Map();
       let naiveAptos = 0;
 
-      const arquivo = await lerArquivoBweb(caminhoFixture('bweb-1t_ac_2026.csv'));
+      const arquivo = await lerArquivoBweb(path.join(diretorio, NOME_2026));
       for await (const registro of arquivo.registros) {
         const v = registro.valores;
         if (v.DS_CARGO_PERGUNTA !== 'Presidente') continue;
@@ -99,10 +107,33 @@ describe('somas e métricas', () => {
   it(
     'ignora cargos fora do escopo',
     async () => {
-      await importar('bweb-1t_ac_2026.csv');
-      const { eleicaoId, cargo } = await alvoCargo('Senador');
-      const votos = await somarVotos(db, { eleicaoId, cargo, corte: { tipo: 'final' } });
-      expect(votos).toEqual([]);
+      const resultado = await importar(
+        NOME_2026,
+        gerarBwebMulti(secoes2026(2, { incluirForaDoEscopo: true })),
+      );
+      expect(resultado.qtLinhasIgnoradas).toBeGreaterThan(0);
+
+      const linha = await db
+        .selectFrom('boletim_versao')
+        .select('eleicao_id')
+        .where('cd_cargo_pergunta', '=', 1)
+        .executeTakeFirstOrThrow();
+
+      const foraDoEscopo = await db
+        .selectFrom('resultado_votavel')
+        .select('id')
+        .where('cd_cargo_pergunta', 'in', [5, 6])
+        .execute();
+      expect(foraDoEscopo).toEqual([]);
+
+      for (const cargo of [5, 6]) {
+        const votos = await somarVotos(db, {
+          eleicaoId: linha.eleicao_id,
+          cargo,
+          corte: { tipo: 'final' },
+        });
+        expect(votos).toEqual([]);
+      }
     },
     { timeout: 120000 },
   );

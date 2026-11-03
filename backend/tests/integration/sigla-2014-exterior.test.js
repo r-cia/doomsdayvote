@@ -5,19 +5,19 @@ import path from 'node:path';
 import { sql } from 'kysely';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
-import { preencherSiglaExterior } from '../../src/migrations/0012_sg_partido_2014_exterior.js';
+import { preencherSiglaExterior } from '../../src/migrations/0001_schema_inicial.js';
 import { atualizarViews, limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2014_1T, escreverArquivo, gerarBweb2014 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+let diretorio;
 
 describe('sigla do exterior (ZZ) em 2014', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-sigla-zz-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-sigla-zz-'));
   });
 
   beforeEach(async () => {
@@ -27,14 +27,14 @@ describe('sigla do exterior (ZZ) em 2014', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
     'preenche a sigla das linhas ZZ sem partido a partir do mesmo nr_partido nas outras UFs',
     async () => {
-      const nome = 'bweb_1t_AC_14102014131600.txt';
-      await importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+      const caminho = await escreverArquivo(diretorio, NOME_2014_1T, gerarBweb2014());
+      await importarArquivo({ db, caminho, nomeArquivo: NOME_2014_1T });
 
       const { rows: alvo } = await sql`
         select bv.id

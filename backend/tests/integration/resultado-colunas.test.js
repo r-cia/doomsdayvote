@@ -6,17 +6,17 @@ import { sql } from 'kysely';
 import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { CENARIO, NOME_2026, escreverArquivo, gerarBweb } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
 
 const db = criarDb({ connectionString: url });
-let storageDir;
+let diretorio;
 
 describe('colunas de resultado_votavel', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-colunas-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-colunas-'));
   });
 
   beforeEach(async () => {
@@ -26,18 +26,14 @@ describe('colunas de resultado_votavel', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it(
     'preenche ano, turno, UF, município, zona, seção e cargo sem bruto',
     async () => {
-      await importarArquivo({
-        db,
-        caminho: caminhoFixture('bweb-1t_ac_2026.csv'),
-        nomeArquivo: 'bweb-1t_ac_2026.csv',
-        storageDir,
-      });
+      const caminho = await escreverArquivo(diretorio, NOME_2026, gerarBweb());
+      await importarArquivo({ db, caminho, nomeArquivo: NOME_2026 });
 
       const { rows } = await sql`
         select ano_eleicao, nr_turno, sg_uf, cd_municipio_tse, nr_zona,
@@ -47,13 +43,13 @@ describe('colunas de resultado_votavel', () => {
       `.execute(db);
 
       expect(rows).toHaveLength(1);
-      expect(rows[0].ano_eleicao).toBe(2026);
-      expect(rows[0].nr_turno).toBe(1);
-      expect(rows[0].sg_uf).toBe('AC');
-      expect(Number(rows[0].cd_municipio_tse)).toBeGreaterThan(0);
-      expect(Number(rows[0].nr_zona)).toBeGreaterThan(0);
-      expect(Number(rows[0].nr_secao)).toBeGreaterThan(0);
-      expect(Number(rows[0].cd_cargo_pergunta)).toBeGreaterThan(0);
+      expect(rows[0].ano_eleicao).toBe(CENARIO.ano);
+      expect(rows[0].nr_turno).toBe(CENARIO.turno);
+      expect(rows[0].sg_uf).toBe(CENARIO.uf);
+      expect(Number(rows[0].cd_municipio_tse)).toBe(CENARIO.municipio);
+      expect(Number(rows[0].nr_zona)).toBe(CENARIO.zona);
+      expect(Number(rows[0].nr_secao)).toBe(CENARIO.secao);
+      expect([1, 3]).toContain(Number(rows[0].cd_cargo_pergunta));
 
       const { rows: colunas } = await sql`
         select column_name

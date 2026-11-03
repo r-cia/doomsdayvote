@@ -40,6 +40,14 @@ const TABELAS = [
   'alerta_importacao',
   'malha_geografica',
   'partido_cor',
+  'totalizacao_lote',
+  'totalizacao_secao',
+  'totalizacao_bu_voto',
+  'totalizacao_rdv_voto',
+  'totalizacao_eleitor',
+  'totalizacao_incidente',
+  'totalizacao_divergencia',
+  'totalizacao_secao_erro',
 ];
 
 let sequencia = 0;
@@ -88,7 +96,6 @@ async function criarBase() {
     .insertInto('lote_importacao')
     .values({
       nome_arquivo: `bweb-ac-${numero}.csv`,
-      caminho_armazenado: `originais/${sha256}.csv`,
       sha256,
       tamanho_bytes: 1000,
       captured_at: new Date('2026-10-04T21:00:00Z'),
@@ -137,7 +144,7 @@ describe('schema inicial', () => {
     await db.destroy();
   });
 
-  it('cria as nove tabelas de domínio', async () => {
+  it('cria as tabelas de domínio', async () => {
     const { rows } = await sql`
       SELECT table_name
       FROM information_schema.tables
@@ -300,7 +307,6 @@ describe('schema inicial', () => {
         .insertInto('lote_importacao')
         .values({
           nome_arquivo: 'bweb-ac-copia.csv',
-          caminho_armazenado: 'originais/copia.csv',
           sha256: base.sha256,
           tamanho_bytes: 1000,
           captured_at: new Date(),
@@ -315,6 +321,176 @@ describe('schema inicial', () => {
         .values({ ano_eleicao: 2026, cd_pleito: 999, nr_turno: 3, cd_eleicao: 999 })
         .execute(),
     ).rejects.toMatchObject({ code: '23514' });
+  });
+
+  it('insere e consulta uma linha de cada tabela de totalização', async () => {
+    const base = await criarBase();
+
+    const lote = await db
+      .insertInto('totalizacao_lote')
+      .values({
+        nome_arquivo: 'o03220rr0305000030241.zip',
+        sg_uf: 'AC',
+        ano_eleicao: 2026,
+        nr_turno: 1,
+        sha256: 'c'.repeat(64),
+        iniciado_em: new Date('2026-10-04T20:55:00Z'),
+        concluido_em: new Date('2026-10-04T21:00:00Z'),
+        status: 'concluido',
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+
+    const secao = await db
+      .insertInto('totalizacao_secao')
+      .values({
+        lote_id: lote.id,
+        ano_eleicao: 2026,
+        nr_turno: 1,
+        sg_uf: 'AC',
+        cd_municipio_tse: base.cdMunicipio,
+        nr_zona: base.nrZona,
+        nr_secao: base.nrSecao,
+        nr_urna_efetivada: 2297435,
+        nr_local_votacao: 1180,
+        qt_aptos: 244,
+        qt_comparecimento: 192,
+        qt_abstencoes: 52,
+        dt_abertura: new Date('2026-10-04T07:00:01Z'),
+        dt_encerramento: new Date('2026-10-04T16:05:33Z'),
+        dt_emissao_bu: new Date('2026-10-04T16:08:54Z'),
+        qt_habilitacao_1: 13,
+        qt_habilitacao_2: 174,
+        qt_habilitacao_3: 5,
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+
+    await db
+      .insertInto('totalizacao_bu_voto')
+      .values({
+        totalizacao_secao_id: secao.id,
+        cd_cargo_pergunta: 6257,
+        cd_tipo_votavel: 1,
+        nr_votavel: 13,
+        qt_votos: 30,
+      })
+      .execute();
+
+    await db
+      .insertInto('totalizacao_rdv_voto')
+      .values({
+        totalizacao_secao_id: secao.id,
+        cd_cargo_pergunta: 6257,
+        cd_tipo_votavel: 1,
+        nr_votavel: 13,
+        qt_votos: 30,
+      })
+      .execute();
+
+    await db
+      .insertInto('totalizacao_eleitor')
+      .values({
+        totalizacao_secao_id: secao.id,
+        habilitado_em: new Date('2026-10-04T07:10:00Z'),
+        computado_em: new Date('2026-10-04T07:10:02Z'),
+        duracao_ms: 1200,
+        qt_falhas_biometria: 1,
+        tp_habilitacao: 2,
+        qt_teclas_indevidas: 0,
+        correcao: false,
+      })
+      .execute();
+
+    await db
+      .insertInto('totalizacao_incidente')
+      .values({
+        totalizacao_secao_id: secao.id,
+        dt_incidente: new Date('2026-10-04T08:00:00Z'),
+        nivel: 'erro',
+        tipo: 'TESTE',
+        texto_original: 'falha de teste',
+      })
+      .execute();
+
+    await db
+      .insertInto('totalizacao_divergencia')
+      .values({
+        lote_id: lote.id,
+        fonte: 'rdv',
+        campo: 'votos',
+        sg_uf: 'AC',
+        cd_municipio_tse: base.cdMunicipio,
+        nr_zona: base.nrZona,
+        nr_secao: base.nrSecao,
+        cd_cargo_pergunta: 6257,
+        nr_votavel: 13,
+        valor_esperado: '30',
+        valor_encontrado: '31',
+      })
+      .execute();
+
+    const loteLido = await db
+      .selectFrom('totalizacao_lote')
+      .selectAll()
+      .where('id', '=', lote.id)
+      .executeTakeFirstOrThrow();
+    expect(loteLido.status).toBe('concluido');
+
+    const secaoLida = await db
+      .selectFrom('totalizacao_secao')
+      .selectAll()
+      .where('id', '=', secao.id)
+      .executeTakeFirstOrThrow();
+    expect(Number(secaoLida.nr_urna_efetivada)).toBe(2297435);
+    expect(Number(secaoLida.nr_local_votacao)).toBe(1180);
+    expect(Number(secaoLida.qt_comparecimento)).toBe(192);
+    expect(Number(secaoLida.qt_habilitacao_1)).toBe(13);
+    expect(Number(secaoLida.qt_habilitacao_2)).toBe(174);
+    expect(Number(secaoLida.qt_habilitacao_3)).toBe(5);
+
+    const votoBu = await db
+      .selectFrom('totalizacao_bu_voto')
+      .selectAll()
+      .where('totalizacao_secao_id', '=', secao.id)
+      .executeTakeFirstOrThrow();
+    expect(Number(votoBu.nr_votavel)).toBe(13);
+    expect(Number(votoBu.qt_votos)).toBe(30);
+
+    const votoRdv = await db
+      .selectFrom('totalizacao_rdv_voto')
+      .selectAll()
+      .where('totalizacao_secao_id', '=', secao.id)
+      .executeTakeFirstOrThrow();
+    expect(Number(votoRdv.nr_votavel)).toBe(13);
+    expect(Number(votoRdv.qt_votos)).toBe(30);
+
+    const eleitor = await db
+      .selectFrom('totalizacao_eleitor')
+      .selectAll()
+      .where('totalizacao_secao_id', '=', secao.id)
+      .executeTakeFirstOrThrow();
+    expect(eleitor.correcao).toBe(false);
+    expect(Number(eleitor.qt_falhas_biometria)).toBe(1);
+
+    const incidente = await db
+      .selectFrom('totalizacao_incidente')
+      .selectAll()
+      .where('totalizacao_secao_id', '=', secao.id)
+      .executeTakeFirstOrThrow();
+    expect(incidente.tipo).toBe('TESTE');
+    expect(incidente.texto_original).toBe('falha de teste');
+
+    const divergencia = await db
+      .selectFrom('totalizacao_divergencia')
+      .selectAll()
+      .where('lote_id', '=', lote.id)
+      .executeTakeFirstOrThrow();
+    expect(divergencia.fonte).toBe('rdv');
+    expect(divergencia.campo).toBe('votos');
+    expect(divergencia.valor_esperado).toBe('30');
+    expect(divergencia.valor_encontrado).toBe('31');
+    expect(Number(divergencia.nr_votavel)).toBe(13);
   });
 
   it('doomsday_app tem DML e não tem DDL', async () => {
@@ -352,11 +528,16 @@ describe('schema inicial', () => {
   });
 
   it('migrate:reset roda duas vezes seguidas', async () => {
-    for (let rodada = 0; rodada < 2; rodada += 1) {
-      const descida = await migrator.migrateTo(NO_MIGRATIONS);
-      expect(descida.error).toBeUndefined();
-      const subida = await migrator.migrateToLatest();
-      expect(subida.error).toBeUndefined();
+    try {
+      for (let rodada = 0; rodada < 2; rodada += 1) {
+        const descida = await migrator.migrateTo(NO_MIGRATIONS);
+        expect(descida.error).toBeUndefined();
+        const subida = await migrator.migrateToLatest();
+        expect(subida.error).toBeUndefined();
+      }
+    } finally {
+      const restauracao = await migrator.migrateToLatest();
+      expect(restauracao.error).toBeUndefined();
     }
   }, 180000);
 });

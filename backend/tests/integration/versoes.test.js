@@ -7,7 +7,7 @@ import { criarDb } from '../../src/db/index.js';
 import { importarArquivo } from '../../src/modules/importacao/importar-arquivo.js';
 import { registrarRotas } from '../../src/routes/index.js';
 import { limparBanco } from '../helpers/db-teste.js';
-import { caminhoFixture } from '../helpers/fixtures.js';
+import { NOME_2014_1T, escreverArquivo, gerarBweb2014 } from '../helpers/fixtures.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL não definida');
@@ -19,22 +19,23 @@ const app = buildApp({
   rotas: registrarRotas,
 });
 
-let storageDir;
+let diretorio;
 let cargo;
 let eleicao;
 
-async function importar(nome) {
-  return importarArquivo({ db, caminho: caminhoFixture(nome), nomeArquivo: nome, storageDir });
+async function importar(nome, conteudo) {
+  const caminho = await escreverArquivo(diretorio, nome, conteudo);
+  return importarArquivo({ db, caminho, nomeArquivo: nome });
 }
 
 describe('versões de BU', () => {
   beforeAll(async () => {
-    storageDir = await mkdtemp(path.join(tmpdir(), 'bweb-versoes-'));
+    diretorio = await mkdtemp(path.join(tmpdir(), 'bweb-versoes-'));
   });
 
   beforeEach(async () => {
     await limparBanco(db);
-    await importar('bweb_1t_AC_14102014131600.txt');
+    await importar(NOME_2014_1T, gerarBweb2014());
 
     const linha = await db
       .selectFrom('boletim_versao as bv')
@@ -50,7 +51,7 @@ describe('versões de BU', () => {
   afterAll(async () => {
     await limparBanco(db);
     await db.destroy();
-    await rm(storageDir, { recursive: true, force: true });
+    await rm(diretorio, { recursive: true, force: true });
   });
 
   it('retorna estrutura de versões', async () => {
