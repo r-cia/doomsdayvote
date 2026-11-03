@@ -29,7 +29,7 @@ ZERO TOLERANCE FOR RULE VIOLATIONS.
 ---
 
 ## 2. WORKFLOW & PROCESS CONTROL
-- **Plan Mode Required:** Present a detailed plan and obtain explicit user approval before writing or modifying code. **Claude agent MUST USE Opus** to do ANY planning. Plan should be stored on docs/current-plan.md.
+- **Plan Mode Required:** Present a detailed plan and obtain explicit user approval before writing or modifying code. O planejamento é responsabilidade do agente da sessão: ele NÃO troca de agente nem de modelo e NÃO delega o planejamento a ninguém. Plan should be stored on docs/current-plan.md.
 - **Strict Scope Boundaries:** Edit ONLY files within the repository root and its subfolders. 
 - **Tool Limits:** Maintain a maximum of **30 tool calls per task**. If additional calls are needed, explain the explicit reason before exceeding the threshold.
 - **Zero Disposable Code:** NEVER write scratch scripts, throwaway test files in `test/`, or ad-hoc verification harnesses (even if deleted afterward). Validate changes solely using the official project test suite or manual reasoning.
