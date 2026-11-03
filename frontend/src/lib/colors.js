@@ -35,6 +35,26 @@ const PALETA_PARTIDOS = Object.freeze({
   AGIR: '#0E7490',
   MOBILIZA: '#0369A1',
   MISSAO: '#166534',
+  PRD: '#14532D',
+})
+
+const SUCESSORES = Object.freeze({
+  PMDB: 'MDB',
+  PR: 'PL',
+  PRB: 'REPUBLICANOS',
+  PPS: 'CIDADANIA',
+  SD: 'SOLIDARIEDADE',
+  PSDC: 'DC',
+  PTN: 'PODE',
+  PHS: 'PODE',
+  PTDOB: 'AVANTE',
+  PSL: 'UNIAO',
+  PPL: 'PCDOB',
+  PTB: 'PRD',
+  PATRIOTA: 'PRD',
+  PATRI: 'PRD',
+  PEN: 'PRD',
+  PRP: 'PRD',
 })
 
 function normalizarSigla(sigla) {
@@ -54,39 +74,55 @@ function clarear(hex, fator = 0.26) {
   return `#${canais.map((canal) => canal.toString(16).padStart(2, '0')).join('')}`
 }
 
+function siglaEfetiva(sigla) {
+  const normalizada = normalizarSigla(sigla)
+  return SUCESSORES[normalizada] ?? normalizada
+}
+
 export function corPartido(sigla) {
-  const cor = PALETA_PARTIDOS[normalizarSigla(sigla)]
+  const cor = PALETA_PARTIDOS[siglaEfetiva(sigla)]
   return cor ? clarear(cor) : COR_NEUTRA
 }
 
 export function siglaTemCor(sigla) {
-  return normalizarSigla(sigla) in PALETA_PARTIDOS
+  return siglaEfetiva(sigla) in PALETA_PARTIDOS
 }
 
-export const FAIXAS_PERCENTUAL = Object.freeze([
-  { min: 0, max: 10, rotulo: '0–10%', cor: '#4a3a16' },
-  { min: 10, max: 20, rotulo: '10–20%', cor: '#5d4a17' },
-  { min: 20, max: 30, rotulo: '20–30%', cor: '#725a19' },
-  { min: 30, max: 40, rotulo: '30–40%', cor: '#886b1c' },
-  { min: 40, max: 50, rotulo: '40–50%', cor: '#9e7d1f' },
-  { min: 50, max: 60, rotulo: '50–60%', cor: '#b58f23' },
-  { min: 60, max: 70, rotulo: '60–70%', cor: '#cca228' },
-  { min: 70, max: 80, rotulo: '70–80%', cor: '#e0b52e' },
-  { min: 80, max: 90, rotulo: '80–90%', cor: '#f2c637' },
-  { min: 90, max: 100, rotulo: '90–100%', cor: '#ffd45e' },
-])
+function misturar(origem, destino, fator) {
+  const canais = [0, 2, 4].map((inicio) => {
+    const a = parseInt(origem.slice(1 + inicio, 3 + inicio), 16)
+    const b = parseInt(destino.slice(1 + inicio, 3 + inicio), 16)
+    return Math.round(a + (b - a) * fator)
+  })
+  return `#${canais.map((canal) => canal.toString(16).padStart(2, '0')).join('')}`
+}
 
-export function faixaPercentual(valor) {
+const ROTULOS_FAIXAS = Object.freeze(
+  Array.from({ length: 10 }, (_, i) => `${i * 10}–${(i + 1) * 10}%`),
+)
+
+// Gradiente do fundo "sem dados" até a cor do partido; a faixa mais baixa já
+// recebe 30% da cor do partido para não se confundir com área sem dados.
+export function faixasPercentual(sigla) {
+  const base = corPartido(sigla)
+  return ROTULOS_FAIXAS.map((rotulo, i) => ({
+    min: i * 10,
+    max: (i + 1) * 10,
+    rotulo,
+    cor: misturar(COR_SEM_DADOS, base, 0.3 + 0.7 * (i / 9)),
+  }))
+}
+
+export function faixaPercentual(valor, sigla) {
   if (valor === null || valor === undefined || valor === '') return null
   const numero = Number(valor)
   if (!Number.isFinite(numero)) return null
   const limitado = Math.min(100, Math.max(0, numero))
-  const indice = Math.min(9, Math.floor(limitado / 10))
-  return FAIXAS_PERCENTUAL[indice]
+  return faixasPercentual(sigla)[Math.min(9, Math.floor(limitado / 10))]
 }
 
-export function corPercentual(valor) {
-  return faixaPercentual(valor)?.cor ?? COR_NEUTRA
+export function corPercentual(valor, sigla) {
+  return faixaPercentual(valor, sigla)?.cor ?? COR_NEUTRA
 }
 
 function luminanciaRelativa(hex) {
@@ -112,10 +148,11 @@ export function corDoLider(area, partidoPorNumero) {
 export function corDaArea(area, modo, candidato, partidoPorNumero) {
   if (!area) return COR_SEM_DADOS
   if (modo === 'percentual') {
+    const numero = candidato ?? area.lider?.nr_votavel
     const percentual = candidato
       ? area.candidatos?.find((item) => item.nr_votavel === candidato)?.percentual
       : area.lider?.percentual
-    return corPercentual(percentual)
+    return corPercentual(percentual, partidoPorNumero?.get?.(numero)?.sg_partido)
   }
   return corDoLider(area, partidoPorNumero)
 }

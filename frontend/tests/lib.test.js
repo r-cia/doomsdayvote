@@ -15,11 +15,12 @@ import {
 } from '../src/lib/agregacoes'
 import {
   COR_NEUTRA,
-  FAIXAS_PERCENTUAL,
+  COR_SEM_DADOS,
   corDaArea,
   corPartido,
   corTextoContraste,
   faixaPercentual,
+  faixasPercentual,
   siglaTemCor,
 } from '../src/lib/colors'
 import {
@@ -103,7 +104,7 @@ describe('cores', () => {
   })
 
   it('distribui percentual em dez faixas de dez pontos', () => {
-    expect(FAIXAS_PERCENTUAL).toHaveLength(10)
+    expect(faixasPercentual('PT')).toHaveLength(10)
     expect(faixaPercentual(0).rotulo).toBe('0–10%')
     expect(faixaPercentual(9.99).rotulo).toBe('0–10%')
     expect(faixaPercentual(10).rotulo).toBe('10–20%')
@@ -126,7 +127,23 @@ describe('cores', () => {
         null,
         partidos,
       ),
-    ).toBe('#b58f23')
+    ).toBe(faixaPercentual(55, 'XYZ').cor)
+  })
+
+  it('sigla histórica usa a cor do sucessor e PRD tem cor própria', () => {
+    expect(corPartido('PMDB')).toBe(corPartido('MDB'))
+    expect(corPartido('PTB')).toBe(corPartido('PRD'))
+    expect(corPartido('PC do B')).toBe(corPartido('PCDOB'))
+    expect(siglaTemCor('PMDB')).toBe(true)
+    expect(corPartido('PRD')).toBe('#518064')
+  })
+
+  it('percentual usa gradiente do partido e a faixa mais baixa difere de sem dados', () => {
+    const faixas = faixasPercentual('PT')
+    expect(new Set(faixas.map((f) => f.cor)).size).toBe(10)
+    expect(faixas[0].cor).not.toBe(COR_SEM_DADOS)
+    expect(faixas[9].cor).toBe(corPartido('PT'))
+    expect(faixasPercentual('XYZ')[9].cor).toBe(COR_NEUTRA)
   })
 })
 

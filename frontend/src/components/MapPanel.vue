@@ -25,7 +25,7 @@ import {
 } from '../lib/agregacoes'
 import {
   COR_SEM_DADOS,
-  FAIXAS_PERCENTUAL,
+  faixasPercentual,
   corDaArea,
   corPartido,
   corTextoContraste,
@@ -524,7 +524,7 @@ const legenda = computed(() => {
       titulo: candidatoSelecionado.value
         ? `Participação de ${candidatoSelecionado.value.nm_votavel}`
         : 'Participação do líder',
-      itens: FAIXAS_PERCENTUAL.map((faixa) => ({
+      itens: faixasPercentual(candidatoSelecionado.value?.sg_partido).map((faixa) => ({
         rotulo: faixa.rotulo,
         cor: faixa.cor,
         texto: corTextoContraste(faixa.cor),
