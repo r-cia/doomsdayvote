@@ -64,6 +64,10 @@ function recebimento(item) {
     : formatarDataHora(item.dt_bu_recebido)
 }
 
+function horario(valor) {
+  return valor ? formatarDataHora(valor) : '—'
+}
+
 function irPara(paginaDestino) {
   const destino = Math.min(Math.max(1, paginaDestino), totalPaginas.value)
   if (destino !== pagina.value) emit('update:page', destino)
@@ -181,10 +185,22 @@ function navegarLinhas(evento) {
 
       <template v-else>
         <TabelaScroll :atualizando="atualizando">
-          <table ref="tabela" @keydown="navegarLinhas">
+          <table ref="tabela" class="tabela-fixa" @keydown="navegarLinhas">
             <caption class="sr-only">
               {{ $t('secoes.legendaTabela') }}
             </caption>
+            <colgroup>
+              <col style="width: 5%" />
+              <col style="width: 19%" />
+              <col style="width: 6%" />
+              <col style="width: 6%" />
+              <col style="width: 8%" />
+              <col style="width: 12%" />
+              <col style="width: 12%" />
+              <col style="width: 12%" />
+              <col style="width: 13%" />
+              <col style="width: 7%" />
+            </colgroup>
             <thead>
               <tr>
                 <th scope="col" class="ordenavel" :aria-sort="ariaSort('sg_uf')"><button type="button" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</button></th>
@@ -193,6 +209,8 @@ function navegarLinhas(evento) {
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_secao')"><button type="button" @click="alternar('nr_secao')">{{ $t('tabela.secao') }}{{ seta('nr_secao') }}</button></th>
                 <th scope="col" class="num ordenavel" :aria-sort="ariaSort('nr_local_votacao')"><button type="button" @click="alternar('nr_local_votacao')">{{ $t('tabela.local') }}{{ seta('nr_local_votacao') }}</button></th>
                 <th scope="col" class="ordenavel" :aria-sort="ariaSort('status')"><button type="button" @click="alternar('status')">{{ $t('tabela.status') }}{{ seta('status') }}</button></th>
+                <th scope="col">{{ $t('versoesBU.abertura') }}</th>
+                <th scope="col">{{ $t('versoesBU.encerramento') }}</th>
                 <th scope="col" class="ordenavel" :aria-sort="ariaSort('bu_recebido')"><button type="button" @click="alternar('bu_recebido')">{{ $t('status.buRecebido') }}{{ seta('bu_recebido') }}</button></th>
                 <th scope="col"><span class="sr-only">{{ $t('comum.acao') }}</span></th>
               </tr>
@@ -200,7 +218,7 @@ function navegarLinhas(evento) {
             <tbody>
               <tr v-for="item in itens" :key="item.id">
                 <td>{{ item.sg_uf }}</td>
-                <td>{{ item.nm_municipio }}</td>
+                <td :title="item.nm_municipio">{{ item.nm_municipio }}</td>
                 <td class="num">{{ item.nr_zona }}</td>
                 <td class="num">{{ item.nr_secao }}</td>
                 <td class="num">{{ item.nr_local_votacao }}</td>
@@ -216,7 +234,9 @@ function navegarLinhas(evento) {
                     {{ motivoSecao(item.motivo) }}
                   </small>
                 </td>
-                <td>{{ recebimento(item) }}</td>
+                <td :title="horario(item.dt_abertura)">{{ horario(item.dt_abertura) }}</td>
+                <td :title="horario(item.dt_encerramento)">{{ horario(item.dt_encerramento) }}</td>
+                <td :title="recebimento(item)">{{ recebimento(item) }}</td>
                 <td>
                   <button
                     type="button"

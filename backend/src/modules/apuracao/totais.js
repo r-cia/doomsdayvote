@@ -1,6 +1,40 @@
 import { sql } from 'kysely';
 import { aplicarEscopo, aplicarFiltroCorte } from './corte.js';
 
+export const CODIGO_IBGE_UF = Object.freeze({
+  RO: '11',
+  AC: '12',
+  AM: '13',
+  RR: '14',
+  PA: '15',
+  AP: '16',
+  TO: '17',
+  MA: '21',
+  PI: '22',
+  CE: '23',
+  RN: '24',
+  PB: '25',
+  PE: '26',
+  AL: '27',
+  SE: '28',
+  BA: '29',
+  MG: '31',
+  ES: '32',
+  RJ: '33',
+  SP: '35',
+  PR: '41',
+  SC: '42',
+  RS: '43',
+  MS: '50',
+  MT: '51',
+  GO: '52',
+  DF: '53',
+});
+
+export function codigoIbgeUf(sgUf) {
+  return CODIGO_IBGE_UF[String(sgUf ?? '').trim().toUpperCase()] ?? null;
+}
+
 function base(db, { eleicaoId, cargo, corte, escopo = {} }) {
   let qb = db
     .selectFrom('boletim_versao as bv')
@@ -177,8 +211,8 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
     if (!areas.has(chave)) {
       areas.set(chave, {
         [nivel === 'uf' ? 'sg_uf' : 'cd_municipio_tse']: chave,
-        geom_id: linha.geom_id ?? null,
-        nm_municipio: linha.nm_municipio ?? null,
+        geom_id: nivel === 'uf' ? codigoIbgeUf(chave) : (linha.geom_id ?? null),
+        nm_municipio: nivel === 'uf' ? null : (linha.nm_municipio ?? null),
         total_votos: 0,
         votos_validos: 0,
         lider: null,
@@ -210,6 +244,17 @@ export async function totaisPorArea(db, { eleicaoId, cargo, corte, nivel = 'uf',
       percentual: area.votos_validos > 0 ? (candidato.qt_votos / area.votos_validos) * 100 : null,
     })),
   }));
+}
+
+export async function localidadesSemGeometria(db, { sgUf } = {}) {
+  let consulta = db
+    .selectFrom('localidade')
+    .select(['sg_uf', 'cd_municipio_tse', 'nm_municipio'])
+    .where('geom_id', 'is', null);
+
+  if (sgUf) consulta = consulta.where('sg_uf', '=', sgUf);
+
+  return consulta.orderBy('sg_uf').orderBy('nm_municipio').execute();
 }
 
 export function areasComDeltaEntreCortes({ areas, areasAnteriores, nivel, candidatoSelecionado, votosCandidatos }) {

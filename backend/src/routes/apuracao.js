@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { corteResposta, resolverCorte } from '../modules/apuracao/corte.js';
 import { contarSecoesComBu } from '../modules/apuracao/progresso.js';
 import { linhaDoTempo } from '../modules/apuracao/timeline.js';
-import { areasComDeltaEntreCortes, somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
+import { areasComDeltaEntreCortes, localidadesSemGeometria, somarMetricasSecao, somarVotos, totaisPorArea } from '../modules/apuracao/totais.js';
 import { lerOrdenacao, ordenacaoSchema, ordenarLista } from '../lib/ordenacao.js';
 import { TTL_CACHE_ESTATICO, baseSchema, buscarEleicao, escopoDaEleicao, escopoDe, metadadosEAvisos } from './comum.js';
 
@@ -145,7 +145,7 @@ export function registrarApuracao({ app, db, cache, cacheado }) {
       : [];
     const escopo = escopoDaEleicao(query, eleicao, corte);
 
-    const [areas, areasAnteriores, [metadados, avisos], votosCandidatos] = await Promise.all([
+    const [areas, areasAnteriores, [metadados, avisos], votosCandidatos, semGeometria] = await Promise.all([
       totaisPorArea(db, {
         eleicaoId: eleicao.id,
         cargo: query.cargo,
@@ -166,6 +166,7 @@ export function registrarApuracao({ app, db, cache, cacheado }) {
         : Promise.resolve(null),
       metadadosEAvisos(cache, db, query, escopo, corte),
       somarVotos(db, { ...escopo, dataPleito: eleicao.dt_pleito }),
+      localidadesSemGeometria(db, { sgUf: query.uf }),
     ]);
 
     const areasComDelta = areasComDeltaEntreCortes({
@@ -181,6 +182,7 @@ export function registrarApuracao({ app, db, cache, cacheado }) {
       corte: corteResposta(corte),
       ...metadados,
       avisos,
+      sem_geometria: semGeometria,
       areas: ordenarLista(areasComDelta, COLUNAS_MAPA, lerOrdenacao(query)),
     };
   }));

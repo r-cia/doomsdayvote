@@ -551,6 +551,24 @@ select {
   height: 100%;
 }
 
+.tracado__modos {
+  margin-left: auto;
+}
+
+.tracado__avisos {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 10px;
+  color: var(--ink-dim);
+}
+
+.tracado__avisos li {
+  max-width: 42ch;
+}
+
 .tracado__vazio {
   display: grid;
   place-content: center;
@@ -799,6 +817,24 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.kpis--quatro {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.totalizacao-subtitulo {
+  margin: 18px 14px 8px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.totalizacao-texto {
+  max-width: 420px;
+  white-space: normal;
 }
 
 .placar__cabecalho {
@@ -1502,6 +1538,37 @@ td {
   vertical-align: middle;
 }
 
+.tabela-fixa {
+  table-layout: fixed;
+}
+
+.tabela-fixa th,
+.tabela-fixa td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* flex não aplica text-overflow: o rótulo do botão passaria reto pelo corte da coluna fixa */
+.tabela-fixa td .button--compacto {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  line-height: 24px;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.tabela-fixa .votos-estado-candidato strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabela-fixa th.ordenavel button {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 tbody tr:hover {
   background: var(--panel-2);
 }
@@ -1747,6 +1814,11 @@ tbody tr[data-ativo='true'] {
   height: 100%;
   min-height: 320px;
   background: var(--bg);
+}
+
+.mapa:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
 }
 
 .mapa-status,

@@ -4,6 +4,24 @@
 
 Toda tabela fica dentro de `TabelaScroll` (`frontend/src/components/TabelaScroll.vue`). Com linhas já exibidas e consulta em andamento (`isFetching`, ou o ref de carregamento nas views que chamam a API direto), `atualizando` escurece as linhas, centraliza o spinner de `StateBlock` carregando sobre a tabela e define `aria-busy="true"`, com `role="status"` oculto (`comum.carregando`). Sem linhas, vale o `StateBlock` carregando. O overlay some ao chegar a resposta ou o erro.
 
+## Larguras
+
+Colunas de dados têm largura fixa: a tabela usa a classe compartilhada `.tabela-fixa` (`table-layout: fixed`) e cada tabela declara um `<colgroup>` com as larguras aprovadas em `<col style="width: …">` (porcentagens; `rem` nas tabelas com número variável de colunas). Sem `colgroup`, a coluna se ajusta ao conteúdo e a tabela muda de largura entre telas e durante a troca de filtro. Célula com texto que pode cortar recebe `title` com o valor completo, e o CSS de `.tabela-fixa th`/`td` trunca com reticências (`overflow: hidden; text-overflow: ellipsis; white-space: nowrap`).
+
+Colunas condicionais (`v-if`) exigem um `<colgroup>` por combinação de colunas. Ordenação (`ordenavel`/`aria-sort`), alinhamento à direita de `num` e `th scope="row"` continuam valendo.
+
+| Tabela | Proporções |
+| :--- | :--- |
+| `MapTable.vue`, nível UF | Local 30 · Votos 14 · Válidos 14 · Líder 26 · % líder 10 · Ação 6 |
+| `MapTable.vue`, com candidato | Local 24 · Votos 11 · Válidos 11 · Líder 20 · % líder 8 · Votos candidato 11 · % candidato 8 · Ação 7 |
+| `SectionsTable.vue` | UF 6 · Município 28 · Zona 8 · Seção 8 · Local 12 · Status 16 · BU recebido 16 · Ação 6 |
+| `VotosPorEstadoPanel.vue` | Candidato 16rem · cada UF 6rem · Total 8rem |
+| `UfPanel.vue`, votos | Candidato 40 · Partido 16 · Votos 22 · % válidos 22 |
+| `UfPanel.vue`, UFs | UF 8 · Votos 20 · Líder 34 · % líder 20 · Ação 18 |
+| `VersoesBuPanel.vue`, campos | Campo 34 · Anterior 22 · Atual 22 · Diferença 22 |
+| `VersoesBuPanel.vue`, votáveis | Número 14 · Votável 34 · Anterior 18 · Atual 18 · Diferença 16 |
+| `ComparacaoLocalGrupo.vue` | UF 6 · Município 26 · Zona 8 · Seção 8 · Participação 13 · Abstenção 13 · Δ participação 13 · Δ abstenção 13 |
+
 ## Grupos recolhíveis (Comparação local)
 
 Cada grupo começa recolhido: o cabeçalho (`.grupo__cabecalho`) contém um botão `.grupo__alternar` com `aria-expanded`, o indicador `▸`/`▾` (`aria-hidden`), o nível e o tamanho do grupo. Ao expandir, a tabela de seções do grupo é buscada em `/api/comparacao-local/secoes` (hook `useComparacaoLocalSecoes`) e exibida dentro de `TabelaScroll`, com `StateBlock` para carregando e erro. A ordenação das colunas é a mesma do painel e vale para todos os grupos abertos. Componente: `ComparacaoLocalGrupo.vue`.

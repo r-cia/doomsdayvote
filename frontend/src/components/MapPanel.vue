@@ -32,7 +32,7 @@ import {
   corTextoContraste,
   gradientePartido,
 } from '../lib/colors'
-import { formatarNumero, formatarPercentual } from '../lib/format'
+import { formatarCorte, formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
   areas: { type: Array, default: () => [] },
@@ -49,6 +49,9 @@ const props = defineProps({
   carregandoTabela: { type: Boolean, default: false },
   errorTabela: { type: String, default: '' },
   ordenacao: Object,
+  corte: { type: Object, default: null },
+  secoesComBu: { type: Number, default: null },
+  semGeometria: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits([
@@ -76,6 +79,8 @@ const tooltip = reactive({
   titulo: '',
   linhas: [],
 })
+const indiceTeclado = ref(-1)
+const anuncioTeclado = ref('')
 
 const CAMPOS_UF = [
   'sg_uf',
@@ -440,8 +445,12 @@ function areaDaFeicao(feature) {
 
 function linhasTooltip(area, feature) {
   const linhas = []
+  if (props.nivel === 'municipio' && props.uf) {
+    linhas.push({ rotulo: t('filtros.uf'), valor: props.uf })
+  }
   if (!area) {
     linhas.push({ rotulo: t('mapa.situacao'), valor: t('comum.semDados') })
+    linhas.push({ rotulo: t('filtros.corte'), valor: formatarCorte(props.corte) })
     return linhas
   }
   linhas.push({
@@ -452,6 +461,13 @@ function linhasTooltip(area, feature) {
     rotulo: t('tabela.validos'),
     valor: formatarNumero(area.votos_validos),
   })
+  if (props.secoesComBu !== null && props.secoesComBu !== undefined) {
+    linhas.push({
+      rotulo: t('painel.kpi.secoesComBu'),
+      valor: formatarNumero(props.secoesComBu),
+    })
+  }
+  linhas.push({ rotulo: t('filtros.corte'), valor: formatarCorte(props.corte) })
   if (area.lider) {
     const candidato = partidoPorNumero.value.get(area.lider.nr_votavel)
     linhas.push({
@@ -474,6 +490,77 @@ function linhasTooltip(area, feature) {
   return linhas
 }
 
+function tituloDaFeicao(area, feature) {
+  const codigo = feature?.properties?._key || ''
+  if (props.nivel === 'municipio' && area) {
+    return [area.nm_municipio || codigo, props.uf, codigo].filter(Boolean).join(' · ')
+  }
+  const rotulo = area?.nm_municipio || feature?.properties?._rotulo
+  return rotulo && rotulo !== codigo
+    ? `${rotulo} · ${codigo}`
+    : area?.nm_municipio || `${rotuloNivel.value} ${codigo}`
+}
+
+function selecionarDaFeicao(feature) {
+  const area = areaDaFeicao(feature)
+  if (props.nivel === 'uf') {
+    const valor = area?.sg_uf ?? ufDaFeicao(feature?.properties)
+    if (valor) emit('select', { tipo: 'uf', valor })
+    return
+  }
+  if (!area) return
+  emit('select', {
+    tipo: 'municipio',
+    valor: area.cd_municipio_tse,
+    uf: props.uf,
+  })
+}
+
+function focarFeature(feature) {
+  const area = areaDaFeicao(feature)
+  tooltip.visivel = true
+  tooltip.x = Math.max(8, (container.value?.clientWidth ?? 0) / 2 - 90)
+  tooltip.y = Math.max(8, (container.value?.clientHeight ?? 0) / 2 - 40)
+  tooltip.titulo = tituloDaFeicao(area, feature)
+  tooltip.linhas = linhasTooltip(area, feature)
+  anuncioTeclado.value = [tooltip.titulo, ...tooltip.linhas.map((linha) => `${linha.rotulo}: ${linha.valor}`)].join('. ')
+}
+
+function navegarTeclado(evento) {
+  const features = prepararFeatures()
+  if (features.length === 0) return
+
+  if (evento.key === 'Enter' || evento.key === ' ') {
+    evento.preventDefault()
+    const feature = features[indiceTeclado.value]
+    if (feature) selecionarDaFeicao(feature)
+    return
+  }
+
+  const navegacao = {
+    ArrowRight: 1,
+    ArrowDown: 1,
+    ArrowLeft: -1,
+    ArrowUp: -1,
+  }
+
+  if (evento.key === 'Home') {
+    evento.preventDefault()
+    indiceTeclado.value = 0
+  } else if (evento.key === 'End') {
+    evento.preventDefault()
+    indiceTeclado.value = features.length - 1
+  } else if (Object.hasOwn(navegacao, evento.key)) {
+    evento.preventDefault()
+    const proximo = indiceTeclado.value < 0 ? 0 : indiceTeclado.value + navegacao[evento.key]
+    indiceTeclado.value = (proximo + features.length) % features.length
+  } else {
+    return
+  }
+
+  focarFeature(features[indiceTeclado.value])
+}
+
 function aoMover(evento) {
   if (!mapa.value || !mapa.value.getLayer('areas-fill')) return
   const encontrados = mapa.value.queryRenderedFeatures(evento.point, {
@@ -485,16 +572,10 @@ function aoMover(evento) {
   }
   const feature = encontrados[0]
   const area = areaDaFeicao(feature)
-  const codigo = feature.properties?._key || ''
-  const rotulo = area?.nm_municipio || feature.properties?._rotulo
-  const titulo =
-    rotulo && rotulo !== codigo
-      ? `${rotulo} · ${codigo}`
-      : area?.nm_municipio || `${rotuloNivel.value} ${codigo}`
   tooltip.visivel = true
   tooltip.x = evento.point.x
   tooltip.y = evento.point.y
-  tooltip.titulo = titulo
+  tooltip.titulo = tituloDaFeicao(area, feature)
   tooltip.linhas = linhasTooltip(area, feature)
   const clicavel =
     area || (props.nivel === 'uf' && ufDaFeicao(feature.properties))
@@ -512,18 +593,7 @@ function aoClicar(evento) {
     layers: ['areas-fill'],
   })
   if (encontrados.length === 0) return
-  const area = areaDaFeicao(encontrados[0])
-  if (props.nivel === 'uf') {
-    const valor = area?.sg_uf ?? ufDaFeicao(encontrados[0].properties)
-    if (valor) emit('select', { tipo: 'uf', valor })
-  } else {
-    if (!area) return
-    emit('select', {
-      tipo: 'municipio',
-      valor: area.cd_municipio_tse,
-      uf: props.uf,
-    })
-  }
+  selecionarDaFeicao(encontrados[0])
 }
 
 async function tentarMalhaNovamente() {
@@ -587,6 +657,7 @@ const legenda = computed(() => {
 watch(
   () => props.nivel,
   async (nivel) => {
+    indiceTeclado.value = -1
     await carregarMalha(nivel)
     atualizarFonte()
     ajustarVisao()
@@ -603,6 +674,7 @@ watch(
     () => props.uf,
   ],
   () => {
+    indiceTeclado.value = -1
     atualizarFonte()
     if (props.nivel === 'municipio') ajustarVisao()
   },
@@ -679,6 +751,14 @@ onBeforeUnmount(() => {
             {{ $t('mapa.percentual') }}
           </button>
         </div>
+        <button
+          v-if="uf"
+          type="button"
+          class="button button--ghost button--compacto"
+          @click="$emit('update:level', 'uf')"
+        >
+          {{ $t('comum.brasil') }}
+        </button>
       </div>
     </div>
 
@@ -716,9 +796,15 @@ onBeforeUnmount(() => {
       <div
         ref="container"
         class="mapa"
-        role="img"
+        role="application"
+        tabindex="0"
+        aria-describedby="mapa-instrucoes"
         :aria-label="$t('mapa.ariaMapa', { nivel: rotuloNivel.toLowerCase(), n: areas.length }, areas.length)"
+        @keydown="navegarTeclado"
+        @blur="esconderTooltip"
       ></div>
+      <p id="mapa-instrucoes" class="sr-only">{{ $t('mapa.instrucoesTeclado') }}</p>
+      <p class="sr-only" role="status" aria-live="polite">{{ anuncioTeclado }}</p>
       <div
         v-if="tooltip.visivel"
         class="mapa-tooltip"
@@ -734,6 +820,10 @@ onBeforeUnmount(() => {
         </dl>
       </div>
     </div>
+
+    <p v-if="semGeometria.length > 0" class="mapa-erro" role="status">
+      {{ $t('mapa.semGeometria', { n: semGeometria.length }) }}
+    </p>
 
     <p v-if="malhaMensagem && malhaEstado === 'ok'" class="mapa-erro" role="alert">
       {{ malhaMensagem }}
@@ -753,6 +843,8 @@ onBeforeUnmount(() => {
             v-for="item in linha.itens"
             :key="item.rotulo"
             class="legenda__degrau"
+            role="img"
+            :aria-label="$t('mapa.faixaAria', { sigla: linha.sigla, faixa: item.rotulo })"
             :style="{ backgroundColor: item.cor }"
             :title="`${linha.sigla} ${item.rotulo}`"
           ></span>

@@ -1,14 +1,28 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Line } from 'vue-chartjs'
+import {
+  CategoryScale,
+  Chart,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
+} from 'chart.js'
 import i18n from '../i18n'
 import StateBlock from './StateBlock.vue'
-import { corPartido } from '../lib/colors'
+import { COR_NEUTRA, corPartido } from '../lib/colors'
+import { avisoMensagem } from '../lib/status'
 import {
   formatarHora,
   formatarNumero,
   paraInputSaoPaulo,
 } from '../lib/format'
+
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
 const props = defineProps({
   series: { type: Array, default: () => [] },
@@ -24,10 +38,7 @@ const props = defineProps({
 const { t: $t, locale } = useI18n()
 const emit = defineEmits(['update:corte', 'retry'])
 
-const canvas = ref(null)
-const area = ref(null)
-let observador = null
-let quadro = null
+const modo = ref('votos')
 
 const tempos = computed(() => props.pontos.map((ponto) => new Date(ponto.t).getTime()))
 
@@ -43,29 +54,12 @@ const indiceCorte = computed(() => {
   return indice
 })
 
-const pontoAtual = computed(
-  () => props.pontos[indiceCorte.value] ?? null,
-)
+const pontoAtual = computed(() => props.pontos[indiceCorte.value] ?? null)
 
 const tempoCorte = computed(() => {
   if (!props.corte) return tempos.value.at(-1) ?? 0
   const valor = new Date(props.corte).getTime()
   return Number.isNaN(valor) ? (tempos.value.at(-1) ?? 0) : valor
-})
-
-const maxVotos = computed(() => {
-  let maximo = 0
-  for (const serie of props.series) {
-    for (const ponto of serie.pontos ?? []) {
-      if (ponto.votos_acumulados > maximo) maximo = ponto.votos_acumulados
-    }
-  }
-  if (maximo === 0) {
-    for (const ponto of props.pontos) {
-      if (ponto.votos_acumulados > maximo) maximo = ponto.votos_acumulados
-    }
-  }
-  return maximo || 1
 })
 
 const partidoPorNumero = computed(() => {
@@ -84,268 +78,153 @@ const rotulo = computed(() => {
   return `${formatarHora(primeiro.t)} → ${formatarHora(ultimo.t)} · ${formatarHora(new Date(tempoCorte.value).toISOString())} · ${formatarNumero(ultimo.votos_acumulados)} · ${formatarNumero(ultimo.secoes_com_bu_acumuladas)}`
 })
 
-function formatarEixo(valor, divisor, sufixo) {
-  if (valor === 0) return '0'
-  const numero = valor / divisor
-  return `${numero.toLocaleString(locale.value, {
-    maximumFractionDigits: numero < 10 ? 1 : 0,
-  })}${sufixo}`
-}
+const comData = computed(
+  () =>
+    props.pontos.length > 1 &&
+    new Date(props.pontos[0].t).toDateString() !==
+      new Date(props.pontos.at(-1).t).toDateString(),
+)
 
-function rotuloHora(iso, comData) {
+function rotuloHora(iso, mostrarData) {
   const hora = formatarHora(iso)
-  return comData
+  return mostrarData
     ? `${new Intl.DateTimeFormat(i18n.global.locale.value, { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))} ${hora}`
     : hora
 }
 
-function pontosDaSerie(serie) {
-  const pontos = (serie.pontos ?? []).slice()
-  if (pontos.length === 0) return pontos
-  const ultimo = pontos.at(-1)
-  const fim = tempos.value.at(-1)
-  if (fim && new Date(ultimo.t).getTime() < fim) {
-    pontos.push({
-      t: new Date(fim).toISOString(),
-      votos_acumulados: ultimo.votos_acumulados,
-    })
+const labels = computed(() =>
+  props.pontos.map((ponto) => rotuloHora(ponto.t, comData.value)),
+)
+
+function valoresDaSerie(serie) {
+  const porTempo = new Map()
+  for (const ponto of serie.pontos ?? []) {
+    porTempo.set(new Date(ponto.t).getTime(), Number(ponto.votos_acumulados ?? 0))
   }
-  return pontos
-}
-
-function desenhar(progresso = 1) {
-  const elemento = canvas.value
-  if (!elemento) return
-  const larguraCss = elemento.clientWidth
-  const alturaCss = elemento.clientHeight
-  if (!larguraCss || !alturaCss) return
-
-  const dpr = window.devicePixelRatio || 1
-  elemento.width = Math.round(larguraCss * dpr)
-  elemento.height = Math.round(alturaCss * dpr)
-
-  const ctx = elemento.getContext?.('2d')
-  if (!ctx) return
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-  ctx.clearRect(0, 0, larguraCss, alturaCss)
-
-  const pad = { esq: 40, dir: 10, topo: 12, base: 20 }
-  const largura = larguraCss - pad.esq - pad.dir
-  const altura = alturaCss - pad.topo - pad.base
-
-  const inicio = tempos.value[0] ?? 0
-  const fim = tempos.value.at(-1) ?? 1
-  const intervalo = Math.max(1, fim - inicio)
-  const x = (tempo) => pad.esq + ((tempo - inicio) / intervalo) * largura
-  const y = (votos) => pad.topo + altura - (votos / maxVotos.value) * altura
-
-  ctx.font = '10px "Fragment Mono", monospace'
-  ctx.textBaseline = 'middle'
-
-  const divisor =
-    maxVotos.value >= 1_000_000 ? 1_000_000 : maxVotos.value >= 1_000 ? 1_000 : 1
-  const sufixo = divisor === 1_000_000 ? 'M' : divisor === 1_000 ? 'k' : ''
-
-  for (let i = 0; i <= 3; i += 1) {
-    const valor = (maxVotos.value / 3) * i
-    const linhaY = Math.round(y(valor)) + 0.5
-    ctx.strokeStyle = 'rgba(255, 181, 46, 0.09)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(pad.esq, linhaY)
-    ctx.lineTo(pad.esq + largura, linhaY)
-    ctx.stroke()
-
-    ctx.fillStyle = '#7e9275'
-    ctx.textAlign = 'right'
-    ctx.fillText(formatarEixo(Math.round(valor), divisor, sufixo), pad.esq - 8, linhaY)
-  }
-
-  const marcas = [inicio, inicio + intervalo / 2, fim]
-  const comData = new Date(inicio).toDateString() !== new Date(fim).toDateString()
-  ctx.fillStyle = '#7e9275'
-  marcas.forEach((marca, indice) => {
-    ctx.textAlign = indice === 0 ? 'left' : indice === 1 ? 'center' : 'right'
-    ctx.fillText(
-      rotuloHora(new Date(marca).toISOString(), comData),
-      x(marca),
-      alturaCss - 8,
-    )
+  let atual = 0
+  return tempos.value.map((tempo) => {
+    if (porTempo.has(tempo)) atual = porTempo.get(tempo)
+    return atual
   })
+}
 
-  const corteX = x(tempoCorte.value)
-  const larguraCorte = Math.max(0, (corteX - pad.esq) * progresso)
+const datasetsVotos = computed(() => {
+  if (props.series.length === 0) {
+    return [
+      {
+        label: $t('comum.votos'),
+        data: props.pontos.map((ponto) => Number(ponto.votos_acumulados ?? 0)),
+        borderColor: COR_NEUTRA,
+        backgroundColor: COR_NEUTRA,
+        borderWidth: 1.4,
+        pointRadius: 0,
+        tension: 0.2,
+      },
+    ]
+  }
 
-  for (const serie of props.series) {
-    const pontos = pontosDaSerie(serie)
-    if (pontos.length === 0) continue
+  return props.series.map((serie) => {
     const cor = corPartido(partidoPorNumero.value.get(serie.nr_votavel))
-    const selecionado = props.candidato === serie.nr_votavel
-
-    ctx.globalAlpha = 0.22
-    ctx.strokeStyle = cor
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    pontos.forEach((ponto, indice) => {
-      const px = x(new Date(ponto.t).getTime())
-      const py = y(ponto.votos_acumulados)
-      if (indice === 0) ctx.moveTo(px, py)
-      else ctx.lineTo(px, py)
-    })
-    ctx.stroke()
-
-    ctx.save()
-    ctx.beginPath()
-    ctx.rect(pad.esq, 0, larguraCorte, alturaCss)
-    ctx.clip()
-    ctx.globalAlpha = 1
-    ctx.lineWidth = selecionado ? 2.2 : 1.3
-    ctx.beginPath()
-    pontos.forEach((ponto, indice) => {
-      const px = x(new Date(ponto.t).getTime())
-      const py = y(ponto.votos_acumulados)
-      if (indice === 0) ctx.moveTo(px, py)
-      else ctx.lineTo(px, py)
-    })
-    ctx.stroke()
-    ctx.restore()
-  }
-
-  ctx.globalAlpha = 1
-  ctx.strokeStyle = '#ffb52e'
-  ctx.lineWidth = 1
-  ctx.setLineDash([2, 3])
-  ctx.beginPath()
-  ctx.moveTo(corteX + 0.5, pad.topo)
-  ctx.lineTo(corteX + 0.5, pad.topo + altura)
-  ctx.stroke()
-  ctx.setLineDash([])
-
-  ctx.fillStyle = '#ffb52e'
-  ctx.beginPath()
-  ctx.moveTo(corteX - 4, pad.topo - 6)
-  ctx.lineTo(corteX + 4, pad.topo - 6)
-  ctx.lineTo(corteX, pad.topo)
-  ctx.closePath()
-  ctx.fill()
-
-  if (props.series.length > 0) {
-    let lider = null
-    for (const serie of props.series) {
-      const pontos = serie.pontos ?? []
-      let ultimo = null
-      for (const ponto of pontos) {
-        if (new Date(ponto.t).getTime() <= tempoCorte.value) ultimo = ponto
-      }
-      if (ultimo && (!lider || ultimo.votos_acumulados > lider.votos)) {
-        lider = { votos: ultimo.votos_acumulados, cor: corPartido(partidoPorNumero.value.get(serie.nr_votavel)) }
-      }
+    return {
+      label: serie.nm_votavel ?? $t('mapa.candidatoN', { n: serie.nr_votavel }),
+      data: valoresDaSerie(serie),
+      borderColor: cor,
+      backgroundColor: cor,
+      borderWidth: props.candidato === serie.nr_votavel ? 2.2 : 1.3,
+      pointRadius: 0,
+      tension: 0.2,
     }
-    if (lider) {
-      ctx.fillStyle = lider.cor
-      ctx.beginPath()
-      ctx.arc(corteX, y(lider.votos), 3, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.strokeStyle = '#0a0d0a'
-      ctx.lineWidth = 1
-      ctx.stroke()
-    }
-  }
-}
+  })
+})
 
-function animar() {
-  if (quadro) cancelAnimationFrame(quadro)
-  const reduzido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  if (reduzido || props.pontos.length === 0) {
-    desenhar(1)
-    return
-  }
-  const inicio = performance.now()
-  const duracao = 520
-  const passo = (agora) => {
-    const progresso = Math.min(1, (agora - inicio) / duracao)
-    const suave = 1 - (1 - progresso) ** 3
-    desenhar(suave)
-    if (progresso < 1) quadro = requestAnimationFrame(passo)
-  }
-  quadro = requestAnimationFrame(passo)
-}
+const dadosGrafico = computed(() =>
+  modo.value === 'secoes'
+    ? {
+        labels: labels.value,
+        datasets: [
+          {
+            label: $t('mapa.secoes'),
+            data: props.pontos.map((ponto) =>
+              Number(ponto.secoes_com_bu_acumuladas ?? 0),
+            ),
+            borderColor: '#ffb52e',
+            backgroundColor: '#ffb52e',
+            borderWidth: 1.6,
+            pointRadius: 0,
+            tension: 0.2,
+            fill: false,
+          },
+        ],
+      }
+    : { labels: labels.value, datasets: datasetsVotos.value },
+)
+
+const opcoes = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 0 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: {
+      display: modo.value === 'votos' && datasetsVotos.value.length > 1,
+      labels: { color: '#c8d4c0', boxWidth: 8, font: { size: 10 } },
+    },
+    tooltip: {
+      callbacks: {
+        label: (item) => `${item.dataset.label}: ${formatarNumero(item.parsed.y)}`,
+      },
+    },
+  },
+  scales: {
+    x: {
+      ticks: { color: '#7e9275', maxTicksLimit: 6, font: { size: 9 } },
+      grid: { color: 'rgba(255, 181, 46, 0.09)' },
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        color: '#7e9275',
+        font: { size: 9 },
+        callback: (valor) => formatarNumero(valor),
+      },
+      grid: { color: 'rgba(255, 181, 46, 0.09)' },
+    },
+  },
+}))
+
+const avisosVisiveis = computed(() =>
+  (props.avisos ?? []).filter((aviso) => Boolean(aviso?.codigo)),
+)
 
 function aoIndice(evento) {
   const indice = Number(evento.target.value)
   const ponto = props.pontos[indice]
   if (ponto) emit('update:corte', paraInputSaoPaulo(ponto.t))
 }
-
-let arrastando = false
-
-function aoApontar(evento) {
-  const elemento = canvas.value
-  if (!elemento || props.pontos.length === 0) return
-  const caixa = elemento.getBoundingClientRect()
-  const pad = { esq: 40, dir: 10 }
-  const largura = caixa.width - pad.esq - pad.dir
-  const relativo = Math.min(1, Math.max(0, (evento.clientX - caixa.left - pad.esq) / largura))
-  const inicio = tempos.value[0]
-  const fim = tempos.value.at(-1)
-  const alvo = inicio + relativo * (fim - inicio)
-
-  let melhor = 0
-  let distancia = Infinity
-  tempos.value.forEach((tempo, indice) => {
-    const diferenca = Math.abs(tempo - alvo)
-    if (diferenca < distancia) {
-      distancia = diferenca
-      melhor = indice
-    }
-  })
-
-  const ponto = props.pontos[melhor]
-  if (ponto) emit('update:corte', paraInputSaoPaulo(ponto.t))
-}
-
-function aoPressionar(evento) {
-  arrastando = true
-  evento.currentTarget.setPointerCapture?.(evento.pointerId)
-  aoApontar(evento)
-}
-
-function aoMover(evento) {
-  if (!arrastando) return
-  aoApontar(evento)
-}
-
-function aoSoltar() {
-  arrastando = false
-}
-
-onMounted(() => {
-  if (typeof ResizeObserver !== 'undefined') {
-    observador = new ResizeObserver(() => desenhar(1))
-    if (area.value) observador.observe(area.value)
-  }
-  document.fonts?.ready?.then(() => desenhar(1))
-  animar()
-})
-
-onBeforeUnmount(() => {
-  observador?.disconnect()
-  if (quadro) cancelAnimationFrame(quadro)
-})
-
-watch(
-  () => [props.series, props.pontos, props.corte, props.candidato],
-  () => animar(),
-  { deep: true },
-)
-
-watch(locale, () => desenhar())
 </script>
 
 <template>
   <section class="painel tracado" aria-labelledby="tracado-titulo">
     <header class="painel__cabecalho">
       <h2 id="tracado-titulo">{{ $t('painel.plotDia') }}</h2>
+      <div class="tracado__modos segmented" role="group" :aria-label="$t('painel.plotDia')">
+        <button
+          type="button"
+          :aria-pressed="modo === 'votos'"
+          :class="{ ativo: modo === 'votos' }"
+          @click="modo = 'votos'"
+        >
+          {{ $t('comum.votos') }}
+        </button>
+        <button
+          type="button"
+          :aria-pressed="modo === 'secoes'"
+          :class="{ ativo: modo === 'secoes' }"
+          @click="modo = 'secoes'"
+        >
+          {{ $t('mapa.secoes') }}
+        </button>
+      </div>
       <p v-if="!loading && !error && pontos.length > 0" class="painel__meta">
         <b>{{ formatarHora(pontoAtual?.t) }}</b> · {{ $t('filtros.corte') }}<br />
         {{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }} {{ $t('mapa.secoes') }} ·
@@ -365,19 +244,26 @@ watch(locale, () => desenhar())
     />
     <div v-else-if="pontos.length === 0" class="tracado__vazio">
       <strong>{{ $t('comum.linhaTempoIndisponivel') }}</strong>
+      <ul
+        v-if="avisosVisiveis.length > 0"
+        class="tracado__avisos"
+        role="status"
+        :aria-label="$t('comum.avisos')"
+      >
+        <li v-for="aviso in avisosVisiveis" :key="aviso.codigo">
+          {{ avisoMensagem(aviso) }}
+        </li>
+      </ul>
     </div>
 
     <template v-else>
-      <div ref="area" class="tracado__area">
-        <canvas
-          ref="canvas"
+      <div class="tracado__area">
+        <Line
           class="tracado__canvas"
+          :data="dadosGrafico"
+          :options="opcoes"
           role="img"
           :aria-label="rotulo"
-          @pointerdown="aoPressionar"
-          @pointermove="aoMover"
-          @pointerup="aoSoltar"
-          @pointercancel="aoSoltar"
         />
       </div>
 
