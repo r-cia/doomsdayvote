@@ -74,7 +74,7 @@ O traçado respeita o corte (`as_of`/`as_of_date`): a curva termina no instante 
 
 ## `GET /api/map`
 
-Totais por área. `level=uf|municipio`; `candidatos` é uma lista de números separados por vírgula para incluir no detalhe da área. Cada área traz `geom_id` (código IBGE) quando a malha foi carregada, `lider_nome` (nome do líder, de `somarVotos`) e, quando `candidatos` é informado, `candidato_votos` e `candidato_percentual` do primeiro número da lista (nulos caso contrário ou se a área não o tem).
+Totais por área. `level=uf|municipio`; `candidatos` é uma lista de números separados por vírgula para incluir no detalhe da área. Cada área traz `geom_id` (código IBGE) quando a malha foi carregada, `lider_nome` (nome do líder, de `somarVotos`) e, quando `candidatos` é informado, `candidato_votos` e `candidato_percentual` do primeiro número da lista (nulos caso contrário ou se a área não o tem). A resposta inclui `sem_geometria`, com `sg_uf`, `cd_municipio_tse` e `nm_municipio` das localidades sem malha (todas ou só a UF informada).
 
 ```json
 { "level": "uf", "areas": [{ "sg_uf": "AM", "geom_id": "13", "total_votos": 0, "votos_validos": 0, "lider": { "nr_votavel": 13, "qt_votos": 0, "percentual": 0 }, "candidatos": [] }] }
@@ -328,3 +328,76 @@ Resposta:
 - `vencedor`: candidato vencedor da eleição (primeiro colocado do último turno carregado do ano).
 - `pares`: um item por par de anos, turno e posição presentes nos dois anos. Pareamento por posição (no 2º turno, 1 = vencedor e 2 = derrotado). `r` é a correlação de Pearson sobre os intervalos presentes nos dois anos; `p_valor` é o p-valor unilateral por permutação em blocos de 6 intervalos, com 10.000 permutações e semente fixa. `r` e `p_valor` são `null` quando não há como calcular.
 - `avisos`: ano sem horário de encerramento (sem `dt_pleito` ou sem BUs com `dt_encerramento`, como 2014); o ano fica fora de `anos` e `pares`.
+
+## Totalização
+
+As rotas de totalização leem os dados carregados por UF e não usam `election_id`. As três rotas consideram apenas lotes `concluido` ou `parcial` e nunca lotes `falhou`, `processando` ou `substituido`. Sem `lote`, o recorte usa o lote vigente de cada UF, ano e turno (o mais recente com dados); no escopo nacional, usa o vigente de cada UF. O recorte é comum às três rotas: `ano` (inteiro, obrigatório), `turno` (inteiro, obrigatório, `1` ou `2`), `uf` (exatamente 2 letras), `municipio` (código TSE), `zona`, `secao` e `lote` (uuid), todos opcionais. O escopo é inferido pela granularidade: `secao`, depois `zona`, `municipio`, `uf` e `nacional`.
+
+Cache Redis por recorte exato: `86400` s em `/api/totalizacao/metricas` e `60` s em `/api/totalizacao/incidentes` e `/api/totalizacao/divergencias`; o cabeçalho `x-cache` indica `hit`, `miss` ou `off`.
+
+Erros: `400 VALIDATION` com `details[].path` para recorte inválido (ano ausente, turno fora de 1 e 2, `fonte` desconhecida) e `500 INTERNAL` para falha inesperada. Formato do erro de validação:
+
+```json
+{ "error": { "code": "VALIDATION", "message": "Parâmetro inválido", "details": [{ "path": "ano", "message": "Required" }] } }
+```
+
+### `GET /api/totalizacao/metricas`
+
+Devolve o agregado do recorte nas três famílias: duração do voto e faixas de biometria, incidentes e números complementares. A mediana usa `percentile_cont(0.5)` sobre `duracao_ms`; `quantidade` conta apenas eleitores com duração preenchida.
+
+```json
+{
+  "escopo": "municipio",
+  "tempo": { "quantidade": 192, "mediaMs": 41200.5, "medianaMs": 38000, "maisRapidoMs": 12500, "maisDemoradoMs": 90000 },
+  "biometria": { "falhou1": 6, "falhou2": 3, "falhou3": 1, "falhou4": 0, "manual": 2 },
+  "incidentes": { "total": 10 },
+  "complementares": { "secoes": 1, "aptos": 244, "comparecimento": 192, "teclasIndevidas": 7, "correcoes": 1 }
+}
+```
+
+- `escopo`: `secao`, `zona`, `municipio`, `uf` ou `nacional`, conforme o filtro mais granular informado.
+- `biometria`: `tp_habilitacao = 2` com `qt_falhas_biometria` 1, 2, 3 e 4 ou mais em `falhou1`, `falhou2`, `falhou3` e `falhou4`; `tp_habilitacao = 3` em `manual`.
+- `incidentes.total` conta as linhas de `totalizacao_incidente` do recorte; a carga só grava nível diferente de `INFO`.
+- `complementares`: `secoes` é a contagem de localizações distintas (UF, município, zona e seção); `aptos` e `comparecimento` somam `totalizacao_secao`; `teclasIndevidas` soma `qt_teclas_indevidas` e `correcoes` conta eleitores com `correcao` verdadeira em `totalizacao_eleitor`.
+- Sem dados, as somas e contagens são `0` e as medidas de tempo são `null`.
+
+### `GET /api/totalizacao/incidentes`
+
+Aceita o recorte mais `pagina` (inteiro mínimo 1, padrão 1) e `tamanho` (inteiro mínimo 1, padrão `SECTIONS_PAGE_SIZE_DEFAULT`, limitado a `SECTIONS_PAGE_SIZE_MAX`; na configuração do projeto, 50 e 200). Ordena por `dt_incidente` e depois por `id`, ambos decrescentes. `total` é a contagem do recorte antes da paginação.
+
+```json
+{
+  "itens": [{
+    "instante": "2026-10-04T16:05:33.000Z",
+    "nivel": "ALERTA",
+    "tipo": "URNA",
+    "texto_original": "…",
+    "sg_uf": "RR",
+    "cd_municipio_tse": 3050,
+    "nr_zona": 3,
+    "nr_secao": 241
+  }],
+  "total": 10,
+  "pagina": 1,
+  "tamanho": 50
+}
+```
+
+### `GET /api/totalizacao/divergencias`
+
+Aceita o recorte mais `fonte` (`rdv`, `log` ou `bweb`, opcional) e a mesma paginação. Devolve todas as colunas de `totalizacao_divergencia`: `id`, `lote_id`, `fonte`, `campo`, `sg_uf`, `cd_municipio_tse`, `nr_zona`, `nr_secao`, `cd_cargo_pergunta`, `nr_votavel`, `valor_esperado`, `valor_encontrado` e `registrado_em`. A ordem é `sg_uf`, `cd_municipio_tse`, `nr_zona`, `nr_secao`, `fonte`, `campo` e `id`.
+
+Sem `fonte`, lista as divergências de todas as fontes; o filtro por `fonte` só restringe a lista, nunca é aplicado por padrão. Linhas de ausência trazem `valor_esperado` `presente` e `valor_encontrado` `ausente`, com `campo` `uf` ou `secao`; nesse caso os campos de localização que a origem não tem ficam nulos. A conferência BU × BWEB usa o ano/turno do arquivo e só compara os cargos 1 (Presidente) e 3 (Governador); cargos 5, 6 e 7 não entram. As divergências existem para as conferências executadas na carga.
+
+```json
+{
+  "itens": [{
+    "id": 1, "lote_id": "…", "fonte": "rdv", "campo": "votos", "sg_uf": "RR",
+    "cd_municipio_tse": 3050, "nr_zona": 3, "nr_secao": 241,
+    "cd_cargo_pergunta": 1, "nr_votavel": 13,
+    "valor_esperado": "192", "valor_encontrado": "191",
+    "registrado_em": "2026-10-04T17:00:00.000Z"
+  }],
+  "total": 1, "pagina": 1, "tamanho": 50
+}
+```

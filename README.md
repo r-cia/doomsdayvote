@@ -6,7 +6,7 @@
 
 Conferência **offline** de Boletins de Urna (BUs) do TSE para os cargos **Presidente** e **Governador**. 
 
-O sistema reconstrói o dia pelo horário oficial de recebimento (`DT_BU_RECEBIDO`), permite consultar por corte temporal, analisa biometria, testa Benford, identifica padrões de duplicação/proximidade, calcula estatísticas descritivas por seção e exibe tudo em abas (`Painel`, `Mapa`, `Análise`).
+O sistema reconstrói o dia pelo horário oficial de recebimento (`DT_BU_RECEBIDO`), permite consultar por corte temporal, analisa biometria, testa Benford, identifica padrões de duplicação/proximidade, calcula estatísticas descritivas por seção, carrega a totalização das urnas (BU, RDV e log) e exibe tudo em abas (`Painel`, `Totalização`, `Mapa`, `Estatística`, `Comparações`, `Biometria`, `Encerramento`, `Relatório` e `Entre anos`).
 
 > **Importante:** Não é totalização oficial, não é tempo real, não é um sistema de apuração. É uma ferramenta de conferência auditável com base nos BUs carregados.
 
@@ -116,7 +116,7 @@ Formatos aceitos:
 - `.csv.gz`
 - `.txt.gz`
 
-O importador faz cópia para `storage/` com hash, usa `COPY` + staging `UNLOGGED`, é idempotente e suporta arquivos fora de ordem.
+O importador lê o arquivo direto da pasta de entrada, sem copiar, usa `COPY` + staging `UNLOGGED`, é idempotente e suporta arquivos fora de ordem. Aceita `.csv`, `.csv.gz` e `.csv.7z` e importa somente os cargos Presidente e Governador.
 
 ### 7.2 Carregar BUs
 
@@ -180,7 +180,13 @@ Após abrir o frontend:
 3. Navegue pelas abas:
    - **Painel**: KPIs, linha do tempo, placar, biometria do recorte
    - **Mapa**: mapa coroplético, painel por UF/município, "Detalhes" paginado e tabela de seções (carrega apenas ao selecionar um município)
-   - **Análise**: Estatística descritiva (média/mediana/desvio populacional por seção), Benford, duplicação e proximidade, isolamento/LOF
+   - **Estatística**: Estatística descritiva (média/mediana/desvio populacional por seção), Benford, duplicação e proximidade, isolamento/LOF, e as divergências da dupla conferência da totalização
+   - **Totalização**: tempo de voto, biometria por faixa e incidentes da urna no recorte
+   - **Comparações**: comparação de governador por estado
+   - **Biometria**: biometria por UF e município
+   - **Encerramento**: urnas e horários de encerramento
+   - **Relatório de consistência**: relatório por ano, turno e cargo
+   - **Entre anos**: comparação entre anos
 
 Os filtros são compartilhados entre abas. Trocar de aba preserva o recorte e aproveita o cache.
 
@@ -196,6 +202,8 @@ Os filtros são compartilhados entre abas. Trocar de aba preserva o recorte e ap
 | `npm run migrate:reset` | Reseta e reaplica migrações (apaga dados!) |
 | `npm run carga` | Importa BUs da pasta `BWEB_INPUT_DIR` |
 | `npm run geo:carregar` | Sincroniza malhas IBGE e correspondência TSE/IBGE |
+| `npm run totalizacao:carregar` | Carrega os arquivos de totalização (`--pasta`, `--arquivo`, `--falhar-rapido`; aceita `.zip` e `.7z`) |
+| `npm run carga:status` | Última carga por UF, lotes parciais, seções com erro, lotes substituídos e UFs sem arquivo (`--lote`, `--json`) |
 | `npm run seed:cores` | Popula cores dos partidos |
 | `npm run cores:pendentes` | Lista partidos sem cor definida |
 | `npm test` | Testes unitários |

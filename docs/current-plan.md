@@ -265,3 +265,92 @@ Como há uma única versão ativa por seção e cargo, **o corte parcial é um s
 - **Suítes:** a suíte completa de integração e a unitária.
 - **Banco real:** EXPLAIN ANALYZE de leitura de uma análise com `as_of` em 2026 1T, antes (cerca de 150 s) e depois.
 - **Na tela:** Obscura na aba Estatística com corte do dia, depois de `npm run migrate`.
+
+## Plano — métricas da sessão a partir do log.jez (2026-11-02)
+
+Escopo: `c6da533b`, `636cf24e`, `061cd512`, mais a estabilização do `migrate:reset` em `tests/integration/schema.test.js`.
+
+### Módulo
+`backend/src/modules/totalizacao/metricas.js`, funções puras sobre a lista de eventos de `parsearLogJez`:
+
+1. `parearEleitores(eventos)` — segmenta a sessão: cada `eleitor_habilitado` fecha o eleitor aberto pelo `identificador_digitado` anterior e é fechado pelo `voto_computado` seguinte. Devolve, por eleitor: `habilitadoEm`, `computadoEm`, `duracaoMs`, `tp_habilitacao`, `qt_falhas_biometria`, `qt_teclas_indevidas`, `correcao`.
+2. `tempoDeVoto(eventos)` — sobre os eleitores pareados: quantidade, média, mediana, mais rápido e mais demorado em ms. Inclui eleitores com inatividade de 45 s e com teclas indevidas, como o card exige.
+3. `biometriaPorFaixa(eventos)` — conta habilitados após 1, 2, 3 e 4 tentativas falhas e habilitados manualmente. A falha é o evento `Número de tentativas de reconhecimento do dedo` anterior à habilitação; não conta `Solicita digital`/`Capturada a digital`, que são passos normais.
+4. `incidentesDaSessao(eventos)` — devolve instante, nível, tipo e texto original de tudo que não é fluxo normal, conforme a regra escolhida pelo usuário.
+
+### Persistência
+Nada de migration nova: `totalizacao_eleitor` e `totalizacao_incidente` já existem na `0015`. O pareamento alimenta as duas tabelas na carga (`91631db5`) e as métricas são calculadas na agregação (`eb57e395`).
+
+### Testes
+Fixtures reais da seção 0241 em `backend/tests/unit/totalizacao/metricas.test.js`: 192 eleitores pareados, 174 habilitações biométricas, 5 manuais, tempos positivos e mediana entre o mais rápido e o mais demorado; classes de biometria somando 174.
+
+### Estabilização do schema.test.js
+O teste `migrate:reset roda duas vezes seguidas` derruba todas as migrations e sobe de novo. Se a suíte for interrompida no meio, o banco de teste fica vazio e todos os arquivos seguintes falham em `limparBanco`. Correção: restaurar o schema em `finally` e mover o arquivo para o fim da ordem de execução, sem mudar o que ele verifica.
+
+### Verificação
+`npm test` e `npm run test:integration` no backend; nenhum contrato de API muda nesta etapa.
+
+## Plano — agregação e API da totalização (2026-11-02)
+
+### Agregação (`eb57e395`)
+`backend/src/modules/totalizacao/agregacao.js`, uma consulta SQL por escopo, sem carregar seção a seção:
+
+- **Escopos:** seção, município, zona, UF e nacional. O recorte entra por `ano_eleicao`, `nr_turno` e, quando houver, `lote_id`, `sg_uf`, `cd_municipio_tse`, `nr_zona`, `nr_secao`.
+- **Tempo de voto:** `avg`, `percentile_cont(0.5)` para mediana, `min` e `max` de `duracao_ms` em `totalizacao_eleitor`, com `count`.
+- **Biometria:** somas por faixa a partir de `qt_falhas_biometria` e `tp_habilitacao` (0, 1, 2, 3, 4+ falhas e manual).
+- **Incidentes:** contagem em `totalizacao_incidente` agrupada pelo escopo.
+- **Complementares:** seções carregadas, aptos, comparecimento, teclas indevidas e correções.
+- **Índices:** a agregação usa os índices existentes `(totalizacao_secao_id, habilitado_em)` e `(totalizacao_secao_id, dt_incidente)`; o join com `totalizacao_secao` filtra pelo lote/recorte antes de agregar.
+
+Critério de teste: a soma das seções de uma UF é igual ao agregado da UF, e a soma das UFs é igual ao nacional, para as três famílias de números.
+
+### API (`cd95bcdf`)
+- `GET /api/totalizacao/metricas` — tempo de voto, biometria, incidentes e complementares no escopo pedido.
+- `GET /api/totalizacao/incidentes` — lista paginada por seção.
+- `GET /api/totalizacao/divergencias` — lista por fonte e escopo, sem filtro que esconda divergência.
+- Recorte igual ao das demais rotas (`ano`, `turno`, `uf`, `municipio`, `zona`, `secao`, `lote`), com validação em zod e contrato documentado em `docs/API.md`.
+
+### Pendência de decisão
+As conferências rodam na carga desde 2026-11-03. BU×RDV e BU×log sempre; BU×BWEB só quando existe exatamente uma `eleicao` para o ano e turno do lote. Em 2026/1º turno o banco tem três eleições, então o worker registra `conferencia_ignorada` com motivo `eleicao_ambigua` e não confere o BWEB. Falta decidir o critério adicional que desempata (por exemplo, a eleição que tem `boletim_versao` daquela UF).
+
+## Plano — resiliência da importação da totalização (2026-11-03)
+
+Origem: a primeira carga real do RR (260 MB, 1.519 seções) morreu inteira na primeira seção por um tipo de voto desconhecido no RDV. A fixture não cobria o caso. O lote só terminou depois da correção, e a carga levou 2 min 36 s. O plano ataca os modos de falha que essa execução expôs.
+
+### Etapa 1 — erro por seção, sem derrubar o lote
+- `carga.js`: `try/catch` em volta de `inserirSecao`; a transação daquela seção volta, as anteriores ficam.
+- Migration `0017`: tabela `totalizacao_secao_erro` (`lote_id`, `prefixo`, `sg_uf`, `cd_municipio_tse`, `nr_zona`, `nr_secao`, `codigo`, `mensagem`, `registrado_em`), única por `(lote_id, prefixo)`.
+- Evento `secao_falhou` por seção, com prefixo e código.
+- Status do lote: `concluido` sem erros; `parcial` com erros; `falhou` só quando o arquivo inteiro não abre. `parcial` entra no check de status.
+- CLI sai com código diferente de zero quando há seção com erro.
+
+### Etapa 2 — retomar sem reprocessar
+- Ao abrir um lote existente (`processando`, `parcial` ou `falhou`), carregar as chaves de seção já gravadas e pular esses prefixos.
+- Reprocessar apenas as seções ausentes e as que estão em `totalizacao_secao_erro`.
+- Não duplicar divergências nem métricas das seções já concluídas.
+
+### Etapa 3 — dois arquivos para a mesma UF/ano/turno
+Hoje a chave única inclui `lote_id`, então um zip novo para a mesma UF cria um segundo conjunto de seções e a agregação soma os dois. Regra proposta:
+- novo lote concluído marca o anterior como `substituido` (`substituido_por`), sem apagar dados;
+- leituras e agregação usam o lote mais recente por `(ano, turno, uf)`;
+- `carga:status` mostra o lote vigente e os substituídos.
+
+### Etapa 4 — integridade do arquivo
+- Verificar CRC32 de cada entrada ZIP na extração (`zlib.crc32`); erro vira seção com erro. O `7z` já valida na extração.
+- Seção sem `-bu.dat` passa a ser erro registrado, não ignorada em silêncio.
+- Manter `-rdv.dat` e `-log.jez` opcionais, com contagem de seções sem cada um.
+
+### Etapa 5 — operação
+- `--falhar-rapido` opcional; o padrão passa a ser resiliente.
+- `npm run carga:status` passa a listar seções com erro e lotes parciais.
+- Sem mudança de memória nesta etapa: o ZIP é lido inteiro (260 MB no RR) e o `7z` extrai sob demanda.
+
+### Etapa 6 — testes
+- Integração com um ZIP de duas seções, uma corrompida: lote `parcial`, uma seção gravada, um erro registrado, a carga seguinte processa só a que falhou.
+- ZIP com entrada corrompida: CRC detecta e registra.
+- Dois lotes para a mesma UF: o antigo vira `substituido` e a agregação conta só o novo.
+
+### Decisões que dependem do usuário
+1. Nome do status parcial: `parcial` (proposto) ou manter `falhou` com contagem separada.
+2. Substituição: automática pelo lote mais recente (proposto) ou só com `--substituir`.
+3. Padrão do worker: resiliente (proposto) ou `--falhar-rapido` como padrão.
