@@ -39,6 +39,8 @@ const { t: $t, locale } = useI18n()
 const emit = defineEmits(['update:corte', 'retry'])
 
 const modo = ref('votos')
+const grafico = ref(null)
+let arrastando = false
 
 const tempos = computed(() => props.pontos.map((ponto) => new Date(ponto.t).getTime()))
 
@@ -193,6 +195,41 @@ function aoIndice(evento) {
   const ponto = props.pontos[indice]
   if (ponto) emit('update:corte', paraInputSaoPaulo(ponto.t))
 }
+
+function indiceDoPonteiro(evento) {
+  const chart = grafico.value?.chart
+  if (!chart || props.pontos.length === 0) return null
+  const escala = chart.scales?.x
+  const area = chart.chartArea
+  if (!escala || !area) return null
+  const retangulo = chart.canvas.getBoundingClientRect()
+  const x = evento.clientX - retangulo.left
+  const valor = escala.getValueForPixel(Math.min(Math.max(x, area.left), area.right))
+  if (valor === undefined || valor === null || Number.isNaN(valor)) return null
+  return Math.max(0, Math.min(props.pontos.length - 1, Math.round(valor)))
+}
+
+function aplicarPonteiro(evento) {
+  const indice = indiceDoPonteiro(evento)
+  if (indice === null) return
+  const ponto = props.pontos[indice]
+  if (ponto) emit('update:corte', paraInputSaoPaulo(ponto.t))
+}
+
+function aoPressionar(evento) {
+  arrastando = true
+  evento.currentTarget.setPointerCapture?.(evento.pointerId)
+  aplicarPonteiro(evento)
+}
+
+function aoMover(evento) {
+  if (!arrastando) return
+  aplicarPonteiro(evento)
+}
+
+function aoSoltar() {
+  arrastando = false
+}
 </script>
 
 <template>
@@ -251,11 +288,16 @@ function aoIndice(evento) {
     <template v-else>
       <div class="tracado__area">
         <Line
+          ref="grafico"
           class="tracado__canvas"
           :data="dadosGrafico"
           :options="opcoes"
           role="img"
           :aria-label="rotulo"
+          @pointerdown="aoPressionar"
+          @pointermove="aoMover"
+          @pointerup="aoSoltar"
+          @pointercancel="aoSoltar"
         />
       </div>
 
