@@ -6,6 +6,7 @@ import { registrarComparacaoAnos } from './comparacao-anos.js';
 import { registrarEncerramento } from './encerramento.js';
 import { registrarRelatorio } from './relatorio.js';
 import { registrarSecoes } from './secoes.js';
+import { registrarTotalizacao } from './totalizacao.js';
 
 export async function registrarRotas(app) {
   const db = app.deps.db;
@@ -28,4 +29,5 @@ export async function registrarRotas(app) {
   registrarEncerramento(contexto);
   registrarRelatorio(contexto);
   registrarSecoes(contexto);
+  registrarTotalizacao(contexto);
 }
