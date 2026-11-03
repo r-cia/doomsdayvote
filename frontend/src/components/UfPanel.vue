@@ -108,13 +108,13 @@ const votosUf = computed(() => candidatosNominais(props.votos))
     <div class="card__cabecalho">
       <div>
         <h2 id="uf-painel-titulo">
-          {{ ufSelecionada ? `Votos em ${ufSelecionada}` : 'Painel por UF' }}
+          {{ ufSelecionada ? $t('ufPanel.votosEm', { uf: ufSelecionada }) : $t('ufPanel.titulo') }}
         </h2>
       </div>
       <div class="uf-painel__acoes">
         <select v-if="!ufSelecionada" v-model="agrupar" class="uf-ordenacao">
-          <option value="nenhum">Sem agrupamento</option>
-          <option value="regiao">Por região</option>
+          <option value="nenhum">{{ $t('biometriaUf.semAgrupamento') }}</option>
+          <option value="regiao">{{ $t('biometriaUf.porRegiao') }}</option>
         </select>
         <button
           v-if="ufSelecionada"
@@ -122,17 +122,17 @@ const votosUf = computed(() => candidatosNominais(props.votos))
           class="button button--ghost button--compacto"
           @click="$emit('municipios', ufSelecionada)"
         >
-          Municípios
+          {{ $t('comum.municipios') }}
         </button>
         <button
           type="button"
           class="button button--ghost button--compacto"
           @click="$emit('limpar')"
         >
-          Brasil
+          {{ $t('comum.brasil') }}
         </button>
         <span class="contador">
-          {{ ufSelecionada ? `${votosUf.length} candidatos` : `${linhas.length} UFs` }}
+          {{ ufSelecionada ? $t('ufPanel.nCandidatos', { n: votosUf.length }) : $t('ufPanel.nUfs', { n: linhas.length }) }}
         </span>
       </div>
     </div>
@@ -140,26 +140,26 @@ const votosUf = computed(() => candidatosNominais(props.votos))
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível carregar o painel por UF"
+      :titulo="$t('ufPanel.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="$emit('retry')"
     />
     <StateBlock
       v-else-if="loading && linhas.length === 0"
       estado="carregando"
-      titulo="Carregando painel por UF"
+      :titulo="$t('ufPanel.carregando')"
     />
 
     <div v-else-if="ufSelecionada" class="tabela-scroll uf-painel__scroll">
       <table>
-        <caption class="sr-only">Votos por candidato em {{ ufSelecionada }}</caption>
+        <caption class="sr-only">{{ $t('ufPanel.captionCandidatos', { uf: ufSelecionada }) }}</caption>
         <thead>
           <tr>
-            <th scope="col">Candidato</th>
-            <th scope="col">Partido</th>
-            <th scope="col" class="num">Votos</th>
-            <th scope="col" class="num">% válidos</th>
+            <th scope="col">{{ $t('comum.candidato') }}</th>
+            <th scope="col">{{ $t('comum.partido') }}</th>
+            <th scope="col" class="num">{{ $t('comum.votos') }}</th>
+            <th scope="col" class="num">{{ $t('ufPanel.pctValidos') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -179,29 +179,29 @@ const votosUf = computed(() => candidatosNominais(props.votos))
           </tr>
         </tbody>
       </table>
-      <p v-if="votosUf.length === 0" class="vazio">Sem votos nesta UF no corte.</p>
+      <p v-if="votosUf.length === 0" class="vazio">{{ $t('ufPanel.semVotos') }}</p>
     </div>
 
     <p v-else-if="linhas.length === 0" class="vazio">
-      Nenhuma UF com dados para os filtros atuais.
+      {{ $t('ufPanel.semUfs') }}
     </p>
 
     <div v-else-if="agrupar === 'regiao' && grupos" class="tabela-scroll uf-painel__scroll">
       <table>
-        <caption class="sr-only">Resumo de votos e líder por UF agrupado por região</caption>
+        <caption class="sr-only">{{ $t('ufPanel.captionRegiao') }}</caption>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('uf')">UF{{ seta('uf') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">Votos{{ seta('total') }}</th>
-            <th scope="col" class="ordenavel" @click="alternar('liderNome')">Líder{{ seta('liderNome') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">% líder{{ seta('liderPercentual') }}</th>
-            <th scope="col"><span class="sr-only">Ações</span></th>
+            <th scope="col" class="ordenavel" @click="alternar('uf')">{{ $t('comum.uf') }}{{ seta('uf') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('total')">{{ $t('comum.votos') }}{{ seta('total') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('liderNome')">{{ $t('ufPanel.lider') }}{{ seta('liderNome') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">{{ $t('ufPanel.pctLider') }}{{ seta('liderPercentual') }}</th>
+            <th scope="col"><span class="sr-only">{{ $t('ufPanel.acoes') }}</span></th>
           </tr>
         </thead>
         <tbody>
           <template v-for="grupo in grupos" :key="grupo.nome">
             <tr>
-              <th colspan="5" class="uf-grupo">{{ grupo.nome }}</th>
+              <th colspan="5" class="uf-grupo">{{ $t(`regioes.${grupo.nome}`) }}</th>
             </tr>
             <tr
               v-for="linha in grupo.itens"
@@ -234,7 +234,7 @@ const votosUf = computed(() => candidatosNominais(props.votos))
                       color: corTextoContraste(corPartido(linha.liderSigla)),
                     }"
                   >{{ linha.liderSigla }}</span>
-                  {{ linha.liderNome ?? `Candidato ${linha.lider.nr_votavel}` }}
+                  {{ linha.liderNome ?? $t('ufPanel.candidatoN', { n: linha.lider.nr_votavel }) }}
                 </span>
                 <span v-else>—</span>
               </td>
@@ -243,10 +243,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
                 <button
                   type="button"
                   class="button button--ghost button--compacto"
-                  :aria-label="`Ver municípios de ${linha.uf}`"
+                  :aria-label="$t('ufPanel.verMunicipios', { uf: linha.uf })"
                   @click="$emit('municipios', linha.uf)"
                 >
-                  Municípios
+                  {{ $t('comum.municipios') }}
                 </button>
               </td>
             </tr>
@@ -257,14 +257,14 @@ const votosUf = computed(() => candidatosNominais(props.votos))
 
     <div v-else class="tabela-scroll uf-painel__scroll">
       <table>
-        <caption class="sr-only">Resumo de votos e líder por UF</caption>
+        <caption class="sr-only">{{ $t('ufPanel.caption') }}</caption>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('uf')">UF{{ seta('uf') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">Votos{{ seta('total') }}</th>
-            <th scope="col" class="ordenavel" @click="alternar('liderNome')">Líder{{ seta('liderNome') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">% líder{{ seta('liderPercentual') }}</th>
-            <th scope="col"><span class="sr-only">Ações</span></th>
+            <th scope="col" class="ordenavel" @click="alternar('uf')">{{ $t('comum.uf') }}{{ seta('uf') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('total')">{{ $t('comum.votos') }}{{ seta('total') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('liderNome')">{{ $t('ufPanel.lider') }}{{ seta('liderNome') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">{{ $t('ufPanel.pctLider') }}{{ seta('liderPercentual') }}</th>
+            <th scope="col"><span class="sr-only">{{ $t('ufPanel.acoes') }}</span></th>
           </tr>
         </thead>
         <tbody>
@@ -299,7 +299,7 @@ const votosUf = computed(() => candidatosNominais(props.votos))
                     color: corTextoContraste(corPartido(linha.liderSigla)),
                   }"
                 >{{ linha.liderSigla }}</span>
-                {{ linha.liderNome ?? `Candidato ${linha.lider.nr_votavel}` }}
+                {{ linha.liderNome ?? $t('ufPanel.candidatoN', { n: linha.lider.nr_votavel }) }}
               </span>
               <span v-else>—</span>
             </td>
@@ -308,10 +308,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
               <button
                 type="button"
                 class="button button--ghost button--compacto"
-                :aria-label="`Ver municípios de ${linha.uf}`"
+                :aria-label="$t('ufPanel.verMunicipios', { uf: linha.uf })"
                 @click="$emit('municipios', linha.uf)"
               >
-                Municípios
+                {{ $t('comum.municipios') }}
               </button>
             </td>
           </tr>

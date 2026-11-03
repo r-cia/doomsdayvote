@@ -11,10 +11,10 @@ defineProps({
 defineEmits(['update:ordenacao'])
 
 const VISOES = [
-  ['outliers', 'Outliers'],
-  ['share', 'Participação do líder'],
-  ['margem', 'Margem'],
-  ['consistencia', 'Consistência aritmética'],
+  ['outliers', 'destaque.outliers'],
+  ['share', 'destaque.share'],
+  ['margem', 'destaque.margem'],
+  ['consistencia', 'destaque.consistencia'],
 ]
 const visao = ref('outliers')
 </script>
@@ -22,8 +22,8 @@ const visao = ref('outliers')
 <template>
   <section class="painel" aria-labelledby="destaque-titulo">
     <header class="painel__cabecalho">
-      <h2 id="destaque-titulo">Seções em destaque</h2>
-      <div class="segmented" role="group" aria-label="Visão">
+      <h2 id="destaque-titulo">{{ $t('destaque.titulo') }}</h2>
+      <div class="segmented" role="group" :aria-label="$t('destaque.visao')">
         <button
           v-for="[chave, rotulo] in VISOES"
           :key="chave"
@@ -32,7 +32,7 @@ const visao = ref('outliers')
           :class="{ ativo: visao === chave }"
           @click="visao = chave"
         >
-          {{ rotulo }}
+          {{ $t(rotulo) }}
         </button>
       </div>
     </header>

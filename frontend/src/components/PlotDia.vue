@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { corPartido } from '../lib/colors'
+import { i18n, t } from '../i18n'
 import {
   formatarHora,
   formatarNumero,
@@ -72,29 +73,30 @@ const partidoPorNumero = computed(() => {
 })
 
 const rotulo = computed(() => {
-  if (props.pontos.length === 0) return 'Linha do tempo indisponível'
+  if (props.pontos.length === 0) return t('plotDia.indisponivel')
   const primeiro = props.pontos[0]
   const ultimo = props.pontos.at(-1)
-  return `Traçado do dia de ${formatarHora(primeiro.t)} a ${formatarHora(ultimo.t)}, com o corte em ${formatarHora(new Date(tempoCorte.value).toISOString())}. ${formatarNumero(ultimo.votos_acumulados)} votos acumulados em ${formatarNumero(ultimo.secoes_com_bu_acumuladas)} seções com BU.`
+  return t('plotDia.aria', { de: formatarHora(primeiro.t), ate: formatarHora(ultimo.t), corte: formatarHora(new Date(tempoCorte.value).toISOString()), votos: formatarNumero(ultimo.votos_acumulados), secoes: formatarNumero(ultimo.secoes_com_bu_acumuladas) })
 })
 
 function formatarEixo(valor, divisor, sufixo) {
   if (valor === 0) return '0'
   const numero = valor / divisor
-  return `${numero.toLocaleString('pt-BR', {
+  return `${numero.toLocaleString(i18n.global.locale.value, {
     maximumFractionDigits: numero < 10 ? 1 : 0,
   })}${sufixo}`
 }
 
-const formatadorDia = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: '2-digit',
-  timeZone: 'America/Sao_Paulo',
-})
+const formatadorDia = () =>
+  new Intl.DateTimeFormat(i18n.global.locale.value, {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone: 'America/Sao_Paulo',
+  })
 
 function rotuloHora(iso, comData) {
   const hora = formatarHora(iso)
-  return comData ? `${formatadorDia.format(new Date(iso))} ${hora}` : hora
+  return comData ? `${formatadorDia().format(new Date(iso))} ${hora}` : hora
 }
 
 function pontosDaSerie(serie) {
@@ -341,8 +343,8 @@ watch(
 <template>
   <section class="painel tracado" aria-labelledby="tracado-titulo">
     <header class="painel__cabecalho">
-      <h2 id="tracado-titulo">Traçado do dia</h2>
-      <div class="segmented" role="group" aria-label="Granularidade">
+      <h2 id="tracado-titulo">{{ $t('plotDia.titulo') }}</h2>
+      <div class="segmented" role="group" :aria-label="$t('plotDia.granularidade')">
         <button
           v-for="g in ['5m', '1m']"
           :key="g"
@@ -351,20 +353,20 @@ watch(
           :class="{ ativo: granularidade === g }"
           @click="emit('update:granularidade', g)"
         >
-          {{ g === '5m' ? '5 min' : '1 min' }}
+          {{ g === '5m' ? $t('plotDia.cincoMin') : $t('plotDia.umMin') }}
         </button>
       </div>
       <p class="painel__meta">
-        <b>{{ formatarHora(pontoAtual?.t) }}</b> · corte<br />
-        {{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }} seções ·
-        {{ formatarNumero(pontoAtual?.votos_acumulados) }} votos
+        <b>{{ formatarHora(pontoAtual?.t) }}</b> · {{ $t('plotDia.corte') }}<br />
+        {{ $t('plotDia.secoes', { n: formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }) }} ·
+        {{ $t('plotDia.votos', { n: formatarNumero(pontoAtual?.votos_acumulados) }) }}
       </p>
     </header>
 
     <div v-if="pontos.length === 0" class="tracado__vazio">
-      <strong>Linha do tempo indisponível</strong>
+      <strong>{{ $t('plotDia.indisponivel') }}</strong>
       <p>
-        {{ avisos[0]?.mensagem ?? 'A fonte deste ano não permite linha do tempo por horário.' }}
+        {{ avisos[0]?.mensagem ?? $t('plotDia.fonteSemHorario') }}
       </p>
     </div>
 
@@ -383,7 +385,7 @@ watch(
       </div>
 
       <div class="curso">
-        <label class="sr-only" for="curso-corte">Corte do dia</label>
+        <label class="sr-only" for="curso-corte">{{ $t('filtros.corte') }}</label>
         <input
           id="curso-corte"
           type="range"
@@ -391,13 +393,13 @@ watch(
           :max="Math.max(0, pontos.length - 1)"
           step="1"
           :value="indiceCorte"
-          :aria-valuetext="`Corte às ${formatarHora(pontoAtual?.t)}`"
+          :aria-valuetext="$t('plotDia.corteAs', { hora: formatarHora(pontoAtual?.t) })"
           @input="aoIndice"
         />
         <p class="curso__leitura">
-          <span>corte <b>{{ formatarHora(pontoAtual?.t) }}</b></span>
-          <span>seções <b>{{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }}</b></span>
-          <span>votos <b>{{ formatarNumero(pontoAtual?.votos_acumulados) }}</b></span>
+          <span>{{ $t('plotDia.corte') }} <b>{{ formatarHora(pontoAtual?.t) }}</b></span>
+          <span>{{ $t('plotDia.secoesRot') }} <b>{{ formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }}</b></span>
+          <span>{{ $t('plotDia.votosRot') }} <b>{{ formatarNumero(pontoAtual?.votos_acumulados) }}</b></span>
         </p>
       </div>
     </template>

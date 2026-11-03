@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { formatarDecimal } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -14,10 +15,7 @@ const limiarLof = computed(() => props.dados?.lof?.limiar ?? 2)
 
 function score(valor) {
   if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR', {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3,
-  })
+  return formatarDecimal(valor, 3)
 }
 
 function tomIf(valor) {
@@ -33,44 +31,44 @@ function tomLof(valor) {
 <template>
   <section class="painel" aria-labelledby="outliers-titulo">
     <header class="painel__cabecalho">
-      <h2 id="outliers-titulo">Isolamento e LOF</h2>
+      <h2 id="outliers-titulo">{{ $t('outliers.titulo') }}</h2>
       <div class="estatistica-controle">
         <label class="campo campo--curto">
-          <span class="campo__rotulo">Ordenar por</span>
+          <span class="campo__rotulo">{{ $t('outliers.ordenarPor') }}</span>
           <select
             :value="ordenacao"
             @change="emit('update:ordenacao', $event.target.value)"
           >
-            <option value="if">Maior IF</option>
-            <option value="lof">Maior LOF</option>
+            <option value="if">{{ $t('outliers.maiorIf') }}</option>
+            <option value="lof">{{ $t('outliers.maiorLof') }}</option>
           </select>
         </label>
       </div>
       <p class="painel__meta">
-        <b>{{ dados?.total_secoes ?? 0 }}</b> seções · IF ≥ {{ limiarIf }}<br />
-        LOF ≥ {{ limiarLof }} · amostra {{ dados?.lof?.amostra ?? 0 }}
-        <template v-if="dados?.lof?.limitado"> (limitada)</template>
+        <b>{{ dados?.total_secoes ?? 0 }}</b> {{ $t('outliers.secoesIf', { limiar: limiarIf }) }}<br />
+        {{ $t('outliers.lofAmostra', { limiar: limiarLof, n: dados?.lof?.amostra ?? 0 }) }}
+        <template v-if="dados?.lof?.limitado"> {{ $t('outliers.limitada') }}</template>
       </p>
     </header>
 
     <div v-if="secoes.length === 0" class="vazio">
-      Sem seções suficientes para o cálculo no recorte.
+      {{ $t('outliers.vazio') }}
     </div>
 
     <div v-else class="tabela-scroll">
       <table>
         <caption class="sr-only">
-          Seções com maior score de anomalia
+          {{ $t('outliers.caption') }}
         </caption>
         <thead>
           <tr>
-            <th scope="col">UF</th>
-            <th scope="col">Município</th>
-            <th scope="col" class="num">Zona</th>
-            <th scope="col" class="num">Seção</th>
+            <th scope="col">{{ $t('comum.uf') }}</th>
+            <th scope="col">{{ $t('comum.municipio') }}</th>
+            <th scope="col" class="num">{{ $t('comum.zona') }}</th>
+            <th scope="col" class="num">{{ $t('comum.secao') }}</th>
             <th scope="col" class="num">IF</th>
             <th scope="col" class="num">LOF</th>
-            <th scope="col">Candidato</th>
+            <th scope="col">{{ $t('comum.candidato') }}</th>
           </tr>
         </thead>
         <tbody>

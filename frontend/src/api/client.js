@@ -1,3 +1,5 @@
+import { i18n, t } from '../i18n'
+
 const BASE = '/api'
 
 export class ApiError extends Error {
@@ -30,8 +32,9 @@ async function obter(caminho, params, signal) {
   if (!resposta.ok) {
     const corpo = await resposta.json().catch(() => null)
     const erro = corpo?.error
+    const chave = `erros.codigo.${erro?.code}`
     throw new ApiError(
-      erro?.message ?? `Falha ao consultar a API (${resposta.status})`,
+      (erro?.code && i18n.global.te(chave) ? t(chave) : null) ?? erro?.message ?? t('erros.falhaApi', { status: resposta.status }),
       resposta.status,
       erro?.code ?? null,
       erro?.details ?? null,

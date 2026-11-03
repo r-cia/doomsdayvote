@@ -30,9 +30,9 @@ const municipioAtivo = computed(() => props.filtros.municipio)
 </script>
 
 <template>
-  <section class="comando" aria-label="Filtros da consulta">
+  <section class="comando" :aria-label="$t('filtros.aria')">
     <label class="campo campo--cargo">
-      <span class="campo__rotulo">Cargo</span>
+      <span class="campo__rotulo">{{ $t('filtros.cargo') }}</span>
       <select
         :value="filtros.cargo ?? ''"
         @change="emit('update:cargo', Number($event.target.value))"
@@ -44,7 +44,7 @@ const municipioAtivo = computed(() => props.filtros.municipio)
     </label>
 
     <label class="campo campo--ano">
-      <span class="campo__rotulo">Ano da eleição</span>
+      <span class="campo__rotulo">{{ $t('filtros.ano') }}</span>
       <select
         :value="filtros.ano ?? ''"
         @change="emit('update:ano', Number($event.target.value))"
@@ -54,22 +54,22 @@ const municipioAtivo = computed(() => props.filtros.municipio)
     </label>
 
     <label class="campo campo--curto">
-      <span class="campo__rotulo">Turno</span>
+      <span class="campo__rotulo">{{ $t('filtros.turno') }}</span>
       <select
         :value="filtros.turno ?? ''"
         @change="emit('update:turno', Number($event.target.value))"
       >
-        <option v-for="turno in turnos" :key="turno" :value="turno">{{ turno }}º</option>
+        <option v-for="turno in turnos" :key="turno" :value="turno">{{ $t('filtros.turnoOpcao', { n: turno }) }}</option>
       </select>
     </label>
 
     <label class="campo campo--candidato">
-      <span class="campo__rotulo">Candidato</span>
+      <span class="campo__rotulo">{{ $t('filtros.candidato') }}</span>
       <select
         :value="filtros.candidato ?? ''"
         @change="emit('update:candidato', $event.target.value === '' ? null : Number($event.target.value))"
       >
-        <option value="">Todos</option>
+        <option value="">{{ $t('comum.todos') }}</option>
         <option v-for="candidato in candidatos" :key="candidato.nr_votavel" :value="candidato.nr_votavel">
           {{ candidato.nm_votavel }} · {{ candidato.sg_partido ?? '—' }}
         </option>
@@ -77,7 +77,7 @@ const municipioAtivo = computed(() => props.filtros.municipio)
     </label>
 
     <label class="campo campo--corte">
-      <span class="campo__rotulo">Corte do dia</span>
+      <span class="campo__rotulo">{{ $t('filtros.corte') }}</span>
       <input
         type="datetime-local"
         :value="filtros.asOfInput"
@@ -86,12 +86,12 @@ const municipioAtivo = computed(() => props.filtros.municipio)
     </label>
 
     <label class="campo campo--uf">
-      <span class="campo__rotulo">UF</span>
+      <span class="campo__rotulo">{{ $t('comum.uf') }}</span>
       <select
         :value="filtros.uf ?? ''"
         @change="emit('update:uf', $event.target.value)"
       >
-        <option value="">Brasil</option>
+        <option value="">{{ $t('comum.brasil') }}</option>
         <option v-for="uf in UFS" :key="uf" :value="uf">{{ uf }}</option>
       </select>
     </label>
@@ -103,10 +103,10 @@ const municipioAtivo = computed(() => props.filtros.municipio)
         class="button button--ghost button--compacto"
         @click="emit('clear-municipio')"
       >
-        Limpar município
+        {{ $t('filtros.limparMunicipio') }}
       </button>
       <button type="button" class="button button--ghost button--compacto" @click="emit('clear')">
-        Limpar filtros
+        {{ $t('filtros.limpar') }}
       </button>
     </div>
   </section>

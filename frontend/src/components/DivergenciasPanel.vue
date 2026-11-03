@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Paginacao from './Paginacao.vue'
 import StateBlock from './StateBlock.vue'
 import { useTotalizacaoDivergencias } from '../composables/queries'
@@ -8,6 +9,7 @@ import { formatarNumero } from '../lib/format'
 
 const TAMANHO = 25
 const FONTES = ['rdv', 'log', 'bweb']
+const { t } = useI18n()
 const store = useFiltersStore()
 const fonte = ref('')
 const pagina = ref(1)
@@ -24,7 +26,7 @@ watch(
 
 const nulo = (valor) => (valor === null || valor === undefined || valor === '' ? '—' : valor)
 const localizacao = (d) =>
-  [d.sg_uf, d.cd_municipio_tse, d.nr_zona && `zona ${d.nr_zona}`, d.nr_secao && `seção ${d.nr_secao}`]
+  [d.sg_uf, d.cd_municipio_tse, d.nr_zona && `${t('comum.zona').toLowerCase()} ${d.nr_zona}`, d.nr_secao && `${t('comum.secao').toLowerCase()} ${d.nr_secao}`]
     .filter((parte) => parte !== null && parte !== undefined && parte !== '')
     .join(' · ') || '—'
 const votavel = (d) =>
@@ -35,40 +37,40 @@ const votavel = (d) =>
   <section class="painel" aria-labelledby="divergencias-titulo" :aria-busy="query.isFetching.value">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Dupla conferência</p>
-        <h2 id="divergencias-titulo">Divergências</h2>
-        <p v-if="query.data.value" class="painel__meta">{{ formatarNumero(query.data.value.total) }} divergências</p>
+        <p class="painel__etiqueta">{{ $t('divergencias.etiqueta') }}</p>
+        <h2 id="divergencias-titulo">{{ $t('divergencias.titulo') }}</h2>
+        <p v-if="query.data.value" class="painel__meta">{{ $t('divergencias.total', { n: formatarNumero(query.data.value.total) }) }}</p>
       </div>
       <label class="campo campo--curto">
-        <span class="campo__rotulo">Fonte</span>
+        <span class="campo__rotulo">{{ $t('divergencias.fonte') }}</span>
         <select v-model="fonte">
-          <option value="">Todas as fontes</option>
+          <option value="">{{ $t('divergencias.todasFontes') }}</option>
           <option v-for="f in FONTES" :key="f" :value="f">{{ f }}</option>
         </select>
       </label>
     </header>
 
-    <StateBlock v-if="query.isLoading.value" estado="carregando" titulo="Carregando divergências" />
+    <StateBlock v-if="query.isLoading.value" estado="carregando" :titulo="$t('divergencias.carregando')" />
     <StateBlock
       v-else-if="query.error.value"
       estado="erro"
-      titulo="Não foi possível carregar as divergências"
+      :titulo="$t('divergencias.erro')"
       :descricao="query.error.value.message"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="query.refetch()"
     />
-    <StateBlock v-else-if="itens.length === 0" estado="vazio" titulo="Nenhuma divergência de dupla conferência neste recorte." />
+    <StateBlock v-else-if="itens.length === 0" estado="vazio" :titulo="$t('divergencias.vazio')" />
     <template v-else>
       <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
         <table class="tabela">
           <thead>
             <tr>
-              <th scope="col">Fonte</th>
-              <th scope="col">Localização</th>
-              <th scope="col">Campo</th>
-              <th scope="col">Cargo · votável</th>
-              <th scope="col">Valor esperado</th>
-              <th scope="col">Valor encontrado</th>
+              <th scope="col">{{ $t('divergencias.fonte') }}</th>
+              <th scope="col">{{ $t('divergencias.localizacao') }}</th>
+              <th scope="col">{{ $t('divergencias.campo') }}</th>
+              <th scope="col">{{ $t('divergencias.cargoVotavel') }}</th>
+              <th scope="col">{{ $t('divergencias.esperado') }}</th>
+              <th scope="col">{{ $t('divergencias.encontrado') }}</th>
             </tr>
           </thead>
           <tbody>

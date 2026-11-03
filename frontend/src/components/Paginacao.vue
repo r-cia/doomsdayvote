@@ -14,11 +14,11 @@ const ir = (destino) => emit('update:pagina', Math.min(Math.max(1, destino), ult
 </script>
 
 <template>
-  <nav class="paginacao" aria-label="Paginação">
-    <button type="button" class="button button--ghost button--compacto" aria-label="Primeira página" :disabled="pagina <= 1" @click="ir(1)">«</button>
-    <button type="button" class="button button--ghost button--compacto" aria-label="Página anterior" :disabled="pagina <= 1" @click="ir(pagina - 1)">‹</button>
-    <span aria-live="polite">Página {{ pagina }} de {{ ultima }} · {{ formatarNumero(total) }} itens</span>
-    <button type="button" class="button button--ghost button--compacto" aria-label="Próxima página" :disabled="pagina >= ultima" @click="ir(pagina + 1)">›</button>
-    <button type="button" class="button button--ghost button--compacto" aria-label="Última página" :disabled="pagina >= ultima" @click="ir(ultima)">»</button>
+  <nav class="paginacao" :aria-label="$t('paginacao.aria')">
+    <button type="button" class="button button--ghost button--compacto" :aria-label="$t('paginacao.primeira')" :disabled="pagina <= 1" @click="ir(1)">«</button>
+    <button type="button" class="button button--ghost button--compacto" :aria-label="$t('paginacao.anterior')" :disabled="pagina <= 1" @click="ir(pagina - 1)">‹</button>
+    <span aria-live="polite">{{ $t('paginacao.pagina', { pagina, total: ultima, itens: formatarNumero(total) }) }}</span>
+    <button type="button" class="button button--ghost button--compacto" :aria-label="$t('paginacao.proxima')" :disabled="pagina >= ultima" @click="ir(pagina + 1)">›</button>
+    <button type="button" class="button button--ghost button--compacto" :aria-label="$t('paginacao.ultima')" :disabled="pagina >= ultima" @click="ir(ultima)">»</button>
   </nav>
 </template>

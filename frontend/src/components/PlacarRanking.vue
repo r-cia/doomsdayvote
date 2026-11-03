@@ -59,24 +59,24 @@ function escolher(candidato) {
 <template>
   <section class="painel placar" aria-labelledby="placar-titulo">
     <header class="painel__cabecalho">
-      <h2 id="placar-titulo">Placar</h2>
+      <h2 id="placar-titulo">{{ $t('placar.titulo') }}</h2>
       <p class="painel__meta">
-        <b>{{ candidatos.length }}</b> candidatos<br />
-        {{ formatarNumero(validos) }} votos válidos
+        <b>{{ candidatos.length }}</b> {{ $t('placar.candidatos') }}<br />
+        {{ $t('placar.votosValidos', { n: formatarNumero(validos) }) }}
       </p>
     </header>
 
     <div class="placar__cabecalho" aria-hidden="true">
       <span>#</span>
-      <span>partido</span>
-      <span>candidato</span>
-      <span class="num">Total</span>
-      <span class="num">% Válidos total</span>
-      <span class="num">Votos</span>
-      <span class="num">% Válidos</span>
-      <span class="num">Tardios</span>
-      <span class="num">% Válidos Tardios</span>
-      <span class="num">Δ corte</span>
+      <span>{{ $t('comum.partido') }}</span>
+      <span>{{ $t('comum.candidato') }}</span>
+      <span class="num">{{ $t('placar.total') }}</span>
+      <span class="num">{{ $t('placar.pctValidosTotal') }}</span>
+      <span class="num">{{ $t('comum.votos') }}</span>
+      <span class="num">{{ $t('placar.pctValidos') }}</span>
+      <span class="num">{{ $t('placar.tardios') }}</span>
+      <span class="num">{{ $t('placar.pctValidosTardios') }}</span>
+      <span class="num">{{ $t('placar.deltaCorte') }}</span>
     </div>
 
     <TransitionGroup name="mover" tag="div" class="placar__lista">
@@ -86,7 +86,7 @@ function escolher(candidato) {
         type="button"
         class="placar__linha"
         :aria-pressed="selecionado === candidato.nr_votavel"
-        :aria-label="`${candidato.nm_votavel}, ${candidato.sg_partido ?? 'sem partido'}, ${formatarNumero(candidato.qt_votos)} votos, ${formatarPercentual(candidato.percentual)} dos válidos`"
+        :aria-label="$t('placar.linhaAria', { nome: candidato.nm_votavel, partido: candidato.sg_partido ?? $t('placar.semPartido'), votos: formatarNumero(candidato.qt_votos), pct: formatarPercentual(candidato.percentual) })"
         @click="escolher(candidato)"
       >
         <span class="placar__pos">{{ String(indice + 1).padStart(2, '0') }}</span>

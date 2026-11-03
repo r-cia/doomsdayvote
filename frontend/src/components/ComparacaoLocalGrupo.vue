@@ -22,27 +22,27 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
 </script>
 
 <template>
-  <StateBlock v-if="query.isLoading.value" estado="carregando" titulo="Carregando seções do grupo" />
+  <StateBlock v-if="query.isLoading.value" estado="carregando" :titulo="$t('comparacaoLocal.carregandoGrupo')" />
   <StateBlock
     v-else-if="query.error.value"
     estado="erro"
-    titulo="Não foi possível carregar as seções do grupo"
+    :titulo="$t('comparacaoLocal.erroGrupo')"
     :descricao="query.error.value.message"
-    acao="Tentar novamente"
+    :acao="$t('comum.tentarNovamente')"
     @acao="query.refetch()"
   />
   <div v-else class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
     <table>
       <thead>
         <tr>
-          <ThOrdenavel coluna="nm_municipio" :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">Município</ThOrdenavel>
-          <ThOrdenavel coluna="nr_zona" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">Zona</ThOrdenavel>
-          <ThOrdenavel coluna="nr_secao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">Seção</ThOrdenavel>
-          <ThOrdenavel coluna="participacao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">Participação</ThOrdenavel>
-          <ThOrdenavel coluna="abstencao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">Abstenção</ThOrdenavel>
-          <ThOrdenavel coluna="participacao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">Distância da mediana (participação)</ThOrdenavel>
-          <ThOrdenavel coluna="abstencao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">Distância da mediana (abstenção)</ThOrdenavel>
-          <th scope="col"><span class="sr-only">Abrir</span></th>
+          <ThOrdenavel coluna="nm_municipio" :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.municipio') }}</ThOrdenavel>
+          <ThOrdenavel coluna="nr_zona" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.zona') }}</ThOrdenavel>
+          <ThOrdenavel coluna="nr_secao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.secao') }}</ThOrdenavel>
+          <ThOrdenavel coluna="participacao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.participacao') }}</ThOrdenavel>
+          <ThOrdenavel coluna="abstencao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.abstencao') }}</ThOrdenavel>
+          <ThOrdenavel coluna="participacao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.distParticipacao') }}</ThOrdenavel>
+          <ThOrdenavel coluna="abstencao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.distAbstencao') }}</ThOrdenavel>
+          <th scope="col"><span class="sr-only">{{ $t('comum.abrir') }}</span></th>
         </tr>
       </thead>
       <tbody>
@@ -54,7 +54,7 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
           <td class="num">{{ formatarPercentual(pct(s.metricas?.abstencao)) }}</td>
           <td class="num">{{ pp(s.distancia_pp?.participacao_pp) }}</td>
           <td class="num">{{ pp(s.distancia_pp?.abstencao_pp) }}</td>
-          <td><RouterLink class="button button--ghost button--compacto" :to="`/secoes/${s.secao.id}`">Abrir seção</RouterLink></td>
+          <td><RouterLink class="button button--ghost button--compacto" :to="`/secoes/${s.secao.id}`">{{ $t('comum.abrirSecao') }}</RouterLink></td>
         </tr>
       </tbody>
     </table>

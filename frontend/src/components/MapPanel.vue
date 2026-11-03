@@ -31,6 +31,7 @@ import {
   corTextoContraste,
 } from '../lib/colors'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import { t } from '../i18n'
 
 const props = defineProps({
   areas: { type: Array, default: () => [] },
@@ -152,13 +153,13 @@ const candidatoSelecionado = computed(() => {
       (candidato) => candidato.nr_votavel === props.candidato,
     ) ?? {
       nr_votavel: props.candidato,
-      nm_votavel: `Candidato ${props.candidato}`,
+      nm_votavel: t('ufPanel.candidatoN', { n: props.candidato }),
       sg_partido: null,
     }
   )
 })
 const rotuloNivel = computed(() =>
-  props.nivel === 'uf' ? 'UF' : 'Município',
+  props.nivel === 'uf' ? t('comum.uf') : t('comum.municipio'),
 )
 
 function primeiroValor(propriedades, campos) {
@@ -220,17 +221,17 @@ async function carregarMalha(nivel) {
     const tipo = resposta.headers?.get?.('content-type') ?? ''
     if (!resposta.ok) {
       throw new Error(
-        `Arquivo /geo/${arquivoMalha(nivel)} não encontrado (HTTP ${resposta.status}).`,
+        t('mapa.arquivoNaoEncontrado', { arquivo: `/geo/${arquivoMalha(nivel)}`, status: resposta.status }),
       )
     }
     if (tipo && !tipo.includes('json')) {
       throw new Error(
-        `O caminho /geo/${arquivoMalha(nivel)} não devolveu um GeoJSON.`,
+        t('mapa.naoGeojson', { arquivo: `/geo/${arquivoMalha(nivel)}` }),
       )
     }
     const dados = await resposta.json()
     if (!Array.isArray(dados?.features) || dados.features.length === 0) {
-      throw new Error(`O arquivo /geo/${arquivoMalha(nivel)} não contém feições.`)
+      throw new Error(t('mapa.semFeicoes', { arquivo: `/geo/${arquivoMalha(nivel)}` }))
     }
     if (token !== tokenMalha) return
     cacheMalhas.set(nivel, dados)
@@ -243,7 +244,7 @@ async function carregarMalha(nivel) {
     malhaMensagem.value =
       erro instanceof Error
         ? erro.message
-        : `Não foi possível carregar /geo/${arquivoMalha(nivel)}.`
+        : t('mapa.naoCarregou', { arquivo: `/geo/${arquivoMalha(nivel)}` })
   }
 }
 
@@ -319,7 +320,7 @@ function atualizarFonte() {
     })
   } catch (erro) {
     malhaMensagem.value =
-      erro instanceof Error ? erro.message : 'Falha ao preparar a malha.'
+      erro instanceof Error ? erro.message : t('mapa.falhaPreparar')
   }
 }
 
@@ -413,7 +414,7 @@ function criarMapa() {
   mapa.value.on('click', aoClicar)
   mapa.value.on('error', (evento) => {
     malhaMensagem.value =
-      evento?.error?.message ?? 'Falha ao desenhar o mapa.'
+      evento?.error?.message ?? t('mapa.falhaDesenhar')
   })
 }
 
@@ -428,35 +429,35 @@ function areaDaFeicao(feature) {
 function linhasTooltip(area, feature) {
   const linhas = []
   if (!area) {
-    linhas.push({ rotulo: 'Situação', valor: 'Sem dados no corte atual' })
+    linhas.push({ rotulo: t('mapa.situacao'), valor: t('mapa.semDadosCorte') })
     return linhas
   }
   linhas.push({
-    rotulo: 'Votos',
+    rotulo: t('comum.votos'),
     valor: formatarNumero(area.total_votos),
   })
   linhas.push({
-    rotulo: 'Válidos',
+    rotulo: t('mapTable.validos'),
     valor: formatarNumero(area.votos_validos),
   })
   if (area.lider) {
     const candidato = partidoPorNumero.value.get(area.lider.nr_votavel)
     linhas.push({
-      rotulo: 'Líder',
-      valor: `${candidato?.nm_votavel ?? `Candidato ${area.lider.nr_votavel}`} (${candidato?.sg_partido ?? '—'}) · ${formatarPercentual(area.lider.percentual)}`,
+      rotulo: t('ufPanel.lider'),
+      valor: `${candidato?.nm_votavel ?? t('ufPanel.candidatoN', { n: area.lider.nr_votavel })} (${candidato?.sg_partido ?? '—'}) · ${formatarPercentual(area.lider.percentual)}`,
     })
   } else {
-    linhas.push({ rotulo: 'Líder', valor: 'Sem líder identificado' })
+    linhas.push({ rotulo: t('ufPanel.lider'), valor: t('mapa.semLider') })
   }
   const candidatoArea = candidatoDaArea(area, props.candidato)
   if (props.candidato && candidatoArea) {
     linhas.push({
-      rotulo: candidatoSelecionado.value?.nm_votavel ?? 'Candidato',
+      rotulo: candidatoSelecionado.value?.nm_votavel ?? t('comum.candidato'),
       valor: `${formatarNumero(candidatoArea.qt_votos)} · ${formatarPercentual(candidatoArea.percentual)}`,
     })
   }
   if (feature?.properties?._rotulo) {
-    linhas.push({ rotulo: 'Código', valor: String(feature.properties._key || '—') })
+    linhas.push({ rotulo: t('mapa.codigo'), valor: String(feature.properties._key || '—') })
   }
   return linhas
 }
@@ -522,8 +523,8 @@ const legenda = computed(() => {
   if (props.modo === 'percentual') {
     return {
       titulo: candidatoSelecionado.value
-        ? `Participação de ${candidatoSelecionado.value.nm_votavel}`
-        : 'Participação do líder',
+        ? t('mapa.participacaoDe', { nome: candidatoSelecionado.value.nm_votavel })
+        : t('mapa.participacaoLider'),
       itens: faixasPercentual(candidatoSelecionado.value?.sg_partido).map((faixa) => ({
         rotulo: faixa.rotulo,
         cor: faixa.cor,
@@ -536,7 +537,7 @@ const legenda = computed(() => {
   for (const area of props.areas) {
     if (!area.lider) continue
     const candidato = partidoPorNumero.value.get(area.lider.nr_votavel)
-    const sigla = candidato?.sg_partido ?? 'Sem partido'
+    const sigla = candidato?.sg_partido ?? t('mapa.semPartido')
     const atual = porPartido.get(sigla) ?? {
       sigla,
       cor: corPartido(candidato?.sg_partido),
@@ -546,7 +547,7 @@ const legenda = computed(() => {
     porPartido.set(sigla, atual)
   }
   return {
-    titulo: 'Líder por área',
+    titulo: t('mapa.liderPorArea'),
     itens: [...porPartido.values()]
       .sort((a, b) => b.total - a.total)
       .slice(0, 10)
@@ -612,38 +613,38 @@ onBeforeUnmount(() => {
   <section class="card mapa-card" aria-labelledby="mapa-titulo">
     <div class="card__cabecalho mapa-card__cabecalho">
       <div>
-        <h2 id="mapa-titulo">Mapa</h2>
-        <p>Malha IBGE local.</p>
+        <h2 id="mapa-titulo">{{ $t('abas.mapa') }}</h2>
+        <p>{{ $t('mapa.malha') }}</p>
       </div>
       <div class="mapa-controles">
-        <div class="segmented" role="group" aria-label="Nível do mapa">
+        <div class="segmented" role="group" :aria-label="$t('mapa.nivelAria')">
           <button
             type="button"
             :aria-pressed="nivel === 'uf'"
             :class="{ ativo: nivel === 'uf' }"
             @click="$emit('update:level', 'uf')"
           >
-            UF
+            {{ $t('comum.uf') }}
           </button>
           <button
             type="button"
             :aria-pressed="nivel === 'municipio'"
             :class="{ ativo: nivel === 'municipio' }"
             :disabled="!uf"
-            :title="!uf ? 'Selecione uma UF para ver municípios' : undefined"
+            :title="!uf ? $t('mapa.selecioneUf') : undefined"
             @click="$emit('update:level', 'municipio')"
           >
-            Municípios
+            {{ $t('comum.municipios') }}
           </button>
         </div>
-        <div class="segmented" role="group" aria-label="Modo de cor do mapa">
+        <div class="segmented" role="group" :aria-label="$t('mapa.modoAria')">
           <button
             type="button"
             :aria-pressed="modo === 'lider'"
             :class="{ ativo: modo === 'lider' }"
             @click="$emit('update:mode', 'lider')"
           >
-            Líder
+            {{ $t('ufPanel.lider') }}
           </button>
           <button
             type="button"
@@ -651,7 +652,7 @@ onBeforeUnmount(() => {
             :class="{ ativo: modo === 'percentual' }"
             @click="$emit('update:mode', 'percentual')"
           >
-            Percentual
+            {{ $t('mapa.percentual') }}
           </button>
         </div>
       </div>
@@ -660,34 +661,33 @@ onBeforeUnmount(() => {
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível carregar o mapa"
+      :titulo="$t('mapa.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="$emit('retry')"
     />
 
     <div v-if="loading && !error" class="mapa-status" role="status">
-      Carregando dados do mapa…
+      {{ $t('mapa.carregandoDados') }}
     </div>
 
     <StateBlock
       v-if="malhaEstado === 'carregando'"
       estado="carregando"
-      titulo="Carregando malha"
-      :descricao="`Lendo /geo/${arquivoMalha(nivel)}.`"
+      :titulo="$t('mapa.carregandoMalha')"
+      :descricao="$t('mapa.lendo', { arquivo: `/geo/${arquivoMalha(nivel)}` })"
     />
 
     <div v-if="malhaEstado === 'ausente'" class="mapa-ausente">
       <StateBlock
         estado="vazio"
-        titulo="Malha não carregada"
-        :descricao="`${malhaMensagem} Adicione o arquivo em frontend/public/geo/${arquivoMalha(nivel)}.`"
-        acao="Tentar novamente"
+        :titulo="$t('mapa.malhaNaoCarregada')"
+        :descricao="$t('mapa.adicioneArquivo', { mensagem: malhaMensagem, arquivo: `frontend/public/geo/${arquivoMalha(nivel)}` })"
+        :acao="$t('comum.tentarNovamente')"
         @acao="tentarMalhaNovamente"
       />
       <p>
-        Nenhuma geografia foi inventada. A tabela alternativa abaixo continua
-        disponível com os dados da API.
+        {{ $t('mapa.nenhumaGeografia') }}
       </p>
     </div>
 
@@ -700,7 +700,7 @@ onBeforeUnmount(() => {
         ref="container"
         class="mapa"
         role="img"
-        :aria-label="`Mapa por ${rotuloNivel.toLowerCase()} com ${areas.length} áreas`"
+        :aria-label="$t('mapa.aria', { nivel: rotuloNivel.toLowerCase(), n: areas.length })"
       ></div>
       <div
         v-if="tooltip.visivel"
@@ -722,9 +722,9 @@ onBeforeUnmount(() => {
       {{ malhaMensagem }}
     </p>
 
-    <div class="legenda" role="group" aria-label="Legenda do mapa">
+    <div class="legenda" role="group" :aria-label="$t('mapa.legendaAria')">
       <strong>{{ legenda.titulo }}</strong>
-      <span class="legenda__meta">{{ feicoesNaMalha }} feições</span>
+      <span class="legenda__meta">{{ $t('mapa.feicoes', { n: feicoesNaMalha }) }}</span>
       <ul>
         <li v-for="item in legenda.itens" :key="item.rotulo">
           <span
@@ -740,10 +740,10 @@ onBeforeUnmount(() => {
             :style="{ backgroundColor: COR_SEM_DADOS }"
             aria-hidden="true"
           ></span>
-          Sem dados
+          {{ $t('comum.semDados') }}
         </li>
       </ul>
-      <p v-if="legenda.itens.length === 0">Sem líder identificado no corte atual.</p>
+      <p v-if="legenda.itens.length === 0">{{ $t('mapa.semLiderCorte') }}</p>
     </div>
 
     <MapTable

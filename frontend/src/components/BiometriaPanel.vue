@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import { t } from '../i18n'
 
 const props = defineProps({
   dados: { type: Object, default: null },
@@ -17,14 +18,14 @@ const fatias = computed(() => {
   return [
     {
       classe: 'biometria__fatia--ok',
-      rotulo: 'habilitados por biometria',
+      rotulo: t('biometriaPanel.habilitados'),
       cor: 'var(--amber)',
       valor: biometria.value.qt_habilitados_por_biometria,
       percentual: biometria.value.percentual_habilitada,
     },
     {
       classe: 'biometria__fatia--nao',
-      rotulo: 'com biometria não habilitada',
+      rotulo: t('biometriaPanel.naoHabilitada'),
       cor: 'var(--alert)',
       valor: biometria.value.qt_biometria_nao_habilitada,
       percentual: biometria.value.percentual_nao_habilitada,
@@ -42,20 +43,20 @@ const participacao = computed(() => {
 <template>
   <section class="painel biometria" aria-labelledby="biometria-titulo">
     <header class="painel__cabecalho">
-      <h2 id="biometria-titulo">Composição do recorte</h2>
+      <h2 id="biometria-titulo">{{ $t('biometriaPanel.titulo') }}</h2>
       <p class="painel__meta">
-        biometria<br />
-        <b>{{ formatarNumero(biometria?.secoes) }}</b> seções
+        {{ $t('abas.biometria').toLowerCase() }}<br />
+        <b>{{ formatarNumero(biometria?.secoes) }}</b> {{ $t('biometriaPanel.secoes') }}
       </p>
     </header>
 
-    <div v-if="!biometria" class="vazio">Sem composição para o recorte.</div>
+    <div v-if="!biometria" class="vazio">{{ $t('biometriaPanel.vazio') }}</div>
 
     <div v-else class="biometria__corpo">
       <div
         class="biometria__barra"
         role="img"
-        :aria-label="`Comparecimento de ${formatarNumero(biometria.qt_comparecimento)}: ${formatarNumero(biometria.qt_habilitados_por_biometria)} habilitados por biometria e ${formatarNumero(biometria.qt_biometria_nao_habilitada)} com biometria não habilitada`"
+        :aria-label="$t('biometriaPanel.barraAria', { comp: formatarNumero(biometria.qt_comparecimento), hab: formatarNumero(biometria.qt_habilitados_por_biometria), nao: formatarNumero(biometria.qt_biometria_nao_habilitada) })"
       >
         <span
           v-for="fatia in fatias"
@@ -75,40 +76,38 @@ const participacao = computed(() => {
 
       <dl class="leituras__valores">
         <div>
-          <dt>Comparecimento</dt>
+          <dt>{{ $t('kpis.comparecimento') }}</dt>
           <dd>
             {{ formatarNumero(biometria.qt_comparecimento) }}
-            <small>{{ formatarPercentual(biometria.percentual_comparecimento) }} dos aptos</small>
+            <small>{{ $t('kpis.dosAptos', { valor: formatarPercentual(biometria.percentual_comparecimento) }) }}</small>
           </dd>
         </div>
         <div>
-          <dt>Habilitados por biometria</dt>
+          <dt>{{ $t('biometriaPanel.habilitadosDt') }}</dt>
           <dd>
             {{ formatarNumero(biometria.qt_habilitados_por_biometria) }}
             <small>{{ formatarPercentual(biometria.percentual_habilitada) }}</small>
           </dd>
         </div>
         <div>
-          <dt>Com biometria não habilitada</dt>
+          <dt>{{ $t('biometriaPanel.naoHabilitadaDt') }}</dt>
           <dd>
             {{ formatarNumero(biometria.qt_biometria_nao_habilitada) }}
             <small>{{ formatarPercentual(biometria.percentual_nao_habilitada) }}</small>
           </dd>
         </div>
         <div>
-          <dt>Aptos</dt>
+          <dt>{{ $t('versoes.aptos') }}</dt>
           <dd>{{ formatarNumero(biometria.qt_aptos) }}</dd>
         </div>
       </dl>
 
       <p v-if="votosCandidato !== null || biometria.secoes_sem_campo > 0" class="nota">
         <template v-if="votosCandidato !== null">
-          <b>{{ nomeCandidato }}</b> tem {{ formatarNumero(votosCandidato) }} votos neste
-          recorte — {{ formatarPercentual(participacao) }} do comparecimento.
+          <b>{{ nomeCandidato }}</b> {{ $t('biometriaPanel.notaCandidato', { votos: formatarNumero(votosCandidato), pct: formatarPercentual(participacao) }) }}
         </template>
         <template v-if="biometria.secoes_sem_campo > 0">
-          {{ formatarNumero(biometria.secoes_sem_campo) }} seções não trazem o campo e
-          entram como zero.
+          {{ $t('biometriaPanel.notaSemCampo', { n: formatarNumero(biometria.secoes_sem_campo) }) }}
         </template>
       </p>
     </div>

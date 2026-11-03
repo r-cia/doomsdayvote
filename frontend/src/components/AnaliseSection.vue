@@ -19,15 +19,15 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
 <template>
   <section id="analise" class="analise" aria-labelledby="analise-titulo">
     <header class="analise__cabecalho">
-      <h2 id="analise-titulo">Análise</h2>
+      <h2 id="analise-titulo">{{ $t('analise.titulo') }}</h2>
     </header>
 
     <StateBlock
       v-if="error"
       estado="erro"
-      titulo="Não foi possível calcular as análises"
+      :titulo="$t('analise.erro')"
       :descricao="error"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="emit('retry')"
     />
 
@@ -54,7 +54,7 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
       <StateBlock
         v-else-if="loading"
         estado="carregando"
-        titulo="Calculando anomalias"
+        :titulo="$t('analise.calculando')"
       />
     </template>
   </section>

@@ -27,32 +27,32 @@ function numeros(grupo) {
 <template>
   <section class="painel" aria-labelledby="duplicacao-titulo">
     <header class="painel__cabecalho">
-      <h2 id="duplicacao-titulo">Duplicação e proximidade</h2>
+      <h2 id="duplicacao-titulo">{{ $t('duplicacao.titulo') }}</h2>
       <p class="painel__meta">
-        vetor de votos idêntico<br />
-        <b>{{ dados?.total_grupos ?? 0 }}</b> grupos ·
-        {{ dados?.total_secoes ?? 0 }} seções
+        {{ $t('duplicacao.vetor') }}<br />
+        <b>{{ dados?.total_grupos ?? 0 }}</b> {{ $t('duplicacao.grupos') }} ·
+        {{ $t('duplicacao.nSecoes', { n: dados?.total_secoes ?? 0 }) }}
       </p>
     </header>
 
     <div v-if="grupos.length === 0" class="vazio">
-      Nenhum vetor de votos repetido no recorte.
+      {{ $t('duplicacao.vazio') }}
     </div>
 
     <div v-else class="tabela-scroll">
       <table>
         <caption class="sr-only">
-          Grupos de seções com o mesmo vetor de votos
+          {{ $t('duplicacao.caption') }}
         </caption>
         <thead>
           <tr>
-            <th scope="col" class="num">Seções</th>
-            <th scope="col">UF</th>
-            <th scope="col">Município</th>
-            <th scope="col">Zonas</th>
-            <th scope="col">Números</th>
-            <th scope="col">Sinalizadores</th>
-            <th scope="col">Candidato</th>
+            <th scope="col" class="num">{{ $t('duplicacao.secoes') }}</th>
+            <th scope="col">{{ $t('comum.uf') }}</th>
+            <th scope="col">{{ $t('comum.municipio') }}</th>
+            <th scope="col">{{ $t('duplicacao.zonas') }}</th>
+            <th scope="col">{{ $t('duplicacao.numeros') }}</th>
+            <th scope="col">{{ $t('duplicacao.sinalizadores') }}</th>
+            <th scope="col">{{ $t('comum.candidato') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -63,11 +63,11 @@ function numeros(grupo) {
             <td>{{ zonas(grupo) }}</td>
             <td>{{ numeros(grupo) }}</td>
             <td>
-              <span v-if="grupo.mesma_zona" class="chip chip--warn">mesma zona</span>
+              <span v-if="grupo.mesma_zona" class="chip chip--warn">{{ $t('duplicacao.mesmaZona') }}</span>
               <span v-if="grupo.secoes_consecutivas" class="chip chip--alert">
-                consecutivas
+                {{ $t('duplicacao.consecutivas') }}
               </span>
-              <span v-if="grupo.mesmo_municipio" class="chip chip--warn">mesmo município</span>
+              <span v-if="grupo.mesmo_municipio" class="chip chip--warn">{{ $t('duplicacao.mesmoMunicipio') }}</span>
               <template v-if="!grupo.mesma_zona && !grupo.secoes_consecutivas && !grupo.mesmo_municipio">
                 <span
                   v-if="

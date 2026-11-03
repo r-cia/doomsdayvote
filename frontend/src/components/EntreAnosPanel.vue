@@ -4,6 +4,7 @@ import CurvasAnos from './CurvasAnos.vue'
 import StateBlock from './StateBlock.vue'
 import { useComparacaoAnos } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
+import { formatarDecimal } from '../lib/format'
 import { diferencasDoTurno, linhasCorrelacao, seriesDoTurno, turnosDisponiveis } from '../lib/entre-anos'
 
 const { eleicoesDisponiveis } = useSelecaoEleicao()
@@ -48,17 +49,17 @@ const percentual = computed(() => seriesDoTurno(resposta.value, turno.value, 'pc
 const difVotos = computed(() => diferencasDoTurno(resposta.value, turno.value, 'votos'))
 const difPercentual = computed(() => diferencasDoTurno(resposta.value, turno.value, 'pct_acumulada'))
 const correlacao = computed(() => linhasCorrelacao(resposta.value, turno.value))
-const numero = (v, casas) => (v === null || v === undefined ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas }))
+const numero = (v, casas) => formatarDecimal(v, casas)
 </script>
 
 <template>
   <section class="painel" aria-labelledby="entre-anos-titulo" :aria-busy="query.isFetching.value">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Entre anos</p>
-        <h2 id="entre-anos-titulo">Presidente · encerramento das urnas</h2>
+        <p class="painel__etiqueta">{{ $t('entreAnos.etiqueta') }}</p>
+        <h2 id="entre-anos-titulo">{{ $t('entreAnos.titulo') }}</h2>
       </div>
-      <div class="segmented" role="group" aria-label="Anos">
+      <div class="segmented" role="group" :aria-label="$t('entreAnos.anos')">
         <button
           v-for="a in anosDisponiveis"
           :key="a.ano"
@@ -73,20 +74,20 @@ const numero = (v, casas) => (v === null || v === undefined ? '—' : Number(v).
       </div>
     </header>
 
-    <p v-for="aviso in avisos" :key="aviso.ano" class="nota" role="status">{{ aviso.ano }}: SEM_HORARIO</p>
+    <p v-for="aviso in avisos" :key="aviso.ano" class="nota" role="status">{{ $t('entreAnos.semHorario', { ano: aviso.ano }) }}</p>
 
-    <div v-if="selecionados.length < 2" class="vazio">Selecione dois ou mais anos.</div>
-    <StateBlock v-else-if="query.isLoading.value" estado="carregando" titulo="Comparando anos" />
+    <div v-if="selecionados.length < 2" class="vazio">{{ $t('entreAnos.selecione') }}</div>
+    <StateBlock v-else-if="query.isLoading.value" estado="carregando" :titulo="$t('entreAnos.comparando')" />
     <StateBlock
       v-else-if="query.error.value"
       estado="erro"
-      titulo="Não foi possível comparar os anos"
+      :titulo="$t('entreAnos.erro')"
       :descricao="query.error.value.message"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="query.refetch()"
     />
     <template v-else-if="resposta">
-      <div class="abas" role="tablist" aria-label="Turno" @keydown="teclaTurno">
+      <div class="abas" role="tablist" :aria-label="$t('filtros.turno')" @keydown="teclaTurno">
         <button
           v-for="t in turnos"
           :id="`aba-turno-${t}`"
@@ -98,30 +99,30 @@ const numero = (v, casas) => (v === null || v === undefined ? '—' : Number(v).
           :class="{ ativo: turno === t }"
           @click="turno = t"
         >
-          {{ t }}º Turno
+          {{ $t('entreAnos.turno', { n: t }) }}
         </button>
       </div>
 
       <div role="tabpanel" :aria-labelledby="`aba-turno-${turno}`" :class="{ atualizando: query.isFetching.value }">
-        <div v-if="votos.length === 0" class="vazio">Sem dados neste turno.</div>
+        <div v-if="votos.length === 0" class="vazio">{{ $t('entreAnos.semTurno') }}</div>
         <template v-else>
-          <CurvasAnos titulo="Votos por intervalo" escala="log" :series="votos" />
-          <CurvasAnos titulo="Diferença dos votos por intervalo" :series="difVotos" />
-          <CurvasAnos titulo="Porcentagem acumulada" escala="linear" :series="percentual" />
-          <CurvasAnos titulo="Diferença da porcentagem acumulada" :series="difPercentual" />
+          <CurvasAnos :titulo="$t('entreAnos.votosIntervalo')" escala="log" :series="votos" />
+          <CurvasAnos :titulo="$t('entreAnos.difVotos')" :series="difVotos" />
+          <CurvasAnos :titulo="$t('entreAnos.pctAcumulada')" escala="linear" :series="percentual" />
+          <CurvasAnos :titulo="$t('entreAnos.difPct')" :series="difPercentual" />
 
           <div class="tabela-scroll">
             <table>
-              <caption class="sr-only">Correlação entre anos</caption>
+              <caption class="sr-only">{{ $t('entreAnos.correlacao') }}</caption>
               <thead>
                 <tr>
-                  <th scope="col">Anos</th>
-                  <th scope="col" class="num">Turno</th>
-                  <th scope="col">Candidato</th>
-                  <th scope="col" class="num">r (votos)</th>
-                  <th scope="col" class="num">p (votos)</th>
-                  <th scope="col" class="num">r (acumulada)</th>
-                  <th scope="col" class="num">p (acumulada)</th>
+                  <th scope="col">{{ $t('entreAnos.anos') }}</th>
+                  <th scope="col" class="num">{{ $t('filtros.turno') }}</th>
+                  <th scope="col">{{ $t('comum.candidato') }}</th>
+                  <th scope="col" class="num">{{ $t('entreAnos.rVotos') }}</th>
+                  <th scope="col" class="num">{{ $t('entreAnos.pVotos') }}</th>
+                  <th scope="col" class="num">{{ $t('entreAnos.rAcumulada') }}</th>
+                  <th scope="col" class="num">{{ $t('entreAnos.pAcumulada') }}</th>
                 </tr>
               </thead>
               <tbody>

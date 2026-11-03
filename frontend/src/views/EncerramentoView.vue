@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { t } from '../i18n'
 import StateBlock from '../components/StateBlock.vue'
 import ThOrdenavel from '../components/ThOrdenavel.vue'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -38,7 +39,7 @@ const urnas = computed(() => urnasQuery.data.value?.ufs ?? [])
 const municipios = computed(() => municipiosQuery.data.value?.municipios ?? [])
 const secoes = computed(() => secoesQuery.data.value?.secoes ?? [])
 
-const nomeMunicipio = (m) => m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
+const nomeMunicipio = (m) => m.nm_municipio ?? `${t('comum.municipio')} ${m.cd_municipio_tse}`
 const nomeSelecionado = computed(() => {
   const m = municipios.value.find((item) => item.cd_municipio_tse === municipioSelecionado.value)
   return m ? nomeMunicipio(m) : ''
@@ -59,34 +60,34 @@ watch(
   <section class="painel" aria-labelledby="urnas-titulo" :aria-busy="urnasQuery.isFetching.value">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Encerramento</p>
-        <h2 id="urnas-titulo">Urnas</h2>
+        <p class="painel__etiqueta">{{ $t('abas.encerramento') }}</p>
+        <h2 id="urnas-titulo">{{ $t('encerramento.urnas') }}</h2>
       </div>
     </header>
 
-    <StateBlock v-if="urnasQuery.isLoading.value" estado="carregando" titulo="Carregando urnas" />
+    <StateBlock v-if="urnasQuery.isLoading.value" estado="carregando" :titulo="$t('encerramento.carregandoUrnas')" />
     <StateBlock
       v-else-if="urnasQuery.error.value"
       estado="erro"
-      titulo="Não foi possível carregar as urnas"
+      :titulo="$t('encerramento.erroUrnas')"
       :descricao="urnasQuery.error.value.message"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="urnasQuery.refetch()"
     />
-    <StateBlock v-else-if="urnas.length === 0" estado="vazio" titulo="Sem dados" />
+    <StateBlock v-else-if="urnas.length === 0" estado="vazio" :titulo="$t('comum.semDados')" />
 
     <div v-else class="tabela-scroll" :class="{ atualizando: urnasQuery.isFetching.value }">
       <table class="tabela">
         <thead>
           <tr>
-            <ThOrdenavel coluna="sg_uf" :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">UF</ThOrdenavel>
-            <ThOrdenavel coluna="total" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Nº de urnas</ThOrdenavel>
-            <ThOrdenavel coluna="ate_1715" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Até 17:15</ThOrdenavel>
-            <ThOrdenavel coluna="pct_1715" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">% até 17:15</ThOrdenavel>
-            <ThOrdenavel coluna="ate_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Até 19:15</ThOrdenavel>
-            <ThOrdenavel coluna="pct_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">% até 19:15</ThOrdenavel>
-            <ThOrdenavel coluna="apos_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Após 19:15</ThOrdenavel>
-            <ThOrdenavel coluna="pct_apos_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">% após 19:15</ThOrdenavel>
+            <ThOrdenavel coluna="sg_uf" :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('comum.uf') }}</ThOrdenavel>
+            <ThOrdenavel coluna="total" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('encerramento.nUrnas') }}</ThOrdenavel>
+            <ThOrdenavel coluna="ate_1715" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('encerramento.ate1715') }}</ThOrdenavel>
+            <ThOrdenavel coluna="pct_1715" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('encerramento.pctAte1715') }}</ThOrdenavel>
+            <ThOrdenavel coluna="ate_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('encerramento.ate1915') }}</ThOrdenavel>
+            <ThOrdenavel coluna="pct_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('encerramento.pctAte1915') }}</ThOrdenavel>
+            <ThOrdenavel coluna="apos_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('encerramento.apos1915') }}</ThOrdenavel>
+            <ThOrdenavel coluna="pct_apos_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">{{ $t('encerramento.pctApos1915') }}</ThOrdenavel>
           </tr>
         </thead>
         <tbody>
@@ -108,31 +109,31 @@ watch(
   <div class="mesa">
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Municípios com maior % após 17:15</h2>
+        <h2>{{ $t('encerramento.municipios') }}</h2>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
-      <div v-if="!ufSelecionada" class="vazio">Clique em um estado na tabela acima.</div>
-      <StateBlock v-else-if="municipiosQuery.isLoading.value" estado="carregando" titulo="Carregando municípios" />
+      <div v-if="!ufSelecionada" class="vazio">{{ $t('biometriaView.cliqueEstado') }}</div>
+      <StateBlock v-else-if="municipiosQuery.isLoading.value" estado="carregando" :titulo="$t('encerramento.carregandoMunicipios')" />
       <StateBlock
         v-else-if="municipiosQuery.error.value"
         estado="erro"
-        titulo="Não foi possível carregar os municípios"
+        :titulo="$t('encerramento.erroMunicipios')"
         :descricao="municipiosQuery.error.value.message"
-        acao="Tentar novamente"
+        :acao="$t('comum.tentarNovamente')"
         @acao="municipiosQuery.refetch()"
       />
-      <div v-else-if="municipios.length === 0" class="vazio">Sem dados.</div>
+      <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}.</div>
       <div v-else class="tabela-scroll" :class="{ atualizando: municipiosQuery.isFetching.value }">
         <table>
           <thead>
             <tr>
-              <ThOrdenavel coluna="nm_municipio" :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Município</ThOrdenavel>
-              <ThOrdenavel coluna="total" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Total</ThOrdenavel>
-              <ThOrdenavel coluna="apos_1715" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Após 17:15</ThOrdenavel>
+              <ThOrdenavel coluna="nm_municipio" :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('comum.municipio') }}</ThOrdenavel>
+              <ThOrdenavel coluna="total" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('placar.total') }}</ThOrdenavel>
+              <ThOrdenavel coluna="apos_1715" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('encerramento.apos1715') }}</ThOrdenavel>
               <ThOrdenavel coluna="pct_apos_1715" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">%</ThOrdenavel>
-              <ThOrdenavel coluna="partido" :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Partido</ThOrdenavel>
-              <ThOrdenavel coluna="votos" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Votos</ThOrdenavel>
-              <ThOrdenavel coluna="pct_votos" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">% Votos</ThOrdenavel>
+              <ThOrdenavel coluna="partido" :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('comum.partido') }}</ThOrdenavel>
+              <ThOrdenavel coluna="votos" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('comum.votos') }}</ThOrdenavel>
+              <ThOrdenavel coluna="pct_votos" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('encerramento.pctVotos') }}</ThOrdenavel>
             </tr>
           </thead>
           <tbody>
@@ -159,32 +160,32 @@ watch(
 
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Seções com maior % após 17:15</h2>
+        <h2>{{ $t('encerramento.secoes') }}</h2>
         <p v-if="municipioSelecionado" class="card__meta">{{ nomeSelecionado }}</p>
       </div>
-      <div v-if="!municipioSelecionado" class="vazio">Clique em um município.</div>
-      <StateBlock v-else-if="secoesQuery.isLoading.value" estado="carregando" titulo="Carregando seções" />
+      <div v-if="!municipioSelecionado" class="vazio">{{ $t('biometriaView.cliqueMunicipio') }}</div>
+      <StateBlock v-else-if="secoesQuery.isLoading.value" estado="carregando" :titulo="$t('secoes.carregando')" />
       <StateBlock
         v-else-if="secoesQuery.error.value"
         estado="erro"
-        titulo="Não foi possível carregar as seções"
+        :titulo="$t('secoes.erro')"
         :descricao="secoesQuery.error.value.message"
-        acao="Tentar novamente"
+        :acao="$t('comum.tentarNovamente')"
         @acao="secoesQuery.refetch()"
       />
-      <div v-else-if="secoes.length === 0" class="vazio">Sem dados.</div>
+      <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}.</div>
       <div v-else class="tabela-scroll" :class="{ atualizando: secoesQuery.isFetching.value }">
         <table>
           <thead>
             <tr>
-              <ThOrdenavel coluna="nr_zona" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Zona</ThOrdenavel>
-              <ThOrdenavel coluna="nr_secao" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Seção</ThOrdenavel>
-              <ThOrdenavel coluna="dt_encerramento" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Encerramento</ThOrdenavel>
-              <th scope="col">Após 17:15</th>
-              <ThOrdenavel coluna="partido" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Partido</ThOrdenavel>
-              <ThOrdenavel coluna="votos" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Votos</ThOrdenavel>
-              <ThOrdenavel coluna="pct_votos" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">% Votos</ThOrdenavel>
-              <th scope="col"><span class="sr-only">Detalhe</span></th>
+              <ThOrdenavel coluna="nr_zona" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('comum.zona') }}</ThOrdenavel>
+              <ThOrdenavel coluna="nr_secao" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('comum.secao') }}</ThOrdenavel>
+              <ThOrdenavel coluna="dt_encerramento" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('versoes.encerramento') }}</ThOrdenavel>
+              <th scope="col">{{ $t('encerramento.apos1715') }}</th>
+              <ThOrdenavel coluna="partido" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('comum.partido') }}</ThOrdenavel>
+              <ThOrdenavel coluna="votos" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('comum.votos') }}</ThOrdenavel>
+              <ThOrdenavel coluna="pct_votos" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('encerramento.pctVotos') }}</ThOrdenavel>
+              <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -192,12 +193,12 @@ watch(
               <td>{{ s.nr_zona }}</td>
               <td>{{ s.nr_secao }}</td>
               <td class="num">{{ formatarHora(s.dt_encerramento) }}</td>
-              <td>{{ s.apos_1715 ? 'Sim' : 'Não' }}</td>
+              <td>{{ s.apos_1715 ? $t('comum.sim') : $t('comum.nao') }}</td>
               <td>{{ s.partido ?? '—' }}</td>
               <td class="num">{{ formatarNumero(s.votos) }}</td>
               <td class="num">{{ formatarPercentual(s.pct_votos) }}</td>
               <td>
-                <button type="button" class="button button--ghost button--compacto" @click="secaoModalId = s.id">Detalhe</button>
+                <button type="button" class="button button--ghost button--compacto" @click="secaoModalId = s.id">{{ $t('comum.detalhe') }}</button>
               </td>
             </tr>
           </tbody>

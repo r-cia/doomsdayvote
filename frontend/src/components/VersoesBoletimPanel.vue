@@ -27,47 +27,47 @@ const nulo = (valor) => (valor === null || valor === undefined || valor === '' ?
 <template>
   <section class="card" aria-labelledby="secao-versoes" :aria-busy="query.isFetching.value">
     <div class="card__cabecalho">
-      <h2 id="secao-versoes">Versões do Boletim de Urna</h2>
+      <h2 id="secao-versoes">{{ $t('versoes.titulo') }}</h2>
       <label v-if="versoes.length > 1" class="campo campo--curto">
-        <span class="campo__rotulo">Comparar com</span>
+        <span class="campo__rotulo">{{ $t('versoes.compararCom') }}</span>
         <select v-model="compararCom">
-          <option value="">Versão anterior</option>
-          <option v-for="v in versoes.filter((item) => !item.ativo)" :key="v.id" :value="v.versao">Versão {{ v.versao }}</option>
+          <option value="">{{ $t('versoes.anterior') }}</option>
+          <option v-for="v in versoes.filter((item) => !item.ativo)" :key="v.id" :value="v.versao">{{ $t('versoes.versaoN', { n: v.versao }) }}</option>
         </select>
       </label>
     </div>
 
-    <StateBlock v-if="query.isLoading.value" estado="carregando" titulo="Carregando versões" />
+    <StateBlock v-if="query.isLoading.value" estado="carregando" :titulo="$t('versoes.carregando')" />
     <StateBlock
       v-else-if="query.error.value"
       estado="erro"
-      titulo="Não foi possível carregar as versões"
+      :titulo="$t('versoes.erro')"
       :descricao="query.error.value.message"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="query.refetch()"
     />
-    <StateBlock v-else-if="versoes.length === 0" estado="vazio" titulo="Sem versões do Boletim de Urna" />
+    <StateBlock v-else-if="versoes.length === 0" estado="vazio" :titulo="$t('versoes.vazio')" />
     <template v-else>
       <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
         <table>
           <thead>
             <tr>
-              <th scope="col" class="num">Versão</th>
-              <th scope="col">Situação</th>
-              <th scope="col">Abertura</th>
-              <th scope="col">Encerramento</th>
-              <th scope="col">Emissão</th>
-              <th scope="col" class="num">Aptos</th>
-              <th scope="col" class="num">Comparecimento</th>
-              <th scope="col" class="num">Abstenções</th>
-              <th scope="col">Lote</th>
-              <th scope="col">Hash</th>
+              <th scope="col" class="num">{{ $t('versoes.versao') }}</th>
+              <th scope="col">{{ $t('versoes.situacao') }}</th>
+              <th scope="col">{{ $t('versoes.abertura') }}</th>
+              <th scope="col">{{ $t('versoes.encerramento') }}</th>
+              <th scope="col">{{ $t('versoes.emissao') }}</th>
+              <th scope="col" class="num">{{ $t('versoes.aptos') }}</th>
+              <th scope="col" class="num">{{ $t('kpis.comparecimento') }}</th>
+              <th scope="col" class="num">{{ $t('versoes.abstencoes') }}</th>
+              <th scope="col">{{ $t('versoes.lote') }}</th>
+              <th scope="col">{{ $t('versoes.hash') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="v in versoes" :key="v.id">
               <td class="num">{{ v.versao }}</td>
-              <td>{{ v.ativo ? 'Ativa' : 'Substituída' }}</td>
+              <td>{{ v.ativo ? $t('versoes.ativa') : $t('versoes.substituida') }}</td>
               <td>{{ formatarDataHora(v.dt_abertura) }}</td>
               <td>{{ formatarDataHora(v.dt_encerramento) }}</td>
               <td>{{ formatarDataHora(v.dt_emissao_bu) }}</td>
@@ -81,18 +81,18 @@ const nulo = (valor) => (valor === null || valor === undefined || valor === '' ?
         </table>
       </div>
 
-      <div v-if="!comparacao" class="vazio">Não há versão anterior para comparar.</div>
+      <div v-if="!comparacao" class="vazio">{{ $t('versoes.semAnterior') }}</div>
       <template v-else>
-        <h3>Campos alterados (versão {{ comparacao.anterior }} → {{ comparacao.atual }})</h3>
-        <div v-if="comparacao.campos_alterados.length === 0" class="vazio">Nenhum campo alterado.</div>
+        <h3>{{ $t('versoes.camposAlterados', { de: comparacao.anterior, para: comparacao.atual }) }}</h3>
+        <div v-if="comparacao.campos_alterados.length === 0" class="vazio">{{ $t('versoes.nenhumCampo') }}</div>
         <div v-else class="tabela-scroll">
           <table>
             <thead>
               <tr>
-                <ThOrdenavel coluna="campo" :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">Campo</ThOrdenavel>
-                <ThOrdenavel coluna="anterior" :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">Anterior</ThOrdenavel>
-                <ThOrdenavel coluna="atual" :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">Atual</ThOrdenavel>
-                <ThOrdenavel coluna="diferenca" numero :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">Diferença</ThOrdenavel>
+                <ThOrdenavel coluna="campo" :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">{{ $t('divergencias.campo') }}</ThOrdenavel>
+                <ThOrdenavel coluna="anterior" :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">{{ $t('versoes.colAnterior') }}</ThOrdenavel>
+                <ThOrdenavel coluna="atual" :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">{{ $t('versoes.colAtual') }}</ThOrdenavel>
+                <ThOrdenavel coluna="diferenca" numero :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">{{ $t('consistencia.diferenca') }}</ThOrdenavel>
               </tr>
             </thead>
             <tbody>
@@ -106,17 +106,17 @@ const nulo = (valor) => (valor === null || valor === undefined || valor === '' ?
           </table>
         </div>
 
-        <h3>Votáveis alterados</h3>
-        <div v-if="comparacao.votaveis_alterados.length === 0" class="vazio">Nenhum votável alterado.</div>
+        <h3>{{ $t('versoes.votaveisAlterados') }}</h3>
+        <div v-if="comparacao.votaveis_alterados.length === 0" class="vazio">{{ $t('versoes.nenhumVotavel') }}</div>
         <div v-else class="tabela-scroll">
           <table>
             <thead>
               <tr>
-                <ThOrdenavel coluna="nr_votavel" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">Número</ThOrdenavel>
-                <ThOrdenavel coluna="nm_votavel" :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">Nome</ThOrdenavel>
-                <ThOrdenavel coluna="anterior" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">Anterior</ThOrdenavel>
-                <ThOrdenavel coluna="atual" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">Atual</ThOrdenavel>
-                <ThOrdenavel coluna="diferenca" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">Diferença</ThOrdenavel>
+                <ThOrdenavel coluna="nr_votavel" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">{{ $t('versoes.numero') }}</ThOrdenavel>
+                <ThOrdenavel coluna="nm_votavel" :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">{{ $t('secoes.nome') }}</ThOrdenavel>
+                <ThOrdenavel coluna="anterior" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">{{ $t('versoes.colAnterior') }}</ThOrdenavel>
+                <ThOrdenavel coluna="atual" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">{{ $t('versoes.colAtual') }}</ThOrdenavel>
+                <ThOrdenavel coluna="diferenca" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">{{ $t('consistencia.diferenca') }}</ThOrdenavel>
               </tr>
             </thead>
             <tbody>

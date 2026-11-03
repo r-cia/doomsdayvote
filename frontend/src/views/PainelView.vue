@@ -104,13 +104,13 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
   <StateBlock
     v-if="resumoQuery.error.value"
     estado="erro"
-    titulo="Não foi possível carregar o resumo"
+    :titulo="$t('painel.erroResumo')"
     :descricao="resumoQuery.error.value.message"
-    acao="Tentar novamente"
+    :acao="$t('comum.tentarNovamente')"
     @acao="resumoQuery.refetch()"
   />
 
-  <section class="mesa" aria-label="Mesa de plotagem e placar">
+  <section class="mesa" :aria-label="$t('painel.mesaAria')">
     <PlotDia
       :series="timelineQuery.data.value?.series ?? []"
       :pontos="timelineQuery.data.value?.pontos ?? []"
@@ -132,7 +132,7 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
     />
   </section>
 
-  <section class="leituras" aria-label="Composição do recorte">
+  <section class="leituras" :aria-label="$t('painel.composicaoAria')">
     <BiometriaPanel
       :dados="analiseQuery.data.value?.biometria ?? null"
       :votos-candidato="votosDoCandidato"

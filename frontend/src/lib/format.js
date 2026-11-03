@@ -1,21 +1,22 @@
+import { i18n, t } from '../i18n'
+
 const FUSO = 'America/Sao_Paulo'
 
-const formatadorNumero = new Intl.NumberFormat('pt-BR')
-const formatadorDataHora = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: FUSO,
-  dateStyle: 'short',
-  timeStyle: 'short',
-})
-const formatadorData = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: FUSO,
-  dateStyle: 'short',
-})
-const formatadorHora = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: FUSO,
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-})
+const idioma = () => i18n.global.locale.value
+const cache = new Map()
+
+function intl(Classe, locale, opcoes, rotulo) {
+  const chave = `${rotulo}:${locale}`
+  if (!cache.has(chave)) cache.set(chave, new Classe(locale, opcoes))
+  return cache.get(chave)
+}
+
+const formatadorNumero = () => intl(Intl.NumberFormat, idioma(), undefined, 'numero')
+const formatadorDataHora = () =>
+  intl(Intl.DateTimeFormat, idioma(), { timeZone: FUSO, dateStyle: 'short', timeStyle: 'short' }, 'datahora')
+const formatadorData = () => intl(Intl.DateTimeFormat, idioma(), { timeZone: FUSO, dateStyle: 'short' }, 'data')
+const formatadorHora = () =>
+  intl(Intl.DateTimeFormat, idioma(), { timeZone: FUSO, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }, 'hora')
 const formatadorPartes = new Intl.DateTimeFormat('en-CA', {
   timeZone: FUSO,
   year: 'numeric',
@@ -33,39 +34,46 @@ const formatadorOffset = new Intl.DateTimeFormat('en-US', {
 export function formatarNumero(valor) {
   if (valor === null || valor === undefined || valor === '') return '—'
   const numero = Number(valor)
-  return Number.isFinite(numero) ? formatadorNumero.format(numero) : '—'
+  return Number.isFinite(numero) ? formatadorNumero().format(numero) : '—'
 }
 
-export function formatarPercentual(valor, casas = 2) {
+export function formatarDecimal(valor, casas = 1) {
   if (valor === null || valor === undefined || valor === '') return '—'
   const numero = Number(valor)
   if (!Number.isFinite(numero)) return '—'
-  return `${new Intl.NumberFormat('pt-BR', {
-    minimumFractionDigits: casas,
-    maximumFractionDigits: casas,
-  }).format(numero)}%`
+  return intl(
+    Intl.NumberFormat,
+    idioma(),
+    { minimumFractionDigits: casas, maximumFractionDigits: casas },
+    `decimal${casas}`,
+  ).format(numero)
+}
+
+export function formatarPercentual(valor, casas = 2) {
+  const texto = formatarDecimal(valor, casas)
+  return texto === '—' ? texto : `${texto}%`
 }
 
 export function formatarDataHora(valor) {
   if (!valor) return '—'
   const data = valor instanceof Date ? valor : new Date(valor)
-  return Number.isNaN(data.getTime()) ? '—' : formatadorDataHora.format(data)
+  return Number.isNaN(data.getTime()) ? '—' : formatadorDataHora().format(data)
 }
 
 export function formatarData(valor) {
   if (!valor) return '—'
   if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
     const [ano, mes, dia] = valor.split('-')
-    return `${dia}/${mes}/${ano}`
+    return formatadorData().format(new Date(Date.UTC(ano, mes - 1, dia, 12)))
   }
   const data = valor instanceof Date ? valor : new Date(valor)
-  return Number.isNaN(data.getTime()) ? '—' : formatadorData.format(data)
+  return Number.isNaN(data.getTime()) ? '—' : formatadorData().format(data)
 }
 
 export function formatarHora(valor) {
   if (!valor) return '—'
   const data = valor instanceof Date ? valor : new Date(valor)
-  return Number.isNaN(data.getTime()) ? '—' : formatadorHora.format(data)
+  return Number.isNaN(data.getTime()) ? '—' : formatadorHora().format(data)
 }
 
 export function formatarSha(valor, tamanho = 12) {
@@ -104,14 +112,14 @@ export function deInputSaoPaulo(valor) {
 }
 
 export function formatarCorte(corte) {
-  if (!corte) return 'Corte final'
+  if (!corte) return t('corte.final')
   if (corte.tipo === 'recebimento_intradiario' && corte.as_of) {
-    return `Corte até ${formatarDataHora(corte.as_of)}`
+    return t('corte.ate', { quando: formatarDataHora(corte.as_of) })
   }
   if (corte.tipo === 'recebimento_diario' && corte.as_of_date) {
-    return `Corte até ${formatarData(corte.as_of_date)}`
+    return t('corte.ate', { quando: formatarData(corte.as_of_date) })
   }
-  return 'Corte final'
+  return t('corte.final')
 }
 
 export function truncar(texto, tamanho = 60) {
@@ -125,9 +133,7 @@ export function formatarDuracao(ms) {
   const total = Number(ms)
   if (!Number.isFinite(total)) return '—'
   const segundos = total / 1000
-  if (segundos < 60) {
-    return `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(segundos)} s`
-  }
+  if (segundos < 60) return `${formatarDecimal(Math.round(segundos * 10) / 10, 0 + (segundos % 1 ? 1 : 0))} s`
   const minutos = Math.floor(segundos / 60)
   return `${minutos} min ${Math.round(segundos - minutos * 60)} s`
 }

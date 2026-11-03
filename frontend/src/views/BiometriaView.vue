@@ -5,6 +5,7 @@ import { api } from '../api/client'
 import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
+import { t } from '../i18n'
 import BiometriaUfPanel from '../components/BiometriaUfPanel.vue'
 import BiometriaFaixasPanel from '../components/BiometriaFaixasPanel.vue'
 
@@ -71,7 +72,7 @@ watch(ordenarSecoes, () => {
 })
 
 function nomeMunicipio(m) {
-  return m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
+  return m.nm_municipio ?? `${t('comum.municipio')} ${m.cd_municipio_tse}`
 }
 
 function abrirSecao(item) {
@@ -90,25 +91,25 @@ function abrirSecao(item) {
   <div class="mesa">
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Municípios com maior biometria não habilitada</h2>
+        <h2>{{ $t('biometriaView.municipios') }}</h2>
         <div class="uf-painel__acoes">
           <select v-if="ufSelecionada" v-model="ordenarMunicipios" class="uf-ordenacao">
-            <option value="nao_habilitada">Não habilitada</option>
-            <option value="percentual">% não habilitada</option>
-            <option value="comparecimento">Comparecimento</option>
+            <option value="nao_habilitada">{{ $t('biometriaView.naoHabilitada') }}</option>
+            <option value="percentual">{{ $t('biometriaUf.pctNaoHabilitada') }}</option>
+            <option value="comparecimento">{{ $t('kpis.comparecimento') }}</option>
           </select>
         </div>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
-      <div v-if="!ufSelecionada" class="vazio">Clique em um estado na tabela acima.</div>
-      <div v-else-if="carregandoMunicipios" class="vazio">Carregando…</div>
-      <div v-else-if="municipios.length === 0" class="vazio">Sem dados.</div>
+      <div v-if="!ufSelecionada" class="vazio">{{ $t('biometriaView.cliqueEstado') }}</div>
+      <div v-else-if="carregandoMunicipios" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}.</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
             <tr>
-              <th scope="col">Município</th>
-              <th scope="col" class="num">Não habilitada</th>
+              <th scope="col">{{ $t('comum.municipio') }}</th>
+              <th scope="col" class="num">{{ $t('biometriaView.naoHabilitada') }}</th>
               <th scope="col" class="num">%</th>
             </tr>
           </thead>
@@ -130,30 +131,30 @@ function abrirSecao(item) {
 
     <div class="card">
       <div class="card__cabecalho">
-        <h2>Seções com maior % não habilitada</h2>
+        <h2>{{ $t('biometriaView.secoes') }}</h2>
         <div class="uf-painel__acoes">
           <select v-if="municipioSelecionado" v-model="ordenarSecoes" class="uf-ordenacao">
-            <option value="percentual">% não habilitada</option>
-            <option value="nao_habilitada">Não habilitada</option>
-            <option value="comparecimento">Comparecimento</option>
+            <option value="percentual">{{ $t('biometriaUf.pctNaoHabilitada') }}</option>
+            <option value="nao_habilitada">{{ $t('biometriaView.naoHabilitada') }}</option>
+            <option value="comparecimento">{{ $t('kpis.comparecimento') }}</option>
           </select>
         </div>
         <p v-if="municipioSelecionado" class="card__meta">
           {{ nomeMunicipio(municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}) }}
         </p>
       </div>
-      <div v-if="!municipioSelecionado" class="vazio">Clique em um município.</div>
-      <div v-else-if="carregandoSecoes" class="vazio">Carregando…</div>
-      <div v-else-if="secoes.length === 0" class="vazio">Sem dados.</div>
+      <div v-if="!municipioSelecionado" class="vazio">{{ $t('biometriaView.cliqueMunicipio') }}</div>
+      <div v-else-if="carregandoSecoes" class="vazio">{{ $t('comum.carregando') }}</div>
+      <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}.</div>
       <div v-else class="tabela-scroll">
         <table>
           <thead>
             <tr>
-              <th scope="col">Zona</th>
-              <th scope="col">Seção</th>
-              <th scope="col" class="num">Não habilitada</th>
+              <th scope="col">{{ $t('comum.zona') }}</th>
+              <th scope="col">{{ $t('comum.secao') }}</th>
+              <th scope="col" class="num">{{ $t('biometriaView.naoHabilitada') }}</th>
               <th scope="col" class="num">%</th>
-              <th scope="col"><span class="sr-only">Detalhe</span></th>
+              <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -168,7 +169,7 @@ function abrirSecao(item) {
                   class="button button--ghost button--compacto"
                   @click="abrirSecao(s)"
                 >
-                  Detalhe
+                  {{ $t('comum.detalhe') }}
                 </button>
               </td>
             </tr>

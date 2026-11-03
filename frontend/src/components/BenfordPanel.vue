@@ -1,7 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { formatarNumero } from '../lib/format'
+import { useI18n } from 'vue-i18n'
+import { formatarNumero, formatarPercentual } from '../lib/format'
 
+const { t } = useI18n()
 const props = defineProps({
   dados: { type: Object, default: null },
   niveis: { type: Object, default: null },
@@ -12,9 +14,9 @@ const props = defineProps({
 const emit = defineEmits(['select'])
 
 const NIVEIS = [
-  ['secao', 'Seção'],
-  ['zona', 'Zona'],
-  ['municipio', 'Município'],
+  ['secao', 'comum.secao'],
+  ['zona', 'comum.zona'],
+  ['municipio', 'comum.municipio'],
 ]
 const nivel = ref('secao')
 
@@ -70,21 +72,20 @@ function formatarMad(valor) {
   })
 }
 
-const pct = (valor) => `${Number(valor).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%`
+const pct = (valor) => formatarPercentual(valor)
 
 function titulo(d) {
   const faixa = faixaDe(d.digito)
-  return `Dígito ${d.digito}: observado ${pct(d.observado_percentual)}, esperado ${pct(d.esperado_percentual)}${
-    faixa ? `, faixa de 95% de ${pct(faixa.p025)} a ${pct(faixa.p975)}` : ''
-  }`
+  return t('benford.digito', { d: d.digito, obs: pct(d.observado_percentual), esp: pct(d.esperado_percentual) }) +
+    (faixa ? t('benford.faixaDe', { de: pct(faixa.p025), ate: pct(faixa.p975) }) : '')
 }
 </script>
 
 <template>
   <section class="painel" aria-labelledby="benford-titulo">
     <header class="painel__cabecalho">
-      <h2 id="benford-titulo">Benford · todos os candidatos</h2>
-      <div class="segmented" role="group" aria-label="Nível">
+      <h2 id="benford-titulo">{{ $t('benford.titulo') }}</h2>
+      <div class="segmented" role="group" :aria-label="$t('benford.nivel')">
         <button
           v-for="[chave, rotulo] in NIVEIS"
           :key="chave"
@@ -93,30 +94,30 @@ function titulo(d) {
           :class="{ ativo: nivel === chave }"
           @click="nivel = chave"
         >
-          {{ rotulo }}
+          {{ $t(rotulo) }}
         </button>
       </div>
       <p class="painel__meta">
-        primeiro dígito<br />
-        <b>{{ formatarNumero(resultado?.n) }}</b> {{ nivel === 'secao' ? 'seções' : 'unidades' }}
+        {{ $t('benford.primeiroDigito') }}<br />
+        <b>{{ formatarNumero(resultado?.n) }}</b> {{ nivel === 'secao' ? $t('benford.secoes') : $t('benford.unidades') }}
       </p>
     </header>
 
     <div v-if="!dados || candidatos.length === 0" class="vazio">
-      Nenhuma seção com {{ minimo }} votos ou mais no corte atual.
+      {{ $t('benford.vazio', { minimo }) }}
     </div>
 
     <template v-else>
       <div class="benford">
         <div class="benford__grafico-wrap">
-          <p v-if="aguardandoNivel" class="vazio">Carregando…</p>
-          <p v-else-if="digitos.length === 0" class="vazio">Sem dados</p>
+          <p v-if="aguardandoNivel" class="vazio">{{ $t('comum.carregando') }}</p>
+          <p v-else-if="digitos.length === 0" class="vazio">{{ $t('comum.semDados') }}</p>
           <template v-else>
             <svg
               class="benford__svg"
               :viewBox="`0 0 ${L} ${A}`"
               role="img"
-              :aria-label="`Distribuição do primeiro dígito dos votos de ${ativo?.nm_votavel}, comparada à lei de Benford`"
+              :aria-label="$t('benford.aria', { nome: ativo?.nm_votavel })"
             >
               <g v-for="(d, i) in digitos" :key="d.digito">
                 <rect
@@ -143,9 +144,9 @@ function titulo(d) {
               <text class="benford__rotulo" :x="MARGEM.esq - 4" :y="y(0)" text-anchor="end">0%</text>
             </svg>
             <p class="benford__legenda">
-              <span><i class="benford__chave benford__chave--obs" aria-hidden="true" /> Observado</span>
-              <span><i class="benford__chave benford__chave--esp" aria-hidden="true" /> Esperado</span>
-              <span v-if="faixas"><i class="benford__chave benford__chave--faixa" aria-hidden="true" /> Faixa de 95% (Monte Carlo)</span>
+              <span><i class="benford__chave benford__chave--obs" aria-hidden="true" /> {{ $t('benford.observado') }}</span>
+              <span><i class="benford__chave benford__chave--esp" aria-hidden="true" /> {{ $t('benford.esperado') }}</span>
+              <span v-if="faixas"><i class="benford__chave benford__chave--faixa" aria-hidden="true" /> {{ $t('benford.faixa') }}</span>
             </p>
           </template>
         </div>
@@ -153,11 +154,11 @@ function titulo(d) {
         <div class="benford__tabela">
           <table>
             <caption class="sr-only">
-              Aderência à lei de Benford por candidato no corte atual
+              {{ $t('benford.caption') }}
             </caption>
             <thead>
               <tr>
-                <th scope="col">Candidato</th>
+                <th scope="col">{{ $t('comum.candidato') }}</th>
                 <th scope="col" class="num">n</th>
                 <th scope="col" class="num">MAD</th>
               </tr>
@@ -187,7 +188,7 @@ function titulo(d) {
 
       <div class="benford__rodape">
         <p class="nota">
-          <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> seções abaixo do mínimo
+          <b>{{ formatarNumero(ativo?.secoes_abaixo_minimo) }}</b> {{ $t('benford.abaixoMinimo') }}
         </p>
       </div>
     </template>

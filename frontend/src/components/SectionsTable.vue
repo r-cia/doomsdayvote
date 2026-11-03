@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import { formatarData, formatarDataHora, formatarNumero } from '../lib/format'
 import { motivoSecao, opcoesStatus, statusSecao } from '../lib/status'
@@ -35,12 +36,13 @@ const pagina = computed(() => Number(props.data?.page ?? 1))
 const totalPaginas = computed(() =>
   Math.max(1, Math.ceil(total.value / Math.max(1, props.pageSize))),
 )
-const statusDisponiveis = opcoesStatus()
+const { t } = useI18n()
+const statusDisponiveis = computed(() => opcoesStatus())
 
 const contexto = computed(() => {
   const partes = []
   if (props.uf) partes.push(props.uf)
-  if (props.municipio) partes.push(`município ${props.municipio}`)
+  if (props.municipio) partes.push(`${t('comum.municipio').toLowerCase()} ${props.municipio}`)
   return partes.join(' · ')
 })
 
@@ -79,30 +81,30 @@ function navegarLinhas(evento) {
   <section class="card secoes" aria-labelledby="secoes-titulo">
     <div class="card__cabecalho">
       <div>
-        <h2 id="secoes-titulo">Seções eleitorais</h2>
+        <h2 id="secoes-titulo">{{ $t('secoes.titulo') }}</h2>
         <p v-if="uf">
-          {{ formatarNumero(total) }} seções no filtro.
-          <template v-if="contexto">Escopo: {{ contexto }}.</template>
+          {{ $t('secoes.noFiltro', { n: formatarNumero(total) }) }}
+          <template v-if="contexto">{{ $t('secoes.escopo', { contexto }) }}</template>
         </p>
       </div>
     </div>
 
-    <p v-if="!uf" class="vazio">Selecione um estado.</p>
+    <p v-if="!uf" class="vazio">{{ $t('secoes.selecioneUf') }}</p>
 
     <template v-else>
       <div class="secoes__barra">
         <label class="campo campo--busca">
-          <span>Município</span>
+          <span>{{ $t('comum.municipio') }}</span>
           <input
             type="text"
-            placeholder="Nome"
+            :placeholder="$t('secoes.nome')"
             :value="municipioNome"
             @change="emit('update:municipio-nome', $event.target.value)"
           />
         </label>
 
         <label class="campo campo--curto">
-          <span>Zona</span>
+          <span>{{ $t('comum.zona') }}</span>
           <input
             type="number"
             min="1"
@@ -112,7 +114,7 @@ function navegarLinhas(evento) {
         </label>
 
         <label class="campo campo--curto">
-          <span>Seção</span>
+          <span>{{ $t('comum.secao') }}</span>
           <input
             type="number"
             min="1"
@@ -122,12 +124,12 @@ function navegarLinhas(evento) {
         </label>
 
         <label class="campo campo--curto">
-          <span>Status</span>
+          <span>{{ $t('secoes.status') }}</span>
           <select
             :value="status"
             @change="emit('update:status', $event.target.value)"
           >
-            <option value="">Todos</option>
+            <option value="">{{ $t('comum.todos') }}</option>
             <option
               v-for="opcao in statusDisponiveis"
               :key="opcao.valor"
@@ -139,7 +141,7 @@ function navegarLinhas(evento) {
         </label>
 
         <label class="campo campo--curto">
-          <span>Por página</span>
+          <span>{{ $t('secoes.porPagina') }}</span>
           <select
             :value="pageSize"
             @change="emit('update:page-size', Number($event.target.value))"
@@ -154,37 +156,37 @@ function navegarLinhas(evento) {
       <StateBlock
         v-if="error"
         estado="erro"
-        titulo="Não foi possível carregar as seções"
+        :titulo="$t('secoes.erro')"
         :descricao="error"
-        acao="Tentar novamente"
+        :acao="$t('comum.tentarNovamente')"
         @acao="emit('retry')"
       />
       <StateBlock
         v-else-if="loading && !data"
         estado="carregando"
-        titulo="Carregando seções"
+        :titulo="$t('secoes.carregando')"
       />
-      <p v-else-if="itens.length === 0" class="vazio">Nenhuma seção encontrada.</p>
+      <p v-else-if="itens.length === 0" class="vazio">{{ $t('secoes.nenhuma') }}</p>
 
       <template v-else>
         <p v-if="loading" class="secoes__atualizando" role="status">
-          Atualizando…
+          {{ $t('secoes.atualizando') }}
         </p>
         <div class="tabela-scroll">
           <table ref="tabela" @keydown="navegarLinhas">
             <caption class="sr-only">
-              Seções eleitorais com status e horário de recebimento do BU
+              {{ $t('secoes.caption') }}
             </caption>
             <thead>
               <tr>
-                <th scope="col">UF</th>
-                <th scope="col">Município</th>
-                <th scope="col" class="num">Zona</th>
-                <th scope="col" class="num">Seção</th>
-                <th scope="col" class="num">Local</th>
-                <th scope="col">Status</th>
-                <th scope="col">BU recebido</th>
-                <th scope="col"><span class="sr-only">Ação</span></th>
+                <th scope="col">{{ $t('comum.uf') }}</th>
+                <th scope="col">{{ $t('comum.municipio') }}</th>
+                <th scope="col" class="num">{{ $t('comum.zona') }}</th>
+                <th scope="col" class="num">{{ $t('comum.secao') }}</th>
+                <th scope="col" class="num">{{ $t('secoes.local') }}</th>
+                <th scope="col">{{ $t('secoes.status') }}</th>
+                <th scope="col">{{ $t('secoes.buRecebido') }}</th>
+                <th scope="col"><span class="sr-only">{{ $t('secoes.acao') }}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -214,7 +216,7 @@ function navegarLinhas(evento) {
                     data-secao-btn
                     @click="emit('select', item)"
                   >
-                    Detalhe
+                    {{ $t('comum.detalhe') }}
                   </button>
                 </td>
               </tr>
@@ -222,8 +224,8 @@ function navegarLinhas(evento) {
           </table>
         </div>
 
-        <nav class="paginacao" aria-label="Paginação das seções">
-          <span>Página {{ pagina }} de {{ totalPaginas }}</span>
+        <nav class="paginacao" :aria-label="$t('secoes.paginacaoAria')">
+          <span>{{ $t('secoes.pagina', { pagina, total: totalPaginas }) }}</span>
           <div class="paginacao__botoes">
             <button
               type="button"
@@ -231,7 +233,7 @@ function navegarLinhas(evento) {
               :disabled="pagina <= 1"
               @click="irPara(1)"
             >
-              Primeira
+              {{ $t('secoes.primeira') }}
             </button>
             <button
               type="button"
@@ -239,7 +241,7 @@ function navegarLinhas(evento) {
               :disabled="pagina <= 1"
               @click="irPara(pagina - 1)"
             >
-              Anterior
+              {{ $t('secoes.anterior') }}
             </button>
             <button
               type="button"
@@ -247,7 +249,7 @@ function navegarLinhas(evento) {
               :disabled="pagina >= totalPaginas"
               @click="irPara(pagina + 1)"
             >
-              Próxima
+              {{ $t('secoes.proxima') }}
             </button>
             <button
               type="button"
@@ -255,7 +257,7 @@ function navegarLinhas(evento) {
               :disabled="pagina >= totalPaginas"
               @click="irParaUltima"
             >
-              Última
+              {{ $t('secoes.ultima') }}
             </button>
           </div>
         </nav>

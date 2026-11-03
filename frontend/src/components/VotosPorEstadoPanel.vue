@@ -79,24 +79,24 @@ function seta(coluna) {
   <section class="painel" aria-labelledby="votos-estado-titulo">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Distribuição</p>
-        <h2 id="votos-estado-titulo">Votos por estado</h2>
+        <p class="painel__etiqueta">{{ $t('votosEstado.etiqueta') }}</p>
+        <h2 id="votos-estado-titulo">{{ $t('votosEstado.titulo') }}</h2>
       </div>
     </header>
 
     <div v-if="ufs.length === 0 || listaCandidatos.length === 0" class="vazio">
-      Sem dados por estado para o corte atual.
+      {{ $t('votosEstado.semDados') }}
     </div>
 
     <div v-else class="tabela-scroll">
       <table class="tabela-votos-estado">
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">Candidato{{ seta('nm_votavel') }}</th>
+            <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">{{ $t('comum.candidato') }}{{ seta('nm_votavel') }}</th>
             <th v-for="area in ufs" :key="area.sg_uf" scope="col" class="num">
               {{ area.sg_uf }}
             </th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">Total{{ seta('total') }}</th>
+            <th scope="col" class="num ordenavel" @click="alternar('total')">{{ $t('placar.total') }}{{ seta('total') }}</th>
           </tr>
         </thead>
         <tbody>

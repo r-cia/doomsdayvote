@@ -17,7 +17,7 @@ const lista = computed(() => {
 </script>
 
 <template>
-  <div v-if="lista.length" class="avisos" role="status" aria-label="Avisos dos dados">
+  <div v-if="lista.length" class="avisos" role="status" :aria-label="$t('avisos.aria')">
     <article
       v-for="aviso in lista"
       :key="aviso.codigo"
@@ -25,7 +25,7 @@ const lista = computed(() => {
       :class="`aviso--${avisoInfo(aviso.codigo).tom}`"
     >
       <strong>{{ avisoInfo(aviso.codigo).rotulo }}</strong>
-      <p>{{ aviso.mensagem }}</p>
+      <p>{{ $te(`avisos.mensagem.${aviso.codigo}`) ? $t(`avisos.mensagem.${aviso.codigo}`) : aviso.mensagem }}</p>
     </article>
   </div>
 </template>

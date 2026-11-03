@@ -39,44 +39,44 @@ const percentual = (fracao) => (fracao === null || fracao === undefined ? null :
 <template>
   <div :aria-busy="query.isFetching.value">
     <p v-if="cobertura" class="painel__meta">
-      <b>{{ formatarNumero(cobertura.consideradas) }}</b> consideradas · {{ formatarNumero(cobertura.com_contexto) }} com contexto ·
-      {{ formatarNumero(cobertura.sem_contexto) }} sem contexto<br />
-      {{ formatarNumero(cobertura.grupos) }} grupos · {{ formatarNumero(cobertura.grupos_insuficientes) }} grupos insuficientes ·
-      {{ formatarNumero(cobertura.faixas_aptos) }} faixas de aptos
+      <b>{{ formatarNumero(cobertura.consideradas) }}</b> {{ $t('consistencia.consideradas') }} · {{ $t('concentracao.comContexto', { n: formatarNumero(cobertura.com_contexto) }) }} ·
+      {{ $t('concentracao.semContexto', { n: formatarNumero(cobertura.sem_contexto) }) }}<br />
+      {{ $t('concentracao.grupos', { n: formatarNumero(cobertura.grupos) }) }} · {{ $t('concentracao.gruposInsuficientes', { n: formatarNumero(cobertura.grupos_insuficientes) }) }} ·
+      {{ $t('concentracao.faixasAptos', { n: formatarNumero(cobertura.faixas_aptos) }) }}
     </p>
 
-    <StateBlock v-if="query.isLoading.value" estado="carregando" titulo="Carregando concentração" />
+    <StateBlock v-if="query.isLoading.value" estado="carregando" :titulo="$t('concentracao.carregando')" />
     <StateBlock
       v-else-if="query.error.value"
       estado="erro"
-      titulo="Não foi possível carregar a concentração"
+      :titulo="$t('concentracao.erro')"
       :descricao="query.error.value.message"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="query.refetch()"
     />
-    <StateBlock v-else-if="itens.length === 0" estado="vazio" titulo="Sem seções no recorte" />
+    <StateBlock v-else-if="itens.length === 0" estado="vazio" :titulo="$t('concentracao.vazio')" />
     <template v-else>
       <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
         <table>
           <thead>
             <tr>
               <th scope="col" class="num">#</th>
-              <ThOrdenavel coluna="sg_uf" :ordenacao="atual.ordenacao.value" @ordenar="ordenar">UF</ThOrdenavel>
-              <ThOrdenavel coluna="nm_municipio" :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Município</ThOrdenavel>
-              <ThOrdenavel coluna="nr_zona" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Zona</ThOrdenavel>
-              <ThOrdenavel coluna="nr_secao" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Seção</ThOrdenavel>
+              <ThOrdenavel coluna="sg_uf" :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('comum.uf') }}</ThOrdenavel>
+              <ThOrdenavel coluna="nm_municipio" :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('comum.municipio') }}</ThOrdenavel>
+              <ThOrdenavel coluna="nr_zona" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('comum.zona') }}</ThOrdenavel>
+              <ThOrdenavel coluna="nr_secao" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('comum.secao') }}</ThOrdenavel>
               <template v-if="visao === 'margem'">
-                <ThOrdenavel coluna="margem_absoluta" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Margem</ThOrdenavel>
-                <ThOrdenavel coluna="margem_pp" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Margem (pp)</ThOrdenavel>
-                <ThOrdenavel coluna="share_lider" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Participação do líder</ThOrdenavel>
+                <ThOrdenavel coluna="margem_absoluta" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('concentracao.margem') }}</ThOrdenavel>
+                <ThOrdenavel coluna="margem_pp" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('concentracao.margemPp') }}</ThOrdenavel>
+                <ThOrdenavel coluna="share_lider" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('destaque.share') }}</ThOrdenavel>
               </template>
               <template v-else>
-                <ThOrdenavel coluna="share_lider" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Participação do líder</ThOrdenavel>
-                <ThOrdenavel coluna="margem_absoluta" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Margem</ThOrdenavel>
-                <ThOrdenavel coluna="share_lider_percentil" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">Percentil</ThOrdenavel>
+                <ThOrdenavel coluna="share_lider" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('destaque.share') }}</ThOrdenavel>
+                <ThOrdenavel coluna="margem_absoluta" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('concentracao.margem') }}</ThOrdenavel>
+                <ThOrdenavel coluna="share_lider_percentil" numero :ordenacao="atual.ordenacao.value" @ordenar="ordenar">{{ $t('concentracao.percentil') }}</ThOrdenavel>
               </template>
-              <th scope="col">Candidato</th>
-              <th scope="col"><span class="sr-only">Abrir</span></th>
+              <th scope="col">{{ $t('comum.candidato') }}</th>
+              <th scope="col"><span class="sr-only">{{ $t('comum.abrir') }}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -98,7 +98,7 @@ const percentual = (fracao) => (fracao === null || fracao === undefined ? null :
               </template>
               <td>{{ i.lider ? `${i.lider.nm_votavel} (${i.lider.sg_partido ?? '—'})` : '—' }}</td>
               <td>
-                <RouterLink class="button button--ghost button--compacto" :to="`/secoes/${i.secao.id}`">Abrir seção</RouterLink>
+                <RouterLink class="button button--ghost button--compacto" :to="`/secoes/${i.secao.id}`">{{ $t('comum.abrirSecao') }}</RouterLink>
               </td>
             </tr>
           </tbody>

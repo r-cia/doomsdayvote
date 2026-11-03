@@ -36,9 +36,15 @@ describe('cliente HTTP', () => {
     expect(erro).toMatchObject({
       status: 400,
       code: 'VALIDATION',
-      message: 'cargo inválido',
+      message: 'Parâmetros inválidos.',
       details: { campo: 'cargo' },
     })
+  })
+
+  it('código de erro desconhecido mostra a mensagem da API', async () => {
+    responder(409, { error: { code: 'OUTRO', message: 'conflito qualquer' } })
+    const erro = await api.resumo({}).catch((e) => e)
+    expect(erro).toMatchObject({ code: 'OUTRO', message: 'conflito qualquer' })
   })
 
   it('erro sem corpo JSON usa a mensagem padrão e code nulo', async () => {

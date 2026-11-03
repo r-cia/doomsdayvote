@@ -60,7 +60,7 @@ const ticksX = Array.from({ length: 7 }, (_, i) => MINUTO_INICIAL + i * 130).map
 <template>
   <figure class="curvas">
     <figcaption>{{ titulo }}</figcaption>
-    <svg class="curvas__svg" :viewBox="`0 0 ${L} ${A}`" role="img" :aria-label="`${titulo}, escala ${logaritmica ? 'logarítmica' : 'linear'}, das 14:00 às 03:00`">
+    <svg class="curvas__svg" :viewBox="`0 0 ${L} ${A}`" role="img" :aria-label="$t('entreAnos.curvaAria', { titulo, escala: logaritmica ? $t('entreAnos.logaritmica') : $t('entreAnos.linear') })">
       <g v-for="t in ticksY" :key="t.pos">
         <line :x1="margemEsq" :x2="L - 8" :y1="y(t.pos)" :y2="y(t.pos)" class="curvas__grade" />
         <text :x="margemEsq - 4" :y="y(t.pos) + 3" text-anchor="end" class="curvas__rotulo">{{ formatarNumero(Math.round(t.valor * 100) / 100) }}</text>

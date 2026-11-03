@@ -1,5 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { formatarNumero } from '../lib/format'
+import { i18n } from '../i18n'
+import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import { useEstatisticas } from '../composables/queries'
 
@@ -8,6 +11,7 @@ const props = defineProps({
   electionId: { type: String, default: '' },
 })
 
+const { t } = useI18n()
 const escopo = ref('turno')
 const estatisticasQuery = useEstatisticas(escopo)
 
@@ -21,18 +25,18 @@ function numero(valor) {
   if (valor === null || valor === undefined) return '—'
   const convertido = Number(valor)
   if (Number.isNaN(convertido)) return '—'
-  return convertido.toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+  return convertido.toLocaleString(i18n.global.locale.value, { maximumFractionDigits: 1 })
 }
 
 function inteiro(valor) {
   if (valor === null || valor === undefined) return '—'
-  return Number(valor).toLocaleString('pt-BR')
+  return formatarNumero(valor)
 }
 
 function erroMensagem(erro) {
   if (!erro) return ''
   if (typeof erro === 'string') return erro
-  return erro.message || 'Erro ao carregar estatísticas'
+  return erro.message || t('estatistica.erroGenerico')
 }
 </script>
 
@@ -40,19 +44,18 @@ function erroMensagem(erro) {
   <section class="painel" aria-labelledby="titulo-estatisticas">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Estatística descritiva</p>
-        <h2 id="titulo-estatisticas">Média, mediana e desvio padrão por seção</h2>
+        <p class="painel__etiqueta">{{ $t('estatistica.etiqueta') }}</p>
+        <h2 id="titulo-estatisticas">{{ $t('estatistica.titulo') }}</h2>
         <p class="painel__subtitulo">
-          Votos por seção de cada candidato e comparecimento por seção. Desvio
-          padrão populacional.
+          {{ $t('estatistica.subtitulo') }}
         </p>
       </div>
       <div class="estatistica-controle">
         <label class="campo campo--curto">
-          <span class="campo__rotulo">Escopo</span>
+          <span class="campo__rotulo">{{ $t('estatistica.escopo') }}</span>
           <select v-model="escopo">
-            <option value="turno">Turno atual</option>
-            <option v-if="temDoisTurnos" value="ano">Ano (1º e 2º)</option>
+            <option value="turno">{{ $t('estatistica.turnoAtual') }}</option>
+            <option v-if="temDoisTurnos" value="ano">{{ $t('estatistica.ano') }}</option>
           </select>
         </label>
       </div>
@@ -61,22 +64,22 @@ function erroMensagem(erro) {
     <StateBlock
       v-if="estatisticasQuery.isLoading.value && blocos.length === 0"
       estado="carregando"
-      titulo="Calculando estatísticas"
-      descricao="Agregando por seção."
+      :titulo="$t('estatistica.calculando')"
+      :descricao="$t('estatistica.agregando')"
     />
     <StateBlock
       v-else-if="estatisticasQuery.error.value"
       estado="erro"
-      titulo="Não foi possível calcular as estatísticas"
+      :titulo="$t('estatistica.erro')"
       :descricao="erroMensagem(estatisticasQuery.error.value)"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="estatisticasQuery.refetch()"
     />
     <StateBlock
       v-else-if="blocos.length === 0"
       estado="vazio"
-      titulo="Sem dados para este recorte"
-      descricao="Selecione um cargo com seções ativas."
+      :titulo="$t('estatistica.semDados')"
+      :descricao="$t('estatistica.selecioneCargo')"
     />
 
     <div v-else class="estatistica-lista">
@@ -86,24 +89,24 @@ function erroMensagem(erro) {
         class="estatistica-bloco"
       >
         <header class="estatistica-bloco__cabecalho">
-          <h3>Turno {{ bloco.nr_turno }} · {{ bloco.ano_eleicao }}</h3>
-          <p>{{ inteiro(bloco.comparecimento.secoes) }} seções</p>
+          <h3>{{ $t('estatistica.turnoAno', { turno: bloco.nr_turno, ano: bloco.ano_eleicao }) }}</h3>
+          <p>{{ $t('duplicacao.nSecoes', { n: inteiro(bloco.comparecimento.secoes) }) }}</p>
         </header>
 
-        <section class="estatistica-tabela-wrap" aria-label="Comparecimento por seção">
+        <section class="estatistica-tabela-wrap" :aria-label="$t('estatistica.comparecimentoPorSecao')">
           <table class="tabela">
             <thead>
               <tr>
-                <th>Variável</th>
-                <th class="tabela__numero">Seções</th>
-                <th class="tabela__numero">Média</th>
-                <th class="tabela__numero">Mediana</th>
-                <th class="tabela__numero">Desvio padrão (pop.)</th>
+                <th>{{ $t('estatistica.variavel') }}</th>
+                <th class="tabela__numero">{{ $t('duplicacao.secoes') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.media') }}</th>
+                <th class="tabela__numero">{{ $t('tempoVoto.mediana') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.desvio') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Comparecimento</td>
+                <td>{{ $t('kpis.comparecimento') }}</td>
                 <td class="tabela__numero">{{ inteiro(bloco.comparecimento.secoes) }}</td>
                 <td class="tabela__numero">{{ numero(bloco.comparecimento.media) }}</td>
                 <td class="tabela__numero">{{ numero(bloco.comparecimento.mediana) }}</td>
@@ -113,17 +116,17 @@ function erroMensagem(erro) {
           </table>
         </section>
 
-        <section class="estatistica-tabela-wrap" aria-label="Votos por seção por candidato">
+        <section class="estatistica-tabela-wrap" :aria-label="$t('estatistica.votosPorSecao')">
           <table class="tabela">
             <thead>
               <tr>
-                <th>Candidato</th>
-                <th>Partido</th>
-                <th class="tabela__numero">Seções</th>
-                <th class="tabela__numero">Seções Zero voto</th>
-                <th class="tabela__numero">Média</th>
-                <th class="tabela__numero">Mediana</th>
-                <th class="tabela__numero">Desvio padrão (pop.)</th>
+                <th>{{ $t('comum.candidato') }}</th>
+                <th>{{ $t('comum.partido') }}</th>
+                <th class="tabela__numero">{{ $t('duplicacao.secoes') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.secoesZero') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.media') }}</th>
+                <th class="tabela__numero">{{ $t('tempoVoto.mediana') }}</th>
+                <th class="tabela__numero">{{ $t('estatistica.desvio') }}</th>
               </tr>
             </thead>
             <tbody>

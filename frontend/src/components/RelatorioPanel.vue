@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import ThOrdenavel from './ThOrdenavel.vue'
 import { useOrdenacao } from '../composables/ordenacao'
@@ -7,8 +8,7 @@ import { useRelatorio } from '../composables/queries'
 import { useFiltersStore } from '../stores/filters'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
-const CARGOS = { 1: 'Presidente', 3: 'Governador' }
-
+const { t } = useI18n()
 const store = useFiltersStore()
 const { ordenacao, alternar } = useOrdenacao()
 const query = useRelatorio(ordenacao)
@@ -19,21 +19,21 @@ const linhas = computed(() => {
   const referencias = query.data.value.comparacao_final_disponivel ? (query.data.value.referencias ?? []) : []
   return [{ ...alvo.value, ehAlvo: true }, ...referencias]
 })
-const rotulo = (r) => `${r.ano_eleicao} · ${r.nr_turno}º turno${r.ehAlvo ? ' (alvo)' : ''}`
+const rotulo = (r) => `${r.ano_eleicao} · ${t('relatorio.turno', { n: r.nr_turno })}${r.ehAlvo ? ` (${t('relatorio.alvo')})` : ''}`
 const chave = (r) => `${r.ehAlvo ? 'alvo' : r.election_id}`
-const col = (coluna, texto, numero = true) => ({ coluna, texto, numero })
-const COLUNAS_PARTICIPACAO = [col('referencia', 'Eleição', false), col('bus', 'Boletins'), col('participacao_pct', 'Participação'), col('abstencao_pct', 'Abstenção')]
+const col = (coluna, numero = true) => ({ coluna, numero })
+const COLUNAS_PARTICIPACAO = [col('referencia', false), col('bus'), col('participacao_pct'), col('abstencao_pct')]
 const COLUNAS_RECEBIMENTO = [
-  col('referencia', 'Eleição', false),
-  col('data_hora', 'Data e hora'),
-  col('somente_data', 'Só data'),
-  col('ausente', 'Ausente'),
-  col('outra_precisao', 'Outra precisão'),
-  col('sem_encerramento', 'Sem encerramento'),
-  col('antes_encerramento', 'Antes do encerramento'),
-  col('antes_emissao', 'Antes da emissão'),
-  col('mediana_atraso_min', 'Mediana do atraso (min)'),
-  col('p90_atraso_min', 'Percentil 90 do atraso (min)'),
+  col('referencia', false),
+  col('data_hora'),
+  col('somente_data'),
+  col('ausente'),
+  col('outra_precisao'),
+  col('sem_encerramento'),
+  col('antes_encerramento'),
+  col('antes_emissao'),
+  col('mediana_atraso_min'),
+  col('p90_atraso_min'),
 ]
 </script>
 
@@ -41,10 +41,10 @@ const COLUNAS_RECEBIMENTO = [
   <section class="painel" aria-labelledby="relatorio-titulo" :aria-busy="query.isFetching.value">
     <header class="painel__cabecalho">
       <div>
-        <p class="painel__etiqueta">Relatório</p>
-        <h2 id="relatorio-titulo">Relatório de consistência</h2>
+        <p class="painel__etiqueta">{{ $t('abas.relatorio') }}</p>
+        <h2 id="relatorio-titulo">{{ $t('relatorio.titulo') }}</h2>
         <p v-if="alvo" class="painel__meta">
-          {{ alvo.ano_eleicao }} · {{ alvo.nr_turno }}º turno · {{ CARGOS[store.cargo] ?? store.cargo }}
+          {{ alvo.ano_eleicao }} · {{ $t('relatorio.turno', { n: alvo.nr_turno }) }} · {{ $t(`relatorio.cargos.${store.cargo}`) }}
           <template v-if="alvo.ds_eleicao"> · {{ alvo.ds_eleicao }}</template>
           <template v-if="store.uf"> · {{ store.uf }}</template>
           <template v-if="store.municipio"> · {{ store.municipio }}</template>
@@ -52,23 +52,23 @@ const COLUNAS_RECEBIMENTO = [
       </div>
     </header>
 
-    <StateBlock v-if="query.isLoading.value" estado="carregando" titulo="Carregando relatório" />
+    <StateBlock v-if="query.isLoading.value" estado="carregando" :titulo="$t('relatorio.carregando')" />
     <StateBlock
       v-else-if="query.error.value"
       estado="erro"
-      titulo="Não foi possível carregar o relatório"
+      :titulo="$t('relatorio.erro')"
       :descricao="query.error.value.message"
-      acao="Tentar novamente"
+      :acao="$t('comum.tentarNovamente')"
       @acao="query.refetch()"
     />
-    <StateBlock v-else-if="linhas.length === 0" estado="vazio" titulo="Sem dados para o recorte" />
+    <StateBlock v-else-if="linhas.length === 0" estado="vazio" :titulo="$t('relatorio.vazio')" />
     <template v-else>
       <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
         <table>
-          <caption class="sr-only">Participação e abstenção</caption>
+          <caption class="sr-only">{{ $t('relatorio.captionParticipacao') }}</caption>
           <thead>
             <tr>
-              <ThOrdenavel v-for="c in COLUNAS_PARTICIPACAO" :key="c.coluna" :coluna="c.coluna" :numero="c.numero" :ordenacao="ordenacao" @ordenar="alternar">{{ c.texto }}</ThOrdenavel>
+              <ThOrdenavel v-for="c in COLUNAS_PARTICIPACAO" :key="c.coluna" :coluna="c.coluna" :numero="c.numero" :ordenacao="ordenacao" @ordenar="alternar">{{ $t(`relatorio.colunas.${c.coluna}`) }}</ThOrdenavel>
             </tr>
           </thead>
           <tbody>
@@ -84,10 +84,10 @@ const COLUNAS_RECEBIMENTO = [
 
       <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
         <table>
-          <caption class="sr-only">Recebimento do Boletim de Urna</caption>
+          <caption class="sr-only">{{ $t('relatorio.captionRecebimento') }}</caption>
           <thead>
             <tr>
-              <ThOrdenavel v-for="c in COLUNAS_RECEBIMENTO" :key="c.coluna" :coluna="c.coluna" :numero="c.numero" :ordenacao="ordenacao" @ordenar="alternar">{{ c.texto }}</ThOrdenavel>
+              <ThOrdenavel v-for="c in COLUNAS_RECEBIMENTO" :key="c.coluna" :coluna="c.coluna" :numero="c.numero" :ordenacao="ordenacao" @ordenar="alternar">{{ $t(`relatorio.colunas.${c.coluna}`) }}</ThOrdenavel>
             </tr>
           </thead>
           <tbody>
