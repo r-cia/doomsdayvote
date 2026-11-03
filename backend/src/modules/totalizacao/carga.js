@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { registrarEventoCarga } from '../../lib/log-carga.js';
 import { decodificarBu } from './bu.js';
-import { conferirBuBweb, existeBwebDaUf } from './conferencia-bweb.js';
+import { conferirBuBweb } from './conferencia-bweb.js';
 import { conferirBuLog } from './conferencia-log.js';
 import { conferirBuRdv, votosDoBu } from './conferencia-rdv.js';
 import { registrarDivergencias } from './divergencias.js';
@@ -321,15 +321,6 @@ export async function carregarZip(
     lote_id: lote.id,
   };
   registrarEvento('lote_iniciado', { ...contexto, status: 'processando' });
-
-  const bwebAusente = !(await existeBwebDaUf(db, {
-    anoEleicao: origem.ano_eleicao,
-    nrTurno: origem.nr_turno,
-    sgUf: origem.sg_uf,
-  }));
-  if (bwebAusente) {
-    registrarEvento('conferencia_ignorada', { ...contexto, motivo: 'bweb_ausente' });
-  }
 
   let secaoAtual = null;
 

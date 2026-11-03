@@ -50,14 +50,6 @@ export function filtroLoteVigente(recorte, alias) {
   )`;
 }
 
-export function escopoDoRecorte(recorte) {
-  if (recorte.nrSecao !== undefined && recorte.nrSecao !== null) return 'secao';
-  if (recorte.nrZona !== undefined && recorte.nrZona !== null) return 'zona';
-  if (recorte.cdMunicipioTse !== undefined && recorte.cdMunicipioTse !== null) return 'municipio';
-  if (recorte.sgUf !== undefined && recorte.sgUf !== null) return 'uf';
-  return 'nacional';
-}
-
 export async function agregarMetricas(db, recorte) {
   if (recorte?.anoEleicao === undefined || recorte?.nrTurno === undefined) {
     throw new Error('recorte exige anoEleicao e nrTurno');
@@ -110,7 +102,6 @@ export async function agregarMetricas(db, recorte) {
   const totais = complementares.rows[0];
 
   return {
-    escopo: escopoDoRecorte(recorte),
     tempo: {
       quantidade: Number(tempo.quantidade),
       mediaMs: tempo.media_ms === null ? null : Number(tempo.media_ms),

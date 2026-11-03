@@ -62,7 +62,6 @@ describe('carga:status', () => {
       ],
       [],
       [],
-      [{ ano_eleicao: 2022, nr_turno: 1, ufs: ['SP'] }],
     ]);
 
     const status = await coletarStatus(db);
@@ -86,10 +85,6 @@ describe('carga:status', () => {
       lote_id: 'lote-bweb',
       erro_codigo: 'ERRO_INTERNO',
     });
-    expect(status.ufs_sem_arquivo).toHaveLength(1);
-    expect(status.ufs_sem_arquivo[0].ufs).toHaveLength(26);
-    expect(status.ufs_sem_arquivo[0].ufs).toContain('AC');
-    expect(status.ufs_sem_arquivo[0].ufs).not.toContain('SP');
     expect(status.lotes_parciais).toEqual([]);
     expect(status.secoes_com_erro).toEqual([]);
     expect(status.lotes_substituidos).toEqual([]);
@@ -100,8 +95,6 @@ describe('carga:status', () => {
     expect(texto).toContain('2022 T1 SP: concluido bu_2022_1_sp.zip (60.0s)');
     expect(texto).toContain('Lotes com falha');
     expect(texto).toContain('bweb lote-bweb bweb.csv ERRO_INTERNO: falhou');
-    expect(texto).toContain('UFs sem arquivo');
-    expect(texto).toContain('2022 T1: AC');
   });
 
   it('detalha um lote da totalização com contagens agregadas', async () => {

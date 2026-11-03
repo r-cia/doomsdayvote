@@ -1,10 +1,5 @@
 import { sql } from 'kysely';
 
-const UFS = Object.freeze([
-  'AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT',
-  'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO',
-]);
-
 const ID_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const DURACAO_MS = sql`
@@ -109,13 +104,6 @@ export async function coletarStatus(db, { lote } = {}) {
     limit 50
   `.execute(db);
 
-  const escopos = await sql`
-    select ano_eleicao, nr_turno, array_agg(distinct sg_uf order by sg_uf) as ufs
-    from totalizacao_lote
-    group by ano_eleicao, nr_turno
-    order by ano_eleicao, nr_turno
-  `.execute(db);
-
   const lotesTotalizacao = falhasTotalizacao.rows.map((linha) => ({
     origem: 'totalizacao',
     ...mapearLote(linha),
@@ -140,7 +128,6 @@ export async function coletarStatus(db, { lote } = {}) {
       registrado_em: instante(linha.registrado_em),
     })),
     lotes_substituidos: substituidos.rows.map(mapearLote),
-    ufs_sem_arquivo: ufsSemArquivo(escopos.rows),
   };
 }
 
@@ -221,16 +208,6 @@ function instante(valor) {
   return valor instanceof Date ? valor.toISOString() : valor;
 }
 
-function ufsSemArquivo(linhas) {
-  return linhas
-    .map((linha) => ({
-      ano: linha.ano_eleicao,
-      turno: linha.nr_turno,
-      ufs: UFS.filter((uf) => !(linha.ufs ?? []).includes(uf)),
-    }))
-    .filter((linha) => linha.ufs.length > 0);
-}
-
 function duracao(ms) {
   if (ms === null || ms === undefined) return 'em andamento';
   return `${(ms / 1000).toFixed(1)}s`;
@@ -276,12 +253,6 @@ export function formatarStatus(status) {
   for (const item of status.lotes_substituidos ?? []) {
     const recorte = item.ano ? ` ${item.ano} T${item.turno} ${item.uf}` : '';
     linhas.push(`  ${item.lote_id}${recorte} ${item.arquivo} → ${item.substituido_por}`.trimEnd());
-  }
-
-  linhas.push('', 'UFs sem arquivo');
-  if (status.ufs_sem_arquivo.length === 0) linhas.push('  (nenhuma)');
-  for (const item of status.ufs_sem_arquivo) {
-    linhas.push(`  ${item.ano} T${item.turno}: ${item.ufs.join(', ')}`);
   }
 
   return linhas.join('\n');

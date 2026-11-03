@@ -163,17 +163,9 @@ const opcoes = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   animation: { duration: 0 },
-  interaction: { mode: 'index', intersect: false },
   plugins: {
-    legend: {
-      display: modo.value === 'votos' && datasetsVotos.value.length > 1,
-      labels: { color: '#c8d4c0', boxWidth: 8, font: { size: 10 } },
-    },
-    tooltip: {
-      callbacks: {
-        label: (item) => `${item.dataset.label}: ${formatarNumero(item.parsed.y)}`,
-      },
-    },
+    legend: { display: false },
+    tooltip: { enabled: false },
   },
   scales: {
     x: {

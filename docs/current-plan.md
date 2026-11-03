@@ -311,7 +311,7 @@ Critério de teste: a soma das seções de uma UF é igual ao agregado da UF, e 
 - Recorte igual ao das demais rotas (`ano`, `turno`, `uf`, `municipio`, `zona`, `secao`, `lote`), com validação em zod e contrato documentado em `docs/API.md`.
 
 ### Pendência de decisão
-As conferências rodam na carga desde 2026-11-03. BU×RDV e BU×log sempre; BU×BWEB só quando existe exatamente uma `eleicao` para o ano e turno do lote. Em 2026/1º turno o banco tem três eleições, então o worker registra `conferencia_ignorada` com motivo `eleicao_ambigua` e não confere o BWEB. Falta decidir o critério adicional que desempata (por exemplo, a eleição que tem `boletim_versao` daquela UF).
+As conferências rodam na carga desde 2026-11-03. BU×RDV e BU×log sempre; BU×BWEB consulta a apuração pelo ano/turno do lote e pelos cargos 1 e 3, sem escolher `eleicao_id`.
 
 ## Plano — resiliência da importação da totalização (2026-11-03)
 

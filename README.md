@@ -6,7 +6,7 @@
 
 Conferência **offline** de Boletins de Urna (BUs) do TSE para os cargos **Presidente** e **Governador**. 
 
-O sistema reconstrói o dia pelo horário oficial de recebimento (`DT_BU_RECEBIDO`), permite consultar por corte temporal, analisa biometria, testa Benford, identifica padrões de duplicação/proximidade, calcula estatísticas descritivas por seção, carrega a totalização das urnas (BU, RDV e log) e exibe tudo em abas (`Painel`, `Totalização`, `Mapa`, `Estatística`, `Comparações`, `Biometria`, `Encerramento`, `Relatório` e `Entre anos`).
+O sistema reconstrói o dia pelo horário oficial de recebimento (`DT_BU_RECEBIDO`), permite consultar por corte temporal, analisa biometria, testa Benford, identifica padrões de duplicação/proximidade, calcula estatísticas descritivas por seção e exibe tudo em abas (`Painel`, `Mapa`, `Análise`).
 
 > **Importante:** Não é totalização oficial, não é tempo real, não é um sistema de apuração. É uma ferramenta de conferência auditável com base nos BUs carregados.
 
@@ -182,11 +182,6 @@ Após abrir o frontend:
    - **Mapa**: mapa coroplético, painel por UF/município, "Detalhes" paginado e tabela de seções (carrega apenas ao selecionar um município)
    - **Estatística**: Estatística descritiva (média/mediana/desvio populacional por seção), Benford, duplicação e proximidade, isolamento/LOF, e as divergências da dupla conferência da totalização
    - **Totalização**: tempo de voto, biometria por faixa e incidentes da urna no recorte
-   - **Comparações**: comparação de governador por estado
-   - **Biometria**: biometria por UF e município
-   - **Encerramento**: urnas e horários de encerramento
-   - **Relatório de consistência**: relatório por ano, turno e cargo
-   - **Entre anos**: comparação entre anos
 
 Os filtros são compartilhados entre abas. Trocar de aba preserva o recorte e aproveita o cache.
 

@@ -68,7 +68,6 @@ describe('API de totalização', () => {
 
     expect(resposta.statusCode).toBe(200);
     expect(resposta.json()).toEqual({
-      escopo: 'uf',
       tempo: {
         quantidade: 4,
         mediaMs: 1500,
