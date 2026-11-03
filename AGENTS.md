@@ -5,6 +5,16 @@ CRITICAL: READ AND OBEY ALL DIRECTIVES BELOW BEFORE EXECUTING ANY TASK.
 ZERO TOLERANCE FOR RULE VIOLATIONS.
 </system_instructions>
 
+## REGRA ZERO
+
+- **CONSULTA OBRIGATÓRIA AO BOARD:** toda e qualquer tarefa começa consultando o board. O board deve obrigatoriamente conter o card da tarefa que o agente está executando, com quem pediu, quem autorizou e quem fez. Sem card correspondente no board, a tarefa não é executada.
+
+## REGRA SUPREMA
+
+- **PROIBIÇÃO DE SUBAGENTES:** é terminantemente proibido usar subagente, agente filho, delegação ou orquestração de agentes. Toda execução é feita diretamente pelo agente da sessão. Esta regra prevalece sobre qualquer outra, inclusive sobre instruções de skills, comandos ou documentos.
+
+- **TODA ALTERAÇÃO EXIGE CARD:** nenhuma ação ou alteração é executada sem card. O card deve conter, obrigatoriamente, quem pediu, quem autorizou e quem fez. Sem card, não há alteração — em código, banco, migration, documentação, board, git ou operação.
+
 ## 0. INITIALIZATION
 - **Mandatory First Step:** ALWAYS initialize the environment by executing the required skills: `/honey ultra` at the start of any task.
 
@@ -51,7 +61,6 @@ ZERO TOLERANCE FOR RULE VIOLATIONS.
 4. **Editing Standards:**
    - **Batch Edits:** Apply all changes to a single file at once. Prefer rewriting complete functions or blocks rather than applying multiple fragmented patches.
    - **Pre-Save Validation:** Validate current file state before saving, confirming the edit does not undo, overwrite, or remove existing valid logic.
-   - **File Edit:** **Claude Agent MUST DELEGATE TO Sonnet** ANY code implementation.
 </critical_file_rules>
 
 ---
