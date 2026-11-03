@@ -28,10 +28,11 @@ export function buildApp({ deps = {}, config = {}, rotas }) {
   app.addHook('onResponse', async (req, reply) => {
     req.log.info(
       {
+        reqId: req.id,
         rota: req.routerPath ?? req.url,
         metodo: req.method,
         status: reply.statusCode,
-        duracao_ms: Number(reply.elapsedTime.toFixed(2)),
+        responseTime: Number(reply.elapsedTime.toFixed(2)),
         bytes: Number(reply.getHeader('content-length') || 0),
         cache: reply.getHeader('x-cache') ?? null,
       },
