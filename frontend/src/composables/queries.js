@@ -252,3 +252,23 @@ export function useTotalizacaoIncidentes(opcoes = {}, habilitado = null) {
 export function useTotalizacaoDivergencias(opcoes = {}, habilitado = null) {
   return totalizacao('totalizacao-divergencias', api.totalizacaoDivergencias, opcoes, habilitado)
 }
+
+export function useEncerramentoUrnas(ordenacoes) {
+  return consulta('encerramento-urnas', api.encerramentoUrnas, { ordenacoes })
+}
+
+export function useEncerramentoMunicipios(opcoes = {}, ordenacoes, habilitado = null) {
+  return consulta('encerramento-municipios', api.encerramentoMunicipios, {
+    extra: () => valores(opcoes),
+    ordenacoes,
+    habilitado,
+  })
+}
+
+export function useEncerramentoSecoes(opcoes = {}, ordenacoes, habilitado = null) {
+  return consulta('encerramento-secoes', api.encerramentoSecoes, {
+    extra: () => valores(opcoes),
+    ordenacoes,
+    habilitado,
+  })
+}

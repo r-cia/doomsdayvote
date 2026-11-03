@@ -2091,3 +2091,17 @@ tr.linha--ativa th {
   padding: 8px 14px;
   font-size: 12px;
 }
+
+th .ordenavel {
+  all: unset;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+}
+
+th .ordenavel:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}

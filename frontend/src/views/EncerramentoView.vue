@@ -1,128 +1,62 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { api } from '../api/client'
+import { computed, ref, watch } from 'vue'
+import StateBlock from '../components/StateBlock.vue'
+import ThOrdenavel from '../components/ThOrdenavel.vue'
+import { useOrdenacao } from '../composables/ordenacao'
+import {
+  useEncerramentoMunicipios,
+  useEncerramentoSecoes,
+  useEncerramentoUrnas,
+} from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
-import { formatarNumero, formatarPercentual } from '../lib/format'
+import { formatarHora, formatarNumero, formatarPercentual } from '../lib/format'
 import SecaoView from './SecaoView.vue'
 
 const { store } = useSelecaoEleicao()
-const router = useRouter()
-
-const urnas = ref([])
-const carregandoUrnas = ref(false)
 
 const ufSelecionada = ref(null)
 const municipioSelecionado = ref(null)
-const municipios = ref([])
-const secoes = ref([])
-const carregandoMunicipios = ref(false)
-const carregandoSecoes = ref(false)
+const secaoModalId = ref(null)
 
-const ordenacao = ref({ coluna: 'sg_uf', direcao: 'asc' })
+const ordUrnas = useOrdenacao()
+const ordMunicipios = useOrdenacao()
+const ordSecoes = useOrdenacao()
 
-function alternar(coluna) {
-  if (ordenacao.value.coluna === coluna) {
-    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
-  } else {
-    ordenacao.value = { coluna, direcao: 'asc' }
-  }
-}
+const urnasQuery = useEncerramentoUrnas(ordUrnas.ordenacao)
+const municipiosQuery = useEncerramentoMunicipios(
+  { uf: ufSelecionada },
+  ordMunicipios.ordenacao,
+  () => Boolean(ufSelecionada.value),
+)
+const secoesQuery = useEncerramentoSecoes(
+  { uf: ufSelecionada, municipio: municipioSelecionado },
+  ordSecoes.ordenacao,
+  () => Boolean(ufSelecionada.value && municipioSelecionado.value),
+)
 
-function seta(coluna) {
-  if (ordenacao.value.coluna !== coluna) return ''
-  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
-}
+const urnas = computed(() => urnasQuery.data.value?.ufs ?? [])
+const municipios = computed(() => municipiosQuery.data.value?.municipios ?? [])
+const secoes = computed(() => secoesQuery.data.value?.secoes ?? [])
 
-function valor(linha, coluna) {
-  if (coluna === 'sg_uf') return linha.sg_uf ?? ''
-  return Number(linha[coluna] ?? 0)
-}
-
-const linhas = computed(() => {
-  const lista = [...urnas.value]
-  const { coluna, direcao } = ordenacao.value
-  lista.sort((a, b) => {
-    const va = valor(a, coluna)
-    const vb = valor(b, coluna)
-    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-    return direcao === 'asc' ? va - vb : vb - va
-  })
-  return lista
+const nomeMunicipio = (m) => m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
+const nomeSelecionado = computed(() => {
+  const m = municipios.value.find((item) => item.cd_municipio_tse === municipioSelecionado.value)
+  return m ? nomeMunicipio(m) : ''
 })
 
-async function carregarUrnas() {
-  carregandoUrnas.value = true
-  try {
-    const r = await api.encerramentoUrnas({
-      election_id: store.electionId,
-      cargo: store.cargo,
-      as_of: store.asOf,
-    })
-    urnas.value = r.ufs ?? []
-  } catch (e) {
-    urnas.value = []
-  } finally {
-    carregandoUrnas.value = false
-  }
-}
-
-async function carregarMunicipios(uf) {
+function escolherUf(uf) {
   ufSelecionada.value = uf
   municipioSelecionado.value = null
-  secoes.value = []
-  carregandoMunicipios.value = true
-  try {
-    const r = await api.encerramentoMunicipios({
-      election_id: store.electionId,
-      cargo: store.cargo,
-      as_of: store.asOf,
-      uf,
-    })
-    municipios.value = r.municipios ?? []
-  } catch (e) {
-    municipios.value = []
-  } finally {
-    carregandoMunicipios.value = false
-  }
 }
 
-async function carregarSecoes(municipio) {
-  municipioSelecionado.value = municipio
-  carregandoSecoes.value = true
-  try {
-    const r = await api.encerramentoSecoes({
-      election_id: store.electionId,
-      cargo: store.cargo,
-      as_of: store.asOf,
-      uf: ufSelecionada.value,
-      municipio,
-    })
-    secoes.value = r.secoes ?? []
-  } catch (e) {
-    secoes.value = []
-  } finally {
-    carregandoSecoes.value = false
-  }
-}
-
-function nomeMunicipio(m) {
-  return m.nm_municipio ?? `Município ${m.cd_municipio_tse}`
-}
-
-const secaoModalId = ref(null)
-function abrirSecao(item) {
-  secaoModalId.value = item.id
-}
-
-onMounted(carregarUrnas)
-watch(() => store.asOf, carregarUrnas)
-watch(() => store.electionId, carregarUrnas)
-watch(() => store.cargo, carregarUrnas)
+watch(
+  () => [store.electionId, store.cargo],
+  () => escolherUf(null),
+)
 </script>
 
 <template>
-  <section class="painel" aria-labelledby="urnas-titulo">
+  <section class="painel" aria-labelledby="urnas-titulo" :aria-busy="urnasQuery.isFetching.value">
     <header class="painel__cabecalho">
       <div>
         <p class="painel__etiqueta">Encerramento</p>
@@ -130,25 +64,33 @@ watch(() => store.cargo, carregarUrnas)
       </div>
     </header>
 
-    <div v-if="carregandoUrnas" class="vazio">Carregando…</div>
-    <div v-else-if="urnas.length === 0" class="vazio">Sem dados.</div>
+    <StateBlock v-if="urnasQuery.isLoading.value" estado="carregando" titulo="Carregando urnas" />
+    <StateBlock
+      v-else-if="urnasQuery.error.value"
+      estado="erro"
+      titulo="Não foi possível carregar as urnas"
+      :descricao="urnasQuery.error.value.message"
+      acao="Tentar novamente"
+      @acao="urnasQuery.refetch()"
+    />
+    <StateBlock v-else-if="urnas.length === 0" estado="vazio" titulo="Sem dados" />
 
-    <div v-else class="tabela-scroll">
+    <div v-else class="tabela-scroll" :class="{ atualizando: urnasQuery.isFetching.value }">
       <table class="tabela">
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('sg_uf')">UF{{ seta('sg_uf') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('total')">Nº de urnas{{ seta('total') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('ate_1715')">Até 17:15{{ seta('ate_1715') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('pct_1715')">% até 17:15{{ seta('pct_1715') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('ate_1915')">Até 19:15{{ seta('ate_1915') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('pct_1915')">% até 19:15{{ seta('pct_1915') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('apos_1915')">Após 19:15{{ seta('apos_1915') }}</th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('pct_apos_1915')">% após 19:15{{ seta('pct_apos_1915') }}</th>
+            <ThOrdenavel coluna="sg_uf" :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">UF</ThOrdenavel>
+            <ThOrdenavel coluna="total" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Nº de urnas</ThOrdenavel>
+            <ThOrdenavel coluna="ate_1715" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Até 17:15</ThOrdenavel>
+            <ThOrdenavel coluna="pct_1715" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">% até 17:15</ThOrdenavel>
+            <ThOrdenavel coluna="ate_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Até 19:15</ThOrdenavel>
+            <ThOrdenavel coluna="pct_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">% até 19:15</ThOrdenavel>
+            <ThOrdenavel coluna="apos_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">Após 19:15</ThOrdenavel>
+            <ThOrdenavel coluna="pct_apos_1915" numero :ordenacao="ordUrnas.ordenacao.value" @ordenar="ordUrnas.alternar">% após 19:15</ThOrdenavel>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="u in linhas" :key="u.sg_uf" class="linha-clicavel" @click="carregarMunicipios(u.sg_uf)">
+          <tr v-for="u in urnas" :key="u.sg_uf" class="linha-clicavel" tabindex="0" @click="escolherUf(u.sg_uf)" @keydown.enter="escolherUf(u.sg_uf)">
             <td>{{ u.sg_uf }}</td>
             <td class="tabela__numero">{{ formatarNumero(u.total) }}</td>
             <td class="tabela__numero">{{ formatarNumero(u.ate_1715) }}</td>
@@ -170,19 +112,27 @@ watch(() => store.cargo, carregarUrnas)
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">Clique em um estado na tabela acima.</div>
-      <div v-else-if="carregandoMunicipios" class="vazio">Carregando…</div>
+      <StateBlock v-else-if="municipiosQuery.isLoading.value" estado="carregando" titulo="Carregando municípios" />
+      <StateBlock
+        v-else-if="municipiosQuery.error.value"
+        estado="erro"
+        titulo="Não foi possível carregar os municípios"
+        :descricao="municipiosQuery.error.value.message"
+        acao="Tentar novamente"
+        @acao="municipiosQuery.refetch()"
+      />
       <div v-else-if="municipios.length === 0" class="vazio">Sem dados.</div>
-      <div v-else class="tabela-scroll">
+      <div v-else class="tabela-scroll" :class="{ atualizando: municipiosQuery.isFetching.value }">
         <table>
           <thead>
             <tr>
-              <th scope="col">Município</th>
-              <th scope="col" class="num">Total</th>
-              <th scope="col" class="num">Após 17:15</th>
-              <th scope="col" class="num">%</th>
-              <th scope="col">Partido</th>
-              <th scope="col" class="num">Votos</th>
-              <th scope="col" class="num">% Votos</th>
+              <ThOrdenavel coluna="nm_municipio" :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Município</ThOrdenavel>
+              <ThOrdenavel coluna="total" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Total</ThOrdenavel>
+              <ThOrdenavel coluna="apos_1715" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Após 17:15</ThOrdenavel>
+              <ThOrdenavel coluna="pct_apos_1715" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">%</ThOrdenavel>
+              <ThOrdenavel coluna="partido" :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Partido</ThOrdenavel>
+              <ThOrdenavel coluna="votos" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">Votos</ThOrdenavel>
+              <ThOrdenavel coluna="pct_votos" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">% Votos</ThOrdenavel>
             </tr>
           </thead>
           <tbody>
@@ -190,9 +140,11 @@ watch(() => store.cargo, carregarUrnas)
               v-for="m in municipios"
               :key="m.cd_municipio_tse"
               class="linha-clicavel"
-              @click="carregarSecoes(m.cd_municipio_tse)"
+              tabindex="0"
+              @click="municipioSelecionado = m.cd_municipio_tse"
+              @keydown.enter="municipioSelecionado = m.cd_municipio_tse"
             >
-              <td>{{ m.nm_municipio ?? 'Município ' + m.cd_municipio_tse }}</td>
+              <td>{{ nomeMunicipio(m) }}</td>
               <td class="num">{{ formatarNumero(m.total) }}</td>
               <td class="num">{{ formatarNumero(m.apos_1715) }}</td>
               <td class="num">{{ formatarPercentual(m.pct_apos_1715) }}</td>
@@ -208,23 +160,30 @@ watch(() => store.cargo, carregarUrnas)
     <div class="card">
       <div class="card__cabecalho">
         <h2>Seções com maior % após 17:15</h2>
-        <p v-if="municipioSelecionado" class="card__meta">
-          {{ (municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}).nm_municipio }}
-        </p>
+        <p v-if="municipioSelecionado" class="card__meta">{{ nomeSelecionado }}</p>
       </div>
       <div v-if="!municipioSelecionado" class="vazio">Clique em um município.</div>
-      <div v-else-if="carregandoSecoes" class="vazio">Carregando…</div>
+      <StateBlock v-else-if="secoesQuery.isLoading.value" estado="carregando" titulo="Carregando seções" />
+      <StateBlock
+        v-else-if="secoesQuery.error.value"
+        estado="erro"
+        titulo="Não foi possível carregar as seções"
+        :descricao="secoesQuery.error.value.message"
+        acao="Tentar novamente"
+        @acao="secoesQuery.refetch()"
+      />
       <div v-else-if="secoes.length === 0" class="vazio">Sem dados.</div>
-      <div v-else class="tabela-scroll">
+      <div v-else class="tabela-scroll" :class="{ atualizando: secoesQuery.isFetching.value }">
         <table>
           <thead>
             <tr>
-              <th scope="col">Zona</th>
-              <th scope="col">Seção</th>
-              <th scope="col" class="num">Encerramento</th>
-              <th scope="col">Partido</th>
-              <th scope="col" class="num">Votos</th>
-              <th scope="col" class="num">% Votos</th>
+              <ThOrdenavel coluna="nr_zona" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Zona</ThOrdenavel>
+              <ThOrdenavel coluna="nr_secao" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Seção</ThOrdenavel>
+              <ThOrdenavel coluna="dt_encerramento" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Encerramento</ThOrdenavel>
+              <th scope="col">Após 17:15</th>
+              <ThOrdenavel coluna="partido" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Partido</ThOrdenavel>
+              <ThOrdenavel coluna="votos" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">Votos</ThOrdenavel>
+              <ThOrdenavel coluna="pct_votos" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">% Votos</ThOrdenavel>
               <th scope="col"><span class="sr-only">Detalhe</span></th>
             </tr>
           </thead>
@@ -232,12 +191,13 @@ watch(() => store.cargo, carregarUrnas)
             <tr v-for="s in secoes" :key="s.id">
               <td>{{ s.nr_zona }}</td>
               <td>{{ s.nr_secao }}</td>
-              <td class="num">{{ s.dt_encerramento ? new Date(s.dt_encerramento).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—' }}</td>
+              <td class="num">{{ formatarHora(s.dt_encerramento) }}</td>
+              <td>{{ s.apos_1715 ? 'Sim' : 'Não' }}</td>
               <td>{{ s.partido ?? '—' }}</td>
               <td class="num">{{ formatarNumero(s.votos) }}</td>
               <td class="num">{{ formatarPercentual(s.pct_votos) }}</td>
               <td>
-                <button type="button" class="button button--ghost button--compacto" @click="abrirSecao(s)">Detalhe</button>
+                <button type="button" class="button button--ghost button--compacto" @click="secaoModalId = s.id">Detalhe</button>
               </td>
             </tr>
           </tbody>
