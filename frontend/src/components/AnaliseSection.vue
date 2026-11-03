@@ -2,7 +2,7 @@
 import BenfordNiveisPanel from './BenfordNiveisPanel.vue'
 import BenfordPanel from './BenfordPanel.vue'
 import DuplicacaoPanel from './DuplicacaoPanel.vue'
-import OutliersPanel from './OutliersPanel.vue'
+import SecoesDestaquePanel from './SecoesDestaquePanel.vue'
 import StateBlock from './StateBlock.vue'
 
 defineProps({
@@ -43,8 +43,8 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
         <BenfordNiveisPanel :dados="anomalias.benford_niveis" />
         <div class="auditoria-grade">
           <DuplicacaoPanel :dados="anomalias.duplicacao" />
-          <OutliersPanel
-            :dados="anomalias.outliers"
+          <SecoesDestaquePanel
+            :outliers="anomalias.outliers"
             :ordenacao="ordenacao"
             @update:ordenacao="emit('update:ordenacao', $event)"
           />
