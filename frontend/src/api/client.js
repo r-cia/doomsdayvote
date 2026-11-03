@@ -1,14 +1,16 @@
 const BASE = '/api'
 
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, code = null, details = null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.code = code
+    this.details = details
   }
 }
 
-function montarQuery(params = {}) {
+export function montarQuery(params = {}) {
   const busca = new URLSearchParams()
   for (const [chave, valor] of Object.entries(params)) {
     if (valor !== null && valor !== undefined && valor !== '') {
@@ -26,16 +28,20 @@ async function obter(caminho, params, signal) {
   })
 
   if (!resposta.ok) {
-    let mensagem = `Falha ao consultar a API (${resposta.status})`
     const corpo = await resposta.json().catch(() => null)
-    if (corpo) {
-      mensagem = corpo.message ?? corpo.mensagem ?? corpo.erro ?? mensagem
-    }
-    throw new ApiError(mensagem, resposta.status)
+    const erro = corpo?.error
+    throw new ApiError(
+      erro?.message ?? `Falha ao consultar a API (${resposta.status})`,
+      resposta.status,
+      erro?.code ?? null,
+      erro?.details ?? null,
+    )
   }
 
   return resposta.json()
 }
+
+const secao = (id) => `/sections/${encodeURIComponent(id)}`
 
 export const api = {
   eleicoes: (signal) => obter('/elections', {}, signal),
@@ -43,6 +49,8 @@ export const api = {
   timeline: (params, signal) => obter('/timeline', params, signal),
   mapa: (params, signal) => obter('/map', params, signal),
   secoes: (params, signal) => obter('/sections', params, signal),
+  secao: (id, params, signal) => obter(secao(id), params, signal),
+  secaoVersoes: (id, params, signal) => obter(`${secao(id)}/versions`, params, signal),
   biometriaMunicipios: (params, signal) => obter('/biometria/municipios', params, signal),
   biometriaSecoes: (params, signal) => obter('/biometria/secoes', params, signal),
   encerramentoUrnas: (params, signal) => obter('/encerramento/urnas', params, signal),
@@ -51,6 +59,13 @@ export const api = {
   analise: (params, signal) => obter('/analysis', params, signal),
   anomalias: (params, signal) => obter('/anomalies', params, signal),
   estatisticas: (params, signal) => obter('/estatisticas', params, signal),
-  secao: (id, params, signal) =>
-    obter(`/sections/${encodeURIComponent(id)}`, params, signal),
+  consistencia: (params, signal) => obter('/consistencia', params, signal),
+  concentracao: (params, signal) => obter('/concentracao', params, signal),
+  comparacaoLocal: (params, signal) => obter('/comparacao-local', params, signal),
+  comparacaoLocalSecoes: (params, signal) => obter('/comparacao-local/secoes', params, signal),
+  relatorio: (params, signal) => obter('/relatorio', params, signal),
+  comparacaoAnos: (params, signal) => obter('/comparacao-anos', params, signal),
+  totalizacaoMetricas: (params, signal) => obter('/totalizacao/metricas', params, signal),
+  totalizacaoIncidentes: (params, signal) => obter('/totalizacao/incidentes', params, signal),
+  totalizacaoDivergencias: (params, signal) => obter('/totalizacao/divergencias', params, signal),
 }

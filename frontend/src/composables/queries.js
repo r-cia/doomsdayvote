@@ -1,7 +1,82 @@
-import { computed, isRef, watch } from 'vue'
+import { computed, toValue, watch } from 'vue'
 import { useQuery, keepPreviousData } from '@tanstack/vue-query'
 import { api } from '../api/client'
 import { useFiltersStore } from '../stores/filters'
+
+const baseDoRecorte = (store) => ({
+  election_id: store.electionId,
+  cargo: store.cargo,
+  as_of: store.asOf,
+  uf: store.uf,
+  municipio: store.municipio,
+})
+
+const baseDaSecao = (store) => ({
+  election_id: store.electionId,
+  cargo: store.cargo,
+  as_of: store.asOf,
+})
+
+const baseDaTotalizacao = (store) => ({
+  ano: store.ano,
+  turno: store.turno,
+  uf: store.uf,
+  municipio: store.municipio,
+})
+
+const prontoDoRecorte = (store) => Boolean(store.electionId && store.cargo)
+const prontoDaTotalizacao = (store) => Boolean(store.ano && store.turno)
+
+// ordenacoes: { ordem, direcao } para a tabela única, ou { [sufixo]: { ordem, direcao } }
+// nas rotas com mais de uma tabela (sufixos do backend: _biometria_uf, _share, ...).
+function paramsOrdenacao(ordenacoes) {
+  const valor = toValue(ordenacoes)
+  if (!valor || typeof valor !== 'object') return {}
+  const porSufixo = 'ordem' in valor ? { '': valor } : valor
+  const params = {}
+  for (const [sufixo, item] of Object.entries(porSufixo)) {
+    const ordenacao = toValue(item)
+    if (ordenacao?.ordem) {
+      params[`ordem${sufixo}`] = ordenacao.ordem
+      params[`direcao${sufixo}`] = ordenacao.direcao ?? 'asc'
+    }
+  }
+  return params
+}
+
+function valores(opcoes) {
+  return Object.fromEntries(
+    Object.entries(opcoes ?? {}).map(([chave, valor]) => [chave, toValue(valor)]),
+  )
+}
+
+function consulta(
+  nome,
+  chamar,
+  {
+    base = baseDoRecorte,
+    pronto = prontoDoRecorte,
+    extra = () => ({}),
+    ordenacoes = null,
+    habilitado = null,
+    identidade = () => [],
+  } = {},
+) {
+  const store = useFiltersStore()
+  const params = computed(() => ({
+    ...base(store),
+    ...extra(),
+    ...paramsOrdenacao(ordenacoes),
+  }))
+  return useQuery({
+    queryKey: computed(() => [nome, ...identidade(), params.value]),
+    queryFn: ({ signal }) => chamar(params.value, signal),
+    enabled: computed(
+      () => pronto(store) && (habilitado === null || Boolean(toValue(habilitado))),
+    ),
+    placeholderData: keepPreviousData,
+  })
+}
 
 export function useEleicoes() {
   const store = useFiltersStore()
@@ -22,284 +97,157 @@ export function useEleicoes() {
   return query
 }
 
-export function useResumo() {
-  const store = useFiltersStore()
-  return useQuery({
-    queryKey: computed(() => [
-      'resumo',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-    ]),
-    queryFn: ({ signal }) =>
-      api.resumo(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
-    placeholderData: keepPreviousData,
-  })
+export function useResumo(ordenacoes) {
+  return consulta('resumo', api.resumo, { ordenacoes })
 }
 
 export function useTimeline() {
   const store = useFiltersStore()
-  return useQuery({
-    queryKey: computed(() => [
-      'timeline',
-      store.electionId,
-      store.cargo,
-      store.uf,
-      store.municipio,
-      store.timelineGranularity,
-    ]),
-    queryFn: ({ signal }) =>
-      api.timeline(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          uf: store.uf,
-          municipio: store.municipio,
-          granularity: store.timelineGranularity,
-          por_candidato: true,
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
-    placeholderData: keepPreviousData,
+  return consulta('timeline', api.timeline, {
+    extra: () => ({ granularity: store.timelineGranularity, por_candidato: true }),
   })
 }
 
-export function useAnalise() {
-  const store = useFiltersStore()
-  return useQuery({
-    queryKey: computed(() => [
-      'analise',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-    ]),
-    queryFn: ({ signal }) =>
-      api.analise(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
-    placeholderData: keepPreviousData,
-  })
+export function useAnalise(ordenacoes) {
+  return consulta('analise', api.analise, { ordenacoes })
 }
 
-export function useAnomalias(habilitado = null, ordenarPor = null) {
-  const store = useFiltersStore()
-  const ordenacao = computed(() =>
-    typeof ordenarPor === 'function'
-      ? ordenarPor()
-      : ordenarPor?.value !== undefined
-        ? ordenarPor.value
-        : (ordenarPor ?? 'if'),
-  )
-  return useQuery({
-    queryKey: computed(() => [
-      'anomalias',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      ordenacao.value,
-    ]),
-    queryFn: ({ signal }) =>
-      api.anomalias(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          ordenar_por: ordenacao.value,
-        },
-        signal,
-      ),
-    enabled: computed(
-      () =>
-        Boolean(store.electionId && store.cargo) &&
-        (habilitado ? habilitado.value : true),
-    ),
-    placeholderData: keepPreviousData,
-  })
+export function useAnomalias(habilitado = null, ordenacoes = null) {
+  return consulta('anomalias', api.anomalias, { habilitado, ordenacoes })
 }
 
-export function useEstatisticas(escopo) {
-  const store = useFiltersStore()
-  const escopoValor = computed(() => escopo?.value ?? escopo ?? 'turno')
-  return useQuery({
-    queryKey: computed(() => [
-      'estatisticas',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      escopoValor.value,
-    ]),
-    queryFn: ({ signal }) =>
-      api.estatisticas(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          escopo: escopoValor.value,
-        },
-        signal,
-      ),
-    enabled: computed(() => Boolean(store.electionId && store.cargo)),
-    placeholderData: keepPreviousData,
+export function useEstatisticas(escopo, ordenacoes) {
+  return consulta('estatisticas', api.estatisticas, {
+    extra: () => ({ escopo: toValue(escopo) ?? 'turno' }),
+    ordenacoes,
   })
 }
 
 export function useMapa(nivel = null, opcoes = {}) {
   const store = useFiltersStore()
-  const nivelEfetivo = computed(() => nivel ?? store.mapLevel)
-  const ufDoMapa = computed(() => (opcoes.ignorarUf ? null : store.uf))
-  const municipioDoMapa = computed(() =>
-    opcoes.ignorarMunicipio ? null : store.municipio,
+  const vazio = (v) => v === null || v === undefined || v === ''
+  const nivelEfetivo = () => nivel ?? store.mapLevel
+  const ufDoMapa = () => (opcoes.ignorarUf ? null : store.uf)
+  return consulta('mapa', api.mapa, {
+    extra: () => {
+      const asOf = toValue(opcoes.asOfOverride)
+      const anterior = toValue(opcoes.asOfAnterior)
+      return {
+        as_of: vazio(asOf) ? store.asOf : asOf,
+        as_of_anterior: vazio(anterior) ? undefined : anterior,
+        uf: ufDoMapa(),
+        municipio: opcoes.ignorarMunicipio ? null : store.municipio,
+        level: nivelEfetivo(),
+        candidatos: opcoes.incluirTodosCandidatos
+          ? toValue(opcoes.candidatos)
+          : store.candidato,
+      }
+    },
+    ordenacoes: opcoes.ordenacoes,
+    habilitado: () => nivelEfetivo() !== 'municipio' || Boolean(ufDoMapa()),
+  })
+}
+
+export function useSecoes(ordenacoes) {
+  const store = useFiltersStore()
+  return consulta('secoes', api.secoes, {
+    extra: () => ({
+      status: store.sectionStatus,
+      zona: store.sectionZona,
+      secao: store.sectionSecao,
+      municipio_nome: store.sectionMunicipioNome,
+      page: store.sectionPage,
+      page_size: store.sectionPageSize,
+    }),
+    ordenacoes,
+    habilitado: () => Boolean(store.municipio),
+  })
+}
+
+export function useSecao(id, ordenacoes) {
+  const idEfetivo = () => (toValue(id) ? String(toValue(id)) : null)
+  return consulta('secao', (params, signal) => api.secao(idEfetivo(), params, signal), {
+    base: baseDaSecao,
+    ordenacoes,
+    habilitado: () => Boolean(idEfetivo()),
+    identidade: () => [idEfetivo()],
+  })
+}
+
+export function useSecaoVersoes(id, opcoes = {}, ordenacoes) {
+  const idEfetivo = () => (toValue(id) ? String(toValue(id)) : null)
+  return consulta(
+    'secao-versoes',
+    (params, signal) => api.secaoVersoes(idEfetivo(), params, signal),
+    {
+      base: baseDaSecao,
+      extra: () => valores(opcoes),
+      ordenacoes,
+      habilitado: () => Boolean(idEfetivo()),
+      identidade: () => [idEfetivo()],
+    },
   )
-  const asOfEfetivo = computed(() => {
-    const o = opcoes.asOfOverride
-    const v = o && typeof o === 'object' && 'value' in o ? o.value : o
-    return (v === null || v === undefined || v === '') ? store.asOf : v
-  })
-  const asOfAnterior = computed(() => {
-    const o = opcoes.asOfAnterior
-    const v = o && typeof o === 'object' && 'value' in o ? o.value : o
-    return (v === null || v === undefined || v === '') ? undefined : v
-  })
-  const candidatosMapa = computed(() => {
-    if (!opcoes.incluirTodosCandidatos) return store.candidato
-    if (typeof opcoes.candidatos === 'function') return opcoes.candidatos()
-    if (opcoes.candidatos?.value !== undefined) return opcoes.candidatos.value
-    return opcoes.candidatos
-  })
+}
 
-  return useQuery({
-    queryKey: computed(() => [
-      'mapa',
-      store.electionId,
-      store.cargo,
-      asOfEfetivo.value,
-      asOfAnterior.value,
-      ufDoMapa.value,
-      municipioDoMapa.value,
-      nivelEfetivo.value,
-      opcoes.incluirTodosCandidatos ? candidatosMapa.value : store.candidato,
-    ]),
-    queryFn: ({ signal }) =>
-      api.mapa(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: asOfEfetivo.value,
-          as_of_anterior: asOfAnterior.value,
-          uf: ufDoMapa.value,
-          municipio: municipioDoMapa.value,
-          level: nivelEfetivo.value,
-          candidatos: candidatosMapa.value,
-        },
-        signal,
-      ),
-    enabled: computed(
-      () =>
-        Boolean(store.electionId && store.cargo) &&
-        (nivelEfetivo.value !== 'municipio' || Boolean(ufDoMapa.value)),
-    ),
-    placeholderData: keepPreviousData,
+export function useConsistencia(opcoes = {}, ordenacoes) {
+  return consulta('consistencia', api.consistencia, {
+    extra: () => valores(opcoes),
+    ordenacoes,
   })
 }
 
-export function useSecoes() {
-  const store = useFiltersStore()
-  return useQuery({
-    queryKey: computed(() => [
-      'secoes',
-      store.electionId,
-      store.cargo,
-      store.asOf,
-      store.uf,
-      store.municipio,
-      store.sectionStatus,
-      store.sectionZona,
-      store.sectionSecao,
-      store.sectionMunicipioNome,
-      store.sectionPage,
-      store.sectionPageSize,
-    ]),
-    queryFn: ({ signal }) =>
-      api.secoes(
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-          uf: store.uf,
-          municipio: store.municipio,
-          status: store.sectionStatus,
-          zona: store.sectionZona,
-          secao: store.sectionSecao,
-          municipio_nome: store.sectionMunicipioNome,
-          page: store.sectionPage,
-          page_size: store.sectionPageSize,
-        },
-        signal,
-      ),
-    enabled: computed(() =>
-      Boolean(store.electionId && store.cargo && store.municipio),
-    ),
-    placeholderData: keepPreviousData,
+export function useConcentracao(opcoes = {}, ordenacoes) {
+  return consulta('concentracao', api.concentracao, {
+    extra: () => valores(opcoes),
+    ordenacoes,
   })
 }
 
-export function useSecao(id) {
+export function useComparacaoLocal(opcoes = {}, ordenacoes) {
+  return consulta('comparacao-local', api.comparacaoLocal, {
+    extra: () => valores(opcoes),
+    ordenacoes,
+  })
+}
+
+export function useComparacaoLocalSecoes(chave, ordenacoes) {
+  return consulta('comparacao-local-secoes', api.comparacaoLocalSecoes, {
+    extra: () => ({ chave: toValue(chave) }),
+    ordenacoes,
+    habilitado: () => Boolean(toValue(chave)),
+  })
+}
+
+export function useRelatorio(ordenacoes) {
+  return consulta('relatorio', api.relatorio, { ordenacoes })
+}
+
+export function useComparacaoAnos(anos) {
   const store = useFiltersStore()
-  const idEfetivo = computed(() => {
-    const valor = isRef(id) ? id.value : id
-    return valor ? String(valor) : null
+  const lista = () => toValue(anos) ?? []
+  return consulta('comparacao-anos', api.comparacaoAnos, {
+    base: () => ({ uf: store.uf }),
+    pronto: () => lista().length >= 2,
+    extra: () => ({ anos: lista().join(',') }),
   })
-  return useQuery({
-    queryKey: computed(() => [
-      'secao',
-      idEfetivo.value,
-      store.electionId,
-      store.cargo,
-      store.asOf,
-    ]),
-    queryFn: ({ signal }) =>
-      api.secao(
-        idEfetivo.value,
-        {
-          election_id: store.electionId,
-          cargo: store.cargo,
-          as_of: store.asOf,
-        },
-        signal,
-      ),
-    enabled: computed(() =>
-      Boolean(idEfetivo.value && store.electionId && store.cargo),
-    ),
+}
+
+function totalizacao(nome, chamar, opcoes) {
+  return consulta(nome, chamar, {
+    base: baseDaTotalizacao,
+    pronto: prontoDaTotalizacao,
+    extra: () => valores(opcoes),
   })
+}
+
+export function useTotalizacaoMetricas(opcoes = {}) {
+  return totalizacao('totalizacao-metricas', api.totalizacaoMetricas, opcoes)
+}
+
+export function useTotalizacaoIncidentes(opcoes = {}) {
+  return totalizacao('totalizacao-incidentes', api.totalizacaoIncidentes, opcoes)
+}
+
+export function useTotalizacaoDivergencias(opcoes = {}) {
+  return totalizacao('totalizacao-divergencias', api.totalizacaoDivergencias, opcoes)
 }

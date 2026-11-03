@@ -21,6 +21,7 @@ function cargoPadrao(eleicao) {
 export const useFiltersStore = defineStore('filters', {
   state: () => ({
     electionId: null,
+    ano: null,
     cargo: null,
     turno: null,
     candidato: null,
@@ -60,6 +61,7 @@ export const useFiltersStore = defineStore('filters', {
         return
       }
 
+      this.ano = atual.ano_eleicao
       if (this.turno === null) this.turno = atual.nr_turno
       const cargos = cargosPermitidos(atual)
       if (!cargos.some((cargo) => cargo.cd_cargo_pergunta === this.cargo)) {
@@ -71,6 +73,7 @@ export const useFiltersStore = defineStore('filters', {
       if (!eleicao) return
       const cargos = cargosPermitidos(eleicao)
       this.electionId = eleicao.id
+      this.ano = eleicao.ano_eleicao
       this.turno = eleicao.nr_turno
       this.cargo = cargoPadrao(eleicao)?.cd_cargo_pergunta ?? null
       this.candidato = null
