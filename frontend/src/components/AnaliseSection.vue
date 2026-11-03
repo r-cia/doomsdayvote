@@ -1,5 +1,4 @@
 <script setup>
-import BenfordNiveisPanel from './BenfordNiveisPanel.vue'
 import BenfordPanel from './BenfordPanel.vue'
 import DuplicacaoPanel from './DuplicacaoPanel.vue'
 import SecoesDestaquePanel from './SecoesDestaquePanel.vue'
@@ -35,12 +34,13 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
     <template v-else>
       <BenfordPanel
         :dados="benford"
+        :niveis="anomalias?.benford_niveis ?? null"
+        :carregando-niveis="loading"
         :selecionado="selecionado"
         @select="emit('select', $event)"
       />
 
       <template v-if="anomalias">
-        <BenfordNiveisPanel :dados="anomalias.benford_niveis" />
         <div class="auditoria-grade">
           <DuplicacaoPanel :dados="anomalias.duplicacao" />
           <SecoesDestaquePanel

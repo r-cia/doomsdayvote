@@ -407,7 +407,7 @@ describe('BenfordPanel', () => {
     expect(texto).toContain('Candidato A')
     expect(texto).toContain('Candidato B')
     expect(texto).toContain('0,0042')
-    expect(texto).toContain('conformidade próxima')
+    expect(texto).not.toContain('conformidade')
     expect(texto).toContain('120')
 
     const botoes = wrapper.findAll('tbody button')

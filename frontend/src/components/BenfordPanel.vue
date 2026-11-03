@@ -1,13 +1,22 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { formatarNumero } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Object, default: null },
+  niveis: { type: Object, default: null },
+  carregandoNiveis: { type: Boolean, default: false },
   selecionado: { type: Number, default: null },
 })
 
 const emit = defineEmits(['select'])
+
+const NIVEIS = [
+  ['secao', 'Seção'],
+  ['zona', 'Zona'],
+  ['municipio', 'Município'],
+]
+const nivel = ref('secao')
 
 const minimo = computed(() => props.dados?.minimo_votos ?? 10)
 const candidatos = computed(() => props.dados?.candidatos ?? [])
@@ -20,9 +29,38 @@ const ativo = computed(() => {
   )
 })
 
-function altura(valor) {
-  return `${Math.max(1, Math.min(100, (valor / 35) * 100))}%`
-}
+const resultado = computed(() => {
+  if (!ativo.value) return null
+  if (nivel.value === 'secao') return ativo.value
+  const doNivel = props.niveis?.candidatos?.find(
+    (candidato) => candidato.nr_votavel === ativo.value.nr_votavel,
+  )
+  return doNivel?.niveis?.[nivel.value] ?? null
+})
+
+const aguardandoNivel = computed(() => nivel.value !== 'secao' && !props.niveis && props.carregandoNiveis)
+const faixas = computed(() => resultado.value?.monte_carlo?.faixa_digitos ?? null)
+const digitos = computed(() => (resultado.value?.n > 0 ? resultado.value.digitos ?? [] : []))
+
+const L = 360
+const A = 160
+const MARGEM = { esq: 30, dir: 8, topo: 8, base: 22 }
+const larguraUtil = L - MARGEM.esq - MARGEM.dir
+const alturaUtil = A - MARGEM.topo - MARGEM.base
+
+const maximo = computed(() => {
+  const valores = digitos.value.flatMap((d) => [d.observado_percentual, d.esperado_percentual])
+  for (const f of faixas.value ?? []) valores.push(f.p975)
+  return Math.max(10, Math.ceil(Math.max(...valores, 0) / 5) * 5)
+})
+
+const passo = computed(() => larguraUtil / 9)
+const x = (indice) => MARGEM.esq + passo.value * indice + passo.value / 2
+const y = (valor) => MARGEM.topo + alturaUtil * (1 - valor / maximo.value)
+const curvaEsperada = computed(() =>
+  digitos.value.map((d, i) => `${x(i)},${y(d.esperado_percentual)}`).join(' '),
+)
+const faixaDe = (digito) => faixas.value?.find((f) => f.digito === digito) ?? null
 
 function formatarMad(valor) {
   if (valor === null || valor === undefined) return '—'
@@ -32,12 +70,13 @@ function formatarMad(valor) {
   })
 }
 
-function tom(classificacao) {
-  if (!classificacao) return ''
-  if (classificacao === 'conformidade próxima') return 'chip--ok'
-  if (classificacao === 'conformidade marginal') return 'chip--warn'
-  if (classificacao === 'não conformidade') return 'chip--alert'
-  return ''
+const pct = (valor) => `${Number(valor).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%`
+
+function titulo(d) {
+  const faixa = faixaDe(d.digito)
+  return `Dígito ${d.digito}: observado ${pct(d.observado_percentual)}, esperado ${pct(d.esperado_percentual)}${
+    faixa ? `, faixa de 95% de ${pct(faixa.p025)} a ${pct(faixa.p975)}` : ''
+  }`
 }
 </script>
 
@@ -45,9 +84,21 @@ function tom(classificacao) {
   <section class="painel" aria-labelledby="benford-titulo">
     <header class="painel__cabecalho">
       <h2 id="benford-titulo">Benford · todos os candidatos</h2>
+      <div class="segmented" role="group" aria-label="Nível">
+        <button
+          v-for="[chave, rotulo] in NIVEIS"
+          :key="chave"
+          type="button"
+          :aria-pressed="nivel === chave"
+          :class="{ ativo: nivel === chave }"
+          @click="nivel = chave"
+        >
+          {{ rotulo }}
+        </button>
+      </div>
       <p class="painel__meta">
         primeiro dígito<br />
-        <b>{{ formatarNumero(ativo?.n) }}</b> seções
+        <b>{{ formatarNumero(resultado?.n) }}</b> {{ nivel === 'secao' ? 'seções' : 'unidades' }}
       </p>
     </header>
 
@@ -57,30 +108,46 @@ function tom(classificacao) {
 
     <template v-else>
       <div class="benford">
-        <div
-          class="benford__grafico"
-          role="img"
-          :aria-label="`Distribuição do primeiro dígito dos votos de ${ativo?.nm_votavel} por seção, comparada à lei de Benford`"
-        >
-          <div
-            v-for="digito in ativo?.digitos ?? []"
-            :key="digito.digito"
-            class="benford__coluna"
-          >
-            <div class="benford__par">
-              <span
-                class="benford__obs"
-                :style="{ height: altura(digito.observado_percentual) }"
-                :title="`observado ${formatarMad(digito.observado_percentual)}%`"
-              />
-              <span
-                class="benford__esp"
-                :style="{ height: altura(digito.esperado_percentual) }"
-                :title="`esperado ${formatarMad(digito.esperado_percentual)}%`"
-              />
-            </div>
-            <span class="benford__digito">{{ digito.digito }}</span>
-          </div>
+        <div class="benford__grafico-wrap">
+          <p v-if="aguardandoNivel" class="vazio">Carregando…</p>
+          <p v-else-if="digitos.length === 0" class="vazio">Sem dados</p>
+          <template v-else>
+            <svg
+              class="benford__svg"
+              :viewBox="`0 0 ${L} ${A}`"
+              role="img"
+              :aria-label="`Distribuição do primeiro dígito dos votos de ${ativo?.nm_votavel}, comparada à lei de Benford`"
+            >
+              <g v-for="(d, i) in digitos" :key="d.digito">
+                <rect
+                  v-if="faixaDe(d.digito)"
+                  class="benford__faixa"
+                  :x="x(i) - passo / 2 + 2"
+                  :y="y(faixaDe(d.digito).p975)"
+                  :width="passo - 4"
+                  :height="Math.max(1, y(faixaDe(d.digito).p025) - y(faixaDe(d.digito).p975))"
+                />
+                <rect
+                  class="benford__barra"
+                  :x="x(i) - passo / 4"
+                  :y="y(d.observado_percentual)"
+                  :width="passo / 2"
+                  :height="Math.max(0, y(0) - y(d.observado_percentual))"
+                >
+                  <title>{{ titulo(d) }}</title>
+                </rect>
+                <text class="benford__rotulo" :x="x(i)" :y="A - 6" text-anchor="middle">{{ d.digito }}</text>
+              </g>
+              <polyline class="benford__curva" :points="curvaEsperada" fill="none" />
+              <text class="benford__rotulo" :x="MARGEM.esq - 4" :y="y(maximo) + 8" text-anchor="end">{{ maximo }}%</text>
+              <text class="benford__rotulo" :x="MARGEM.esq - 4" :y="y(0)" text-anchor="end">0%</text>
+            </svg>
+            <p class="benford__legenda">
+              <span><i class="benford__chave benford__chave--obs" aria-hidden="true" /> Observado</span>
+              <span><i class="benford__chave benford__chave--esp" aria-hidden="true" /> Esperado</span>
+              <span v-if="faixas"><i class="benford__chave benford__chave--faixa" aria-hidden="true" /> Faixa de 95% (Monte Carlo)</span>
+            </p>
+          </template>
         </div>
 
         <div class="benford__tabela">
@@ -93,7 +160,6 @@ function tom(classificacao) {
                 <th scope="col">Candidato</th>
                 <th scope="col" class="num">n</th>
                 <th scope="col" class="num">MAD</th>
-                <th scope="col">Leitura</th>
               </tr>
             </thead>
             <tbody>
@@ -113,11 +179,6 @@ function tom(classificacao) {
                 </td>
                 <td class="num">{{ formatarNumero(candidato.n) }}</td>
                 <td class="num">{{ formatarMad(candidato.mad) }}</td>
-                <td>
-                  <span class="chip" :class="tom(candidato.classificacao)">
-                    {{ candidato.classificacao ?? 'sem dados' }}
-                  </span>
-                </td>
               </tr>
             </tbody>
           </table>

@@ -2113,3 +2113,55 @@ th .ordenavel:focus-visible {
   display: grid;
   gap: 8px;
 }
+
+.benford__svg {
+  width: 100%;
+  height: auto;
+}
+
+.benford__barra {
+  fill: var(--amber);
+}
+
+.benford__faixa {
+  fill: var(--amber);
+  opacity: 0.22;
+}
+
+.benford__curva {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.benford__rotulo {
+  fill: currentColor;
+  font-size: 9px;
+}
+
+.benford__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.benford__chave {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+}
+
+.benford__chave--obs {
+  background: var(--amber);
+}
+
+.benford__chave--esp {
+  background: var(--ink);
+  height: 2px;
+}
+
+.benford__chave--faixa {
+  background: var(--amber);
+  opacity: 0.35;
+}
