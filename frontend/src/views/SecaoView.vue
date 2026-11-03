@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StateBlock from '../components/StateBlock.vue'
+import VersoesBoletimPanel from '../components/VersoesBoletimPanel.vue'
 
 const props = defineProps({
   modal: { type: Boolean, default: false },
@@ -286,6 +287,8 @@ function voltar() { fechar() }
           </table>
         </div>
       </section>
+
+      <VersoesBoletimPanel :secao-id="id" />
     </template>
     </div>
   </div>
