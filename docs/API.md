@@ -331,7 +331,7 @@ Resposta:
 
 ## Totalização
 
-As rotas de totalização leem os dados carregados por UF e não usam `election_id`. As três rotas consideram apenas lotes `concluido` ou `parcial` e nunca lotes `falhou`, `processando` ou `substituido`. Sem `lote`, o recorte usa o lote vigente de cada UF, ano e turno (o mais recente com dados); no escopo nacional, usa o vigente de cada UF. O recorte é comum às três rotas: `ano` (inteiro, obrigatório), `turno` (inteiro, obrigatório, `1` ou `2`), `uf` (exatamente 2 letras), `municipio` (código TSE), `zona`, `secao` e `lote` (uuid), todos opcionais. O escopo é inferido pela granularidade: `secao`, depois `zona`, `municipio`, `uf` e `nacional`.
+As rotas de totalização leem os dados carregados por UF e não usam `election_id`. As três rotas consideram apenas lotes `concluido` ou `parcial` e nunca lotes `falhou`, `processando` ou `substituido`. Sem `lote`, o recorte usa o lote vigente de cada UF, ano e turno (o mais recente com dados); no escopo nacional, usa o vigente de cada UF. O recorte é comum às três rotas: `ano` (inteiro, obrigatório), `turno` (inteiro, obrigatório, `1` ou `2`), `uf` (exatamente 2 letras), `municipio` (código TSE), `zona`, `secao` e `lote` (uuid), todos opcionais.
 
 Cache Redis por recorte exato: `86400` s em `/api/totalizacao/metricas` e `60` s em `/api/totalizacao/incidentes` e `/api/totalizacao/divergencias`; o cabeçalho `x-cache` indica `hit`, `miss` ou `off`.
 
