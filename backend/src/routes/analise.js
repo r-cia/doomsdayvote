@@ -144,7 +144,11 @@ export function registrarAnalise({ app, db, cache, cacheado }) {
       candidatos: ordenarLista(benfordBase.candidatos, COLUNAS_BENFORD_NIVEIS, lerOrdenacao(query, '_benford')),
     };
     const outliers = pontuarOutliers(linhas);
-    const ranking = ordenarLista(outliers.pontuadas, COLUNAS_OUTLIERS, lerOrdenacao(query)).slice(0, 20);
+    const ranking = ordenarLista(
+      outliers.pontuadas.slice(0, 20),
+      COLUNAS_OUTLIERS,
+      lerOrdenacao(query),
+    );
 
     return {
       corte: corteResposta(corte),
