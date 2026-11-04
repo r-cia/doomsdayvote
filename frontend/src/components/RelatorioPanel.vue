@@ -63,7 +63,8 @@ const COLUNAS_RECEBIMENTO = [
     />
     <StateBlock v-else-if="linhas.length === 0" estado="vazio" :titulo="$t('relatorio.vazio')" />
     <template v-else>
-      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
+      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
+        <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
         <table>
           <caption class="sr-only">{{ $t('relatorio.captionParticipacao') }}</caption>
           <thead>
@@ -82,7 +83,8 @@ const COLUNAS_RECEBIMENTO = [
         </table>
       </div>
 
-      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
+      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
+        <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
         <table>
           <caption class="sr-only">{{ $t('relatorio.captionRecebimento') }}</caption>
           <thead>

@@ -60,7 +60,8 @@ watch(
     />
     <StateBlock v-else-if="itens.length === 0" estado="vazio" :titulo="$t('consistencia.vazio')" />
     <template v-else>
-      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
+      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
+        <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
         <table>
           <thead>
             <tr>

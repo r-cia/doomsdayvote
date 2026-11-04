@@ -33,4 +33,17 @@ describe('DivergenciasPanel', () => {
     const w = await montar(DivergenciasPanel)
     expect(w.text()).toContain('Nenhuma divergência de dupla conferência neste recorte.')
   })
+
+  it('durante a recarga com linhas já exibidas marca a tabela como ocupada e avisa leitores de tela', async () => {
+    api.totalizacaoDivergencias.mockResolvedValueOnce({ itens: [item], total: 60, pagina: 1, tamanho: 25 })
+    const w = await montar(DivergenciasPanel)
+    api.totalizacaoDivergencias.mockReturnValueOnce(new Promise(() => {}))
+    await w.find('button[aria-label="Próxima página"]').trigger('click')
+    await flushPromises()
+    const tabela = w.find('.tabela-scroll')
+    expect(tabela.classes()).toContain('atualizando')
+    expect(tabela.attributes('aria-busy')).toBe('true')
+    expect(tabela.find('[role="status"]').text()).toBe('Carregando…')
+    expect(w.find('tbody tr').exists()).toBe(true)
+  })
 })

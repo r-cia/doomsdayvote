@@ -48,7 +48,8 @@ const nulo = (valor) => (valor === null || valor === undefined || valor === '' ?
     />
     <StateBlock v-else-if="versoes.length === 0" estado="vazio" :titulo="$t('versoes.vazio')" />
     <template v-else>
-      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
+      <div class="tabela-scroll" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
+        <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
         <table>
           <thead>
             <tr>

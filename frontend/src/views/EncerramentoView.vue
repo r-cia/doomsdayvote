@@ -76,7 +76,8 @@ watch(
     />
     <StateBlock v-else-if="urnas.length === 0" estado="vazio" :titulo="$t('comum.semDados')" />
 
-    <div v-else class="tabela-scroll" :class="{ atualizando: urnasQuery.isFetching.value }">
+    <div v-else class="tabela-scroll" :class="{ atualizando: urnasQuery.isFetching.value }" :aria-busy="urnasQuery.isFetching.value">
+      <span v-if="urnasQuery.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
       <table class="tabela">
         <thead>
           <tr>
@@ -123,7 +124,8 @@ watch(
         @acao="municipiosQuery.refetch()"
       />
       <div v-else-if="municipios.length === 0" class="vazio">{{ $t('comum.semDados') }}.</div>
-      <div v-else class="tabela-scroll" :class="{ atualizando: municipiosQuery.isFetching.value }">
+      <div v-else class="tabela-scroll" :class="{ atualizando: municipiosQuery.isFetching.value }" :aria-busy="municipiosQuery.isFetching.value">
+        <span v-if="municipiosQuery.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
         <table>
           <thead>
             <tr>
@@ -174,7 +176,8 @@ watch(
         @acao="secoesQuery.refetch()"
       />
       <div v-else-if="secoes.length === 0" class="vazio">{{ $t('comum.semDados') }}.</div>
-      <div v-else class="tabela-scroll" :class="{ atualizando: secoesQuery.isFetching.value }">
+      <div v-else class="tabela-scroll" :class="{ atualizando: secoesQuery.isFetching.value }" :aria-busy="secoesQuery.isFetching.value">
+        <span v-if="secoesQuery.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
         <table>
           <thead>
             <tr>

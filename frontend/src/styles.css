@@ -2079,8 +2079,38 @@ tr.linha--ativa th {
 }
 
 .atualizando {
-  opacity: 0.55;
+  position: relative;
+}
+
+.atualizando > :not(.sr-only) {
+  opacity: 0.45;
   transition: opacity 0.15s;
+}
+
+.atualizando::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 2px solid var(--line);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atualizando::after {
+    animation: none;
+  }
 }
 
 .paginacao {

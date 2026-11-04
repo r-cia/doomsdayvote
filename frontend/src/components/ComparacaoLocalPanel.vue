@@ -69,7 +69,7 @@ const identificacao = (g) =>
     />
     <StateBlock v-else-if="grupos.length === 0" estado="vazio" :titulo="$t('comparacaoLocal.vazio')" />
     <template v-else>
-      <ul class="lista-grupos" :class="{ atualizando: query.isFetching.value }">
+      <ul class="lista-grupos" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
         <li v-for="g in grupos" :key="g.chave">
           <button
             type="button"

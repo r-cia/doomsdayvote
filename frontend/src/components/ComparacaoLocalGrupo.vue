@@ -31,7 +31,8 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
     :acao="$t('comum.tentarNovamente')"
     @acao="query.refetch()"
   />
-  <div v-else class="tabela-scroll" :class="{ atualizando: query.isFetching.value }">
+  <div v-else class="tabela-scroll" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
+    <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
     <table>
       <thead>
         <tr>

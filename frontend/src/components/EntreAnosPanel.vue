@@ -103,7 +103,8 @@ const numero = (v, casas) => formatarDecimal(v, casas)
         </button>
       </div>
 
-      <div role="tabpanel" :aria-labelledby="`aba-turno-${turno}`" :class="{ atualizando: query.isFetching.value }">
+      <div role="tabpanel" :aria-labelledby="`aba-turno-${turno}`" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
+        <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
         <div v-if="votos.length === 0" class="vazio">{{ $t('entreAnos.semTurno') }}</div>
         <template v-else>
           <CurvasAnos :titulo="$t('entreAnos.votosIntervalo')" escala="log" :series="votos" />
