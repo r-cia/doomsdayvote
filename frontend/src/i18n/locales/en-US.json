@@ -10,7 +10,6 @@
     "idioma": "Language",
     "h1": "Ballot box report checking",
     "abrindo": "Opening the room",
-    "consultando": "Querying the local API.",
     "erroEleicoes": "Could not load the elections",
     "semEleicao": "No election available",
     "semEleicaoDesc": "Load the ballot box reports through the backend and reload this page."
@@ -296,7 +295,6 @@
     "aria": "Plot of the day from {de} to {ate}, with the cut at {corte}. {votos} accumulated votes in {secoes} sections with report."
   },
   "mapa": {
-    "malha": "Local IBGE mesh.",
     "nivelAria": "Map level",
     "modoAria": "Map color mode",
     "percentual": "Percentage",
@@ -307,7 +305,6 @@
     "lendo": "Reading {arquivo}.",
     "malhaNaoCarregada": "Mesh not loaded",
     "adicioneArquivo": "{mensagem} Add the file at {arquivo}.",
-    "nenhumaGeografia": "No geography was made up. The alternative table below remains available with the API data.",
     "aria": "Map by {nivel} with {n} areas",
     "legendaAria": "Map legend",
     "feicoes": "{n} features",
@@ -353,12 +350,10 @@
   "estatistica": {
     "etiqueta": "Descriptive statistics",
     "titulo": "Mean, median and standard deviation per section",
-    "subtitulo": "Votes per section of each candidate and turnout per section. Population standard deviation.",
     "escopo": "Scope",
     "turnoAtual": "Current round",
     "ano": "Year (1st and 2nd)",
     "calculando": "Calculating statistics",
-    "agregando": "Aggregating by section.",
     "erro": "Could not calculate the statistics",
     "erroGenerico": "Error loading statistics",
     "semDados": "No data for this selection",
@@ -566,10 +561,8 @@
     "biometriaNaoHabilitada": "Biometrics not enabled",
     "versoesAnteriores": "Previous versions",
     "lote": "Import batch",
-    "loteDesc": "Origin of the report considered in this cut.",
     "arquivo": "File",
     "resultados": "Section results",
-    "resultadosDesc": "Votes by votable type in the active report.",
     "nLinhas": "{n} rows",
     "semResultados": "No results for this section",
     "captionResultados": "Results by votable in the section",

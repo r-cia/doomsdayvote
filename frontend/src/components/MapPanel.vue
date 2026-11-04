@@ -617,7 +617,6 @@ onBeforeUnmount(() => {
     <div class="card__cabecalho mapa-card__cabecalho">
       <div>
         <h2 id="mapa-titulo">{{ $t('abas.mapa') }}</h2>
-        <p>{{ $t('mapa.malha') }}</p>
       </div>
       <div class="mapa-controles">
         <div class="segmented" role="group" :aria-label="$t('mapa.nivelAria')">
@@ -689,9 +688,6 @@ onBeforeUnmount(() => {
         :acao="$t('comum.tentarNovamente')"
         @acao="tentarMalhaNovamente"
       />
-      <p>
-        {{ $t('mapa.nenhumaGeografia') }}
-      </p>
     </div>
 
     <div

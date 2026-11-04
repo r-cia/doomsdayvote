@@ -225,7 +225,6 @@ function voltar() { fechar() }
         <div class="card__cabecalho">
           <div>
             <h2 id="secao-lote">{{ $t('secao.lote') }}</h2>
-            <p>{{ $t('secao.loteDesc') }}</p>
           </div>
         </div>
         <dl class="dados dados--linha">
@@ -238,7 +237,6 @@ function voltar() { fechar() }
         <div class="card__cabecalho">
           <div>
             <h2 id="secao-resultados">{{ $t('secao.resultados') }}</h2>
-            <p>{{ $t('secao.resultadosDesc') }}</p>
           </div>
           <span class="contador">{{ $t('secao.nLinhas', { n: resultados.length }) }}</span>
         </div>

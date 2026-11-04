@@ -103,7 +103,6 @@ const candidatos = computed(() =>
         v-if="eleicoesQuery.isLoading.value"
         estado="carregando"
         :titulo="$t('app.abrindo')"
-        :descricao="$t('app.consultando')"
       />
       <StateBlock
         v-else-if="eleicoesQuery.error.value"

@@ -49,9 +49,6 @@ function erroMensagem(erro) {
       <div>
         <p class="painel__etiqueta">{{ $t('estatistica.etiqueta') }}</p>
         <h2 id="titulo-estatisticas">{{ $t('estatistica.titulo') }}</h2>
-        <p class="painel__subtitulo">
-          {{ $t('estatistica.subtitulo') }}
-        </p>
       </div>
       <div class="estatistica-controle">
         <label class="campo campo--curto">
@@ -68,7 +65,6 @@ function erroMensagem(erro) {
       v-if="estatisticasQuery.isLoading.value && blocos.length === 0"
       estado="carregando"
       :titulo="$t('estatistica.calculando')"
-      :descricao="$t('estatistica.agregando')"
     />
     <StateBlock
       v-else-if="estatisticasQuery.error.value"

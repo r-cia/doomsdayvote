@@ -10,7 +10,6 @@
     "idioma": "Idioma",
     "h1": "Verificación de actas de urna",
     "abrindo": "Abriendo la sala",
-    "consultando": "Consultando la API local.",
     "erroEleicoes": "No se pudieron cargar las elecciones",
     "semEleicao": "Ninguna elección disponible",
     "semEleicaoDesc": "Cargue las actas desde el backend y recargue esta página."
@@ -296,7 +295,6 @@
     "aria": "Trazado del día de {de} a {ate}, con el corte en {corte}. {votos} votos acumulados en {secoes} secciones con acta."
   },
   "mapa": {
-    "malha": "Malla IBGE local.",
     "nivelAria": "Nivel del mapa",
     "modoAria": "Modo de color del mapa",
     "percentual": "Porcentaje",
@@ -307,7 +305,6 @@
     "lendo": "Leyendo {arquivo}.",
     "malhaNaoCarregada": "Malla no cargada",
     "adicioneArquivo": "{mensagem} Añada el archivo en {arquivo}.",
-    "nenhumaGeografia": "No se inventó ninguna geografía. La tabla alternativa de abajo sigue disponible con los datos de la API.",
     "aria": "Mapa por {nivel} con {n} áreas",
     "legendaAria": "Leyenda del mapa",
     "feicoes": "{n} elementos",
@@ -353,12 +350,10 @@
   "estatistica": {
     "etiqueta": "Estadística descriptiva",
     "titulo": "Media, mediana y desviación estándar por sección",
-    "subtitulo": "Votos por sección de cada candidato y participación por sección. Desviación estándar poblacional.",
     "escopo": "Ámbito",
     "turnoAtual": "Vuelta actual",
     "ano": "Año (1.ª y 2.ª)",
     "calculando": "Calculando estadísticas",
-    "agregando": "Agregando por sección.",
     "erro": "No se pudieron calcular las estadísticas",
     "erroGenerico": "Error al cargar las estadísticas",
     "semDados": "Sin datos para esta selección",
@@ -566,10 +561,8 @@
     "biometriaNaoHabilitada": "Biometría no habilitada",
     "versoesAnteriores": "Versiones anteriores",
     "lote": "Lote de importación",
-    "loteDesc": "Origen del acta considerada en este corte.",
     "arquivo": "Archivo",
     "resultados": "Resultados de la sección",
-    "resultadosDesc": "Votos por tipo de votable en el acta activa.",
     "nLinhas": "{n} filas",
     "semResultados": "Sin resultados para esta sección",
     "captionResultados": "Resultados por votable en la sección",

@@ -583,8 +583,7 @@ describe('MapPanel', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Malha não carregada')
-    expect(wrapper.text()).toContain('Nenhuma geografia foi inventada')
-    expect(wrapper.text()).toContain('Tabela alternativa ao mapa')
+    expect(wrapper.text()).not.toContain('Nenhuma geografia')
     expect(wrapper.text()).toContain('SP')
   })
 })

@@ -10,7 +10,6 @@
     "idioma": "Idioma",
     "h1": "Conferência de boletins de urna",
     "abrindo": "Abrindo a sala",
-    "consultando": "Consultando a API local.",
     "erroEleicoes": "Não foi possível carregar as eleições",
     "semEleicao": "Nenhuma eleição disponível",
     "semEleicaoDesc": "Carregue os BUs pelo backend e recarregue esta página."
@@ -296,7 +295,6 @@
     "aria": "Traçado do dia de {de} a {ate}, com o corte em {corte}. {votos} votos acumulados em {secoes} seções com BU."
   },
   "mapa": {
-    "malha": "Malha IBGE local.",
     "nivelAria": "Nível do mapa",
     "modoAria": "Modo de cor do mapa",
     "percentual": "Percentual",
@@ -307,7 +305,6 @@
     "lendo": "Lendo {arquivo}.",
     "malhaNaoCarregada": "Malha não carregada",
     "adicioneArquivo": "{mensagem} Adicione o arquivo em {arquivo}.",
-    "nenhumaGeografia": "Nenhuma geografia foi inventada. A tabela alternativa abaixo continua disponível com os dados da API.",
     "aria": "Mapa por {nivel} com {n} áreas",
     "legendaAria": "Legenda do mapa",
     "feicoes": "{n} feições",
@@ -353,12 +350,10 @@
   "estatistica": {
     "etiqueta": "Estatística descritiva",
     "titulo": "Média, mediana e desvio padrão por seção",
-    "subtitulo": "Votos por seção de cada candidato e comparecimento por seção. Desvio padrão populacional.",
     "escopo": "Escopo",
     "turnoAtual": "Turno atual",
     "ano": "Ano (1º e 2º)",
     "calculando": "Calculando estatísticas",
-    "agregando": "Agregando por seção.",
     "erro": "Não foi possível calcular as estatísticas",
     "erroGenerico": "Erro ao carregar estatísticas",
     "semDados": "Sem dados para este recorte",
@@ -566,10 +561,8 @@
     "biometriaNaoHabilitada": "Biometria não habilitada",
     "versoesAnteriores": "Versões anteriores",
     "lote": "Lote de importação",
-    "loteDesc": "Origem do BU considerado neste corte.",
     "arquivo": "Arquivo",
     "resultados": "Resultados da seção",
-    "resultadosDesc": "Votos por tipo de votável no BU ativo.",
     "nLinhas": "{n} linhas",
     "semResultados": "Sem resultados para esta seção",
     "captionResultados": "Resultados por votável na seção",
