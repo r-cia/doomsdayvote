@@ -11,11 +11,13 @@ defineProps({
         <h2 id="cobertura-titulo">{{ $t('cobertura.titulo') }}</h2>
       </div>
     </header>
-    <dl class="leituras__valores">
-      <div v-for="item in itens" :key="item.rotulo">
-        <dt>{{ item.rotulo }}</dt>
-        <dd>{{ item.valor }}</dd>
-      </div>
-    </dl>
+    <div class="biometria__corpo">
+      <dl class="leituras__valores">
+        <div v-for="item in itens" :key="item.rotulo">
+          <dt>{{ item.rotulo }}</dt>
+          <dd>{{ item.valor }}</dd>
+        </div>
+      </dl>
+    </div>
   </section>
 </template>

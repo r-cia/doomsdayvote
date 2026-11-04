@@ -42,11 +42,13 @@ const vazio = computed(() => !(query.data.value?.complementares?.secoes > 0))
     />
     <StateBlock v-else-if="vazio" estado="vazio" :titulo="$t('totalizacao.semDados')" />
 
-    <dl v-else class="leituras__valores" :class="{ 'atualizando': query.isFetching.value }">
-      <div v-for="[rotulo, valor] in faixas" :key="rotulo">
-        <dt>{{ rotulo }}</dt>
-        <dd>{{ formatarNumero(valor) }}</dd>
-      </div>
-    </dl>
+    <div v-else class="biometria__corpo">
+      <dl class="leituras__valores" :class="{ 'atualizando': query.isFetching.value }">
+        <div v-for="[rotulo, valor] in faixas" :key="rotulo">
+          <dt>{{ rotulo }}</dt>
+          <dd>{{ formatarNumero(valor) }}</dd>
+        </div>
+      </dl>
+    </div>
   </section>
 </template>
