@@ -1,4 +1,5 @@
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
+import { open } from 'node:fs/promises';
 import { promisify } from 'node:util';
 import { crc32, inflateRawSync } from 'node:zlib';
 
@@ -16,7 +17,7 @@ export class ZipError extends Error {
 
 const executar = promisify(execFile);
 const MAX_BUFFER_LISTAGEM = 64 * 1024 * 1024;
-const MAX_BUFFER_EXTRACAO = 256 * 1024 * 1024;
+const MAX_ERRO_7Z = 64 * 1024;
 const MAGIC = Object.freeze({
   zip: Buffer.from([0x50, 0x4b, 0x03, 0x04]),
   '7z': Buffer.from([0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c]),
@@ -42,6 +43,17 @@ export function detectarFormato(conteudo) {
   throw new Error('formato de arquivo não suportado: esperado zip ou 7z');
 }
 
+export async function detectarFormatoArquivo(caminho) {
+  const arquivo = await open(caminho, 'r');
+  try {
+    const cabecalho = Buffer.alloc(MAGIC['7z'].length);
+    const { bytesRead } = await arquivo.read(cabecalho, 0, cabecalho.length, 0);
+    return detectarFormato(cabecalho.subarray(0, bytesRead));
+  } finally {
+    await arquivo.close();
+  }
+}
+
 function lerPropriedades(bloco) {
   const propriedades = {};
   for (const linha of bloco.split('\n')) {
@@ -65,6 +77,7 @@ export async function listarEntradas7z(caminho) {
     entradas.push({
       nome: propriedades.Path,
       metodo: propriedades.Method === 'Copy' ? 0 : 8,
+      tamanho: Number(propriedades.Size ?? 0),
       tamanhoComprimido: Number(propriedades['Packed Size'] ?? 0),
     });
   }
@@ -72,12 +85,66 @@ export async function listarEntradas7z(caminho) {
   return entradas;
 }
 
-export async function extrairEntrada7z(caminho, nome) {
-  const { stdout } = await executar7z(['x', '-so', '-y', caminho, nome], {
-    maxBuffer: MAX_BUFFER_EXTRACAO,
-    encoding: 'buffer',
+export async function* lerEntradas7z(caminho, entradas) {
+  if (entradas.length === 0) return;
+
+  const limites = [];
+  let acumulado = 0;
+  for (const entrada of entradas) {
+    acumulado += entrada.tamanho;
+    limites.push(acumulado);
+  }
+
+  const filho = spawn('7z', ['x', '-so', '-y', caminho], {
+    stdio: ['ignore', 'pipe', 'pipe'],
   });
-  return stdout;
+  let erro = '';
+  filho.stderr.setEncoding('utf8');
+  filho.stderr.on('data', (texto) => {
+    if (erro.length < MAX_ERRO_7Z) erro += texto;
+  });
+  const encerrado = new Promise((resolver) => filho.on('close', resolver));
+
+  try {
+    let indice = 0;
+    let posicao = 0;
+    let pedacos = [];
+
+    for await (const pedaco of filho.stdout) {
+      let deslocamento = 0;
+      while (deslocamento < pedaco.length) {
+        if (indice >= entradas.length) {
+          throw new Error(`7z devolveu mais dados que as entradas listadas: ${caminho}`);
+        }
+        const limite = limites[indice];
+        const quantidade = Math.min(limite - posicao, pedaco.length - deslocamento);
+        pedacos.push(pedaco.subarray(deslocamento, deslocamento + quantidade));
+        posicao += quantidade;
+        deslocamento += quantidade;
+
+        if (posicao === limite) {
+          yield { entrada: entradas[indice], conteudo: Buffer.concat(pedacos) };
+          indice += 1;
+          pedacos = [];
+          while (indice < entradas.length && limites[indice] === posicao) {
+            yield { entrada: entradas[indice], conteudo: Buffer.alloc(0) };
+            indice += 1;
+          }
+        }
+      }
+    }
+
+    const codigo = await encerrado;
+    if (codigo !== 0) {
+      throw new Error(`7z falhou: ${erro.trim() || `código ${codigo}`}`);
+    }
+    if (indice !== entradas.length) {
+      throw new Error(`7z devolveu menos dados que as entradas listadas: ${caminho}`);
+    }
+  } finally {
+    filho.stdout.destroy();
+    if (filho.exitCode === null && filho.signalCode === null) filho.kill();
+  }
 }
 
 export function listarEntradas(conteudo, contexto = 'log.jez') {

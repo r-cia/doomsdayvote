@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,9 +13,9 @@ import { decodificarRdv } from './rdv.js';
 import { parsearLogJez } from './log.js';
 import { registrarEleitores, registrarIncidentes } from './metricas.js';
 import {
-  detectarFormato,
+  detectarFormatoArquivo,
   extrairEntrada,
-  extrairEntrada7z,
+  lerEntradas7z,
   listarEntradas,
   listarEntradas7z,
 } from './zip.js';
@@ -65,8 +66,14 @@ function derivarOrigem(nomeArquivo) {
   };
 }
 
-function agrupar(entradas) {
-  const grupos = new Map();
+async function hashArquivo(caminho) {
+  const hash = createHash('sha256');
+  for await (const pedaco of createReadStream(caminho)) hash.update(pedaco);
+  return hash.digest('hex');
+}
+
+function resumirEntradas(entradas) {
+  const prefixos = new Set();
   let ignoradas = 0;
 
   for (const entrada of entradas) {
@@ -75,13 +82,42 @@ function agrupar(entradas) {
       ignoradas += 1;
       continue;
     }
-    const prefixo = entrada.nome.slice(0, -sufixo[0].length);
-    const grupo = grupos.get(prefixo) ?? {};
-    grupo[sufixo[1]] = entrada;
-    grupos.set(prefixo, grupo);
+    prefixos.add(entrada.nome.slice(0, -sufixo[0].length));
   }
 
-  return { grupos, ignoradas };
+  return { prefixos: [...prefixos].sort(), ignoradas };
+}
+
+async function* gruposDoArquivo({ formato, caminhoArquivo, conteudo, entradas }) {
+  const vistos = new Set();
+  let atual = null;
+
+  const fluxo =
+    formato === '7z'
+      ? lerEntradas7z(caminhoArquivo, entradas)
+      : (function* () {
+          for (const entrada of entradas) yield { entrada };
+        })();
+
+  for await (const { entrada, conteudo: dados } of fluxo) {
+    const sufixo = SUFIXOS.find(([valor]) => entrada.nome.endsWith(valor));
+    if (!sufixo) continue;
+
+    const prefixo = entrada.nome.slice(0, -sufixo[0].length);
+    if (atual?.prefixo !== prefixo) {
+      if (atual) yield atual;
+      if (vistos.has(prefixo)) {
+        throw new Error(
+          `entradas da seção ${prefixo} não são contíguas no arquivo ${caminhoArquivo}`,
+        );
+      }
+      vistos.add(prefixo);
+      atual = { prefixo, grupo: {} };
+    }
+    atual.grupo[sufixo[1]] = Object.assign(entrada, { conteudo: dados });
+  }
+
+  if (atual) yield atual;
 }
 
 async function inserirSecao(trx, grupo, extrair, destino) {
@@ -272,8 +308,8 @@ export async function carregarZip(
 ) {
   const inicio = Date.now();
   const nomeArquivo = path.basename(caminhoArquivo);
-  const conteudo = await readFile(caminhoArquivo);
-  const sha256 = createHash('sha256').update(conteudo).digest('hex');
+  const formato = await detectarFormatoArquivo(caminhoArquivo);
+  const sha256 = await hashArquivo(caminhoArquivo);
 
   const existente = await db
     .selectFrom('totalizacao_lote')
@@ -291,18 +327,17 @@ export async function carregarZip(
   }
 
   const origem = derivarOrigem(nomeArquivo);
-  const formato = detectarFormato(conteudo);
+  const conteudo = formato === 'zip' ? await readFile(caminhoArquivo) : null;
   const entradas =
     formato === '7z'
       ? await listarEntradas7z(caminhoArquivo)
       : listarEntradas(conteudo, 'arquivo zip');
+  const { prefixos, ignoradas } = resumirEntradas(entradas);
+  if (prefixos.length === 0) throw new Error(`arquivo sem entradas de seção: ${nomeArquivo}`);
   const extrair =
     formato === '7z'
-      ? (entrada) => extrairEntrada7z(caminhoArquivo, entrada.nome)
+      ? (entrada) => entrada.conteudo
       : (entrada) => extrairEntrada(conteudo, entrada, 'arquivo zip');
-  const { grupos, ignoradas } = agrupar(entradas);
-  const prefixos = [...grupos.keys()].sort();
-  if (prefixos.length === 0) throw new Error(`arquivo sem entradas de seção: ${nomeArquivo}`);
 
   const destino = { ...origem, nome_arquivo: nomeArquivo };
   const lote = existente
@@ -335,8 +370,14 @@ export async function carregarZip(
 
     const { gravadas, comErro } = await carregarSecoesDoLote(db, lote.id);
 
-    for (const [indice, prefixo] of prefixos.entries()) {
-      const grupo = grupos.get(prefixo);
+    let indice = 0;
+    for await (const { prefixo, grupo } of gruposDoArquivo({
+      formato,
+      caminhoArquivo,
+      conteudo,
+      entradas,
+    })) {
+      indice += 1;
       if (!grupo.rdv) secoesSemRdv += 1;
       if (!grupo.log) secoesSemLog += 1;
 
@@ -396,9 +437,15 @@ export async function carregarZip(
         etapa: 'secao',
         loteId: lote.id,
         prefixo,
-        atual: indice + 1,
+        atual: indice,
         total: prefixos.length,
       });
+    }
+
+    if (indice !== prefixos.length) {
+      throw new Error(
+        `arquivo ${nomeArquivo} devolveu ${indice} seções, esperado ${prefixos.length}`,
+      );
     }
 
     const secoesComErro = await contarSecoesComErro(db, lote.id);
