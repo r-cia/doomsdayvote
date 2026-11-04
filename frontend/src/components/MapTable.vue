@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
 import { candidatoDaArea, linhasMapa } from '../lib/agregacoes'
+import ThOrdenavel from './ThOrdenavel.vue'
 import { corDaArea, corPartido, corTextoContraste } from '../lib/colors'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
@@ -8,16 +9,16 @@ const props = defineProps({
   areas: { type: Array, default: () => [] },
   nivel: { type: String, default: 'uf' },
   modo: { type: String, default: 'lider' },
+  ordenacao: { type: Object, default: null },
   candidato: { type: Number, default: null },
   candidatos: { type: Array, default: () => [] },
   uf: { type: String, default: null },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'ordenar'])
 
 const tabela = ref(null)
 const pagina = ref(1)
-const ordenacao = ref({ coluna: 'total', direcao: 'desc' })
 const porPagina = 25
 const partidoPorNumero = computed(() => {
   const mapa = new Map()
@@ -55,31 +56,7 @@ const linhasBase = computed(() =>
   }),
 )
 
-const linhas = computed(() => {
-  const lista = [...linhasBase.value]
-  const { coluna, direcao } = ordenacao.value
-  lista.sort((a, b) => {
-    let va = a[coluna], vb = b[coluna]
-    if (va == null) va = ''
-    if (vb == null) vb = ''
-    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-    return direcao === 'asc' ? va - vb : vb - va
-  })
-  return lista
-})
-
-function alternar(coluna) {
-  if (ordenacao.value.coluna === coluna) {
-    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
-  } else {
-    ordenacao.value = { coluna, direcao: 'asc' }
-  }
-}
-
-function seta(coluna) {
-  if (ordenacao.value.coluna !== coluna) return ''
-  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
-}
+const linhas = linhasBase
 const totalPaginas = computed(() => Math.max(1, Math.ceil(linhas.value.length / porPagina)))
 const linhasPagina = computed(() => {
   if (pagina.value > totalPaginas.value) pagina.value = totalPaginas.value
@@ -167,13 +144,13 @@ function aoClicarLinha(linha) {
         </colgroup>
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('rotulo')">{{ nivel === 'uf' ? $t('comum.uf') : $t('comum.municipio') }}{{ seta('rotulo') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">{{ $t('comum.votos') }}{{ seta('total') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('validos')">{{ $t('mapTable.validos') }}{{ seta('validos') }}</th>
-            <th scope="col" class="ordenavel" @click="alternar('liderNome')">{{ $t('ufPanel.lider') }}{{ seta('liderNome') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">{{ $t('ufPanel.pctLider') }}{{ seta('liderPercentual') }}</th>
-            <th v-if="candidato" scope="col" class="num ordenavel" @click="alternar('candidatoVotos')">{{ $t('mapTable.votosCandidato') }}{{ seta('candidatoVotos') }}</th>
-            <th v-if="candidato" scope="col" class="num ordenavel" @click="alternar('candidatoPercentual')">{{ $t('mapTable.pctCandidato') }}{{ seta('candidatoPercentual') }}</th>
+            <ThOrdenavel :coluna="nivel === 'uf' ? 'sg_uf' : 'nm_municipio'" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ nivel === 'uf' ? $t('comum.uf') : $t('comum.municipio') }}</ThOrdenavel>
+            <ThOrdenavel coluna="total_votos" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.votos') }}</ThOrdenavel>
+            <ThOrdenavel coluna="votos_validos" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('mapTable.validos') }}</ThOrdenavel>
+            <ThOrdenavel coluna="lider_nome" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('ufPanel.lider') }}</ThOrdenavel>
+            <ThOrdenavel coluna="lider_percentual" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('ufPanel.pctLider') }}</ThOrdenavel>
+            <ThOrdenavel v-if="candidato" coluna="candidato_votos" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('mapTable.votosCandidato') }}</ThOrdenavel>
+            <ThOrdenavel v-if="candidato" coluna="candidato_percentual" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('mapTable.pctCandidato') }}</ThOrdenavel>
             <th scope="col"><span class="sr-only">{{ $t('secoes.acao') }}</span></th>
           </tr>
         </thead>

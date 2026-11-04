@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import ThOrdenavel from './ThOrdenavel.vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
 const { t } = useI18n()
@@ -9,9 +10,10 @@ const props = defineProps({
   niveis: { type: Object, default: null },
   carregandoNiveis: { type: Boolean, default: false },
   selecionado: { type: Number, default: null },
+  ordenacao: { type: Object, default: null },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'ordenar'])
 
 const NIVEIS = [
   ['secao', 'comum.secao'],
@@ -158,9 +160,9 @@ function titulo(d) {
             </caption>
             <thead>
               <tr>
-                <th scope="col">{{ $t('comum.candidato') }}</th>
-                <th scope="col" class="num">n</th>
-                <th scope="col" class="num">MAD</th>
+                <ThOrdenavel coluna="nm_votavel" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.candidato') }}</ThOrdenavel>
+                <ThOrdenavel coluna="n" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">n</ThOrdenavel>
+                <ThOrdenavel coluna="mad" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">MAD</ThOrdenavel>
               </tr>
             </thead>
             <tbody>

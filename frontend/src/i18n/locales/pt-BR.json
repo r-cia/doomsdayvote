@@ -94,14 +94,38 @@
     }
   },
   "status": {
-    "sem_bu": { "rotulo": "Sem BU", "descricao": "Nenhum boletim de urna recebido para esta seção." },
-    "encerrada_aguardando_bu": { "rotulo": "Encerrada, aguardando BU", "descricao": "A seção encerrou, mas o BU ainda não foi recebido no corte atual." },
-    "bu_recebido": { "rotulo": "BU recebido", "descricao": "Boletim de urna recebido e considerado no corte atual." },
-    "nao_apurada": { "rotulo": "Não apurada", "descricao": "Seção não apurada segundo o tipo de urna informado." },
-    "anulada_apurada_separado": { "rotulo": "Anulada, apurada em separado", "descricao": "Seção anulada com apuração realizada em separado." },
-    "anulada": { "rotulo": "Anulada", "descricao": "Seção anulada." },
-    "nao_instalada": { "rotulo": "Não instalada", "descricao": "Seção não instalada." },
-    "desconhecido": { "rotulo": "Desconhecido", "descricao": "Status não reconhecido ou metadados insuficientes." },
+    "sem_bu": {
+      "rotulo": "Sem BU",
+      "descricao": "Nenhum boletim de urna recebido para esta seção."
+    },
+    "encerrada_aguardando_bu": {
+      "rotulo": "Encerrada, aguardando BU",
+      "descricao": "A seção encerrou, mas o BU ainda não foi recebido no corte atual."
+    },
+    "bu_recebido": {
+      "rotulo": "BU recebido",
+      "descricao": "Boletim de urna recebido e considerado no corte atual."
+    },
+    "nao_apurada": {
+      "rotulo": "Não apurada",
+      "descricao": "Seção não apurada segundo o tipo de urna informado."
+    },
+    "anulada_apurada_separado": {
+      "rotulo": "Anulada, apurada em separado",
+      "descricao": "Seção anulada com apuração realizada em separado."
+    },
+    "anulada": {
+      "rotulo": "Anulada",
+      "descricao": "Seção anulada."
+    },
+    "nao_instalada": {
+      "rotulo": "Não instalada",
+      "descricao": "Seção não instalada."
+    },
+    "desconhecido": {
+      "rotulo": "Desconhecido",
+      "descricao": "Status não reconhecido ou metadados insuficientes."
+    },
     "naoReconhecido": "Status não reconhecido pela interface.",
     "motivos": {
       "PRECISAO_INSUFICIENTE": "A data de recebimento do BU não tem precisão suficiente para este corte.",
@@ -320,9 +344,6 @@
   },
   "outliers": {
     "titulo": "Isolamento e LOF",
-    "maiorIf": "Maior IF",
-    "maiorLof": "Maior LOF",
-    "ordenarPor": "Ordenar por",
     "secoesIf": "seções · IF ≥ {limiar}",
     "lofAmostra": "LOF ≥ {limiar} · amostra {n}",
     "limitada": "(limitada)",
@@ -457,7 +478,10 @@
     "titulo": "Relatório de consistência",
     "alvo": "alvo",
     "turno": "{n}º turno",
-    "cargos": { "1": "Presidente", "3": "Governador" },
+    "cargos": {
+      "1": "Presidente",
+      "3": "Governador"
+    },
     "carregando": "Carregando relatório",
     "erro": "Não foi possível carregar o relatório",
     "vazio": "Sem dados para o recorte",
@@ -508,8 +532,17 @@
     "numero": "Número"
   },
   "secao": {
-    "cat": { "nominal": "Nominal", "legenda": "Legenda", "branco": "Branco", "nulo": "Nulo" },
-    "precisao": { "DATA_HORA": "Data e hora", "DATA": "Somente data", "AUSENTE": "Ausente" },
+    "cat": {
+      "nominal": "Nominal",
+      "legenda": "Legenda",
+      "branco": "Branco",
+      "nulo": "Nulo"
+    },
+    "precisao": {
+      "DATA_HORA": "Data e hora",
+      "DATA": "Somente data",
+      "AUSENTE": "Ausente"
+    },
     "voltar": "← Voltar ao painel",
     "fechar": "Fechar",
     "extrato": "Extrato de teletipo · boletim de urna",

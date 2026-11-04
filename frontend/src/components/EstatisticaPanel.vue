@@ -4,6 +4,8 @@ import { formatarNumero } from '../lib/format'
 import { i18n } from '../i18n'
 import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
+import ThOrdenavel from './ThOrdenavel.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useEstatisticas } from '../composables/queries'
 
 const props = defineProps({
@@ -13,7 +15,8 @@ const props = defineProps({
 
 const { t } = useI18n()
 const escopo = ref('turno')
-const estatisticasQuery = useEstatisticas(escopo)
+const { ordenacao, alternar } = useOrdenacao()
+const estatisticasQuery = useEstatisticas(escopo, ordenacao)
 
 const temDoisTurnos = computed(
   () => (estatisticasQuery.data.value?.turnos_disponiveis?.length ?? 0) >= 2,
@@ -120,13 +123,13 @@ function erroMensagem(erro) {
           <table class="tabela">
             <thead>
               <tr>
-                <th>{{ $t('comum.candidato') }}</th>
-                <th>{{ $t('comum.partido') }}</th>
-                <th class="tabela__numero">{{ $t('duplicacao.secoes') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.secoesZero') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.media') }}</th>
-                <th class="tabela__numero">{{ $t('tempoVoto.mediana') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.desvio') }}</th>
+                <ThOrdenavel coluna="nm_votavel" :ordenacao="ordenacao" @ordenar="alternar">{{ $t('comum.candidato') }}</ThOrdenavel>
+                <ThOrdenavel coluna="sg_partido" :ordenacao="ordenacao" @ordenar="alternar">{{ $t('comum.partido') }}</ThOrdenavel>
+                <ThOrdenavel coluna="secoes" numero :ordenacao="ordenacao" @ordenar="alternar">{{ $t('duplicacao.secoes') }}</ThOrdenavel>
+                <ThOrdenavel coluna="secoes_zero" numero :ordenacao="ordenacao" @ordenar="alternar">{{ $t('estatistica.secoesZero') }}</ThOrdenavel>
+                <ThOrdenavel coluna="media" numero :ordenacao="ordenacao" @ordenar="alternar">{{ $t('estatistica.media') }}</ThOrdenavel>
+                <ThOrdenavel coluna="mediana" numero :ordenacao="ordenacao" @ordenar="alternar">{{ $t('tempoVoto.mediana') }}</ThOrdenavel>
+                <ThOrdenavel coluna="desvio" numero :ordenacao="ordenacao" @ordenar="alternar">{{ $t('estatistica.desvio') }}</ThOrdenavel>
               </tr>
             </thead>
             <tbody>

@@ -94,14 +94,38 @@
     }
   },
   "status": {
-    "sem_bu": { "rotulo": "No report", "descricao": "No ballot box report received for this section." },
-    "encerrada_aguardando_bu": { "rotulo": "Closed, awaiting report", "descricao": "The section has closed, but its report was not yet received in the current cut." },
-    "bu_recebido": { "rotulo": "Report received", "descricao": "Ballot box report received and considered in the current cut." },
-    "nao_apurada": { "rotulo": "Not counted", "descricao": "Section not counted according to the ballot box type reported." },
-    "anulada_apurada_separado": { "rotulo": "Annulled, counted separately", "descricao": "Annulled section with a separate count." },
-    "anulada": { "rotulo": "Annulled", "descricao": "Annulled section." },
-    "nao_instalada": { "rotulo": "Not installed", "descricao": "Section not installed." },
-    "desconhecido": { "rotulo": "Unknown", "descricao": "Unrecognized status or insufficient metadata." },
+    "sem_bu": {
+      "rotulo": "No report",
+      "descricao": "No ballot box report received for this section."
+    },
+    "encerrada_aguardando_bu": {
+      "rotulo": "Closed, awaiting report",
+      "descricao": "The section has closed, but its report was not yet received in the current cut."
+    },
+    "bu_recebido": {
+      "rotulo": "Report received",
+      "descricao": "Ballot box report received and considered in the current cut."
+    },
+    "nao_apurada": {
+      "rotulo": "Not counted",
+      "descricao": "Section not counted according to the ballot box type reported."
+    },
+    "anulada_apurada_separado": {
+      "rotulo": "Annulled, counted separately",
+      "descricao": "Annulled section with a separate count."
+    },
+    "anulada": {
+      "rotulo": "Annulled",
+      "descricao": "Annulled section."
+    },
+    "nao_instalada": {
+      "rotulo": "Not installed",
+      "descricao": "Section not installed."
+    },
+    "desconhecido": {
+      "rotulo": "Unknown",
+      "descricao": "Unrecognized status or insufficient metadata."
+    },
     "naoReconhecido": "Status not recognized by the interface.",
     "motivos": {
       "PRECISAO_INSUFICIENTE": "The report's receipt date does not have enough precision for this cut.",
@@ -320,9 +344,6 @@
   },
   "outliers": {
     "titulo": "Isolation and LOF",
-    "maiorIf": "Highest IF",
-    "maiorLof": "Highest LOF",
-    "ordenarPor": "Sort by",
     "secoesIf": "sections · IF ≥ {limiar}",
     "lofAmostra": "LOF ≥ {limiar} · sample {n}",
     "limitada": "(limited)",
@@ -457,7 +478,10 @@
     "titulo": "Consistency report",
     "alvo": "target",
     "turno": "round {n}",
-    "cargos": { "1": "President", "3": "Governor" },
+    "cargos": {
+      "1": "President",
+      "3": "Governor"
+    },
     "carregando": "Loading report",
     "erro": "Could not load the report",
     "vazio": "No data for the selection",
@@ -508,8 +532,17 @@
     "numero": "Number"
   },
   "secao": {
-    "cat": { "nominal": "Nominal", "legenda": "Party", "branco": "Blank", "nulo": "Null" },
-    "precisao": { "DATA_HORA": "Date and time", "DATA": "Date only", "AUSENTE": "Missing" },
+    "cat": {
+      "nominal": "Nominal",
+      "legenda": "Party",
+      "branco": "Blank",
+      "nulo": "Null"
+    },
+    "precisao": {
+      "DATA_HORA": "Date and time",
+      "DATA": "Date only",
+      "AUSENTE": "Missing"
+    },
     "voltar": "← Back to dashboard",
     "fechar": "Close",
     "extrato": "Teletype extract · ballot box report",

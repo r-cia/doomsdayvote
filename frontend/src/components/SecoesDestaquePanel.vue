@@ -6,9 +6,9 @@ import OutliersPanel from './OutliersPanel.vue'
 
 defineProps({
   outliers: { type: Object, default: null },
-  ordenacao: { type: String, default: 'if' },
+  ordenacao: { type: Object, default: null },
 })
-defineEmits(['update:ordenacao'])
+defineEmits(['ordenar'])
 
 const VISOES = [
   ['outliers', 'destaque.outliers'],
@@ -37,7 +37,7 @@ const visao = ref('outliers')
       </div>
     </header>
 
-    <OutliersPanel v-if="visao === 'outliers'" :dados="outliers" :ordenacao="ordenacao" @update:ordenacao="$emit('update:ordenacao', $event)" />
+    <OutliersPanel v-if="visao === 'outliers'" :dados="outliers" :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)" />
     <ConsistenciaTabela v-else-if="visao === 'consistencia'" />
     <ConcentracaoTabela v-else :visao="visao" />
   </section>

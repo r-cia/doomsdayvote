@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
+import ThOrdenavel from './ThOrdenavel.vue'
 import { formatarData, formatarDataHora, formatarNumero } from '../lib/format'
 import { motivoSecao, opcoesStatus, statusSecao } from '../lib/status'
 
@@ -16,6 +17,7 @@ const props = defineProps({
   pageSize: { type: Number, default: 25 },
   uf: { type: String, default: null },
   municipio: { type: Number, default: null },
+  ordenacao: { type: Object, default: null },
 })
 
 const emit = defineEmits([
@@ -27,6 +29,7 @@ const emit = defineEmits([
   'update:municipio-nome',
   'select',
   'retry',
+  'ordenar',
 ])
 
 const tabela = ref(null)
@@ -189,13 +192,13 @@ function navegarLinhas(evento) {
             </colgroup>
             <thead>
               <tr>
-                <th scope="col">{{ $t('comum.uf') }}</th>
-                <th scope="col">{{ $t('comum.municipio') }}</th>
-                <th scope="col" class="num">{{ $t('comum.zona') }}</th>
-                <th scope="col" class="num">{{ $t('comum.secao') }}</th>
-                <th scope="col" class="num">{{ $t('secoes.local') }}</th>
-                <th scope="col">{{ $t('secoes.status') }}</th>
-                <th scope="col">{{ $t('secoes.buRecebido') }}</th>
+                <ThOrdenavel coluna="sg_uf" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.uf') }}</ThOrdenavel>
+                <ThOrdenavel coluna="nm_municipio" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.municipio') }}</ThOrdenavel>
+                <ThOrdenavel coluna="nr_zona" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.zona') }}</ThOrdenavel>
+                <ThOrdenavel coluna="nr_secao" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.secao') }}</ThOrdenavel>
+                <ThOrdenavel coluna="nr_local_votacao" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('secoes.local') }}</ThOrdenavel>
+                <ThOrdenavel coluna="status" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('secoes.status') }}</ThOrdenavel>
+                <ThOrdenavel coluna="bu_recebido" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('secoes.buRecebido') }}</ThOrdenavel>
                 <th scope="col"><span class="sr-only">{{ $t('secoes.acao') }}</span></th>
               </tr>
             </thead>

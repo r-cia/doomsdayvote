@@ -34,6 +34,8 @@ import { formatarNumero, formatarPercentual } from '../lib/format'
 import { t } from '../i18n'
 
 const props = defineProps({
+  areasTabela: { type: Array, default: null },
+  ordenacaoTabela: { type: Object, default: null },
   areas: { type: Array, default: () => [] },
   nivel: { type: String, default: 'uf' },
   modo: { type: String, default: 'lider' },
@@ -48,6 +50,7 @@ const props = defineProps({
 const emit = defineEmits([
   'update:level',
   'update:mode',
+  'ordenar-tabela',
   'select',
   'retry',
 ])
@@ -747,7 +750,9 @@ onBeforeUnmount(() => {
     </div>
 
     <MapTable
-      :areas="areas"
+      :areas="areasTabela ?? areas"
+      :ordenacao="ordenacaoTabela"
+      @ordenar="$emit('ordenar-tabela', $event)"
       :nivel="nivel"
       :modo="modo"
       :candidato="candidato"

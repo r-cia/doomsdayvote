@@ -1,13 +1,14 @@
 <script setup>
 import { computed } from 'vue'
+import ThOrdenavel from './ThOrdenavel.vue'
 import { formatarDecimal } from '../lib/format'
 
 const props = defineProps({
   dados: { type: Object, default: null },
-  ordenacao: { type: String, default: 'if' },
+  ordenacao: { type: Object, default: null },
 })
 
-const emit = defineEmits(['update:ordenacao'])
+const emit = defineEmits(['ordenar'])
 
 const secoes = computed(() => props.dados?.secoes ?? [])
 const limiarIf = computed(() => props.dados?.isolamento?.limiar ?? 0.6)
@@ -32,18 +33,6 @@ function tomLof(valor) {
   <section class="painel" aria-labelledby="outliers-titulo">
     <header class="painel__cabecalho">
       <h2 id="outliers-titulo">{{ $t('outliers.titulo') }}</h2>
-      <div class="estatistica-controle">
-        <label class="campo campo--curto">
-          <span class="campo__rotulo">{{ $t('outliers.ordenarPor') }}</span>
-          <select
-            :value="ordenacao"
-            @change="emit('update:ordenacao', $event.target.value)"
-          >
-            <option value="if">{{ $t('outliers.maiorIf') }}</option>
-            <option value="lof">{{ $t('outliers.maiorLof') }}</option>
-          </select>
-        </label>
-      </div>
       <p class="painel__meta">
         <b>{{ dados?.total_secoes ?? 0 }}</b> {{ $t('outliers.secoesIf', { limiar: limiarIf }) }}<br />
         {{ $t('outliers.lofAmostra', { limiar: limiarLof, n: dados?.lof?.amostra ?? 0 }) }}
@@ -62,13 +51,13 @@ function tomLof(valor) {
         </caption>
         <thead>
           <tr>
-            <th scope="col">{{ $t('comum.uf') }}</th>
-            <th scope="col">{{ $t('comum.municipio') }}</th>
-            <th scope="col" class="num">{{ $t('comum.zona') }}</th>
-            <th scope="col" class="num">{{ $t('comum.secao') }}</th>
-            <th scope="col" class="num">IF</th>
-            <th scope="col" class="num">LOF</th>
-            <th scope="col">{{ $t('comum.candidato') }}</th>
+            <ThOrdenavel coluna="sg_uf" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.uf') }}</ThOrdenavel>
+            <ThOrdenavel coluna="nm_municipio" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.municipio') }}</ThOrdenavel>
+            <ThOrdenavel coluna="nr_zona" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.zona') }}</ThOrdenavel>
+            <ThOrdenavel coluna="nr_secao" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.secao') }}</ThOrdenavel>
+            <ThOrdenavel coluna="score_if" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">IF</ThOrdenavel>
+            <ThOrdenavel coluna="score_lof" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">LOF</ThOrdenavel>
+            <ThOrdenavel coluna="candidato" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.candidato') }}</ThOrdenavel>
           </tr>
         </thead>
         <tbody>

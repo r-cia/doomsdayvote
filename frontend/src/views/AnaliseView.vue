@@ -3,18 +3,17 @@ import AnaliseSection from '../components/AnaliseSection.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
 import TempoVotoPanel from '../components/TempoVotoPanel.vue'
 import IncidentesPanel from '../components/IncidentesPanel.vue'
-import { computed, ref, watch } from 'vue'
+import { watch } from 'vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useAnalise, useAnomalias } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 
 const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
 
-const ordenacao = ref('if')
-const analiseQuery = useAnalise()
-const anomaliasQuery = useAnomalias(
-  null,
-  computed(() => ({ ordem: ordenacao.value === 'lof' ? 'score_lof' : 'score_if', direcao: 'desc' })),
-)
+const ordBenford = useOrdenacao()
+const ordOutliers = useOrdenacao()
+const analiseQuery = useAnalise(ordBenford.ordenacao)
+const anomaliasQuery = useAnomalias(null, ordOutliers.ordenacao)
 
 watch(
   () => store.asOf,
@@ -43,9 +42,11 @@ watch(
     :selecionado="store.candidato"
     :loading="anomaliasQuery.isLoading.value"
     :error="anomaliasQuery.error.value?.message ?? ''"
-    :ordenacao="ordenacao"
+    :ordenacao-outliers="ordOutliers.ordenacao.value"
+    :ordenacao-benford="ordBenford.ordenacao.value"
     @retry="anomaliasQuery.refetch()"
     @select="aoCandidato"
-    @update:ordenacao="ordenacao = $event"
+    @ordenar-outliers="ordOutliers.alternar"
+    @ordenar-benford="ordBenford.alternar"
   />
 </template>

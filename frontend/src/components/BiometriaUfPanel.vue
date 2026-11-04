@@ -1,12 +1,14 @@
 <script setup>
+import ThOrdenavel from './ThOrdenavel.vue'
 import { computed, ref } from 'vue'
 import { formatarNumero, formatarPercentual } from '../lib/format'
 
 const props = defineProps({
+  ordenacao: { type: Object, default: null },
   dados: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'ordenar'])
 
 const REGIAO = {
   AC: 'Norte', AM: 'Norte', AP: 'Norte', PA: 'Norte', RO: 'Norte', RR: 'Norte', TO: 'Norte',
@@ -19,19 +21,6 @@ const REGIAO = {
 
 const agrupar = ref('nenhum')
 const agruparRegiao = computed(() => agrupar.value === 'regiao')
-const ordenacao = ref({ coluna: 'sg_uf', direcao: 'asc' })
-
-function alternar(coluna) {
-  if (ordenacao.value.coluna === coluna) {
-    ordenacao.value = {
-      coluna,
-      direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc',
-    }
-  } else {
-    ordenacao.value = { coluna, direcao: 'asc' }
-  }
-}
-
 const base = computed(() => [...(props.dados ?? [])])
 
 const agregado = computed(() => {
@@ -65,35 +54,7 @@ const agregado = computed(() => {
   }))
 })
 
-function valor(linha, coluna) {
-  if (coluna === 'sg_uf') return linha.sg_uf ?? ''
-  if (coluna === 'qt_habilitados_por_biometria') return Number(linha.qt_habilitados_por_biometria ?? 0)
-  if (coluna === 'percentual_habilitada') return Number(linha.percentual_habilitada ?? 0)
-  if (coluna === 'qt_biometria_nao_habilitada') return Number(linha.qt_biometria_nao_habilitada ?? 0)
-  if (coluna === 'percentual_nao_habilitada') return Number(linha.percentual_nao_habilitada ?? 0)
-  return 0
-}
-
-const linhas = computed(() => {
-  const lista = [...agregado.value]
-  const { coluna, direcao } = ordenacao.value
-  lista.sort((a, b) => {
-    const va = valor(a, coluna)
-    const vb = valor(b, coluna)
-    if (typeof va === 'string' || typeof vb === 'string') {
-      return direcao === 'asc'
-        ? String(va).localeCompare(String(vb))
-        : String(vb).localeCompare(String(va))
-    }
-    return direcao === 'asc' ? va - vb : vb - va
-  })
-  return lista
-})
-
-function seta(coluna) {
-  if (ordenacao.value.coluna !== coluna) return ''
-  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
-}
+const linhas = agregado
 </script>
 
 <template>
@@ -117,21 +78,11 @@ function seta(coluna) {
       <table class="tabela">
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('sg_uf')">
-              {{ agruparRegiao ? $t('biometriaUf.regiao') : $t('comum.uf') }}{{ seta('sg_uf') }}
-            </th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_habilitados_por_biometria')">
-              {{ $t('biometriaUf.votosComBiometria') }}{{ seta('qt_habilitados_por_biometria') }}
-            </th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_habilitada')">
-              {{ $t('biometriaUf.pctComBiometria') }}{{ seta('percentual_habilitada') }}
-            </th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('qt_biometria_nao_habilitada')">
-              {{ $t('biometriaUf.votosNaoHabilitada') }}{{ seta('qt_biometria_nao_habilitada') }}
-            </th>
-            <th scope="col" class="tabela__numero ordenavel" @click="alternar('percentual_nao_habilitada')">
-              {{ $t('biometriaUf.pctNaoHabilitada') }}{{ seta('percentual_nao_habilitada') }}
-            </th>
+            <ThOrdenavel coluna="sg_uf" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ agruparRegiao ? $t('biometriaUf.regiao') : $t('comum.uf') }}</ThOrdenavel>
+            <ThOrdenavel coluna="qt_habilitados_por_biometria" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('biometriaUf.votosComBiometria') }}</ThOrdenavel>
+            <ThOrdenavel coluna="percentual_habilitada" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('biometriaUf.pctComBiometria') }}</ThOrdenavel>
+            <ThOrdenavel coluna="qt_biometria_nao_habilitada" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('biometriaUf.votosNaoHabilitada') }}</ThOrdenavel>
+            <ThOrdenavel coluna="percentual_nao_habilitada" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('biometriaUf.pctNaoHabilitada') }}</ThOrdenavel>
           </tr>
         </thead>
         <tbody>

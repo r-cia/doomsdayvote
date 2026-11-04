@@ -2,6 +2,8 @@
 import { ref, watch } from 'vue'
 import SecaoView from './SecaoView.vue'
 import { api } from '../api/client'
+import ThOrdenavel from '../components/ThOrdenavel.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useAnalise } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { formatarNumero, formatarPercentual } from '../lib/format'
@@ -12,7 +14,10 @@ import BiometriaFaixasPanel from '../components/BiometriaFaixasPanel.vue'
 const secaoModalId = ref(null)
 
 const { store } = useSelecaoEleicao()
-const analiseQuery = useAnalise()
+const ordUf = useOrdenacao()
+const ordMunicipios = useOrdenacao()
+const ordSecoes = useOrdenacao()
+const analiseQuery = useAnalise(() => ({ _biometria_uf: ordUf.ordenacao.value }))
 
 const ufSelecionada = ref(null)
 const municipioSelecionado = ref(null)
@@ -20,8 +25,7 @@ const municipios = ref([])
 const secoes = ref([])
 const carregandoMunicipios = ref(false)
 const carregandoSecoes = ref(false)
-const ordenarMunicipios = ref('nao_habilitada')
-const ordenarSecoes = ref('percentual')
+const paramsOrdem = (o) => (o ? { ordem: o.ordem, direcao: o.direcao } : {})
 
 async function carregarMunicipios(uf) {
   ufSelecionada.value = uf
@@ -34,7 +38,7 @@ async function carregarMunicipios(uf) {
       cargo: store.cargo,
       as_of: store.asOf,
       uf,
-      ordenar_por: ordenarMunicipios.value,
+      ...paramsOrdem(ordMunicipios.ordenacao.value),
     })
     municipios.value = r.municipios ?? []
   } catch (e) {
@@ -54,7 +58,7 @@ async function carregarSecoes(municipio) {
       as_of: store.asOf,
       uf: ufSelecionada.value,
       municipio,
-      ordenar_por: ordenarSecoes.value,
+      ...paramsOrdem(ordSecoes.ordenacao.value),
     })
     secoes.value = r.secoes ?? []
   } catch (e) {
@@ -64,10 +68,10 @@ async function carregarSecoes(municipio) {
   }
 }
 
-watch(ordenarMunicipios, () => {
+watch(ordMunicipios.ordenacao, () => {
   if (ufSelecionada.value) carregarMunicipios(ufSelecionada.value)
 })
-watch(ordenarSecoes, () => {
+watch(ordSecoes.ordenacao, () => {
   if (municipioSelecionado.value) carregarSecoes(municipioSelecionado.value)
 })
 
@@ -85,6 +89,8 @@ function abrirSecao(item) {
 
   <BiometriaUfPanel
     :dados="analiseQuery.data.value?.biometria_uf ?? []"
+    :ordenacao="ordUf.ordenacao.value"
+    @ordenar="ordUf.alternar"
     @select="carregarMunicipios"
   />
 
@@ -92,13 +98,6 @@ function abrirSecao(item) {
     <div class="card">
       <div class="card__cabecalho">
         <h2>{{ $t('biometriaView.municipios') }}</h2>
-        <div class="uf-painel__acoes">
-          <select v-if="ufSelecionada" v-model="ordenarMunicipios" class="uf-ordenacao">
-            <option value="nao_habilitada">{{ $t('biometriaView.naoHabilitada') }}</option>
-            <option value="percentual">{{ $t('biometriaUf.pctNaoHabilitada') }}</option>
-            <option value="comparecimento">{{ $t('kpis.comparecimento') }}</option>
-          </select>
-        </div>
         <p v-if="ufSelecionada" class="card__meta">{{ ufSelecionada }}</p>
       </div>
       <div v-if="!ufSelecionada" class="vazio">{{ $t('biometriaView.cliqueEstado') }}</div>
@@ -108,9 +107,9 @@ function abrirSecao(item) {
         <table>
           <thead>
             <tr>
-              <th scope="col">{{ $t('comum.municipio') }}</th>
-              <th scope="col" class="num">{{ $t('biometriaView.naoHabilitada') }}</th>
-              <th scope="col" class="num">%</th>
+              <ThOrdenavel coluna="nm_municipio" :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('comum.municipio') }}</ThOrdenavel>
+              <ThOrdenavel coluna="qt_nao_habilitada" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">{{ $t('biometriaView.naoHabilitada') }}</ThOrdenavel>
+              <ThOrdenavel coluna="percentual_nao_habilitada" numero :ordenacao="ordMunicipios.ordenacao.value" @ordenar="ordMunicipios.alternar">%</ThOrdenavel>
             </tr>
           </thead>
           <tbody>
@@ -132,13 +131,6 @@ function abrirSecao(item) {
     <div class="card">
       <div class="card__cabecalho">
         <h2>{{ $t('biometriaView.secoes') }}</h2>
-        <div class="uf-painel__acoes">
-          <select v-if="municipioSelecionado" v-model="ordenarSecoes" class="uf-ordenacao">
-            <option value="percentual">{{ $t('biometriaUf.pctNaoHabilitada') }}</option>
-            <option value="nao_habilitada">{{ $t('biometriaView.naoHabilitada') }}</option>
-            <option value="comparecimento">{{ $t('kpis.comparecimento') }}</option>
-          </select>
-        </div>
         <p v-if="municipioSelecionado" class="card__meta">
           {{ nomeMunicipio(municipios.find((m) => m.cd_municipio_tse === municipioSelecionado) || {}) }}
         </p>
@@ -150,10 +142,10 @@ function abrirSecao(item) {
         <table>
           <thead>
             <tr>
-              <th scope="col">{{ $t('comum.zona') }}</th>
-              <th scope="col">{{ $t('comum.secao') }}</th>
-              <th scope="col" class="num">{{ $t('biometriaView.naoHabilitada') }}</th>
-              <th scope="col" class="num">%</th>
+              <ThOrdenavel coluna="nr_zona" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('comum.zona') }}</ThOrdenavel>
+              <ThOrdenavel coluna="nr_secao" :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('comum.secao') }}</ThOrdenavel>
+              <ThOrdenavel coluna="qt_nao_habilitada" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">{{ $t('biometriaView.naoHabilitada') }}</ThOrdenavel>
+              <ThOrdenavel coluna="percentual_nao_habilitada" numero :ordenacao="ordSecoes.ordenacao.value" @ordenar="ordSecoes.alternar">%</ThOrdenavel>
               <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
             </tr>
           </thead>

@@ -94,14 +94,38 @@
     }
   },
   "status": {
-    "sem_bu": { "rotulo": "Sin acta", "descricao": "No se recibió ningún acta de urna para esta sección." },
-    "encerrada_aguardando_bu": { "rotulo": "Cerrada, esperando acta", "descricao": "La sección cerró, pero su acta aún no se recibió en el corte actual." },
-    "bu_recebido": { "rotulo": "Acta recibida", "descricao": "Acta de urna recibida y considerada en el corte actual." },
-    "nao_apurada": { "rotulo": "No escrutada", "descricao": "Sección no escrutada según el tipo de urna informado." },
-    "anulada_apurada_separado": { "rotulo": "Anulada, escrutada por separado", "descricao": "Sección anulada con escrutinio realizado por separado." },
-    "anulada": { "rotulo": "Anulada", "descricao": "Sección anulada." },
-    "nao_instalada": { "rotulo": "No instalada", "descricao": "Sección no instalada." },
-    "desconhecido": { "rotulo": "Desconocido", "descricao": "Estado no reconocido o metadatos insuficientes." },
+    "sem_bu": {
+      "rotulo": "Sin acta",
+      "descricao": "No se recibió ningún acta de urna para esta sección."
+    },
+    "encerrada_aguardando_bu": {
+      "rotulo": "Cerrada, esperando acta",
+      "descricao": "La sección cerró, pero su acta aún no se recibió en el corte actual."
+    },
+    "bu_recebido": {
+      "rotulo": "Acta recibida",
+      "descricao": "Acta de urna recibida y considerada en el corte actual."
+    },
+    "nao_apurada": {
+      "rotulo": "No escrutada",
+      "descricao": "Sección no escrutada según el tipo de urna informado."
+    },
+    "anulada_apurada_separado": {
+      "rotulo": "Anulada, escrutada por separado",
+      "descricao": "Sección anulada con escrutinio realizado por separado."
+    },
+    "anulada": {
+      "rotulo": "Anulada",
+      "descricao": "Sección anulada."
+    },
+    "nao_instalada": {
+      "rotulo": "No instalada",
+      "descricao": "Sección no instalada."
+    },
+    "desconhecido": {
+      "rotulo": "Desconocido",
+      "descricao": "Estado no reconocido o metadatos insuficientes."
+    },
     "naoReconhecido": "Estado no reconocido por la interfaz.",
     "motivos": {
       "PRECISAO_INSUFICIENTE": "La fecha de recepción del acta no tiene precisión suficiente para este corte.",
@@ -320,9 +344,6 @@
   },
   "outliers": {
     "titulo": "Aislamiento y LOF",
-    "maiorIf": "Mayor IF",
-    "maiorLof": "Mayor LOF",
-    "ordenarPor": "Ordenar por",
     "secoesIf": "secciones · IF ≥ {limiar}",
     "lofAmostra": "LOF ≥ {limiar} · muestra {n}",
     "limitada": "(limitada)",
@@ -457,7 +478,10 @@
     "titulo": "Informe de consistencia",
     "alvo": "objetivo",
     "turno": "{n}.ª vuelta",
-    "cargos": { "1": "Presidente", "3": "Gobernador" },
+    "cargos": {
+      "1": "Presidente",
+      "3": "Gobernador"
+    },
     "carregando": "Cargando informe",
     "erro": "No se pudo cargar el informe",
     "vazio": "Sin datos para la selección",
@@ -508,8 +532,17 @@
     "numero": "Número"
   },
   "secao": {
-    "cat": { "nominal": "Nominal", "legenda": "De partido", "branco": "En blanco", "nulo": "Nulo" },
-    "precisao": { "DATA_HORA": "Fecha y hora", "DATA": "Solo fecha", "AUSENTE": "Ausente" },
+    "cat": {
+      "nominal": "Nominal",
+      "legenda": "De partido",
+      "branco": "En blanco",
+      "nulo": "Nulo"
+    },
+    "precisao": {
+      "DATA_HORA": "Fecha y hora",
+      "DATA": "Solo fecha",
+      "AUSENTE": "Ausente"
+    },
     "voltar": "← Volver al panel",
     "fechar": "Cerrar",
     "extrato": "Extracto de teletipo · acta de urna",

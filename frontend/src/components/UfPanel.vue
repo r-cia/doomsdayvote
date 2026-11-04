@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import StateBlock from './StateBlock.vue'
+import ThOrdenavel from './ThOrdenavel.vue'
 import { candidatosNominais, linhasMapa } from '../lib/agregacoes'
 import { corPartido, corTextoContraste } from '../lib/colors'
 import { formatarNumero, formatarPercentual } from '../lib/format'
@@ -12,25 +13,12 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   ufSelecionada: { type: String, default: null },
+  ordenacao: { type: Object, default: null },
 })
 
-defineEmits(['select', 'municipios', 'retry', 'limpar'])
+const emit = defineEmits(['select', 'municipios', 'retry', 'limpar', 'ordenar'])
 
-const ordenacao = ref({ coluna: 'total', direcao: 'desc' })
 const agrupar = ref('nenhum')
-
-function alternar(coluna) {
-  if (ordenacao.value.coluna === coluna) {
-    ordenacao.value = { coluna, direcao: ordenacao.value.direcao === 'asc' ? 'desc' : 'asc' }
-  } else {
-    ordenacao.value = { coluna, direcao: 'asc' }
-  }
-}
-
-function seta(coluna) {
-  if (ordenacao.value.coluna !== coluna) return ''
-  return ordenacao.value.direcao === 'asc' ? ' ↑' : ' ↓'
-}
 
 const REGIOES = {
   Norte: ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
@@ -72,19 +60,7 @@ const linhas = computed(() => {
     ...linha,
     largura: Math.max(0, Math.min(100, Number(linha.liderPercentual ?? 0))),
   }))
-  const lista = [...comLargura]
-  const { coluna, direcao } = ordenacao.value
-  lista.sort((a, b) => {
-    let va, vb
-    if (coluna === 'uf') { va = a.uf ?? ''; vb = b.uf ?? '' }
-    else if (coluna === 'total') { va = a.total; vb = b.total }
-    else if (coluna === 'liderNome') { va = a.liderNome ?? ''; vb = b.liderNome ?? '' }
-    else if (coluna === 'liderPercentual') { va = a.liderPercentual ?? -1; vb = b.liderPercentual ?? -1 }
-    else { va = a[coluna]; vb = b[coluna] }
-    if (typeof va === 'string') return direcao === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-    return direcao === 'asc' ? va - vb : vb - va
-  })
-  return lista
+  return comLargura
 })
 
 const grupos = computed(() => {
@@ -206,10 +182,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
 
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('uf')">{{ $t('comum.uf') }}{{ seta('uf') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">{{ $t('comum.votos') }}{{ seta('total') }}</th>
-            <th scope="col" class="ordenavel" @click="alternar('liderNome')">{{ $t('ufPanel.lider') }}{{ seta('liderNome') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">{{ $t('ufPanel.pctLider') }}{{ seta('liderPercentual') }}</th>
+            <ThOrdenavel coluna="sg_uf" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.uf') }}</ThOrdenavel>
+            <ThOrdenavel coluna="total_votos" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.votos') }}</ThOrdenavel>
+            <ThOrdenavel coluna="lider_nome" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('ufPanel.lider') }}</ThOrdenavel>
+            <ThOrdenavel coluna="lider_percentual" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('ufPanel.pctLider') }}</ThOrdenavel>
             <th scope="col"><span class="sr-only">{{ $t('ufPanel.acoes') }}</span></th>
           </tr>
         </thead>
@@ -283,10 +259,10 @@ const votosUf = computed(() => candidatosNominais(props.votos))
 
         <thead>
           <tr>
-            <th scope="col" class="ordenavel" @click="alternar('uf')">{{ $t('comum.uf') }}{{ seta('uf') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('total')">{{ $t('comum.votos') }}{{ seta('total') }}</th>
-            <th scope="col" class="ordenavel" @click="alternar('liderNome')">{{ $t('ufPanel.lider') }}{{ seta('liderNome') }}</th>
-            <th scope="col" class="num ordenavel" @click="alternar('liderPercentual')">{{ $t('ufPanel.pctLider') }}{{ seta('liderPercentual') }}</th>
+            <ThOrdenavel coluna="sg_uf" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.uf') }}</ThOrdenavel>
+            <ThOrdenavel coluna="total_votos" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.votos') }}</ThOrdenavel>
+            <ThOrdenavel coluna="lider_nome" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('ufPanel.lider') }}</ThOrdenavel>
+            <ThOrdenavel coluna="lider_percentual" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('ufPanel.pctLider') }}</ThOrdenavel>
             <th scope="col"><span class="sr-only">{{ $t('ufPanel.acoes') }}</span></th>
           </tr>
         </thead>

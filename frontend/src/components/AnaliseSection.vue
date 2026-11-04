@@ -10,10 +10,11 @@ defineProps({
   selecionado: { type: Number, default: null },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
-  ordenacao: { type: String, default: 'if' },
+  ordenacaoOutliers: { type: Object, default: null },
+  ordenacaoBenford: { type: Object, default: null },
 })
 
-const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
+const emit = defineEmits(['retry', 'select', 'ordenar-outliers', 'ordenar-benford'])
 </script>
 
 <template>
@@ -37,6 +38,8 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
         :niveis="anomalias?.benford_niveis ?? null"
         :carregando-niveis="loading"
         :selecionado="selecionado"
+        :ordenacao="ordenacaoBenford"
+        @ordenar="emit('ordenar-benford', $event)"
         @select="emit('select', $event)"
       />
 
@@ -45,8 +48,8 @@ const emit = defineEmits(['retry', 'select', 'update:ordenacao'])
           <DuplicacaoPanel :dados="anomalias.duplicacao" />
           <SecoesDestaquePanel
             :outliers="anomalias.outliers"
-            :ordenacao="ordenacao"
-            @update:ordenacao="emit('update:ordenacao', $event)"
+            :ordenacao="ordenacaoOutliers"
+            @ordenar="emit('ordenar-outliers', $event)"
           />
         </div>
       </template>

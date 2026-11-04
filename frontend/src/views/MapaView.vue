@@ -6,6 +6,7 @@ import MapPanel from '../components/MapPanel.vue'
 import SectionsTable from '../components/SectionsTable.vue'
 import SecaoView from '../views/SecaoView.vue'
 import UfPanel from '../components/UfPanel.vue'
+import { useOrdenacao } from '../composables/ordenacao'
 import { useMapa, useResumo, useSecoes } from '../composables/queries'
 import { useSelecaoEleicao } from '../composables/selecao'
 import { candidatosNominais } from '../lib/agregacoes'
@@ -18,7 +19,9 @@ const mapaQuery = useMapa()
 const candidatos = computed(() =>
   candidatosNominais(resumoQuery.data.value?.votos ?? []),
 )
+const ordUf = useOrdenacao()
 const mapaUfQuery = useMapa('uf', {
+  ordenacoes: ordUf.ordenacao,
   ignorarMunicipio: true,
   ignorarUf: true,
   incluirTodosCandidatos: true,
@@ -29,7 +32,11 @@ const mapaUfQuery = useMapa('uf', {
     return lista.join(',')
   }),
 })
-const secoesQuery = useSecoes()
+const ordMapa = useOrdenacao()
+const mapaTabelaQuery = useMapa(null, { ordenacoes: ordMapa.ordenacao })
+const ordSecoes = useOrdenacao()
+const secoesQuery = useSecoes(ordSecoes.ordenacao)
+watch(ordSecoes.ordenacao, () => store.definirPagina(1))
 
 watch(
   () => store.asOf,
@@ -113,6 +120,9 @@ function atualizarSecoes() {
   <section class="malha" :aria-label="$t('mapaView.aria')">
     <MapPanel
       :areas="mapaQuery.data.value?.areas ?? []"
+      :areas-tabela="mapaTabelaQuery.data.value?.areas ?? null"
+      :ordenacao-tabela="ordMapa.ordenacao.value"
+      @ordenar-tabela="ordMapa.alternar"
       :nivel="store.mapLevel"
       :modo="store.mapMode"
       :candidato="store.candidato"
@@ -134,6 +144,8 @@ function atualizarSecoes() {
       :loading="mapaUfQuery.isLoading.value"
       :error="mapaUfQuery.error.value?.message ?? ''"
       :uf-selecionada="store.uf"
+      :ordenacao="ordUf.ordenacao.value"
+      @ordenar="ordUf.alternar"
       @select="selecionarUf"
       @municipios="verMunicipios"
       @retry="atualizarMapa"
@@ -153,6 +165,8 @@ function atualizarSecoes() {
     :page-size="store.sectionPageSize"
     :uf="store.uf"
     :municipio="store.municipio"
+    :ordenacao="ordSecoes.ordenacao.value"
+    @ordenar="ordSecoes.alternar"
     @update:page="store.definirPagina"
     @update:page-size="store.definirTamanhoPagina"
     @update:status="store.definirStatusSecao"
