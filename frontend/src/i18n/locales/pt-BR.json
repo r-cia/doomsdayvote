@@ -377,7 +377,10 @@
     "caption": "Aderência à lei de Benford por candidato no corte atual",
     "abaixoMinimo": "seções abaixo do mínimo",
     "digito": "Dígito {d}: observado {obs}, esperado {esp}",
-    "faixaDe": ", faixa de 95% de {de} a {ate}"
+    "faixaDe": ", faixa de 95% de {de} a {ate}",
+    "niveisTitulo": "Benford por níveis",
+    "niveisCandidatos": "candidatos",
+    "niveisCaption": "Aderência à lei de Benford por candidato em seção, zona e município"
   },
   "destaque": {
     "titulo": "Seções em destaque",

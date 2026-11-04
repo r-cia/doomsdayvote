@@ -377,7 +377,10 @@
     "caption": "Adherence to Benford's law per candidate in the current cut",
     "abaixoMinimo": "sections below the minimum",
     "digito": "Digit {d}: observed {obs}, expected {esp}",
-    "faixaDe": ", 95% band from {de} to {ate}"
+    "faixaDe": ", 95% band from {de} to {ate}",
+    "niveisTitulo": "Benford by levels",
+    "niveisCandidatos": "candidates",
+    "niveisCaption": "Benford's law fit per candidate at section, zone and municipality level"
   },
   "destaque": {
     "titulo": "Highlighted sections",

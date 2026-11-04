@@ -1,4 +1,5 @@
 <script setup>
+import BenfordNiveisPanel from './BenfordNiveisPanel.vue'
 import BenfordPanel from './BenfordPanel.vue'
 import DuplicacaoPanel from './DuplicacaoPanel.vue'
 import SecoesDestaquePanel from './SecoesDestaquePanel.vue'
@@ -12,9 +13,10 @@ defineProps({
   error: { type: String, default: '' },
   ordenacaoOutliers: { type: Object, default: null },
   ordenacaoBenford: { type: Object, default: null },
+  ordenacaoNiveis: { type: Object, default: null },
 })
 
-const emit = defineEmits(['retry', 'select', 'ordenar-outliers', 'ordenar-benford'])
+const emit = defineEmits(['retry', 'select', 'ordenar-outliers', 'ordenar-benford', 'ordenar-niveis'])
 </script>
 
 <template>
@@ -44,6 +46,11 @@ const emit = defineEmits(['retry', 'select', 'ordenar-outliers', 'ordenar-benfor
       />
 
       <template v-if="anomalias">
+        <BenfordNiveisPanel
+          :dados="anomalias.benford_niveis"
+          :ordenacao="ordenacaoNiveis"
+          @ordenar="emit('ordenar-niveis', $event)"
+        />
         <div class="auditoria-grade">
           <DuplicacaoPanel :dados="anomalias.duplicacao" />
           <SecoesDestaquePanel

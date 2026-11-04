@@ -17,7 +17,7 @@ describe('larguras fixas das tabelas', () => {
         expect(larguras.reduce((a, b) => a + b, 0), nome).toBe(100)
       }
     }
-    expect(total).toBe(9)
+    expect(total).toBe(10)
   })
 
   it('toda tabela com colgroup usa a classe de largura fixa', () => {

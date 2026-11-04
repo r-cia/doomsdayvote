@@ -14,7 +14,8 @@ const { store, aoCandidato } = useSelecaoEleicao()
 const ordBenford = useOrdenacao()
 const ordOutliers = useOrdenacao()
 const analiseQuery = useAnalise(ordBenford.ordenacao)
-const anomaliasQuery = useAnomalias(null, ordOutliers.ordenacao)
+const ordNiveis = useOrdenacao()
+const anomaliasQuery = useAnomalias(null, { '': ordOutliers.ordenacao, _benford: ordNiveis.ordenacao })
 
 const itensCobertura = computed(() => {
   const a = analiseQuery.data.value?.cobertura
@@ -50,10 +51,12 @@ const itensCobertura = computed(() => {
     :error="analiseQuery.error.value?.message ?? anomaliasQuery.error.value?.message ?? ''"
     :ordenacao-outliers="ordOutliers.ordenacao.value"
     :ordenacao-benford="ordBenford.ordenacao.value"
+    :ordenacao-niveis="ordNiveis.ordenacao.value"
     @retry="() => { analiseQuery.refetch(); anomaliasQuery.refetch() }"
     @select="aoCandidato"
     @ordenar-outliers="ordOutliers.alternar"
     @ordenar-benford="ordBenford.alternar"
+    @ordenar-niveis="ordNiveis.alternar"
   />
   <Cobertura :itens="itensCobertura" />
 </template>
