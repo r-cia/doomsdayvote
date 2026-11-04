@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { formatarNumero } from '../lib/format'
-import { i18n } from '../i18n'
+import { formatarDecimal, formatarNumero } from '../lib/format'
 import { useI18n } from 'vue-i18n'
 import StateBlock from './StateBlock.vue'
 import ThOrdenavel from './ThOrdenavel.vue'
@@ -25,10 +24,7 @@ const temDoisTurnos = computed(
 const blocos = computed(() => estatisticasQuery.data.value?.blocos ?? [])
 
 function numero(valor) {
-  if (valor === null || valor === undefined) return '—'
-  const convertido = Number(valor)
-  if (Number.isNaN(convertido)) return '—'
-  return convertido.toLocaleString(i18n.global.locale.value, { maximumFractionDigits: 1 })
+  return formatarDecimal(valor, 1)
 }
 
 function inteiro(valor) {
