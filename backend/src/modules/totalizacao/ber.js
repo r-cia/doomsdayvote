@@ -107,10 +107,6 @@ export function exigirUniversal(tlv, tag, contexto) {
   if (!ehUniversal(tlv, tag)) throw invalido(tlv.inicio, `${contexto}: tag universal ${tag} esperada`);
 }
 
-export function exigirContexto(tlv, numero, contexto) {
-  if (!ehContexto(tlv, numero)) throw invalido(tlv.inicio, `${contexto}: tag de contexto [${numero}] esperada`);
-}
-
 export function lerInteiro(buffer, tlv) {
   exigirUniversal(tlv, TAG.INTEGER, 'INTEGER');
   if (tlv.construido) throw invalido(tlv.inicio, 'INTEGER não pode ser construído');
