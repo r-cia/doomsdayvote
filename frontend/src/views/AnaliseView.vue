@@ -1,29 +1,12 @@
 <script setup>
-import AnaliseSection from '../components/AnaliseSection.vue'
+import AnaliseBloco from '../components/AnaliseBloco.vue'
 import EstatisticaPanel from '../components/EstatisticaPanel.vue'
-import TempoVotoPanel from '../components/TempoVotoPanel.vue'
+import ExibirSobDemanda from '../components/ExibirSobDemanda.vue'
 import IncidentesPanel from '../components/IncidentesPanel.vue'
-import { watch } from 'vue'
-import { useOrdenacao } from '../composables/ordenacao'
-import { useAnalise, useAnomalias } from '../composables/queries'
+import TempoVotoPanel from '../components/TempoVotoPanel.vue'
 import { useSelecaoEleicao } from '../composables/selecao'
 
-const { store, aoCandidato, eleicoesDisponiveis } = useSelecaoEleicao()
-
-const ordBenford = useOrdenacao()
-const ordOutliers = useOrdenacao()
-const analiseQuery = useAnalise(ordBenford.ordenacao)
-const anomaliasQuery = useAnomalias(null, ordOutliers.ordenacao)
-
-watch(
-  () => store.asOf,
-  () => {
-    analiseQuery.refetch()
-    anomaliasQuery.refetch()
-  },
-)
-
-
+const { store, eleicoesDisponiveis } = useSelecaoEleicao()
 </script>
 
 <template>
@@ -32,21 +15,13 @@ watch(
     :election-id="store.electionId"
   />
 
-  <TempoVotoPanel />
+  <ExibirSobDemanda>
+    <TempoVotoPanel />
+  </ExibirSobDemanda>
 
   <IncidentesPanel />
 
-  <AnaliseSection
-    :benford="analiseQuery.data.value?.benford ?? null"
-    :anomalias="anomaliasQuery.data.value ?? null"
-    :selecionado="store.candidato"
-    :loading="anomaliasQuery.isLoading.value"
-    :error="anomaliasQuery.error.value?.message ?? ''"
-    :ordenacao-outliers="ordOutliers.ordenacao.value"
-    :ordenacao-benford="ordBenford.ordenacao.value"
-    @retry="anomaliasQuery.refetch()"
-    @select="aoCandidato"
-    @ordenar-outliers="ordOutliers.alternar"
-    @ordenar-benford="ordBenford.alternar"
-  />
+  <ExibirSobDemanda alturaMinima="320px">
+    <AnaliseBloco />
+  </ExibirSobDemanda>
 </template>

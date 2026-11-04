@@ -626,5 +626,17 @@
       "NOT_FOUND": "Resource not found.",
       "INTERNAL_ERROR": "Internal server error."
     }
+  },
+  "cobertura": {
+    "titulo": "Coverage",
+    "consideradas": "Sections considered",
+    "busSemAptos": "Reports without eligible voters",
+    "busSemComparecimento": "Reports without turnout",
+    "busSemAbstencoes": "Reports without abstentions",
+    "busSemBiometria": "Reports without biometrics",
+    "abaixoMinimoBenford": "Sections below the minimum (Benford)",
+    "duplicacaoGrupos": "Duplicated groups",
+    "duplicacaoSecoes": "Duplicated sections",
+    "duplicacaoEscopo": "Sections in the duplication scope"
   }
 }

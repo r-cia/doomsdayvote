@@ -2259,3 +2259,25 @@ th .ordenavel:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.cobertura {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
+.cobertura div {
+  display: flex;
+  gap: 6px;
+}
+
+.cobertura dt {
+  color: var(--ink-dim);
+}
+
+.cobertura dd {
+  margin: 0;
+}

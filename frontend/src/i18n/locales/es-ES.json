@@ -626,5 +626,17 @@
       "NOT_FOUND": "Recurso no encontrado.",
       "INTERNAL_ERROR": "Error interno del servidor."
     }
+  },
+  "cobertura": {
+    "titulo": "Cobertura",
+    "consideradas": "Secciones consideradas",
+    "busSemAptos": "Actas sin aptos",
+    "busSemComparecimento": "Actas sin participación",
+    "busSemAbstencoes": "Actas sin abstenciones",
+    "busSemBiometria": "Actas sin biometría",
+    "abaixoMinimoBenford": "Secciones por debajo del mínimo (Benford)",
+    "duplicacaoGrupos": "Grupos duplicados",
+    "duplicacaoSecoes": "Secciones duplicadas",
+    "duplicacaoEscopo": "Secciones en el ámbito de la duplicación"
   }
 }
