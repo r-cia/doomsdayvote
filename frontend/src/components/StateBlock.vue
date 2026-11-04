@@ -37,7 +37,7 @@ defineEmits(['acao'])
       <p v-if="descricao">{{ descricao }}</p>
       <slot />
     </div>
-    <button v-if="acao" type="button" class="button button--secondary" @click="$emit('acao')">
+    <button v-if="acao" type="button" class="button button--ghost" @click="$emit('acao')">
       {{ acao }}
     </button>
   </div>

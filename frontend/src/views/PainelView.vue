@@ -120,7 +120,6 @@ const timelineAvisos = computed(() => timelineQuery.data.value?.avisos ?? [])
       :avisos="timelineAvisos"
       :granularidade="store.timelineGranularity"
       @update:corte="aoCorte"
-      @update:granularidade="store.definirGranularidade"
     />
 
     <PlacarRanking

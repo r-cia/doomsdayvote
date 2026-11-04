@@ -134,9 +134,9 @@
     }
   },
   "idiomas": {
-    "pt-BR": "Português (Brasil)",
-    "es-ES": "Español (España)",
-    "en-US": "English (United States)"
+    "pt-BR": "PT-BR",
+    "es-ES": "ES-ES",
+    "en-US": "EN-US"
   },
   "regioes": {
     "Norte": "North",
@@ -281,9 +281,6 @@
   },
   "plotDia": {
     "titulo": "Plot of the day",
-    "granularidade": "Granularity",
-    "cincoMin": "5 min",
-    "umMin": "1 min",
     "corte": "cut",
     "secoes": "{n} sections",
     "votos": "{n} votes",

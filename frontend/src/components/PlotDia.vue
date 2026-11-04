@@ -18,7 +18,7 @@ const props = defineProps({
   granularidade: { type: String, default: '5m' },
 })
 
-const emit = defineEmits(['update:corte', 'update:granularidade'])
+const emit = defineEmits(['update:corte'])
 
 const canvas = ref(null)
 const area = ref(null)
@@ -344,18 +344,6 @@ watch(
   <section class="painel tracado" aria-labelledby="tracado-titulo">
     <header class="painel__cabecalho">
       <h2 id="tracado-titulo">{{ $t('plotDia.titulo') }}</h2>
-      <div class="segmented" role="group" :aria-label="$t('plotDia.granularidade')">
-        <button
-          v-for="g in ['5m', '1m']"
-          :key="g"
-          type="button"
-          :aria-pressed="granularidade === g"
-          :class="{ ativo: granularidade === g }"
-          @click="emit('update:granularidade', g)"
-        >
-          {{ g === '5m' ? $t('plotDia.cincoMin') : $t('plotDia.umMin') }}
-        </button>
-      </div>
       <p class="painel__meta">
         <b>{{ formatarHora(pontoAtual?.t) }}</b> · {{ $t('plotDia.corte') }}<br />
         {{ $t('plotDia.secoes', { n: formatarNumero(pontoAtual?.secoes_com_bu_acumuladas) }) }} ·

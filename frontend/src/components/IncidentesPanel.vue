@@ -33,7 +33,7 @@ const secao = (i) =>
   <section class="painel" aria-labelledby="incidentes-titulo">
     <header class="painel__cabecalho">
       <h2 id="incidentes-titulo">{{ $t('incidentes.titulo') }}</h2>
-      <button type="button" class="button button--secondary" :aria-expanded="aberto" aria-controls="incidentes-corpo" @click="aberto = !aberto">
+      <button type="button" class="button button--ghost" :aria-expanded="aberto" aria-controls="incidentes-corpo" @click="aberto = !aberto">
         {{ aberto ? $t('incidentes.recolher') : $t('incidentes.expandir') }}
       </button>
     </header>

@@ -1640,6 +1640,38 @@ tr.linha--ativa th {
   color: var(--ink-faint);
 }
 
+.painel__etiqueta {
+  margin-bottom: 2px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 16px;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.state__icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.state__texto strong {
+  font-weight: 400;
+  color: var(--ink-dim);
+}
+
+.state__texto p {
+  margin-top: 2px;
+}
+
 /* ── avisos e estados ─────────────────────────────────────────────── */
 
 .aviso {
@@ -2260,24 +2292,3 @@ th .ordenavel:focus-visible {
   white-space: nowrap;
 }
 
-.cobertura {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  margin: 0;
-  padding: 8px 14px;
-  font-size: 12px;
-}
-
-.cobertura div {
-  display: flex;
-  gap: 6px;
-}
-
-.cobertura dt {
-  color: var(--ink-dim);
-}
-
-.cobertura dd {
-  margin: 0;
-}

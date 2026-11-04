@@ -73,7 +73,7 @@ const identificacao = (g) =>
         <li v-for="g in grupos" :key="g.chave">
           <button
             type="button"
-            class="button button--secondary"
+            class="button button--ghost"
             :aria-expanded="abertos.has(g.chave)"
             @click="alternarGrupo(g.chave)"
           >
