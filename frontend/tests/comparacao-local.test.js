@@ -35,7 +35,7 @@ describe('ComparacaoLocalPanel', () => {
     const w = await montar(ComparacaoLocalPanel)
     await w.find('button[aria-expanded]').trigger('click')
     await flushPromises()
-    await w.findAll('thead button')[3].trigger('click')
+    await w.findAll('thead button')[4].trigger('click')
     await flushPromises()
     expect(api.comparacaoLocalSecoes.mock.calls.at(-1)[0]).toMatchObject({ ordem: 'participacao', direcao: 'asc' })
   })

@@ -87,7 +87,13 @@ const nulo = (valor) => (valor === null || valor === undefined || valor === '' ?
         <h3>{{ $t('versoes.camposAlterados', { de: comparacao.anterior, para: comparacao.atual }) }}</h3>
         <div v-if="comparacao.campos_alterados.length === 0" class="vazio">{{ $t('versoes.nenhumCampo') }}</div>
         <div v-else class="tabela-scroll">
-          <table>
+          <table class="tabela-fixa">
+            <colgroup>
+              <col style="width: 34%" />
+              <col style="width: 22%" />
+              <col style="width: 22%" />
+              <col style="width: 22%" />
+            </colgroup>
             <thead>
               <tr>
                 <ThOrdenavel coluna="campo" :ordenacao="campos.ordenacao.value" @ordenar="campos.alternar">{{ $t('divergencias.campo') }}</ThOrdenavel>
@@ -110,7 +116,14 @@ const nulo = (valor) => (valor === null || valor === undefined || valor === '' ?
         <h3>{{ $t('versoes.votaveisAlterados') }}</h3>
         <div v-if="comparacao.votaveis_alterados.length === 0" class="vazio">{{ $t('versoes.nenhumVotavel') }}</div>
         <div v-else class="tabela-scroll">
-          <table>
+          <table class="tabela-fixa">
+            <colgroup>
+              <col style="width: 14%" />
+              <col style="width: 34%" />
+              <col style="width: 18%" />
+              <col style="width: 18%" />
+              <col style="width: 16%" />
+            </colgroup>
             <thead>
               <tr>
                 <ThOrdenavel coluna="nr_votavel" numero :ordenacao="votaveis.ordenacao.value" @ordenar="votaveis.alternar">{{ $t('versoes.numero') }}</ThOrdenavel>

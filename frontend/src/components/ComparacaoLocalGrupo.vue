@@ -33,9 +33,20 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
   />
   <div v-else class="tabela-scroll" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
     <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
-    <table>
+    <table class="tabela-fixa">
+      <colgroup>
+        <col style="width: 6%" />
+        <col style="width: 26%" />
+        <col style="width: 8%" />
+        <col style="width: 8%" />
+        <col style="width: 13%" />
+        <col style="width: 13%" />
+        <col style="width: 13%" />
+        <col style="width: 13%" />
+      </colgroup>
       <thead>
         <tr>
+          <ThOrdenavel coluna="sg_uf" :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.uf') }}</ThOrdenavel>
           <ThOrdenavel coluna="nm_municipio" :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.municipio') }}</ThOrdenavel>
           <ThOrdenavel coluna="nr_zona" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.zona') }}</ThOrdenavel>
           <ThOrdenavel coluna="nr_secao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.secao') }}</ThOrdenavel>
@@ -43,19 +54,18 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
           <ThOrdenavel coluna="abstencao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.abstencao') }}</ThOrdenavel>
           <ThOrdenavel coluna="participacao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.distParticipacao') }}</ThOrdenavel>
           <ThOrdenavel coluna="abstencao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.distAbstencao') }}</ThOrdenavel>
-          <th scope="col"><span class="sr-only">{{ $t('comum.abrir') }}</span></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="s in secoes" :key="s.secao.id">
-          <td>{{ s.secao.nm_municipio || s.secao.cd_municipio_tse }}</td>
+          <td>{{ s.secao.sg_uf }}</td>
+          <td :title="s.secao.nm_municipio">{{ s.secao.nm_municipio || s.secao.cd_municipio_tse }}</td>
           <td class="num">{{ s.secao.nr_zona }}</td>
-          <td class="num">{{ s.secao.nr_secao }}</td>
+          <td class="num"><RouterLink :to="`/secoes/${s.secao.id}`" :title="$t('comum.abrirSecao')">{{ s.secao.nr_secao }}</RouterLink></td>
           <td class="num">{{ formatarPercentual(pct(s.metricas?.participacao)) }}</td>
           <td class="num">{{ formatarPercentual(pct(s.metricas?.abstencao)) }}</td>
           <td class="num">{{ pp(s.distancia_pp?.participacao_pp) }}</td>
           <td class="num">{{ pp(s.distancia_pp?.abstencao_pp) }}</td>
-          <td><RouterLink class="button button--ghost button--compacto" :to="`/secoes/${s.secao.id}`">{{ $t('comum.abrirSecao') }}</RouterLink></td>
         </tr>
       </tbody>
     </table>

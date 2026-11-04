@@ -152,8 +152,15 @@ const votosUf = computed(() => candidatosNominais(props.votos))
     />
 
     <div v-else-if="ufSelecionada" class="tabela-scroll uf-painel__scroll">
-      <table>
+      <table class="tabela-fixa">
         <caption class="sr-only">{{ $t('ufPanel.captionCandidatos', { uf: ufSelecionada }) }}</caption>
+        <colgroup>
+          <col style="width: 40%" />
+          <col style="width: 16%" />
+          <col style="width: 22%" />
+          <col style="width: 22%" />
+        </colgroup>
+
         <thead>
           <tr>
             <th scope="col">{{ $t('comum.candidato') }}</th>
@@ -187,8 +194,16 @@ const votosUf = computed(() => candidatosNominais(props.votos))
     </p>
 
     <div v-else-if="agrupar === 'regiao' && grupos" class="tabela-scroll uf-painel__scroll">
-      <table>
+      <table class="tabela-fixa">
         <caption class="sr-only">{{ $t('ufPanel.captionRegiao') }}</caption>
+        <colgroup>
+          <col style="width: 8%" />
+          <col style="width: 20%" />
+          <col style="width: 34%" />
+          <col style="width: 20%" />
+          <col style="width: 18%" />
+        </colgroup>
+
         <thead>
           <tr>
             <th scope="col" class="ordenavel" @click="alternar('uf')">{{ $t('comum.uf') }}{{ seta('uf') }}</th>
@@ -256,8 +271,16 @@ const votosUf = computed(() => candidatosNominais(props.votos))
     </div>
 
     <div v-else class="tabela-scroll uf-painel__scroll">
-      <table>
+      <table class="tabela-fixa">
         <caption class="sr-only">{{ $t('ufPanel.caption') }}</caption>
+        <colgroup>
+          <col style="width: 8%" />
+          <col style="width: 20%" />
+          <col style="width: 34%" />
+          <col style="width: 20%" />
+          <col style="width: 18%" />
+        </colgroup>
+
         <thead>
           <tr>
             <th scope="col" class="ordenavel" @click="alternar('uf')">{{ $t('comum.uf') }}{{ seta('uf') }}</th>

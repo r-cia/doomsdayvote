@@ -2247,3 +2247,15 @@ th .ordenavel:focus-visible {
 .abas button:focus-visible {
   outline: 2px solid var(--amber);
 }
+
+.tabela-fixa {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.tabela-fixa th,
+.tabela-fixa td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

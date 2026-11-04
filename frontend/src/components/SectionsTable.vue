@@ -173,10 +173,20 @@ function navegarLinhas(evento) {
           {{ $t('secoes.atualizando') }}
         </p>
         <div class="tabela-scroll">
-          <table ref="tabela" @keydown="navegarLinhas">
+          <table ref="tabela" class="tabela-fixa" @keydown="navegarLinhas">
             <caption class="sr-only">
               {{ $t('secoes.caption') }}
             </caption>
+            <colgroup>
+              <col style="width: 6%" />
+              <col style="width: 28%" />
+              <col style="width: 8%" />
+              <col style="width: 8%" />
+              <col style="width: 12%" />
+              <col style="width: 16%" />
+              <col style="width: 16%" />
+              <col style="width: 6%" />
+            </colgroup>
             <thead>
               <tr>
                 <th scope="col">{{ $t('comum.uf') }}</th>
@@ -192,7 +202,7 @@ function navegarLinhas(evento) {
             <tbody>
               <tr v-for="item in itens" :key="item.id">
                 <td>{{ item.sg_uf }}</td>
-                <td>{{ item.nm_municipio }}</td>
+                <td :title="item.nm_municipio">{{ item.nm_municipio }}</td>
                 <td class="num">{{ item.nr_zona }}</td>
                 <td class="num">{{ item.nr_secao }}</td>
                 <td class="num">{{ item.nr_local_votacao }}</td>

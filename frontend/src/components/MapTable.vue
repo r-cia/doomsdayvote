@@ -143,10 +143,28 @@ function aoClicarLinha(linha) {
     </p>
 
     <div v-else class="tabela-scroll">
-      <table ref="tabela">
+      <table ref="tabela" class="tabela-fixa">
         <caption class="sr-only">
           {{ $t('mapTable.caption', { nivel: nivel === 'uf' ? $t('comum.uf') : $t('comum.municipio').toLowerCase() }) }}
         </caption>
+        <colgroup v-if="!candidato">
+          <col style="width: 30%" />
+          <col style="width: 14%" />
+          <col style="width: 14%" />
+          <col style="width: 26%" />
+          <col style="width: 10%" />
+          <col style="width: 6%" />
+        </colgroup>
+        <colgroup v-else>
+          <col style="width: 24%" />
+          <col style="width: 11%" />
+          <col style="width: 11%" />
+          <col style="width: 20%" />
+          <col style="width: 8%" />
+          <col style="width: 11%" />
+          <col style="width: 8%" />
+          <col style="width: 7%" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" @click="alternar('rotulo')">{{ nivel === 'uf' ? $t('comum.uf') : $t('comum.municipio') }}{{ seta('rotulo') }}</th>
@@ -161,7 +179,7 @@ function aoClicarLinha(linha) {
         </thead>
         <tbody @keydown="navegarLinhas">
           <tr v-for="linha in linhasPagina" :key="linha.chave">
-            <th scope="row">
+            <th scope="row" :title="linha.rotulo">
               <span class="area-rotulo">
                 <span
                   class="area-cor"
@@ -173,7 +191,7 @@ function aoClicarLinha(linha) {
             </th>
             <td class="num">{{ formatarNumero(linha.total) }}</td>
             <td class="num">{{ formatarNumero(linha.validos) }}</td>
-            <td>
+            <td :title="linha.liderNome ?? undefined">
               <span v-if="linha.liderSigla" class="lider">
                 <span
                   class="party-dot party-dot--mini"

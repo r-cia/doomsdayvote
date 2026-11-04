@@ -89,7 +89,15 @@ function seta(coluna) {
     </div>
 
     <div v-else class="tabela-scroll">
-      <table class="tabela-votos-estado">
+      <table
+        class="tabela-votos-estado tabela-fixa"
+        :style="{ width: `calc(24rem + ${ufs.length * 6}rem)`, minWidth: '100%' }"
+      >
+        <colgroup>
+          <col style="width: 16rem" />
+          <col v-for="area in ufs" :key="area.sg_uf" style="width: 6rem" />
+          <col style="width: 8rem" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col" class="ordenavel" @click="alternar('nm_votavel')">{{ $t('comum.candidato') }}{{ seta('nm_votavel') }}</th>
