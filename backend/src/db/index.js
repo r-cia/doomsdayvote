@@ -12,8 +12,10 @@ export function criarDb({
   workMemMb = 64,
 }) {
   // statement_timeout precisa ir em `options`: o pg descarta valor 0 como falsy.
+  // jit=off: com 472 mil BUs a compilação JIT leva minutos por consulta (316 s → 3,8 s sem JIT).
   const options = [
     '-c timezone=UTC',
+    '-c jit=off',
     `-c work_mem=${workMemMb}MB`,
     `-c statement_timeout=${statementTimeout}`,
     ...(readOnly ? ['-c default_transaction_read_only=on'] : []),
