@@ -13,10 +13,9 @@ import { decodificarRdv } from './rdv.js';
 import { parsearLogJez } from './log.js';
 import { registrarEleitores, registrarIncidentes } from './metricas.js';
 import {
+  abrirZipArquivo,
   detectarFormatoArquivo,
-  extrairEntrada,
   lerEntradas7z,
-  listarEntradas,
   listarEntradas7z,
 } from './zip.js';
 
@@ -88,7 +87,7 @@ function resumirEntradas(entradas) {
   return { prefixos: [...prefixos].sort(), ignoradas };
 }
 
-async function* gruposDoArquivo({ formato, caminhoArquivo, conteudo, entradas }) {
+async function* gruposDoArquivo({ formato, caminhoArquivo, entradas }) {
   const vistos = new Set();
   let atual = null;
 
@@ -301,14 +300,28 @@ async function finalizarLote(db, loteId, origem, status) {
   });
 }
 
-export async function carregarZip(
+export async function carregarZip(db, caminhoArquivo, opcoes = {}) {
+  const formato = await detectarFormatoArquivo(caminhoArquivo);
+  if (formato !== 'zip') {
+    return carregarZipAberto(db, caminhoArquivo, { formato, zip: null }, opcoes);
+  }
+
+  const zip = await abrirZipArquivo(caminhoArquivo);
+  try {
+    return await carregarZipAberto(db, caminhoArquivo, { formato, zip }, opcoes);
+  } finally {
+    await zip.fechar();
+  }
+}
+
+async function carregarZipAberto(
   db,
   caminhoArquivo,
+  { formato, zip },
   { aoProgredir, registrarEvento = registrarEventoCarga, falharRapido = false } = {},
 ) {
   const inicio = Date.now();
   const nomeArquivo = path.basename(caminhoArquivo);
-  const formato = await detectarFormatoArquivo(caminhoArquivo);
   const sha256 = await hashArquivo(caminhoArquivo);
 
   const existente = await db
@@ -327,17 +340,11 @@ export async function carregarZip(
   }
 
   const origem = derivarOrigem(nomeArquivo);
-  const conteudo = formato === 'zip' ? await readFile(caminhoArquivo) : null;
-  const entradas =
-    formato === '7z'
-      ? await listarEntradas7z(caminhoArquivo)
-      : listarEntradas(conteudo, 'arquivo zip');
+  const entradas = formato === '7z' ? await listarEntradas7z(caminhoArquivo) : zip.entradas;
   const { prefixos, ignoradas } = resumirEntradas(entradas);
   if (prefixos.length === 0) throw new Error(`arquivo sem entradas de seção: ${nomeArquivo}`);
   const extrair =
-    formato === '7z'
-      ? (entrada) => entrada.conteudo
-      : (entrada) => extrairEntrada(conteudo, entrada, 'arquivo zip');
+    formato === '7z' ? (entrada) => entrada.conteudo : (entrada) => zip.extrair(entrada);
 
   const destino = { ...origem, nome_arquivo: nomeArquivo };
   const lote = existente
@@ -374,7 +381,6 @@ export async function carregarZip(
     for await (const { prefixo, grupo } of gruposDoArquivo({
       formato,
       caminhoArquivo,
-      conteudo,
       entradas,
     })) {
       indice += 1;
