@@ -629,13 +629,13 @@ describe('carga dos zips de totalização por UF', () => {
     expect(lote.status).toBe('falhou');
   }, 120000);
 
-  it('retoma o lote parcial processando só a seção que falhou', async () => {
+  it('reimporta o lote parcial do zero, sem retomar as seções gravadas', async () => {
     const bu = gerarBu();
     const rdv = gerarRdv({ votos: votosDoCenario() });
     const log = gerarLogJez();
     const bu242 = gerarBu({ secao: 2 });
 
-    const caminho = await escreverZip('retomada', [
+    const caminho = await escreverZip('reinicio', [
       [`${PREFIXO}-bu.dat`, bu],
       [`${PREFIXO}-rdv.dat`, rdv],
       [`${PREFIXO}-log.jez`, log],
@@ -661,17 +661,20 @@ describe('carga dos zips de totalização por UF', () => {
       },
     });
 
-    expect(processadas).toEqual([PREFIXO_242]);
+    expect(processadas).toEqual([PREFIXO, PREFIXO_242]);
     expect(segunda).toMatchObject({
       status: 'parcial',
       secoes: 2,
-      secoes_processadas: 1,
-      secoes_ignoradas: 1,
-      votos_bu: 0,
-      votos_rdv: 0,
+      secoes_processadas: 2,
+      secoes_ignoradas: 0,
+      votos_bu: VOTOS_BU,
+      votos_rdv: VOTOS_RDV,
     });
-    expect(await contar('totalizacao_secao', { coluna: 'lote_id', valor: primeira.lote_id })).toBe(1);
-    expect(await contar('totalizacao_secao_erro', { coluna: 'lote_id', valor: primeira.lote_id })).toBe(1);
+    expect(segunda.lote_id).not.toBe(primeira.lote_id);
+    expect(await contar('totalizacao_lote', { coluna: 'id', valor: primeira.lote_id })).toBe(0);
+    expect(await contar('totalizacao_secao', { coluna: 'lote_id', valor: primeira.lote_id })).toBe(0);
+    expect(await contar('totalizacao_secao', { coluna: 'lote_id', valor: segunda.lote_id })).toBe(1);
+    expect(await contar('totalizacao_secao_erro', { coluna: 'lote_id', valor: segunda.lote_id })).toBe(1);
   }, 120000);
 
   it('detecta CRC divergente e registra a seção como erro', async () => {

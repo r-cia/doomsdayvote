@@ -218,20 +218,17 @@ async function inserirSecao(trx, grupo, extrair, destino) {
   return { votosBu: votosBu.length, votosRdv: votosRdv.length };
 }
 
-async function reaproveitarLote(db, existente, destino) {
-  return db
+async function reiniciarLote(db, existente, destino, sha256) {
+  await db
     .updateTable('totalizacao_lote')
-    .set({
-      nome_arquivo: destino.nome_arquivo,
-      sg_uf: destino.sg_uf,
-      ano_eleicao: destino.ano_eleicao,
-      nr_turno: destino.nr_turno,
-      iniciado_em: new Date(),
-      concluido_em: null,
-      status: 'processando',
-      substituido_por: null,
-    })
-    .where('id', '=', existente.id)
+    .set({ substituido_por: null })
+    .where('substituido_por', '=', existente.id)
+    .execute();
+  await db.deleteFrom('totalizacao_secao').where('lote_id', '=', existente.id).execute();
+  await db.deleteFrom('totalizacao_lote').where('id', '=', existente.id).execute();
+  return db
+    .insertInto('totalizacao_lote')
+    .values({ ...destino, sha256, status: 'processando' })
     .returning('id')
     .executeTakeFirstOrThrow();
 }
@@ -348,7 +345,7 @@ async function carregarZipAberto(
 
   const destino = { ...origem, nome_arquivo: nomeArquivo };
   const lote = existente
-    ? await reaproveitarLote(db, existente, destino)
+    ? await reiniciarLote(db, existente, destino, sha256)
     : await db
         .insertInto('totalizacao_lote')
         .values({ ...destino, sha256, status: 'processando' })
