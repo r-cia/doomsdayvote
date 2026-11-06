@@ -947,7 +947,6 @@ select {
 .benford__tabela {
   padding: 8px 0 0;
   overflow: auto;
-  max-height: 150px;
 }
 
 .benford__tabela table {
@@ -2003,10 +2002,6 @@ tr.linha--ativa th {
 
   .benford {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .benford__tabela {
-    max-height: 220px;
   }
 }
 

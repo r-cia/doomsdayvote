@@ -18,4 +18,4 @@ Gráfico do painel Benford da aba Estatística (`BenfordPanel.vue`, componente `
 
 ## Tabela
 
-Ao lado do gráfico: candidato, `n`, MAD e `p` (`monte_carlo.p_valor`), com MAD e `p` em 4 casas pelo formatador do idioma. `n` e MAD ordenam no servidor; a coluna `p` não ordena. Clicar no candidato o seleciona no gráfico.
+Ao lado do gráfico: candidato, `n`, MAD e `p` (`monte_carlo.p_valor`), com MAD e `p` em 4 casas pelo formatador do idioma. `n` e MAD ordenam no servidor; a coluna `p` não ordena. Clicar no candidato o seleciona no gráfico. A tabela não tem altura máxima: acompanha a altura da coluna do gráfico e, com muitos candidatos, o painel cresce em vez de ganhar barra de rolagem vertical.
