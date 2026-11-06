@@ -95,7 +95,7 @@ const digitos = computed(() => (resultado.value?.n > 0 ? resultado.value.digitos
                 <ThOrdenavel coluna="nm_votavel" :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">{{ $t('comum.candidato') }}</ThOrdenavel>
                 <ThOrdenavel coluna="n" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">n</ThOrdenavel>
                 <ThOrdenavel coluna="mad" numero :ordenacao="ordenacao" @ordenar="emit('ordenar', $event)">MAD</ThOrdenavel>
-                <th scope="col" class="tabela__numero num">p</th>
+                <th scope="col" class="num">p</th>
               </tr>
             </thead>
             <tbody>

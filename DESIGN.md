@@ -141,7 +141,7 @@ A paleta é uma sala escura com três tintas de estado e um papel claro reservad
 - **Body** (400, 12–13px, 1.5): nomes, tabelas e textos de apoio.
 - **Label** (400, 9px, tracking 0.14em, caixa alta): rótulos de campo, colunas e legendas.
 
-**The Tabular Rule.** Todo número é tabular. Nenhum valor alinha à esquerda.
+**The Tabular Rule.** Todo número é tabular. Número e texto alinham sempre à esquerda, e o número fica abaixo do cabeçalho da sua coluna.
 
 ## Layout
 
@@ -194,7 +194,7 @@ A página de detalhe da seção troca o fundo para papel, a tinta para quase pre
 
 ### Do:
 - **Do** usar o fio de 1px para separar planos.
-- **Do** alinhar todo número à direita, em algarismos tabulares.
+- **Do** alinhar todo número e todo texto à esquerda, abaixo do cabeçalho da coluna, em algarismos tabulares.
 - **Do** reservar o âmbar para estrutura e leitura; estado usa verde, âmbar ou vermelho.
 - **Do** manter o primeiro viewport com ranking, traçado, biometria e Benford.
 - **Do** nomear a fonte do dado (corte, seção, lote) perto do número.

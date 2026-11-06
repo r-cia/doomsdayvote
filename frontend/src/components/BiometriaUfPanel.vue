@@ -88,16 +88,16 @@ const linhas = agregado
         <tbody>
           <tr v-for="linha in linhas" :key="linha.sg_uf" class="linha-clicavel" @click="emit('select', linha.sg_uf)">
             <td>{{ agruparRegiao ? $t(`regioes.${linha.sg_uf}`) : linha.sg_uf }}</td>
-            <td class="tabela__numero">
+            <td class="num">
               {{ formatarNumero(linha.qt_habilitados_por_biometria) }}
             </td>
-            <td class="tabela__numero">
+            <td class="num">
               {{ formatarPercentual(linha.percentual_habilitada) }}
             </td>
-            <td class="tabela__numero">
+            <td class="num">
               {{ formatarNumero(linha.qt_biometria_nao_habilitada) }}
             </td>
-            <td class="tabela__numero">
+            <td class="num">
               {{ formatarPercentual(linha.percentual_nao_habilitada) }}
             </td>
           </tr>

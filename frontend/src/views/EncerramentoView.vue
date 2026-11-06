@@ -94,13 +94,13 @@ watch(
         <tbody>
           <tr v-for="u in urnas" :key="u.sg_uf" class="linha-clicavel" tabindex="0" @click="escolherUf(u.sg_uf)" @keydown.enter="escolherUf(u.sg_uf)">
             <td>{{ u.sg_uf }}</td>
-            <td class="tabela__numero">{{ formatarNumero(u.total) }}</td>
-            <td class="tabela__numero">{{ formatarNumero(u.ate_1715) }}</td>
-            <td class="tabela__numero">{{ formatarPercentual(u.pct_1715) }}</td>
-            <td class="tabela__numero">{{ formatarNumero(u.ate_1915) }}</td>
-            <td class="tabela__numero">{{ formatarPercentual(u.pct_1915) }}</td>
-            <td class="tabela__numero">{{ formatarNumero(u.apos_1915) }}</td>
-            <td class="tabela__numero">{{ formatarPercentual(u.pct_apos_1915) }}</td>
+            <td class="num">{{ formatarNumero(u.total) }}</td>
+            <td class="num">{{ formatarNumero(u.ate_1715) }}</td>
+            <td class="num">{{ formatarPercentual(u.pct_1715) }}</td>
+            <td class="num">{{ formatarNumero(u.ate_1915) }}</td>
+            <td class="num">{{ formatarPercentual(u.pct_1915) }}</td>
+            <td class="num">{{ formatarNumero(u.apos_1915) }}</td>
+            <td class="num">{{ formatarPercentual(u.pct_apos_1915) }}</td>
           </tr>
         </tbody>
       </table>

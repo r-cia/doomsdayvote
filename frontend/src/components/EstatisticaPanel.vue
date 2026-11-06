@@ -93,19 +93,19 @@ function erroMensagem(erro) {
             <thead>
               <tr>
                 <th>{{ $t('estatistica.variavel') }}</th>
-                <th class="tabela__numero">{{ $t('duplicacao.secoes') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.media') }}</th>
-                <th class="tabela__numero">{{ $t('tempoVoto.mediana') }}</th>
-                <th class="tabela__numero">{{ $t('estatistica.desvio') }}</th>
+                <th class="num">{{ $t('duplicacao.secoes') }}</th>
+                <th class="num">{{ $t('estatistica.media') }}</th>
+                <th class="num">{{ $t('tempoVoto.mediana') }}</th>
+                <th class="num">{{ $t('estatistica.desvio') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>{{ $t('kpis.comparecimento') }}</td>
-                <td class="tabela__numero">{{ inteiro(bloco.comparecimento.secoes) }}</td>
-                <td class="tabela__numero">{{ numero(bloco.comparecimento.media) }}</td>
-                <td class="tabela__numero">{{ numero(bloco.comparecimento.mediana) }}</td>
-                <td class="tabela__numero">{{ numero(bloco.comparecimento.desvio) }}</td>
+                <td class="num">{{ inteiro(bloco.comparecimento.secoes) }}</td>
+                <td class="num">{{ numero(bloco.comparecimento.media) }}</td>
+                <td class="num">{{ numero(bloco.comparecimento.mediana) }}</td>
+                <td class="num">{{ numero(bloco.comparecimento.desvio) }}</td>
               </tr>
             </tbody>
           </table>
@@ -133,11 +133,11 @@ function erroMensagem(erro) {
                   </span>
                 </td>
                 <td>{{ candidato.sg_partido }}</td>
-                <td class="tabela__numero">{{ inteiro(candidato.secoes) }}</td>
-                <td class="tabela__numero">{{ inteiro(bloco.comparecimento.secoes - (candidato.secoes_com_voto ?? 0)) }}</td>
-                <td class="tabela__numero">{{ numero(candidato.media) }}</td>
-                <td class="tabela__numero">{{ numero(candidato.mediana) }}</td>
-                <td class="tabela__numero">{{ numero(candidato.desvio) }}</td>
+                <td class="num">{{ inteiro(candidato.secoes) }}</td>
+                <td class="num">{{ inteiro(bloco.comparecimento.secoes - (candidato.secoes_com_voto ?? 0)) }}</td>
+                <td class="num">{{ numero(candidato.media) }}</td>
+                <td class="num">{{ numero(candidato.mediana) }}</td>
+                <td class="num">{{ numero(candidato.desvio) }}</td>
               </tr>
             </tbody>
           </table>

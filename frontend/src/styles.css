@@ -139,7 +139,7 @@ select {
 }
 
 .num {
-  text-align: right;
+  text-align: left;
   font-variant-numeric: tabular-nums;
 }
 
@@ -472,7 +472,7 @@ select {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-faint);
-  text-align: right;
+  text-align: left;
 }
 
 .painel__meta b {
@@ -659,19 +659,19 @@ select {
 }
 
 .placar__votos {
-  text-align: right;
+  text-align: left;
   font-size: 13px;
   color: var(--amber);
 }
 
 .placar__percentual {
-  text-align: right;
+  text-align: left;
   font-size: 11px;
   color: var(--ink-dim);
 }
 
 .placar__delta {
-  text-align: right;
+  text-align: left;
   font-size: 9px;
   color: var(--ok);
   opacity: 0;
@@ -1490,7 +1490,7 @@ tbody tr[data-ativo='true'] {
 }
 
 .uf-linha__votos {
-  text-align: right;
+  text-align: left;
   font-size: 11px;
 }
 
@@ -1935,10 +1935,10 @@ tr.linha--ativa th {
 .detalhe-status {
   display: grid;
   gap: 4px;
-  justify-items: end;
+  justify-items: start;
   font-size: 10px;
   color: #55604e;
-  text-align: right;
+  text-align: left;
 }
 
 .detalhe-grade {

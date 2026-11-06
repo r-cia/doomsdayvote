@@ -15,7 +15,7 @@ const ariaSort = computed(() =>
 </script>
 
 <template>
-  <th scope="col" :aria-sort="ariaSort" :class="{ tabela__numero: numero, num: numero }">
+  <th scope="col" :aria-sort="ariaSort" :class="{ num: numero }">
     <button type="button" class="ordenavel" @click="$emit('ordenar', coluna)">
       <slot />
       <span aria-hidden="true">{{ ativa ? (ordenacao.direcao === 'desc' ? ' ↓' : ' ↑') : '' }}</span>

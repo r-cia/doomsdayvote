@@ -94,12 +94,12 @@
     "rules": [
       { "name": "The Three Inks Rule", "body": "A página tem no máximo três tintas de estado em uso simultâneo; cor de partido nunca vira estado.", "section": "colors" },
       { "name": "The Teletype Exception Rule", "body": "O papel claro existe apenas no extrato da seção. Fora dele, a sala é escura.", "section": "colors" },
-      { "name": "The Tabular Rule", "body": "Todo número é tabular. Nenhum valor alinha à esquerda.", "section": "typography" },
+      { "name": "The Tabular Rule", "body": "Todo número é tabular. Número e texto alinham sempre à esquerda, e o número fica abaixo do cabeçalho da sua coluna.", "section": "typography" },
       { "name": "The Seam Rule", "body": "Nenhum painel projeta sombra; se dois planos precisam se separar, entra um fio.", "section": "elevation" }
     ],
     "dos": [
       "Do usar o fio de 1px para separar planos.",
-      "Do alinhar todo número à direita, em algarismos tabulares.",
+      "Do alinhar todo número e todo texto à esquerda, abaixo do cabeçalho da coluna, em algarismos tabulares.",
       "Do reservar o âmbar para estrutura e leitura; estado usa verde, âmbar ou vermelho.",
       "Do manter o primeiro viewport com ranking, traçado, biometria e Benford.",
       "Do nomear a fonte do dado (corte, seção, lote) perto do número."

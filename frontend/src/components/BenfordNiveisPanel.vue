@@ -66,7 +66,7 @@ const pValor = (valor) => formatarDecimal(valor?.monte_carlo?.p_valor, 4)
             <ThOrdenavel coluna="nm_votavel" :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comum.candidato') }}</ThOrdenavel>
             <ThOrdenavel :coluna="`${nivel}_n`" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">n</ThOrdenavel>
             <ThOrdenavel :coluna="`${nivel}_mad`" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">MAD</ThOrdenavel>
-            <th scope="col" class="tabela__numero num">p</th>
+            <th scope="col" class="num">p</th>
           </tr>
         </thead>
         <tbody>

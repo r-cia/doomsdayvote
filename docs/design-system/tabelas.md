@@ -10,7 +10,11 @@ Colunas de dados têm largura fixa: a tabela usa a classe compartilhada `.tabela
 
 Célula com texto que pode cortar recebe `title` com o valor completo, e o CSS de `.tabela-fixa th`/`td` trunca com reticências (`overflow: hidden; text-overflow: ellipsis; white-space: nowrap`). Botão compacto dentro de `.tabela-fixa td` fica `inline-block` com o mesmo truncamento, porque flex não aplica `text-overflow`.
 
-Colunas condicionais (`v-if`) exigem um `<colgroup>` por combinação de colunas. Ordenação (`ordenavel`/`aria-sort`) e alinhamento à direita de `num` continuam valendo.
+Colunas condicionais (`v-if`) exigem um `<colgroup>` por combinação de colunas. Ordenação (`ordenavel`/`aria-sort`) continua valendo.
+
+## Alinhamento
+
+Número e texto alinham **sempre à esquerda**, e o número fica abaixo do cabeçalho da sua coluna. Coluna numérica usa a classe `num` (`text-align: left` e algarismos tabulares) no cabeçalho e na célula: `ThOrdenavel` com `numero` aplica `num` ao `th`, e a célula numérica leva `class="num"`. Não existe outra classe para número (`tabela__numero` foi removida por não ter regra de CSS). Nenhuma regra de CSS alinha texto ou número à direita; `text-align` só aceita `left`, com exceção dos estados vazios centralizados (`.tracado__vazio`, `.mapa-ausente`, `.vazio`, `.estado`) e do rótulo do botão compacto em `.tabela-fixa`.
 
 `ComparacaoLocalGrupo.vue`: UF 6 · Município 26 · Zona 8 · Seção 8 · Participação 11,5 · Abstenção 11,5 · Δ participação 11,5 · Δ abstenção 11,5 · Ação 6.
 
