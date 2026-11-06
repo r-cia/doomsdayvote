@@ -117,6 +117,8 @@ npm run geo:carregar
 
 ### 6.4 Cores dos partidos
 
+`seed:cores` cadastra e atualiza as cores a partir de `backend/data/partido-cores.json`.
+
 ```bash
 cd backend
 npm run seed:cores
@@ -167,7 +169,7 @@ O backend também expõe a totalização, a consistência aritmética, a concent
 | `npm run totalizacao:carregar` | Importa pacotes de totalização |
 | `npm run carga:status` | Mostra o estado dos lotes |
 | `npm run geo:carregar` | Sincroniza as malhas do IBGE |
-| `npm run seed:cores` | Cadastra as cores dos partidos |
+| `npm run seed:cores` | Cadastra e atualiza as cores dos partidos a partir de `backend/data/partido-cores.json` |
 | `npm run cores:pendentes` | Lista partidos sem cor |
 | `npm test` | Testes unitários |
 | `npm run test:coverage` | Testes unitários com cobertura |

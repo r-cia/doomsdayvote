@@ -109,7 +109,7 @@ Cada bloco traz `comparecimento` (média, mediana e desvio padrão populacional 
 
 ## Ordenação, paginação e erros
 
-- Ordenação no servidor pelos parâmetros `ordem` (coluna aceita pela rota) e `direcao` (`asc` ou `desc`). Rotas com mais de uma tabela usam sufixos (`ordem_share`, `ordem_margem`, `ordem_duplicacao`, `ordem_benford`, `ordem_campos`, `ordem_votaveis`, `ordem_biometria_uf`). Valores nulos vão para o fim.
+- Ordenação no servidor pelos parâmetros `ordem` (coluna aceita pela rota) e `direcao` (`asc` ou `desc`). Rotas com mais de uma tabela usam sufixos (`ordem_share`, `ordem_margem`, `ordem_duplicacao`, `ordem_benford`, `ordem_campos`, `ordem_votaveis`, `ordem_biometria_uf`). Valores nulos vão para o fim. Nas listas com recorte dos N primeiros (participação do líder, margem e outliers), o recorte segue a métrica padrão da lista e a ordenação pedida reordena apenas os itens já recortados.
 - Paginação por `page` e `page_size`. O padrão e o máximo vêm de `SECTIONS_PAGE_SIZE_DEFAULT` (50) e `SECTIONS_PAGE_SIZE_MAX` (200). Rotas com `limit` aceitam de 1 a 100, com padrão 20.
 - Erros: `{ "error": { "code", "message", "details"? } }`. Parâmetro inválido responde `400 VALIDATION`, recurso inexistente `404 NOT_FOUND` e falha inesperada `500 INTERNAL`.
 
