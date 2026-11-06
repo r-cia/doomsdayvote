@@ -435,6 +435,10 @@
     "erro": "No se pudieron cargar los grupos",
     "vazio": "Sin grupos en la selección",
     "insuficientes": "Datos insuficientes",
+    "consideradas": "Secciones consideradas",
+    "comGrupo": "Agrupadas",
+    "semGrupo": "Sin agrupar",
+    "gruposInsuficientes": "Grupos insuficientes",
     "niveis": {
       "local": "Local de votación",
       "zona": "Zona",

@@ -30,6 +30,21 @@ describe('ComparacaoLocalPanel', () => {
     expect(w.text()).toContain('1,5 pp')
   })
 
+  it('mostra o resumo de cobertura no rodapé do painel', async () => {
+    api.comparacaoLocal.mockResolvedValue({
+      cobertura: { consideradas: 20, com_grupo: 15, sem_grupo: 5, grupos: 2, grupos_insuficientes: 1 },
+      page: 1, page_size: 50, total: 2, grupos: [grupo('zona:AC|1|1')],
+    })
+    const w = await montar(ComparacaoLocalPanel)
+    const resumo = w.find('dl.painel-resumo')
+    expect(resumo.exists()).toBe(true)
+    expect(resumo.text()).toContain('Seções consideradas')
+    expect(resumo.text()).toContain('20')
+    expect(resumo.text()).toContain('Com grupo')
+    expect(resumo.text()).toContain('Sem grupo')
+    expect(resumo.text()).toContain('Grupos insuficientes')
+  })
+
   it('o botão da seção abre o Boletim de Urna em modal, sem link', async () => {
     api.comparacaoLocal.mockResolvedValue({ cobertura: {}, page: 1, page_size: 50, total: 1, grupos: [grupo('zona:AC|1|1')] })
     api.comparacaoLocalSecoes.mockResolvedValue({ chave: 'zona:AC|1|1', secoes: [secao] })

@@ -32,7 +32,7 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
   />
   <div v-else class="tabela-scroll" :class="{ atualizando: query.isFetching.value }" :aria-busy="query.isFetching.value">
     <span v-if="query.isFetching.value" class="sr-only" role="status">{{ $t('comum.carregando') }}</span>
-    <table class="tabela-fixa">
+    <table class="analise-tabela tabela-fixa">
       <colgroup>
         <col style="width: 6%" />
         <col style="width: 26%" />

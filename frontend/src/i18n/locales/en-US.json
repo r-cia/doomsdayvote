@@ -435,6 +435,10 @@
     "erro": "Could not load the groups",
     "vazio": "No groups in the selection",
     "insuficientes": "Insufficient data",
+    "consideradas": "Sections considered",
+    "comGrupo": "Grouped",
+    "semGrupo": "Ungrouped",
+    "gruposInsuficientes": "Insufficient groups",
     "niveis": {
       "local": "Voting venue",
       "zona": "Zone",
