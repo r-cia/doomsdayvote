@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 import { api } from '../src/api/client'
-import { coresPorCandidato, diferencasDoTurno, seriesDoTurno, tracoDoAno } from '../src/lib/entre-anos'
+import { coresPorCandidato, diferencasDoTurno, margemEsquerda, seriesDoTurno, tracoDoAno } from '../src/lib/entre-anos'
 import EntreAnosPanel from '../src/components/EntreAnosPanel.vue'
 import { montar } from './helpers'
 
@@ -28,6 +28,11 @@ describe('lib/entre-anos', () => {
     expect(tracoDoAno(resposta, 2018)).not.toBe(tracoDoAno(resposta, 2022))
     const series = seriesDoTurno(resposta, 1, 'votos')
     expect(series.find((s) => s.rotulo === '2018 · Alfa').cor).toBe(series.find((s) => s.rotulo === '2022 · Alfa').cor)
+  })
+
+  it('reserva margem pelo maior rótulo', () => {
+    expect(margemEsquerda(['0', '207.952'])).toBeGreaterThan(margemEsquerda(['0', '10']))
+    expect(margemEsquerda(['207.952'])).toBeGreaterThanOrEqual(7 * 6)
   })
 
   it('diferença só nos minutos presentes nos dois anos', () => {

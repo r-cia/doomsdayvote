@@ -16,17 +16,17 @@ const niveis = {
 describe('BenfordPanel', () => {
   it('desenha a faixa de 95% por dígito e a legenda quando existe', () => {
     const w = mount(BenfordPanel, { props: { dados, niveis } })
-    expect(w.findAll('.benford__faixa')).toHaveLength(9)
+    expect(w.findAll('.benford-faixa__svg .benford-faixa__faixa')).toHaveLength(9)
     expect(w.text()).toContain('Faixa de 95% (Monte Carlo)')
     expect(w.text()).toContain('Observado')
     expect(w.text()).toContain('Esperado')
-    expect(w.find('rect.benford__barra title').text()).toContain('faixa de 95%')
+    expect(w.find('rect.benford-faixa__barra title').text()).toContain('faixa de 95%')
   })
 
   it('sem faixa nada da faixa é desenhado', () => {
     const semFaixa = { minimo_votos: 10, candidatos: [{ nr_votavel: 13, nm_votavel: 'Fulano', ...nivel(100, false) }] }
     const w = mount(BenfordPanel, { props: { dados: semFaixa } })
-    expect(w.findAll('.benford__faixa')).toHaveLength(0)
+    expect(w.findAll('.benford-faixa__faixa')).toHaveLength(0)
     expect(w.text()).not.toContain('Faixa de 95%')
   })
 
@@ -38,7 +38,7 @@ describe('BenfordPanel', () => {
     expect(w.text()).toContain('Sem dados')
     expect(botoes[1].attributes('aria-pressed')).toBe('true')
     await botoes[2].trigger('click')
-    expect(w.findAll('.benford__faixa')).toHaveLength(9)
+    expect(w.findAll('.benford-faixa__svg .benford-faixa__faixa')).toHaveLength(9)
   })
 
   it('zona ou município enquanto as anomalias carregam mostram carregando', async () => {

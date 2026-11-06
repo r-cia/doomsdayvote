@@ -5,11 +5,19 @@ const PALETA_CANDIDATOS = ['#ffb52e', '#5fb0ff', '#74e08c', '#ff6b57', '#c58cff'
 const PALETA_DIFERENCAS = ['#ffb52e', '#5fb0ff', '#74e08c', '#ff6b57', '#c58cff', '#4fd1c5']
 const TRACOS = ['', '6 3', '2 3', '8 3 2 3', '1 3']
 
+const LARGURA_CARACTERE = 6
+const FOLGA_ROTULO = 14
+
 export function rotuloMinuto(minuto) {
   const dia = ((minuto % 1440) + 1440) % 1440
   const h = String(Math.floor(dia / 60)).padStart(2, '0')
   const m = String(dia % 60).padStart(2, '0')
   return `${h}:${m}`
+}
+
+export function margemEsquerda(rotulos) {
+  const largura = Math.max(0, ...rotulos.map((rotulo) => String(rotulo).length))
+  return largura * LARGURA_CARACTERE + FOLGA_ROTULO
 }
 
 export function coresPorCandidato(resposta) {
