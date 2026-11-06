@@ -93,6 +93,9 @@ describe('limpeza de BU', () => {
       ['o00406-0111200060046.logjez', 'log'],
       ['o00406-0111200060046.imgbu', 'imgbu'],
       ['o00406-0111200060046.vscmr', 'vscmr'],
+      ['o00406-0111200060046.imgbusa', 'imgbusa'],
+      ['o00406-0111200060046.logsajez', 'logsajez'],
+      ['o00406-0111200060046.vscsa', 'vscsa'],
     ]);
     const caminho = path.join(diretorio, 'bu-2022.zip');
     await writeFile(caminho, zip);

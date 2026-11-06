@@ -8,17 +8,7 @@ import { createGzip } from 'node:zlib';
 
 const executar = promisify(execFile);
 
-export const SUFIXOS_INUTEIS_BU = Object.freeze([
-  '*.vsc',
-  '*.vscmr',
-  '*.pdf',
-  '*.id',
-  '*-imgbu.dat',
-  '*-imgbusa.dat',
-  '*-busa.dat',
-  '*-logsa.jez',
-  '*.imgbu',
-]);
+const LOTE_REMOCAO = 500;
 
 export const PADRAO_MANTIDOS_BU = /-(bu|rdv)\.dat$|-log\.jez$|\.(bu|rdv|logjez)$/;
 
@@ -28,12 +18,18 @@ export async function listarEntradas(caminho) {
 }
 
 export async function limparZipBu(caminho) {
-  await executar('zip', ['-d', caminho, ...SUFIXOS_INUTEIS_BU], { maxBuffer: 256 * 1024 * 1024 });
+  const inuteis = (await listarEntradas(caminho)).filter((nome) => !PADRAO_MANTIDOS_BU.test(nome));
+
+  for (let inicio = 0; inicio < inuteis.length; inicio += LOTE_REMOCAO) {
+    await executar('zip', ['-d', caminho, ...inuteis.slice(inicio, inicio + LOTE_REMOCAO)], {
+      maxBuffer: 256 * 1024 * 1024,
+    });
+  }
 
   const entradas = await listarEntradas(caminho);
-  const inuteis = entradas.filter((nome) => !PADRAO_MANTIDOS_BU.test(nome));
-  if (inuteis.length > 0) {
-    throw new Error(`entradas fora do padrão após limpeza: ${inuteis.slice(0, 3).join(', ')}`);
+  const foraDoPadrao = entradas.filter((nome) => !PADRAO_MANTIDOS_BU.test(nome));
+  if (foraDoPadrao.length > 0) {
+    throw new Error(`entradas fora do padrão após limpeza: ${foraDoPadrao.slice(0, 3).join(', ')}`);
   }
 
   const { stdout } = await executar('unzip', ['-t', caminho], {
