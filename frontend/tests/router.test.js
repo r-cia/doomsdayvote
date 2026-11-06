@@ -9,10 +9,6 @@ describe('roteador', () => {
     },
   )
 
-  it('/secoes/:id abre a Seção', () => {
-    expect(router.resolve('/secoes/abc').name).toBe('secao')
-  })
-
   it('raiz e caminho desconhecido redirecionam para /painel', () => {
     expect(router.resolve('/').redirectedFrom).toBeUndefined()
     expect(router.resolve('/xyz').matched[0].redirect).toBe('/painel')

@@ -3,12 +3,17 @@ import { ref } from 'vue'
 import ConcentracaoTabela from './ConcentracaoTabela.vue'
 import ConsistenciaTabela from './ConsistenciaTabela.vue'
 import OutliersPanel from './OutliersPanel.vue'
+import { useFiltersStore } from '../stores/filters'
+import SecaoView from '../views/SecaoView.vue'
 
 defineProps({
   outliers: { type: Object, default: null },
   ordenacao: { type: Object, default: null },
 })
 defineEmits(['ordenar'])
+
+const store = useFiltersStore()
+const secaoModalId = ref(null)
 
 const VISOES = [
   ['outliers', 'destaque.outliers'],
@@ -38,7 +43,18 @@ const visao = ref('outliers')
     </header>
 
     <OutliersPanel v-if="visao === 'outliers'" :dados="outliers" :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)" />
-    <ConsistenciaTabela v-else-if="visao === 'consistencia'" />
-    <ConcentracaoTabela v-else :visao="visao" />
+    <ConsistenciaTabela v-else-if="visao === 'consistencia'" @abrir-secao="secaoModalId = $event" />
+    <ConcentracaoTabela v-else :visao="visao" @abrir-secao="secaoModalId = $event" />
   </section>
+
+  <SecaoView
+    v-if="secaoModalId"
+    :id-prop="secaoModalId"
+    :election-id-prop="store.electionId"
+    :cargo-prop="store.cargo"
+    :as-of-prop="store.asOf ?? ''"
+    :uf-prop="store.uf ?? ''"
+    :municipio-prop="store.municipio ?? ''"
+    @close="secaoModalId = null"
+  />
 </template>

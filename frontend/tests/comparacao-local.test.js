@@ -5,6 +5,7 @@ import ComparacaoLocalPanel from '../src/components/ComparacaoLocalPanel.vue'
 import { montar } from './helpers'
 
 vi.mock('../src/api/client', () => ({ api: new Proxy({}, { get: (alvo, nome) => (alvo[nome] ??= vi.fn()) }) }))
+vi.mock('../src/views/SecaoView.vue', () => ({ default: { props: ['idProp'], template: '<div class="secao-modal-stub">{{ idProp }}</div>' } }))
 
 const grupo = (chave, extra = {}) => ({
   chave, nivel: 'zona', tamanho: 12, dados_insuficientes: false,
@@ -27,6 +28,18 @@ describe('ComparacaoLocalPanel', () => {
     expect(api.comparacaoLocalSecoes.mock.calls[0][0]).toMatchObject({ chave: 'zona:AC|1|1' })
     expect(w.text()).toContain('80,00%')
     expect(w.text()).toContain('1,5 pp')
+  })
+
+  it('o botão da seção abre o Boletim de Urna em modal, sem link', async () => {
+    api.comparacaoLocal.mockResolvedValue({ cobertura: {}, page: 1, page_size: 50, total: 1, grupos: [grupo('zona:AC|1|1')] })
+    api.comparacaoLocalSecoes.mockResolvedValue({ chave: 'zona:AC|1|1', secoes: [secao] })
+    const w = await montar(ComparacaoLocalPanel)
+    await w.find('button[aria-expanded]').trigger('click')
+    await flushPromises()
+    expect(w.find('a').exists()).toBe(false)
+    expect(w.find('.secao-modal-stub').exists()).toBe(false)
+    await w.find('tbody button').trigger('click')
+    expect(w.find('.secao-modal-stub').text()).toBe('s1')
   })
 
   it('ordena as seções no servidor', async () => {

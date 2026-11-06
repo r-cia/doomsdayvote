@@ -538,13 +538,8 @@
       "DATA": "Date only",
       "AUSENTE": "Missing"
     },
-    "voltar": "← Back to dashboard",
     "fechar": "Close",
     "extrato": "Teletype extract · ballot box report",
-    "semFiltros": "Filters not provided",
-    "semFiltrosDesc": "Go back to the dashboard, select an election and an office, and open the details from the sections table.",
-    "irPainel": "Go to dashboard",
-    "voltarPainel": "Back to dashboard",
     "carregando": "Loading section details",
     "erro": "Could not load the section",
     "cabecalho": "Section {secao} · Zone {zona}",

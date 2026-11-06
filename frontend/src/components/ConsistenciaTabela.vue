@@ -1,6 +1,5 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
 import Paginacao from './Paginacao.vue'
 import StateBlock from './StateBlock.vue'
 import ThOrdenavel from './ThOrdenavel.vue'
@@ -15,6 +14,8 @@ const REGRAS = [
   'comparecimento_vs_aptos',
   'biometria_vs_comparecimento',
 ]
+
+defineEmits(['abrir-secao'])
 
 const store = useFiltersStore()
 const regra = ref('')
@@ -83,7 +84,7 @@ watch(
               <td>{{ REGRAS.includes(i.regra) ? $t(`consistencia.regras.${i.regra}`) : i.regra }}</td>
               <td class="num">{{ formatarNumero(i.diferenca) }}</td>
               <td>
-                <RouterLink class="button button--ghost button--compacto" :to="`/secoes/${i.secao_id}`">{{ $t('comum.abrirSecao') }}</RouterLink>
+                <button type="button" class="button button--ghost button--compacto" @click="$emit('abrir-secao', i.secao_id)">{{ $t('comum.abrirSecao') }}</button>
               </td>
             </tr>
           </tbody>

@@ -43,11 +43,6 @@ const router = createRouter({
       path: '/auditoria',
       redirect: '/painel',
     },
-    {
-      path: '/secoes/:id',
-      name: 'secao',
-      component: () => import('./views/SecaoView.vue'),
-    },
     { path: '/:pathMatch(.*)*', redirect: '/painel' },
   ],
   scrollBehavior: () => ({ top: 0 }),

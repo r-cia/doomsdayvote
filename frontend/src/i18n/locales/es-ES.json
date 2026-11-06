@@ -538,13 +538,8 @@
       "DATA": "Solo fecha",
       "AUSENTE": "Ausente"
     },
-    "voltar": "← Volver al panel",
     "fechar": "Cerrar",
     "extrato": "Extracto de teletipo · acta de urna",
-    "semFiltros": "Filtros no informados",
-    "semFiltrosDesc": "Vuelva al panel, seleccione una elección y un cargo y abra el detalle desde la tabla de secciones.",
-    "irPainel": "Ir al panel",
-    "voltarPainel": "Volver al panel",
     "carregando": "Cargando detalle de la sección",
     "erro": "No se pudo cargar la sección",
     "cabecalho": "Sección {secao} · Zona {zona}",

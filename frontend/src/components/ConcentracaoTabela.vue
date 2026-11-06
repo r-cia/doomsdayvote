@@ -1,6 +1,5 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
 import Paginacao from './Paginacao.vue'
 import StateBlock from './StateBlock.vue'
 import ThOrdenavel from './ThOrdenavel.vue'
@@ -12,6 +11,7 @@ import { formatarNumero, formatarPercentual } from '../lib/format'
 const props = defineProps({
   visao: { type: String, required: true },
 })
+defineEmits(['abrir-secao'])
 
 const store = useFiltersStore()
 const pagina = ref(1)
@@ -99,7 +99,7 @@ const percentual = (fracao) => (fracao === null || fracao === undefined ? null :
               </template>
               <td>{{ i.lider ? `${i.lider.nm_votavel} (${i.lider.sg_partido ?? '—'})` : '—' }}</td>
               <td>
-                <RouterLink class="button button--ghost button--compacto" :to="`/secoes/${i.secao.id}`">{{ $t('comum.abrirSecao') }}</RouterLink>
+                <button type="button" class="button button--ghost button--compacto" @click="$emit('abrir-secao', i.secao.id)">{{ $t('comum.abrirSecao') }}</button>
               </td>
             </tr>
           </tbody>

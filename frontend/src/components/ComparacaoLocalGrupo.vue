@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
 import StateBlock from './StateBlock.vue'
 import ThOrdenavel from './ThOrdenavel.vue'
 import { useComparacaoLocalSecoes } from '../composables/queries'
@@ -10,7 +9,7 @@ const props = defineProps({
   chave: { type: String, required: true },
   ordenacao: { type: Object, default: null },
 })
-defineEmits(['ordenar'])
+defineEmits(['ordenar', 'abrir-secao'])
 
 const query = useComparacaoLocalSecoes(
   () => props.chave,
@@ -39,10 +38,11 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
         <col style="width: 26%" />
         <col style="width: 8%" />
         <col style="width: 8%" />
-        <col style="width: 13%" />
-        <col style="width: 13%" />
-        <col style="width: 13%" />
-        <col style="width: 13%" />
+        <col style="width: 11.5%" />
+        <col style="width: 11.5%" />
+        <col style="width: 11.5%" />
+        <col style="width: 11.5%" />
+        <col style="width: 6%" />
       </colgroup>
       <thead>
         <tr>
@@ -54,6 +54,7 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
           <ThOrdenavel coluna="abstencao" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.abstencao') }}</ThOrdenavel>
           <ThOrdenavel coluna="participacao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.distParticipacao') }}</ThOrdenavel>
           <ThOrdenavel coluna="abstencao_pp" numero :ordenacao="ordenacao" @ordenar="$emit('ordenar', $event)">{{ $t('comparacaoLocal.distAbstencao') }}</ThOrdenavel>
+          <th scope="col"><span class="sr-only">{{ $t('comum.detalhe') }}</span></th>
         </tr>
       </thead>
       <tbody>
@@ -61,11 +62,14 @@ const pp = (valor) => (valor === null || valor === undefined ? '—' : `${format
           <td>{{ s.secao.sg_uf }}</td>
           <td :title="s.secao.nm_municipio">{{ s.secao.nm_municipio || s.secao.cd_municipio_tse }}</td>
           <td class="num">{{ s.secao.nr_zona }}</td>
-          <td class="num"><RouterLink :to="`/secoes/${s.secao.id}`" :title="$t('comum.abrirSecao')">{{ s.secao.nr_secao }}</RouterLink></td>
+          <td class="num">{{ s.secao.nr_secao }}</td>
           <td class="num">{{ formatarPercentual(pct(s.metricas?.participacao)) }}</td>
           <td class="num">{{ formatarPercentual(pct(s.metricas?.abstencao)) }}</td>
           <td class="num">{{ pp(s.distancia_pp?.participacao_pp) }}</td>
           <td class="num">{{ pp(s.distancia_pp?.abstencao_pp) }}</td>
+          <td>
+            <button type="button" class="button button--ghost button--compacto" @click="$emit('abrir-secao', s.secao.id)">{{ $t('comum.detalhe') }}</button>
+          </td>
         </tr>
       </tbody>
     </table>

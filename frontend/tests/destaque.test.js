@@ -5,6 +5,7 @@ import SecoesDestaquePanel from '../src/components/SecoesDestaquePanel.vue'
 import { montar } from './helpers'
 
 vi.mock('../src/api/client', () => ({ api: new Proxy({}, { get: (alvo, nome) => (alvo[nome] ??= vi.fn()) }) }))
+vi.mock('../src/views/SecaoView.vue', () => ({ default: { props: ['idProp'], template: '<div class="secao-modal-stub">{{ idProp }}</div>' } }))
 
 const consistencia = {
   cobertura: { consideradas: 10, avaliadas: 9, com_divergencia: 2, sem_divergencia: 7 },
@@ -37,7 +38,9 @@ describe('SecoesDestaquePanel', () => {
     const w = await abrir('Consistência aritmética')
     expect(w.text()).toContain('Comparecimento × aptos')
     expect(w.text()).toContain('2 com divergência')
-    expect(w.find('a').attributes('href')).toBe('/secoes/s1')
+    expect(w.find('a').exists()).toBe(false)
+    await w.find('tbody button').trigger('click')
+    expect(w.find('.secao-modal-stub').text()).toBe('s1')
     await w.findAll('thead button').at(5).trigger('click')
     await flushPromises()
     expect(api.consistencia.mock.calls.at(-1)[0]).toMatchObject({ ordem: 'diferenca', direcao: 'asc' })

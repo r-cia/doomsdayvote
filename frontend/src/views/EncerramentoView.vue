@@ -212,7 +212,6 @@ watch(
 
   <SecaoView
     v-if="secaoModalId"
-    :modal="true"
     :id-prop="secaoModalId"
     :election-id-prop="store.electionId"
     :cargo-prop="store.cargo"

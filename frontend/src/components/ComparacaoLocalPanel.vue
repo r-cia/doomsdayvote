@@ -8,11 +8,13 @@ import { useOrdenacao } from '../composables/ordenacao'
 import { useComparacaoLocal } from '../composables/queries'
 import { useFiltersStore } from '../stores/filters'
 import { formatarNumero } from '../lib/format'
+import SecaoView from '../views/SecaoView.vue'
 
 const { t } = useI18n()
 const store = useFiltersStore()
 const pagina = ref(1)
 const abertos = ref(new Set())
+const secaoModalId = ref(null)
 const { ordenacao, alternar } = useOrdenacao()
 
 const query = useComparacaoLocal({ page: pagina })
@@ -85,10 +87,22 @@ const identificacao = (g) =>
             :chave="g.chave"
             :ordenacao="ordenacao"
             @ordenar="alternar"
+            @abrir-secao="secaoModalId = $event"
           />
         </li>
       </ul>
       <Paginacao v-model:pagina="pagina" :total="query.data.value?.total ?? 0" :tamanho="query.data.value?.page_size ?? 50" />
     </template>
   </section>
+
+  <SecaoView
+    v-if="secaoModalId"
+    :id-prop="secaoModalId"
+    :election-id-prop="store.electionId"
+    :cargo-prop="store.cargo"
+    :as-of-prop="store.asOf ?? ''"
+    :uf-prop="store.uf ?? ''"
+    :municipio-prop="store.municipio ?? ''"
+    @close="secaoModalId = null"
+  />
 </template>

@@ -1,11 +1,9 @@
 <script setup>
 import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import StateBlock from '../components/StateBlock.vue'
 import VersoesBoletimPanel from '../components/VersoesBoletimPanel.vue'
 
 const props = defineProps({
-  modal: { type: Boolean, default: false },
   idProp: { type: String, default: '' },
   electionIdProp: { type: String, default: '' },
   cargoProp: { type: [String, Number], default: '' },
@@ -30,24 +28,14 @@ import { t } from '../i18n'
 import { useFiltersStore } from '../stores/filters'
 
 const store = useFiltersStore()
-const rota = useRoute()
-const router = useRouter()
 
-if (props.modal) {
-  if (props.electionIdProp) store.electionId = String(props.electionIdProp)
-  if (props.cargoProp) store.cargo = Number(props.cargoProp)
-  if (props.asOfProp) store.asOfInput = paraInputSaoPaulo(String(props.asOfProp))
-  if (props.ufProp) store.uf = String(props.ufProp)
-  if (props.municipioProp) store.municipio = Number(props.municipioProp)
-} else {
-  if (rota.query.election_id) store.electionId = String(rota.query.election_id)
-  if (rota.query.cargo) store.cargo = Number(rota.query.cargo)
-  if (rota.query.as_of) store.asOfInput = paraInputSaoPaulo(String(rota.query.as_of))
-  if (rota.query.uf) store.uf = String(rota.query.uf)
-  if (rota.query.municipio) store.municipio = Number(rota.query.municipio)
-}
+if (props.electionIdProp) store.electionId = String(props.electionIdProp)
+if (props.cargoProp) store.cargo = Number(props.cargoProp)
+if (props.asOfProp) store.asOfInput = paraInputSaoPaulo(String(props.asOfProp))
+if (props.ufProp) store.uf = String(props.ufProp)
+if (props.municipioProp) store.municipio = Number(props.municipioProp)
 
-const id = computed(() => (props.modal ? String(props.idProp) : String(rota.params.id)))
+const id = computed(() => String(props.idProp))
 const consulta = useSecao(id)
 const dados = computed(() => consulta.data.value ?? null)
 const secao = computed(() => dados.value?.secao ?? null)
@@ -57,7 +45,6 @@ const resultados = computed(() => dados.value?.resultados ?? [])
 const status = computed(() => dados.value?.status ?? null)
 const statusInfo = computed(() => statusSecao(status.value?.status))
 const motivo = computed(() => motivoSecao(status.value?.motivo))
-const habilitado = computed(() => Boolean(store.electionId && store.cargo))
 
 const totalValidos = computed(() =>
   resultados.value
@@ -103,27 +90,16 @@ function recebimento() {
 }
 
 function fechar() {
-  if (props.modal) emit('close')
-  else router.push({ name: 'painel' })
+  emit('close')
 }
-function voltar() { fechar() }
 </script>
 
 <template>
-  <Teleport to="body" :disabled="!modal">
-    <div :class="modal ? 'secao-modal__overlay' : 'page page--extrato'" @click.self="modal && fechar()">
-      <div :class="modal ? 'secao-modal page--extrato' : ''">
+  <Teleport to="body">
+    <div class="secao-modal__overlay" @click.self="fechar">
+      <div class="secao-modal page--extrato">
       <div class="extrato-topo">
         <button
-          v-if="!modal"
-          type="button"
-          class="button button--ghost"
-          @click="voltar"
-        >
-          {{ $t('secao.voltar') }}
-        </button>
-        <button
-          v-else
           type="button"
           class="button button--ghost secao-modal__fechar"
           :aria-label="$t('secao.fechar')"
@@ -135,15 +111,7 @@ function voltar() { fechar() }
       </div>
 
     <StateBlock
-      v-if="!habilitado"
-      estado="vazio"
-      :titulo="$t('secao.semFiltros')"
-      :descricao="$t('secao.semFiltrosDesc')"
-      :acao="$t('secao.irPainel')"
-      @acao="voltar"
-    />
-    <StateBlock
-      v-else-if="consulta.isLoading.value"
+      v-if="consulta.isLoading.value"
       estado="carregando"
       :titulo="$t('secao.carregando')"
     />
@@ -152,8 +120,8 @@ function voltar() { fechar() }
       estado="erro"
       :titulo="$t('secao.erro')"
       :descricao="consulta.error.value.message"
-      :acao="$t('secao.voltarPainel')"
-      @acao="voltar"
+      :acao="$t('secao.fechar')"
+      @acao="fechar"
     />
 
     <template v-else-if="dados">

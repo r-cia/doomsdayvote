@@ -538,13 +538,8 @@
       "DATA": "Somente data",
       "AUSENTE": "Ausente"
     },
-    "voltar": "← Voltar ao painel",
     "fechar": "Fechar",
     "extrato": "Extrato de teletipo · boletim de urna",
-    "semFiltros": "Filtros não informados",
-    "semFiltrosDesc": "Volte ao painel, selecione uma eleição e um cargo e abra o detalhe pela tabela de seções.",
-    "irPainel": "Ir ao painel",
-    "voltarPainel": "Voltar ao painel",
     "carregando": "Carregando detalhe da seção",
     "erro": "Não foi possível carregar a seção",
     "cabecalho": "Seção {secao} · Zona {zona}",
