@@ -10,15 +10,17 @@ const executar = promisify(execFile);
 
 export const SUFIXOS_INUTEIS_BU = Object.freeze([
   '*.vsc',
+  '*.vscmr',
   '*.pdf',
   '*.id',
   '*-imgbu.dat',
   '*-imgbusa.dat',
   '*-busa.dat',
   '*-logsa.jez',
+  '*.imgbu',
 ]);
 
-const SUFIXOS_MANTIDOS_BU = /-(bu|rdv)\.dat$|-log\.jez$/;
+export const PADRAO_MANTIDOS_BU = /-(bu|rdv)\.dat$|-log\.jez$|\.(bu|rdv|logjez)$/;
 
 export async function listarEntradas(caminho) {
   const { stdout } = await executar('unzip', ['-Z1', caminho], { maxBuffer: 256 * 1024 * 1024 });
@@ -29,7 +31,7 @@ export async function limparZipBu(caminho) {
   await executar('zip', ['-d', caminho, ...SUFIXOS_INUTEIS_BU], { maxBuffer: 256 * 1024 * 1024 });
 
   const entradas = await listarEntradas(caminho);
-  const inuteis = entradas.filter((nome) => !SUFIXOS_MANTIDOS_BU.test(nome));
+  const inuteis = entradas.filter((nome) => !PADRAO_MANTIDOS_BU.test(nome));
   if (inuteis.length > 0) {
     throw new Error(`entradas fora do padrão após limpeza: ${inuteis.slice(0, 3).join(', ')}`);
   }

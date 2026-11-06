@@ -85,6 +85,27 @@ describe('limpeza de BU', () => {
       'secao-rdv.dat',
     ]);
   });
+
+  it('mantém apenas bu, rdv e log no padrão de 2022', async () => {
+    const zip = gerarZip([
+      ['o00406-0111200060046.bu', 'bu'],
+      ['o00406-0111200060046.rdv', 'rdv'],
+      ['o00406-0111200060046.logjez', 'log'],
+      ['o00406-0111200060046.imgbu', 'imgbu'],
+      ['o00406-0111200060046.vscmr', 'vscmr'],
+    ]);
+    const caminho = path.join(diretorio, 'bu-2022.zip');
+    await writeFile(caminho, zip);
+
+    const { entradas } = await limparZipBu(caminho);
+
+    expect(entradas).toBe(3);
+    expect((await listarEntradas(caminho)).sort()).toEqual([
+      'o00406-0111200060046.bu',
+      'o00406-0111200060046.logjez',
+      'o00406-0111200060046.rdv',
+    ]);
+  });
 });
 
 describe('conversão de BWEB', () => {

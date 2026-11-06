@@ -2,9 +2,7 @@ import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { anosDisponiveis, filtrarRecursos, listarRecursos } from '../modules/aquisicao/tse.js';
 import { baixar } from '../modules/aquisicao/download.js';
-import { limparZipBu, listarEntradas } from '../modules/aquisicao/limpeza.js';
-
-const MANTIDOS = /-(bu|rdv)\.dat$|-log\.jez$/;
+import { limparZipBu, listarEntradas, PADRAO_MANTIDOS_BU } from '../modules/aquisicao/limpeza.js';
 
 function lerArgumentos(argv) {
   const opcoes = { anos: null, turnos: [], ufs: [], destino: 'bu' };
@@ -31,7 +29,7 @@ function lerArgumentos(argv) {
 async function jaLimpo(caminho) {
   try {
     const entradas = await listarEntradas(caminho);
-    return entradas.length > 0 && entradas.every((nome) => MANTIDOS.test(nome));
+    return entradas.length > 0 && entradas.every((nome) => PADRAO_MANTIDOS_BU.test(nome));
   } catch {
     return false;
   }
