@@ -41,6 +41,25 @@ describe('catálogo do TSE', () => {
     ]);
   });
 
+  it('ignora assinatura sha1 do boletim de urna', async () => {
+    const recursos = await listarRecursos('bweb', 2014, {
+      fetch: async () =>
+        resposta([
+          { name: 'AC', url: 'https://cdn/bweb_1t_AC_14102014131600.zip' },
+          { name: 'AC hash', url: 'https://cdn/bweb_1t_AC_14102014131600.zip.sha1' },
+        ]),
+    });
+
+    expect(recursos).toEqual([
+      {
+        nome: 'AC',
+        url: 'https://cdn/bweb_1t_AC_14102014131600.zip',
+        uf: 'AC',
+        turno: 1,
+      },
+    ]);
+  });
+
   it('filtra por UF e turno', async () => {
     const recursos = await listarRecursos('bweb', 2026, {
       fetch: async () =>

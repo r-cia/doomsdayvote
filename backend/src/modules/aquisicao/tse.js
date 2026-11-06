@@ -18,7 +18,7 @@ const DATASETS = {
   },
 };
 
-const PADRAO_ASSINATURA = /\.(sha512|sha256|md5)$/i;
+const PADRAO_ASSINATURA = /\.(sha512|sha256|sha1|md5)$/i;
 const PADROES_NOME = {
   bu: /_(\d)t_([A-Z]{2})\.(?:zip|7z)$/i,
   bweb: /bweb_(\d)t_([A-Z]{2})_/i,
