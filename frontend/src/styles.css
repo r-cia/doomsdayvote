@@ -2321,3 +2321,13 @@ th .ordenavel:focus-visible {
   white-space: nowrap;
 }
 
+/* flex não aplica text-overflow: o rótulo do botão passaria reto pelo corte da coluna fixa */
+.tabela-fixa td .button--compacto {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  line-height: 24px;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
