@@ -39,5 +39,7 @@
   { "sg_partido": "REPUBLICANOS", "cor_hex": "#4338CA", "fonte": "junk:frontend/src/lib/colors.js" },
   { "sg_partido": "SOLIDARIEDADE", "cor_hex": "#0F766E", "fonte": "junk:frontend/src/lib/colors.js" },
   { "sg_partido": "UNIÃO", "cor_hex": "#0E7490", "fonte": "junk:frontend/src/lib/colors.js (UNIAO)" },
-  { "sg_partido": "UP", "cor_hex": "#9D174D", "fonte": "junk:frontend/src/lib/colors.js" }
+  { "sg_partido": "UP", "cor_hex": "#9D174D", "fonte": "junk:frontend/src/lib/colors.js" },
+  { "sg_partido": "DEMOCRATA", "cor_hex": "#475569", "fonte": "junk:frontend/src/lib/colors.js (PMB, mesmo partido)" },
+  { "sg_partido": "PMN", "cor_hex": "#0369A1", "fonte": "junk:frontend/src/lib/colors.js (MOBILIZA, mesmo partido)" }
 ]
