@@ -40,5 +40,7 @@
   { "sg_partido": "AGIR", "cor_hex": "#0066BB", "fonte": "wikidata:Q2534868" },
   { "sg_partido": "MOBILIZA", "cor_hex": "#DA010A", "fonte": "wikidata:Q429972" },
   { "sg_partido": "PC do B", "cor_hex": "#DA251C", "fonte": "wikidata:Q504000" },
-  { "sg_partido": "MISSÃO", "cor_hex": "#FDBF35", "fonte": "pt.wikipedia:Partido Missão" }
+  { "sg_partido": "MISSÃO", "cor_hex": "#FDBF35", "fonte": "pt.wikipedia:Partido Missão" },
+  { "sg_partido": "PMB", "cor_hex": "#475569", "fonte": "junk:frontend/src/lib/colors.js" },
+  { "sg_partido": "PR", "cor_hex": "#1D4ED8", "fonte": "junk:frontend/src/lib/colors.js (sucessor PL)" }
 ]
