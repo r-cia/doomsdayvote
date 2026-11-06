@@ -15,8 +15,6 @@ ZERO TOLERANCE FOR RULE VIOLATIONS.
 
 - **TODA ALTERAÇÃO EXIGE CARD:** nenhuma ação ou alteração é executada sem card. O card deve conter, obrigatoriamente, quem pediu, quem autorizou e quem fez. Sem card, não há alteração — em código, banco, migration, documentação, board, git ou operação.
 
-- **Pasta de dados do TSE em disco separado:** `bu/`, `bweb/` e `files/` não pertencem ao repositório — vivem em `/mnt/processing/vote/bu`, `/mnt/processing/vote/bweb` e `/mnt/processing/vote/files`. É proibido criar, ler, mover ou apagar esses caminhos sem autorização explícita e escrita do usuário na conversa.
-
 ## 0. INITIALIZATION
 - **Mandatory First Step:** ALWAYS initialize the environment by executing the required skills: `/honey ultra` at the start of any task.
 
