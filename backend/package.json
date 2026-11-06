@@ -17,6 +17,7 @@
     "test:integration": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run --config vitest.integration.config.js",
     "carga": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/scripts/carregar-pasta.js",
     "totalizacao:carregar": "node --max-old-space-size=16384 --stack-size=16000 --env-file-if-exists=.env src/scripts/totalizacao-carregar.js",
+    "totalizacao:carregar:paralelo": "sh -c 'export DB_POOL_MAX=\"${POOL:-4}\"; p=\"${PASTA:-/mnt/storage/vote/bu/2026}\"; find \"$p\" -maxdepth 1 -name \"*.zip\" -printf \"%f\\n\" | xargs -P \"${WORKERS:-6}\" -I{} npm run --silent totalizacao:carregar -- --pasta \"$p\" --arquivo {}'",
     "seed:cores": "node --env-file-if-exists=.env src/scripts/seed-cores.js",
     "cores:pendentes": "node --env-file-if-exists=.env src/scripts/cores-pendentes.js",
     "carga:status": "node --env-file-if-exists=.env src/scripts/carga-status.js",
