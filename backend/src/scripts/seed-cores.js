@@ -17,7 +17,7 @@ for (const cor of cores) {
   await db
     .insertInto('partido_cor')
     .values({ sg_partido: cor.sg_partido, cor_hex: cor.cor_hex, fonte: cor.fonte })
-    .onConflict((oc) => oc.column('sg_partido').doNothing())
+    .onConflict((oc) => oc.column('sg_partido').doUpdateSet({ cor_hex: cor.cor_hex, fonte: cor.fonte }))
     .execute();
 }
 

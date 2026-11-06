@@ -57,7 +57,7 @@ describe('cores de partido', () => {
     await rm(diretorio, { recursive: true, force: true });
   });
 
-  it('seed é idempotente e não sobrescreve cor manual', async () => {
+  it('seed é idempotente e restaura a cor do arquivo', async () => {
     await semear();
     const total = await contar(db, 'partido_cor');
     expect(total).toBeGreaterThan(0);
@@ -76,7 +76,7 @@ describe('cores de partido', () => {
       .selectAll()
       .where('sg_partido', '=', 'PT')
       .executeTakeFirstOrThrow();
-    expect(pt.cor_hex).toBe('#000001');
+    expect(pt.cor_hex).toBe('#C1121F');
   });
 
   it('rejeita cor fora do formato', async () => {
