@@ -204,7 +204,7 @@ function decodificarConteudoBu(buffer) {
   const raiz = lerTlv(buffer, 0);
   exigirSequencia(raiz, 'BU');
   const itens = filhos(buffer, raiz);
-  if (itens.length < 7) throw invalido(raiz.inicio, 'BU incompleto');
+  if (itens.length < 6) throw invalido(raiz.inicio, 'BU incompleto');
 
   const dataHora = lerDataHora(buffer, itens[0], 'data/hora do BU');
 
@@ -223,12 +223,15 @@ function decodificarConteudoBu(buffer) {
   const comparecimento = lerInteiro(buffer, comparecimentoTlv);
 
   const habilitacaoTlv = itens.find((item) => ehContexto(item, 1) && item.construido);
-  if (!habilitacaoTlv) throw invalido(raiz.inicio, 'BU sem habilitações');
-  const habilitacoes = filhos(buffer, habilitacaoTlv);
-  if (habilitacoes.length !== 3) throw invalido(habilitacaoTlv.inicio, 'três habilitações esperadas');
+  const habilitacoes = habilitacaoTlv ? filhos(buffer, habilitacaoTlv) : null;
+  if (habilitacoes && habilitacoes.length !== 3) {
+    throw invalido(habilitacaoTlv.inicio, 'três habilitações esperadas');
+  }
 
-  const indiceHabilitacao = itens.indexOf(habilitacaoTlv);
-  const cargosTlv = itens[indiceHabilitacao + 1];
+  const indiceCargos = habilitacaoTlv
+    ? itens.indexOf(habilitacaoTlv)
+    : itens.indexOf(comparecimentoTlv);
+  const cargosTlv = itens[indiceCargos + 1];
   if (!cargosTlv) throw invalido(raiz.inicio, 'BU sem cargos');
   exigirSequencia(cargosTlv, 'cargos');
   const cargos = [];
@@ -241,9 +244,9 @@ function decodificarConteudoBu(buffer) {
     abertura,
     encerramento,
     comparecimento,
-    habilitacao1: lerInteiro(buffer, habilitacoes[0]),
-    habilitacao2: lerInteiro(buffer, habilitacoes[1]),
-    habilitacao3: lerInteiro(buffer, habilitacoes[2]),
+    habilitacao1: habilitacoes ? lerInteiro(buffer, habilitacoes[0]) : null,
+    habilitacao2: habilitacoes ? lerInteiro(buffer, habilitacoes[1]) : null,
+    habilitacao3: habilitacoes ? lerInteiro(buffer, habilitacoes[2]) : null,
     urna: localidade.urna,
     localidade: {
       municipio: localidade.municipio,

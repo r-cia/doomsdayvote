@@ -267,7 +267,9 @@ export function gerarBu(opcoes = {}) {
     urnaBer(urna),
     contextoConstruido(0, texto(abertura), texto(encerramento)),
     inteiro(comparecimento),
-    contextoConstruido(1, ...habilitacoes.map((valor) => inteiro(valor))),
+    ...(habilitacoes === null
+      ? []
+      : [contextoConstruido(1, ...habilitacoes.map((valor) => inteiro(valor)))]),
     sequencia(
       ...cargos.map((cargo) =>
         cargoBer({

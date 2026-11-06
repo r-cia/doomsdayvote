@@ -42,6 +42,15 @@ describe('decoder do bu.dat', () => {
     expect(bu.habilitacao3).toBe(0);
   });
 
+  it('decodifica BU sem bloco de habilitações (seções do exterior)', () => {
+    const semHabilitacoes = decodificarBu(gerarBu({ habilitacoes: null }));
+    expect(semHabilitacoes.habilitacao1).toBeNull();
+    expect(semHabilitacoes.habilitacao2).toBeNull();
+    expect(semHabilitacoes.habilitacao3).toBeNull();
+    expect(semHabilitacoes.cargos.map((cargo) => cargo.identificador)).toEqual([1, 3]);
+    expect(semHabilitacoes.comparecimento).toBe(3);
+  });
+
   it('achata os cargos internos com o identificador do próprio cargo', () => {
     expect(bu.cargos.map((cargo) => cargo.identificador)).toEqual([1, 3]);
     expect(
