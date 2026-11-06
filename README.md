@@ -166,6 +166,8 @@ O backend também expõe a totalização, a consistência aritmética, a concent
 | `npm run migrate` | Aplica as migrações pendentes |
 | `npm run migrate:reset` | Reaplica as migrações do zero (apaga os dados) |
 | `npm run carga` | Importa os Boletins de Urna da pasta `BWEB_INPUT_DIR` |
+| `npm run bu:baixar` | Baixa os ZIPs de totalização do TSE, limpa o que a importação não usa e deixa prontos (`--anos`, `--turno`, `--uf`, `--destino`) |
+| `npm run bweb:baixar` | Baixa os boletins de urna do TSE e converte para `.csv.gz` (`--anos`, `--turno`, `--uf`, `--destino`) |
 | `npm run totalizacao:carregar` | Importa pacotes de totalização |
 | `npm run carga:status` | Mostra o estado dos lotes |
 | `npm run geo:carregar` | Sincroniza as malhas do IBGE |
@@ -183,6 +185,18 @@ O backend também expõe a totalização, a consistência aritmética, a concent
 | `npm run build` | Build de produção |
 | `npm run preview` | Visualiza o build |
 | `npm test` | Testes |
+
+### Aquisição dos arquivos do TSE
+
+```bash
+npm run bu:baixar   -- --anos 2026 --turno 1 --uf AC,AL   # padrão: todos os anos e UFs
+npm run bweb:baixar -- --anos 2026,2022 --turno 2
+```
+
+- BU: baixa de `arqurnatot`, remove `*.vsc`, `*.pdf`, `*.id`, `*-imgbu*.dat`, `*-busa.dat` e `*-logsa.jez`, confere o CRC e mantém apenas o ZIP limpo
+- BWEB: baixa `buweb`, extrai o CSV/TXT, grava `.csv.gz` e descarta o original
+- Destino padrão: `bu/<ano>` e `bweb/<ano>`; `--destino` troca a raiz
+- Arquivo já limpo/convertido é pulado; nenhum comando acessa o banco
 
 ## 10. Estrutura
 

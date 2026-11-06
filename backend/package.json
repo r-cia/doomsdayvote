@@ -20,7 +20,9 @@
     "seed:cores": "node --env-file-if-exists=.env src/scripts/seed-cores.js",
     "cores:pendentes": "node --env-file-if-exists=.env src/scripts/cores-pendentes.js",
     "carga:status": "node --env-file-if-exists=.env src/scripts/carga-status.js",
-    "geo:carregar": "node --env-file-if-exists=.env src/scripts/geo-carregar.js"
+    "geo:carregar": "node --env-file-if-exists=.env src/scripts/geo-carregar.js",
+    "bu:baixar": "node --env-file-if-exists=.env src/scripts/baixar-bu.js",
+    "bweb:baixar": "node --env-file-if-exists=.env src/scripts/baixar-bweb.js"
   },
   "dependencies": {
     "fastify": "^5.2.1",
