@@ -7,6 +7,15 @@ import { carregarPasta } from '../modules/importacao/carregar-pasta.js';
 
 const LOCK = 727274;
 
+function lerArgumentos(argv) {
+  const opcoes = { pasta: null, arquivo: null };
+  for (let indice = 0; indice < argv.length; indice += 1) {
+    if (argv[indice] === '--pasta') opcoes.pasta = argv[indice + 1];
+    else if (argv[indice] === '--arquivo') opcoes.arquivo = argv[indice + 1];
+  }
+  return opcoes;
+}
+
 async function main() {
   let env;
   try {
@@ -16,15 +25,21 @@ async function main() {
     process.exit(1);
   }
 
-  // REFRESH MATERIALIZED VIEW exige o dono da view.
-  const cliente = new pg.Client({ connectionString: env.DATABASE_MIGRATION_URL });
-  await cliente.connect();
-  await cliente.query('SET statement_timeout = 0');
-  const { rows } = await cliente.query('select pg_try_advisory_lock($1) as ok', [LOCK]);
-  if (!rows[0].ok) {
-    console.error('CARGA_EM_ANDAMENTO');
-    await cliente.end();
-    process.exit(2);
+  const { pasta, arquivo } = lerArgumentos(process.argv.slice(2));
+  const inputDir = pasta ?? env.BWEB_INPUT_DIR;
+
+  let cliente = null;
+  if (!arquivo) {
+    // REFRESH MATERIALIZED VIEW exige o dono da view.
+    cliente = new pg.Client({ connectionString: env.DATABASE_MIGRATION_URL });
+    await cliente.connect();
+    await cliente.query('SET statement_timeout = 0');
+    const { rows } = await cliente.query('select pg_try_advisory_lock($1) as ok', [LOCK]);
+    if (!rows[0].ok) {
+      console.error('CARGA_EM_ANDAMENTO');
+      await cliente.end();
+      process.exit(2);
+    }
   }
 
   // Lote offline: COPY de arquivos grandes passa dos 60s do limite padrão.
@@ -37,23 +52,22 @@ async function main() {
   const cache = criarCache({ url: env.REDIS_URL });
 
   try {
-    const resumo = await carregarPasta({
-      db,
-      inputDir: env.BWEB_INPUT_DIR,
-    });
+    const resumo = await carregarPasta({ db, inputDir, arquivo });
     console.log(JSON.stringify(resumo, null, 2));
-    await atualizarViewsMaterializadas((texto) => cliente.query(texto));
+    if (cliente) await atualizarViewsMaterializadas((texto) => cliente.query(texto));
     await cache.invalidar();
     await cache.fechar();
     await db.destroy();
-    await cliente.query('select pg_advisory_unlock($1)', [LOCK]);
-    await cliente.end();
+    if (cliente) {
+      await cliente.query('select pg_advisory_unlock($1)', [LOCK]);
+      await cliente.end();
+    }
     process.exit(resumo.falhas > 0 ? 1 : 0);
   } catch (erro) {
     console.error(erro.message);
     await cache.fechar();
     await db.destroy();
-    await cliente.end();
+    if (cliente) await cliente.end();
     process.exit(1);
   }
 }

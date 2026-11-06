@@ -13,18 +13,23 @@ function carimbo(data = new Date()) {
 export async function carregarPasta({
   db,
   inputDir,
+  arquivo = null,
   now = new Date(),
   registrarEvento = registrarEventoCarga,
 }) {
   const entradas = await readdir(inputDir, { withFileTypes: true });
-  const arquivos = entradas
-    .filter((entrada) => entrada.isFile() && EXTENSOES.test(entrada.name))
-    .map((entrada) => entrada.name)
-    .sort();
-  const ignoradosExtensao = entradas
-    .filter((entrada) => entrada.isFile() && !EXTENSOES.test(entrada.name))
-    .map((entrada) => entrada.name)
-    .sort();
+  const arquivos = arquivo
+    ? [arquivo]
+    : entradas
+        .filter((entrada) => entrada.isFile() && EXTENSOES.test(entrada.name))
+        .map((entrada) => entrada.name)
+        .sort();
+  const ignoradosExtensao = arquivo
+    ? []
+    : entradas
+        .filter((entrada) => entrada.isFile() && !EXTENSOES.test(entrada.name))
+        .map((entrada) => entrada.name)
+        .sort();
 
   const resumo = {
     arquivos: arquivos.length,
