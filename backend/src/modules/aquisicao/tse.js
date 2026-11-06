@@ -10,11 +10,6 @@ const DATASETS = {
     2022: 'resultados-2022-boletim-de-urna',
     2018: 'resultados-2018-boletim-de-urna',
     2014: 'resultados-2014-boletim-de-urna',
-    2010: 'resultados-2010',
-    2006: 'resultados-2006',
-    2002: 'resultados-2002',
-    1998: 'resultados-1998',
-    1994: 'resultados-1994',
   },
 };
 

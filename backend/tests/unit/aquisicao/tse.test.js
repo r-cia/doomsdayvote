@@ -13,7 +13,7 @@ function resposta(resources) {
 describe('catálogo do TSE', () => {
   it('lista os anos disponíveis por tipo', () => {
     expect(anosDisponiveis('bu')).toEqual([2026, 2022]);
-    expect(anosDisponiveis('bweb')).toContain(1994);
+    expect(anosDisponiveis('bweb')).toContain(2014);
     expect(anosDisponiveis('bweb')).toContain(2026);
   });
 
