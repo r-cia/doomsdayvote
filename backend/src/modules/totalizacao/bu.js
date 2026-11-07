@@ -65,7 +65,7 @@ function decodificarLocalidade(buffer, itens) {
       campos.length >= 3 &&
       ehUniversal(campos[0], TAG.INTEGER) &&
       ehUniversal(campos[1], TAG.OCTET_STRING) &&
-      ehUniversal(campos[2], TAG.SEQUENCE)
+      (ehUniversal(campos[2], TAG.SEQUENCE) || ehUniversal(campos[2], TAG.GENERAL_STRING))
     );
   });
   if (!urnaTlv) throw invalido(0, 'BU sem urna');
@@ -135,13 +135,18 @@ function ehNoCargo(buffer, tlv) {
 function ehCabecalhoCargo(buffer, tlv) {
   if (!ehUniversal(tlv, TAG.SEQUENCE) || !tlv.construido) return false;
   const campos = filhos(buffer, tlv);
-  return (
+  const leiaute2026 =
     campos.length >= 5 &&
     ehUniversal(campos[0], TAG.INTEGER) &&
     ehUniversal(campos[1], TAG.INTEGER) &&
     ehUniversal(campos[2], TAG.INTEGER) &&
-    ehUniversal(campos[3], TAG.INTEGER)
-  );
+    ehUniversal(campos[3], TAG.INTEGER);
+  const leiaute2022 =
+    campos.length === 3 &&
+    ehUniversal(campos[0], TAG.INTEGER) &&
+    ehUniversal(campos[1], TAG.INTEGER) &&
+    ehUniversal(campos[2], TAG.SEQUENCE);
+  return leiaute2026 || leiaute2022;
 }
 
 function ehGrupo(buffer, tlv) {
@@ -218,35 +223,66 @@ function decodificarConteudoBu(buffer) {
   const encerramento = lerGeneralString(buffer, instantes[1]);
 
   const indiceAbertura = itens.indexOf(aberturaTlv);
-  const comparecimentoTlv = itens[indiceAbertura + 1];
-  if (!comparecimentoTlv) throw invalido(raiz.inicio, 'BU sem comparecimento');
-  const comparecimento = lerInteiro(buffer, comparecimentoTlv);
+  const libCodigoTlv = itens.find((item) => ehContexto(item, 1) && !item.construido);
+  const compBiometricoTlv = itens.find((item) => ehContexto(item, 2) && !item.construido);
+  const leiaute2022 = Boolean(libCodigoTlv || compBiometricoTlv);
 
-  const habilitacaoTlv = itens.find((item) => ehContexto(item, 1) && item.construido);
-  const habilitacoes = habilitacaoTlv ? filhos(buffer, habilitacaoTlv) : null;
-  if (habilitacoes && habilitacoes.length !== 3) {
-    throw invalido(habilitacaoTlv.inicio, 'três habilitações esperadas');
+  let comparecimento;
+  let habilitacao1;
+  let habilitacao2;
+  let habilitacao3;
+  let cargosTlv;
+
+  if (leiaute2022) {
+    cargosTlv = itens.find((item) => ehContexto(item, 3) && item.construido);
+    habilitacao1 = libCodigoTlv ? lerInteiroImplicito(buffer, libCodigoTlv) : null;
+    habilitacao2 = compBiometricoTlv ? lerInteiroImplicito(buffer, compBiometricoTlv) : null;
+    habilitacao3 = null;
+  } else {
+    const comparecimentoTlv = itens[indiceAbertura + 1];
+    if (!comparecimentoTlv) throw invalido(raiz.inicio, 'BU sem comparecimento');
+    comparecimento = lerInteiro(buffer, comparecimentoTlv);
+
+    const habilitacaoTlv = itens.find((item) => ehContexto(item, 1) && item.construido);
+    const habilitacoes = habilitacaoTlv ? filhos(buffer, habilitacaoTlv) : null;
+    if (habilitacoes && habilitacoes.length !== 3) {
+      throw invalido(habilitacaoTlv.inicio, 'três habilitações esperadas');
+    }
+
+    const indiceCargos = habilitacaoTlv
+      ? itens.indexOf(habilitacaoTlv)
+      : itens.indexOf(comparecimentoTlv);
+    cargosTlv = itens[indiceCargos + 1];
+
+    habilitacao1 = habilitacoes ? lerInteiro(buffer, habilitacoes[0]) : null;
+    habilitacao2 = habilitacoes ? lerInteiro(buffer, habilitacoes[1]) : null;
+    habilitacao3 = habilitacoes ? lerInteiro(buffer, habilitacoes[2]) : null;
   }
 
-  const indiceCargos = habilitacaoTlv
-    ? itens.indexOf(habilitacaoTlv)
-    : itens.indexOf(comparecimentoTlv);
-  const cargosTlv = itens[indiceCargos + 1];
   if (!cargosTlv) throw invalido(raiz.inicio, 'BU sem cargos');
-  exigirSequencia(cargosTlv, 'cargos');
+  if (leiaute2022) {
+    if (!cargosTlv.construido) throw invalido(cargosTlv.inicio, 'cargos: SEQUENCE esperada');
+  } else {
+    exigirSequencia(cargosTlv, 'cargos');
+  }
   const cargos = [];
   coletarCargos(buffer, cargosTlv, { aptos: null, comparecimento: null }, cargos);
   if (cargos.length === 0) throw invalido(cargosTlv.inicio, 'BU sem cargos decodificáveis');
   cargos.sort((a, b) => a.identificador - b.identificador);
+
+  if (leiaute2022) comparecimento = cargos[0].comparecimento;
+  if (comparecimento === null || comparecimento === undefined) {
+    throw invalido(cargosTlv.inicio, 'BU sem comparecimento');
+  }
 
   return {
     dataHora,
     abertura,
     encerramento,
     comparecimento,
-    habilitacao1: habilitacoes ? lerInteiro(buffer, habilitacoes[0]) : null,
-    habilitacao2: habilitacoes ? lerInteiro(buffer, habilitacoes[1]) : null,
-    habilitacao3: habilitacoes ? lerInteiro(buffer, habilitacoes[2]) : null,
+    habilitacao1,
+    habilitacao2,
+    habilitacao3,
     urna: localidade.urna,
     localidade: {
       municipio: localidade.municipio,

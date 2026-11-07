@@ -91,8 +91,7 @@ function resumirEntradas(entradas) {
 }
 
 async function* gruposDoArquivo({ formato, caminhoArquivo, entradas }) {
-  const vistos = new Set();
-  let atual = null;
+  const pendentes = new Map();
 
   const fluxo =
     formato === '7z'
@@ -106,20 +105,22 @@ async function* gruposDoArquivo({ formato, caminhoArquivo, entradas }) {
     if (!sufixo) continue;
 
     const prefixo = entrada.nome.slice(0, -sufixo[0].length);
-    if (atual?.prefixo !== prefixo) {
-      if (atual) yield atual;
-      if (vistos.has(prefixo)) {
-        throw new Error(
-          `entradas da seção ${prefixo} não são contíguas no arquivo ${caminhoArquivo}`,
-        );
-      }
-      vistos.add(prefixo);
-      atual = { prefixo, grupo: {} };
+    const grupo = pendentes.get(prefixo) ?? {};
+    grupo[sufixo[1]] = Object.assign(entrada, { conteudo: dados });
+
+    // O TSE intercala entradas de seções vizinhas nos arquivos de 2º turno.
+    if (Object.keys(grupo).length === 3) {
+      pendentes.delete(prefixo);
+      yield { prefixo, grupo };
+    } else {
+      pendentes.set(prefixo, grupo);
     }
-    atual.grupo[sufixo[1]] = Object.assign(entrada, { conteudo: dados });
   }
 
-  if (atual) yield atual;
+  if (pendentes.size > 0) {
+    const [prefixo] = pendentes.keys();
+    throw new Error(`seção ${prefixo} incompleta no arquivo ${caminhoArquivo}`);
+  }
 }
 
 async function inserirSecao(trx, grupo, extrair, destino) {
@@ -395,18 +396,7 @@ async function carregarZipAberto(
       secaoAtual = prefixo;
 
       if (!grupo.bu) {
-        const erro = Object.assign(new Error(`seção ${prefixo} sem -bu.dat`), {
-          codigo: CODIGO_SEM_BU,
-        });
-        registrarEvento('secao_falhou', {
-          ...contexto,
-          secao: prefixo,
-          prefixo,
-          erro_codigo: CODIGO_SEM_BU,
-          erro_mensagem: erro.message,
-        });
-        if (falharRapido) throw erro;
-        await registrarSecaoErro(db, { loteId: lote.id, sgUf: origem.sg_uf, prefixo }, erro);
+        secoesIgnoradas += 1;
         continue;
       }
 

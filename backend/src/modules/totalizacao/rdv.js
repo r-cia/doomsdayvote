@@ -104,6 +104,29 @@ function agregar(votos) {
   );
 }
 
+function localizarEleicoes(conteudo, itens) {
+  const rdv = procurar(conteudo, itens, (item) => {
+    if (!ehUniversal(item, TAG.SEQUENCE) || !item.construido) return false;
+    const campos = filhos(conteudo, item);
+    return (
+      campos.length >= 4 &&
+      ehUniversal(campos[0], TAG.INTEGER) &&
+      ehUniversal(campos[1], TAG.ENUMERATED) &&
+      ehUniversal(campos[2], TAG.SEQUENCE)
+    );
+  });
+  if (!rdv) {
+    return procurar(conteudo, itens, (item) => ehContexto(item, 1) && item.construido);
+  }
+
+  const campos = filhos(conteudo, rdv);
+  return (
+    campos.find((item) => ehContexto(item, 0) && item.construido) ??
+    campos.find((item) => ehContexto(item, 1) && item.construido) ??
+    procurar(conteudo, itens, (item) => ehContexto(item, 1) && item.construido)
+  );
+}
+
 export function decodificarRdv(conteudo) {
   if (!Buffer.isBuffer(conteudo)) throw new TypeError('conteudo deve ser Buffer');
   const raiz = lerTlv(conteudo, 0);
@@ -111,7 +134,7 @@ export function decodificarRdv(conteudo) {
   const itens = filhos(conteudo, raiz);
   if (itens.length < 2) throw invalido(raiz.inicio, 'arquivo sem cabeçalho e votos');
 
-  const votosTlv = procurar(conteudo, itens, (item) => ehContexto(item, 1) && item.construido);
+  const votosTlv = localizarEleicoes(conteudo, itens);
   if (!votosTlv) throw invalido(raiz.inicio, 'arquivo sem registro de votos');
 
   const votos = [];

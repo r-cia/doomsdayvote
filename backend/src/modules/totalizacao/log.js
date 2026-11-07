@@ -1,4 +1,8 @@
-import { extrairEntrada, listarEntradas } from './zip.js';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { detectarFormato, extrairEntrada, listarEntradas } from './zip.js';
 
 export const TIPO_EVENTO = Object.freeze({
   IDENTIFICADOR_DIGITADO: 'identificador_digitado',
@@ -37,8 +41,24 @@ const CLASSIFICADORES = Object.freeze([
   [/^Procedimento de encerramento confirmado$/, TIPO_EVENTO.ENCERRAMENTO],
 ]);
 
+function extrairLogd7z(conteudo) {
+  const diretorio = mkdtempSync(path.join(tmpdir(), 'logjez-'));
+  const arquivo = path.join(diretorio, 'log.jez');
+  try {
+    writeFileSync(arquivo, conteudo);
+    return execFileSync('7z', ['e', '-so', arquivo, 'logd.dat'], {
+      maxBuffer: 256 * 1024 * 1024,
+    });
+  } catch {
+    throw new Error('log.jez sem logd.dat');
+  } finally {
+    rmSync(diretorio, { recursive: true, force: true });
+  }
+}
+
 export function extrairLogd(conteudo) {
   if (!Buffer.isBuffer(conteudo)) throw new TypeError('conteudo deve ser Buffer');
+  if (detectarFormato(conteudo) === '7z') return extrairLogd7z(conteudo);
   const entrada = listarEntradas(conteudo).find((item) => item.nome === 'logd.dat');
   if (!entrada) throw new Error('log.jez sem logd.dat');
   return extrairEntrada(conteudo, entrada);
