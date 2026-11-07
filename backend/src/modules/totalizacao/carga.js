@@ -27,6 +27,9 @@ const SUFIXOS = Object.freeze([
   ['-bu.dat', 'bu'],
   ['-rdv.dat', 'rdv'],
   ['-log.jez', 'log'],
+  ['.bu', 'bu'],
+  ['.rdv', 'rdv'],
+  ['.logjez', 'log'],
 ]);
 const CODIGO_SEM_BU = 'SEM_BU';
 const CODIGO_INTERNO = 'ERRO_INTERNO';
