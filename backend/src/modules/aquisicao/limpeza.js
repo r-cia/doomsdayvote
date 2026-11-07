@@ -8,7 +8,21 @@ import { createGzip } from 'node:zlib';
 
 const executar = promisify(execFile);
 
-const LOTE_REMOCAO = 500;
+export const SUFIXOS_INUTEIS_BU = Object.freeze([
+  '*.vsc',
+  '*.vscmr',
+  '*.vscsa',
+  '*.pdf',
+  '*.id',
+  '*-imgbu.dat',
+  '*-imgbusa.dat',
+  '*-busa.dat',
+  '*-logsa.jez',
+  '*.imgbu',
+  '*.imgbusa',
+  '*.logsajez',
+  '*.busa',
+]);
 
 export const PADRAO_MANTIDOS_BU = /-(bu|rdv)\.dat$|-log\.jez$|\.(bu|rdv|logjez)$/;
 
@@ -18,13 +32,7 @@ export async function listarEntradas(caminho) {
 }
 
 export async function limparZipBu(caminho) {
-  const inuteis = (await listarEntradas(caminho)).filter((nome) => !PADRAO_MANTIDOS_BU.test(nome));
-
-  for (let inicio = 0; inicio < inuteis.length; inicio += LOTE_REMOCAO) {
-    await executar('zip', ['-d', caminho, ...inuteis.slice(inicio, inicio + LOTE_REMOCAO)], {
-      maxBuffer: 256 * 1024 * 1024,
-    });
-  }
+  await executar('zip', ['-d', caminho, ...SUFIXOS_INUTEIS_BU], { maxBuffer: 256 * 1024 * 1024 });
 
   const entradas = await listarEntradas(caminho);
   const foraDoPadrao = entradas.filter((nome) => !PADRAO_MANTIDOS_BU.test(nome));
