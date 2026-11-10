@@ -41,12 +41,12 @@ export async function existeBwebDaUf(db, { anoEleicao, nrTurno, sgUf }) {
 
 export async function divergenciasBuBweb(
   db,
-  { anoEleicao, nrTurno, votosBu, sgUf, cdMunicipioTse, nrZona, nrSecao },
+  { anoEleicao, nrTurno, votosBu, sgUf, cdMunicipioTse, nrZona, nrSecao, bwebDaUf },
 ) {
   const localizacao = { sgUf, cdMunicipioTse, nrZona, nrSecao };
   const divergencias = [];
 
-  if (!(await existeBwebDaUf(db, { anoEleicao, nrTurno, sgUf }))) {
+  if (!(bwebDaUf ?? (await existeBwebDaUf(db, { anoEleicao, nrTurno, sgUf })))) {
     divergencias.push(
       divergenciaDeAusencia({ fonte: 'bweb', campo: 'uf', ...localizacao }),
     );

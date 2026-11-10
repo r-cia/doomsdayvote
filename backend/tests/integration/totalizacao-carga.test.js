@@ -757,6 +757,39 @@ describe('carga dos zips de totalização por UF', () => {
     expect(agregado.complementares).toMatchObject({ secoes: 1, aptos: CENARIO.aptos });
   }, 120000);
 
+  it('carrega as seções em paralelo com o mesmo resultado do sequencial e isola a seção com erro', async () => {
+    const secoes = [1, 2, 3, 4, 5, 6];
+    const entradas = secoes.flatMap((secao) => {
+      const prefixo = `ac9999z101${String(secao).padStart(4, '0')}`;
+      return [
+        [`${prefixo}-bu.dat`, secao === 4 ? gerarBu({ secao }).subarray(0, 32) : gerarBu({ secao })],
+        [`${prefixo}-rdv.dat`, gerarRdv({ votos: votosDoCenario() })],
+        [`${prefixo}-log.jez`, gerarLogJez()],
+      ];
+    });
+    const caminho = await escreverZip('paralelo', entradas);
+
+    const paralelo = await carregarZip(db, caminho, { concorrencia: 3 });
+    expect(paralelo).toMatchObject({
+      status: 'parcial',
+      secoes: 6,
+      secoes_com_erro: 1,
+      votos_bu: VOTOS_BU * 5,
+      votos_rdv: VOTOS_RDV * 5,
+    });
+    expect(await contar('totalizacao_secao', { coluna: 'lote_id', valor: paralelo.lote_id })).toBe(5);
+    expect(await contar('totalizacao_secao_erro', { coluna: 'lote_id', valor: paralelo.lote_id })).toBe(1);
+
+    const sequencial = await carregarZip(db, caminho, { concorrencia: 1 });
+    expect(sequencial).toMatchObject({
+      status: 'parcial',
+      secoes: 6,
+      secoes_com_erro: 1,
+      votos_bu: paralelo.votos_bu,
+      votos_rdv: paralelo.votos_rdv,
+    });
+  }, 120000);
+
   it('registra a janela do turno quando o log traz eventos de outro turno e a janela não identificada quando não coincide', async () => {
     const turnoAnterior = [
       { instante: '2026-09-27T07:00:01', modulo: 'URNA', texto: 'Urna pronta para receber votos' },

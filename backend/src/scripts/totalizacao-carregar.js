@@ -6,9 +6,10 @@ import { registrarEventoCarga } from '../lib/log-carga.js';
 import { carregarZip } from '../modules/totalizacao/carga.js';
 
 function lerArgumentos(argv) {
-  const opcoes = { pasta: null, arquivo: null, falharRapido: false, retomar: false };
+  const opcoes = { pasta: null, arquivo: null, falharRapido: false, retomar: false, concorrencia: 4 };
   for (let indice = 0; indice < argv.length; indice += 1) {
-    if (argv[indice] === '--pasta') opcoes.pasta = argv[indice + 1];
+    if (argv[indice] === '--concorrencia') opcoes.concorrencia = Number(argv[indice + 1]);
+    else if (argv[indice] === '--pasta') opcoes.pasta = argv[indice + 1];
     else if (argv[indice] === '--arquivo') opcoes.arquivo = argv[indice + 1];
     else if (argv[indice] === '--falhar-rapido') opcoes.falharRapido = true;
     else if (argv[indice] === '--retomar') opcoes.retomar = true;
@@ -29,10 +30,12 @@ async function main() {
     process.exit(1);
   }
 
-  const { pasta, arquivo, falharRapido, retomar } = lerArgumentos(process.argv.slice(2));
-  if (!pasta) {
+  const { pasta, arquivo, falharRapido, retomar, concorrencia } = lerArgumentos(
+    process.argv.slice(2),
+  );
+  if (!pasta || !Number.isInteger(concorrencia) || concorrencia < 1) {
     console.error(
-      'uso: npm run totalizacao:carregar -- --pasta <diretório> [--arquivo <nome.zip|nome.7z>] [--falhar-rapido]',
+      'uso: npm run totalizacao:carregar -- --pasta <diretório> [--arquivo <nome.zip|nome.7z>] [--falhar-rapido] [--concorrencia <n>=4]',
     );
     process.exit(1);
   }
@@ -70,6 +73,7 @@ async function main() {
         const resultado = await carregarZip(db, path.join(pasta, nome), {
           falharRapido,
           retomar,
+          concorrencia: Math.min(concorrencia, env.DB_POOL_MAX - 1),
           aoProgredir: ({ etapa, atual, total }) => {
             if (etapa === 'secao' && (atual % 100 === 0 || atual === total)) {
               console.log(`${nome}: ${atual}/${total} seções (${segundos(inicio)}s)`);

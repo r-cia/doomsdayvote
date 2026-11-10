@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { registrarEventoCarga } from '../../lib/log-carga.js';
 import { decodificarBu } from './bu.js';
-import { conferirBuBweb } from './conferencia-bweb.js';
+import { conferirBuBweb, existeBwebDaUf } from './conferencia-bweb.js';
 import { conferirBuLog, janelaDoBu } from './conferencia-log.js';
 import { registrarIntervencao } from './intervencoes.js';
 import { conferirBuRdv, votosDoBu } from './conferencia-rdv.js';
@@ -153,7 +153,7 @@ function descricaoDaJanela(janela, totalEventos) {
   };
 }
 
-async function inserirSecao(trx, grupo, extrair, destino) {
+async function inserirSecao(trx, grupo, extrair, destino, contexto) {
   const conteudoBu = await extrair(grupo.bu);
   const bu = lerFonte('BU', () => decodificarBu(conteudoBu));
   const cdMunicipio = bu.localidade.municipio;
@@ -165,11 +165,14 @@ async function inserirSecao(trx, grupo, extrair, destino) {
   const nomes = await carregarMunicipios();
   const nomeMunicipio = nomes.get(`${destino.sg_uf}:${cdMunicipio}`) ?? `MUNICÍPIO ${cdMunicipio}`;
 
-  await trx
-    .insertInto('localidade')
-    .values({ sg_uf: destino.sg_uf, cd_municipio_tse: cdMunicipio, nm_municipio: nomeMunicipio })
-    .onConflict((oc) => oc.columns(['sg_uf', 'cd_municipio_tse']).doNothing())
-    .execute();
+  const chaveMunicipio = `${destino.sg_uf}:${cdMunicipio}`;
+  if (!contexto.municipiosGravados.has(chaveMunicipio)) {
+    await trx
+      .insertInto('localidade')
+      .values({ sg_uf: destino.sg_uf, cd_municipio_tse: cdMunicipio, nm_municipio: nomeMunicipio })
+      .onConflict((oc) => oc.columns(['sg_uf', 'cd_municipio_tse']).doNothing())
+      .execute();
+  }
 
   const secao = await trx
     .insertInto('totalizacao_secao')
@@ -277,10 +280,11 @@ async function inserirSecao(trx, grupo, extrair, destino) {
     anoEleicao: destino.ano_eleicao,
     nrTurno: destino.nr_turno,
     votosBu,
+    bwebDaUf: contexto.bwebDaUf,
     ...localizacao,
   });
 
-  return { votosBu: votosBu.length, votosRdv: votosRdv.length };
+  return { votosBu: votosBu.length, votosRdv: votosRdv.length, municipio: chaveMunicipio };
 }
 
 async function retomarLote(db, existente, destino) {
@@ -399,7 +403,13 @@ async function carregarZipAberto(
   db,
   caminhoArquivo,
   { formato, zip },
-  { aoProgredir, registrarEvento = registrarEventoCarga, falharRapido = false, retomar = false } = {},
+  {
+    aoProgredir,
+    registrarEvento = registrarEventoCarga,
+    falharRapido = false,
+    retomar = false,
+    concorrencia = 1,
+  } = {},
 ) {
   const inicio = Date.now();
   const nomeArquivo = path.basename(caminhoArquivo);
@@ -459,48 +469,47 @@ async function carregarZipAberto(
     await aoProgredir?.({ etapa: 'lote', loteId: lote.id, atual: 0, total: prefixos.length });
 
     const { gravadas, comErro } = await carregarSecoesDoLote(db, lote.id);
+    const contextoSecao = {
+      municipiosGravados: new Set(),
+      bwebDaUf: await existeBwebDaUf(db, {
+        anoEleicao: origem.ano_eleicao,
+        nrTurno: origem.nr_turno,
+        sgUf: origem.sg_uf,
+      }),
+    };
 
     let indice = 0;
-    for await (const { prefixo, grupo } of gruposDoArquivo({
-      formato,
-      caminhoArquivo,
-      entradas,
-    })) {
-      indice += 1;
-      if (!grupo.rdv) secoesSemRdv += 1;
-      if (!grupo.log) secoesSemLog += 1;
+    let falhaFatal = null;
+    const emVoo = new Set();
 
-      if (!comErro.has(prefixo) && gravadas.has(prefixo)) {
-        secoesIgnoradas += 1;
-        continue;
-      }
-
-      secaoAtual = prefixo;
-
-      if (!grupo.bu) {
-        secoesIgnoradas += 1;
-        continue;
-      }
-
+    const processar = async (prefixo, grupo) => {
       try {
         const resultado = await db.transaction().execute(async (trx) => {
-          const inserido = await inserirSecao(trx, grupo, extrair, {
-            ...destino,
-            lote_id: lote.id,
-            prefixo,
-          });
-          await trx
-            .deleteFrom('totalizacao_secao_erro')
-            .where('lote_id', '=', lote.id)
-            .where('prefixo', '=', prefixo)
-            .execute();
+          const inserido = await inserirSecao(
+            trx,
+            grupo,
+            extrair,
+            { ...destino, lote_id: lote.id, prefixo },
+            contextoSecao,
+          );
+          if (comErro.has(prefixo)) {
+            await trx
+              .deleteFrom('totalizacao_secao_erro')
+              .where('lote_id', '=', lote.id)
+              .where('prefixo', '=', prefixo)
+              .execute();
+          }
           return inserido;
         });
 
+        contextoSecao.municipiosGravados.add(resultado.municipio);
         votosBu += resultado.votosBu;
         votosRdv += resultado.votosRdv;
       } catch (erro) {
-        if (falharRapido) throw erro;
+        if (falharRapido) {
+          falhaFatal ??= erro;
+          return;
+        }
         registrarEvento('secao_falhou', {
           ...contexto,
           secao: prefixo,
@@ -518,7 +527,37 @@ async function carregarZipAberto(
         atual: indice,
         total: prefixos.length,
       });
+    };
+
+    for await (const { prefixo, grupo } of gruposDoArquivo({
+      formato,
+      caminhoArquivo,
+      entradas,
+    })) {
+      if (falhaFatal) break;
+      indice += 1;
+      if (!grupo.rdv) secoesSemRdv += 1;
+      if (!grupo.log) secoesSemLog += 1;
+
+      if (!comErro.has(prefixo) && gravadas.has(prefixo)) {
+        secoesIgnoradas += 1;
+        continue;
+      }
+
+      secaoAtual = prefixo;
+
+      if (!grupo.bu) {
+        secoesIgnoradas += 1;
+        continue;
+      }
+
+      const tarefa = processar(prefixo, grupo).finally(() => emVoo.delete(tarefa));
+      emVoo.add(tarefa);
+      if (emVoo.size >= concorrencia) await Promise.race(emVoo);
     }
+
+    await Promise.all(emVoo);
+    if (falhaFatal) throw falhaFatal;
 
     if (indice !== prefixos.length) {
       throw new Error(
