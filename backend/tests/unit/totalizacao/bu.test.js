@@ -51,6 +51,23 @@ describe('decoder do bu.dat', () => {
     expect(semHabilitacoes.comparecimento).toBe(3);
   });
 
+  it('decodifica BU de 2022 sem cont[1] e cont[2] com habilitações nulas', () => {
+    const bu2022 = decodificarBu(gerarBu({ leiaute2022: true }));
+    expect(bu2022.habilitacao1).toBeNull();
+    expect(bu2022.habilitacao2).toBeNull();
+    expect(bu2022.habilitacao3).toBeNull();
+    expect(bu2022.cargos.map((cargo) => cargo.identificador)).toEqual([1, 3]);
+    expect(bu2022.comparecimento).toBe(3);
+    expect(bu2022.cargos.map((cargo) => cargo.votaveis)).toEqual(bu.cargos.map((cargo) => cargo.votaveis));
+  });
+
+  it('decodifica BU de 2022 com cont[1] e cont[2]', () => {
+    const bu2022 = decodificarBu(gerarBu({ leiaute2022: true, habilitacoes2022: [3, 2] }));
+    expect(bu2022.habilitacao1).toBe(3);
+    expect(bu2022.habilitacao2).toBe(2);
+    expect(bu2022.cargos.map((cargo) => cargo.identificador)).toEqual([1, 3]);
+  });
+
   it('achata os cargos internos com o identificador do próprio cargo', () => {
     expect(bu.cargos.map((cargo) => cargo.identificador)).toEqual([1, 3]);
     expect(

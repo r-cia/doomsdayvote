@@ -225,7 +225,8 @@ function decodificarConteudoBu(buffer) {
   const indiceAbertura = itens.indexOf(aberturaTlv);
   const libCodigoTlv = itens.find((item) => ehContexto(item, 1) && !item.construido);
   const compBiometricoTlv = itens.find((item) => ehContexto(item, 2) && !item.construido);
-  const leiaute2022 = Boolean(libCodigoTlv || compBiometricoTlv);
+  const cargos2022Tlv = itens.find((item) => ehContexto(item, 3) && item.construido);
+  const leiaute2022 = Boolean(libCodigoTlv || compBiometricoTlv || cargos2022Tlv);
 
   let comparecimento;
   let habilitacao1;

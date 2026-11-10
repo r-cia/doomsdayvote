@@ -241,6 +241,22 @@ function cargoBer({ identificador, aptos, comparecimento, votaveis }) {
   );
 }
 
+function cargoBer2022({ identificador, aptos, comparecimento, votaveis }) {
+  return sequencia(
+    inteiro(500 + identificador),
+    inteiro(aptos),
+    sequencia(
+      sequencia(
+        enumerado(1),
+        inteiro(comparecimento),
+        sequencia(
+          sequencia(contextoInteiro(1, identificador), inteiro(2), sequencia(...votaveis.map(votavelBer))),
+        ),
+      ),
+    ),
+  );
+}
+
 function urnaBer(urna) {
   return sequencia(inteiro(urna), octetString(Buffer.alloc(32, 0x11)), sequencia(inteiro(1), texto('URNA')));
 }
@@ -259,7 +275,35 @@ export function gerarBu(opcoes = {}) {
     comparecimento = CENARIO.comparecimento,
     habilitacoes = [CENARIO.habilitacao1, CENARIO.habilitacao2, CENARIO.habilitacao3],
     cargos = CENARIO.cargos,
+    leiaute2022 = false,
+    habilitacoes2022 = null,
   } = opcoes;
+
+  if (leiaute2022) {
+    const interno = sequencia(
+      sequencia(texto(dataHora)),
+      enumerado(2),
+      urnaBer(urna),
+      sequencia(sequencia(inteiro(municipio), inteiro(zona)), inteiro(local), inteiro(secao)),
+      texto('2022'),
+      contextoConstruido(0, texto(abertura), texto(encerramento)),
+      ...(habilitacoes2022 === null
+        ? []
+        : [contextoInteiro(1, habilitacoes2022[0]), contextoInteiro(2, habilitacoes2022[1])]),
+      contextoConstruido(
+        3,
+        ...cargos.map((cargo) =>
+          cargoBer2022({
+            identificador: cargo.identificador,
+            aptos: cargo.aptos ?? CENARIO.aptos,
+            comparecimento: cargo.comparecimento ?? comparecimento,
+            votaveis: cargo.votaveis,
+          }),
+        ),
+      ),
+    );
+    return sequencia(sequencia(texto(dataHoraArquivo)), octetString(interno));
+  }
 
   const conteudo = sequencia(
     sequencia(texto(dataHora)),
