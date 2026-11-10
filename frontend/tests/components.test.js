@@ -10,6 +10,7 @@ import PlotDia from '../src/components/PlotDia.vue'
 import PlacarRanking from '../src/components/PlacarRanking.vue'
 import BiometriaPanel from '../src/components/BiometriaPanel.vue'
 import BenfordPanel from '../src/components/BenfordPanel.vue'
+import StateBlock from '../src/components/StateBlock.vue'
 
 vi.mock('vue-chartjs', () => ({
   Line: {
@@ -585,5 +586,20 @@ describe('MapPanel', () => {
     expect(wrapper.text()).toContain('Malha não carregada')
     expect(wrapper.text()).not.toContain('Nenhuma geografia')
     expect(wrapper.text()).toContain('SP')
+  })
+})
+
+describe('StateBlock', () => {
+  it('marca o estado carregando como ocupado', () => {
+    const wrapper = mount(StateBlock, { props: { estado: 'carregando', titulo: 'Carregando' } })
+
+    expect(wrapper.classes()).toContain('state--carregando')
+    expect(wrapper.attributes('aria-busy')).toBe('true')
+  })
+
+  it('não marca os outros estados como ocupados', () => {
+    const wrapper = mount(StateBlock, { props: { estado: 'vazio', titulo: 'Vazio' } })
+
+    expect(wrapper.attributes('aria-busy')).toBe('false')
   })
 })

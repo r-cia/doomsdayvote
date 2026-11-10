@@ -14,6 +14,7 @@ defineEmits(['acao'])
     class="state"
     :class="`state--${estado}`"
     :role="estado === 'erro' ? 'alert' : 'status'"
+    :aria-busy="estado === 'carregando'"
   >
     <span class="state__icon" aria-hidden="true">
       <svg v-if="estado === 'carregando'" viewBox="0 0 24 24" width="22" height="22">

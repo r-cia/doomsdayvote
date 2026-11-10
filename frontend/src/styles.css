@@ -1678,6 +1678,16 @@ tr.linha--ativa th {
   flex: none;
 }
 
+.state--carregando .state__icon svg {
+  animation: state-spin 900ms linear infinite;
+}
+
+@keyframes state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .state__texto strong {
   font-weight: 400;
   color: var(--ink-dim);
@@ -2117,6 +2127,11 @@ tr.linha--ativa th {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .state--carregando .state__icon svg {
+    stroke-dasharray: none;
+    opacity: 0.7;
   }
 }
 
