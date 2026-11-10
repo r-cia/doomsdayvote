@@ -11,6 +11,7 @@ import { CODIGO_ERRO_BER } from '../../src/modules/totalizacao/ber.js';
 import { decodificarBu } from '../../src/modules/totalizacao/bu.js';
 import { carregarZip } from '../../src/modules/totalizacao/carga.js';
 import { votosDoBu } from '../../src/modules/totalizacao/conferencia-rdv.js';
+import { listarIntervencoes, registrarIntervencao } from '../../src/modules/totalizacao/intervencoes.js';
 import { CODIGO_ERRO_ZIP } from '../../src/modules/totalizacao/zip.js';
 import {
   CENARIO,
@@ -753,5 +754,42 @@ describe('carga dos zips de totalização por UF', () => {
       sgUf: CENARIO.uf,
     });
     expect(agregado.complementares).toMatchObject({ secoes: 1, aptos: CENARIO.aptos });
+  }, 120000);
+
+  it('registra a intervenção por ponteiro e contagem e reverte junto com a transação', async () => {
+    const caminhoBase = await escreverZip('intervencao', [[`${PREFIXO}-bu.dat`, gerarBu()]]);
+    const resultado = await carregarZip(db, caminhoBase);
+    const intervencao = {
+      loteId: resultado.lote_id,
+      prefixo: PREFIXO,
+      fonte: 'LOG',
+      posicao: 'linhas 1-3',
+      tipo: 'JANELA_DO_TURNO',
+      descricao: 'eventos de outro turno fora da janela do BU',
+      impacto: '10 eventos e 2 votos computados de outro turno',
+    };
+
+    await db.transaction().execute((trx) => registrarIntervencao(trx, intervencao));
+    expect(await listarIntervencoes(db, resultado.lote_id)).toMatchObject([
+      {
+        prefixo: PREFIXO,
+        fonte: 'LOG',
+        posicao: 'linhas 1-3',
+        tipo: 'JANELA_DO_TURNO',
+        impacto: '10 eventos e 2 votos computados de outro turno',
+      },
+    ]);
+
+    await expect(
+      db.transaction().execute(async (trx) => {
+        await registrarIntervencao(trx, { ...intervencao, tipo: 'SEGUNDA' });
+        throw new Error('falha depois do registro');
+      }),
+    ).rejects.toThrow('falha depois do registro');
+    expect(await listarIntervencoes(db, resultado.lote_id)).toHaveLength(1);
+
+    await expect(
+      registrarIntervencao(db, { ...intervencao, fonte: 'ARQUIVO' }),
+    ).rejects.toThrow();
   }, 120000);
 });
