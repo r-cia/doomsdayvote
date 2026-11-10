@@ -5,6 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { criarDb } from '../../src/db/index.js';
 import { agregarMetricas } from '../../src/modules/totalizacao/agregacao.js';
 import { carregarZip } from '../../src/modules/totalizacao/carga.js';
+import { recalcularMetricasDoLote } from '../../src/modules/totalizacao/metricas-zona.js';
 import {
   CENARIO,
   gerarBu,
@@ -186,6 +187,28 @@ describe('agregação das métricas de totalização', () => {
     expect(escopoLote).toBe('nacional');
     expect(escopoUf).toBe('uf');
     expect(metricasLote).toEqual(metricasUf);
+  });
+
+  it('lê as métricas da zona gravadas na carga e cai para os eleitores quando o lote não as tem', async () => {
+    const pelaSecao = await agregarMetricas(db, recorteDaSecao());
+    const pelaZona = await agregarMetricas(db, recorte({ sgUf: UF, nrZona: CENARIO.zona }));
+    const nacional = await agregarMetricas(db, recorte());
+
+    expect(
+      await db
+        .selectFrom('totalizacao_zona_metrica')
+        .select('qt_incidentes')
+        .where('lote_id', '=', loteId)
+        .execute(),
+    ).toEqual([{ qt_incidentes: 1 }]);
+    expect(pelaZona).toEqual(pelaSecao);
+    expect(nacional).toEqual(pelaSecao);
+
+    await db.deleteFrom('totalizacao_zona_duracao').where('lote_id', '=', loteId).execute();
+    await db.deleteFrom('totalizacao_zona_metrica').where('lote_id', '=', loteId).execute();
+    expect(await agregarMetricas(db, recorte())).toEqual(pelaSecao);
+    await recalcularMetricasDoLote(db, loteId);
+    expect(await agregarMetricas(db, recorte())).toEqual(pelaSecao);
   });
 
   it('usa só o lote vigente por UF quando o recorte não traz lote', async () => {

@@ -13,6 +13,7 @@ import { registrarDivergencias } from './divergencias.js';
 import { decodificarRdv } from './rdv.js';
 import { parsearLogJez } from './log.js';
 import { contarSemPar, registrarEleitores, registrarIncidentes } from './metricas.js';
+import { recalcularMetricasDoLote } from './metricas-zona.js';
 import {
   abrirZipArquivo,
   detectarFormatoArquivo,
@@ -366,6 +367,7 @@ async function contarSecoesComErro(db, loteId) {
 
 async function finalizarLote(db, loteId, origem, status) {
   await db.transaction().execute(async (trx) => {
+    await recalcularMetricasDoLote(trx, loteId);
     await trx
       .updateTable('totalizacao_lote')
       .set({ status, concluido_em: new Date() })
