@@ -68,6 +68,19 @@ function derivarOrigem(nomeArquivo) {
   };
 }
 
+function lerFonte(fonte, executar, localizacao = null) {
+  try {
+    return executar();
+  } catch (erro) {
+    const partes = [`fonte=${fonte}`];
+    if (erro.offset !== undefined) partes.push(`offset=${erro.offset}`);
+    partes.push(erro.message);
+    erro.message = partes.join('; ');
+    if (localizacao) erro.localizacao = localizacao;
+    throw erro;
+  }
+}
+
 async function hashArquivo(caminho) {
   const hash = createHash('sha256');
   for await (const pedaco of createReadStream(caminho)) hash.update(pedaco);
@@ -118,14 +131,19 @@ async function* gruposDoArquivo({ formato, caminhoArquivo, entradas }) {
   }
 
   if (pendentes.size > 0) {
-    const [prefixo] = pendentes.keys();
-    throw new Error(`seção ${prefixo} incompleta no arquivo ${caminhoArquivo}`);
+    for (const [prefixo, grupo] of pendentes) yield { prefixo, grupo };
   }
 }
 
 async function inserirSecao(trx, grupo, extrair, destino) {
-  const bu = decodificarBu(await extrair(grupo.bu));
+  const conteudoBu = await extrair(grupo.bu);
+  const bu = lerFonte('BU', () => decodificarBu(conteudoBu));
   const cdMunicipio = bu.localidade.municipio;
+  const localizacaoErro = {
+    cd_municipio_tse: cdMunicipio,
+    nr_zona: bu.localidade.zona,
+    nr_secao: bu.localidade.secao,
+  };
   const nomes = await carregarMunicipios();
   const nomeMunicipio = nomes.get(`${destino.sg_uf}:${cdMunicipio}`) ?? `MUNICÍPIO ${cdMunicipio}`;
 
@@ -177,8 +195,9 @@ async function inserirSecao(trx, grupo, extrair, destino) {
       .execute();
   }
 
+  const conteudoRdv = grupo.rdv ? await extrair(grupo.rdv) : null;
   const votosRdv = grupo.rdv
-    ? decodificarRdv(await extrair(grupo.rdv))
+    ? lerFonte('RDV', () => decodificarRdv(conteudoRdv), localizacaoErro)
         .filter((voto) => voto.cargo === 1 || voto.cargo === 3)
         .map((voto) => ({
           totalizacao_secao_id: secao.id,
@@ -201,7 +220,8 @@ async function inserirSecao(trx, grupo, extrair, destino) {
   }
 
   if (grupo.log) {
-    const eventos = parsearLogJez(await extrair(grupo.log));
+    const conteudoLog = await extrair(grupo.log);
+    const eventos = lerFonte('LOG', () => parsearLogJez(conteudoLog), localizacaoErro);
     await registrarEleitores(trx, secao.id, eventos);
     await registrarIncidentes(trx, secao.id, eventos);
     await registrarDivergencias(
@@ -220,6 +240,24 @@ async function inserirSecao(trx, grupo, extrair, destino) {
   });
 
   return { votosBu: votosBu.length, votosRdv: votosRdv.length };
+}
+
+async function retomarLote(db, existente, destino) {
+  return db
+    .updateTable('totalizacao_lote')
+    .set({
+      nome_arquivo: destino.nome_arquivo,
+      sg_uf: destino.sg_uf,
+      ano_eleicao: destino.ano_eleicao,
+      nr_turno: destino.nr_turno,
+      iniciado_em: new Date(),
+      concluido_em: null,
+      status: 'processando',
+      substituido_por: null,
+    })
+    .where('id', '=', existente.id)
+    .returning('id')
+    .executeTakeFirstOrThrow();
 }
 
 async function reiniciarLote(db, existente, destino, sha256) {
@@ -263,6 +301,7 @@ async function registrarSecaoErro(db, { loteId, sgUf, prefixo }, erro) {
     codigo: erro.codigo ?? CODIGO_INTERNO,
     mensagem: erro.message,
     registrado_em: new Date(),
+    ...(erro.localizacao ?? {}),
   };
 
   await db
@@ -319,7 +358,7 @@ async function carregarZipAberto(
   db,
   caminhoArquivo,
   { formato, zip },
-  { aoProgredir, registrarEvento = registrarEventoCarga, falharRapido = false } = {},
+  { aoProgredir, registrarEvento = registrarEventoCarga, falharRapido = false, retomar = false } = {},
 ) {
   const inicio = Date.now();
   const nomeArquivo = path.basename(caminhoArquivo);
@@ -349,7 +388,9 @@ async function carregarZipAberto(
 
   const destino = { ...origem, nome_arquivo: nomeArquivo };
   const lote = existente
-    ? await reiniciarLote(db, existente, destino, sha256)
+    ? retomar
+      ? await retomarLote(db, existente, destino)
+      : await reiniciarLote(db, existente, destino, sha256)
     : await db
         .insertInto('totalizacao_lote')
         .values({ ...destino, sha256, status: 'processando' })

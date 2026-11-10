@@ -6,11 +6,12 @@ import { registrarEventoCarga } from '../lib/log-carga.js';
 import { carregarZip } from '../modules/totalizacao/carga.js';
 
 function lerArgumentos(argv) {
-  const opcoes = { pasta: null, arquivo: null, falharRapido: false };
+  const opcoes = { pasta: null, arquivo: null, falharRapido: false, retomar: false };
   for (let indice = 0; indice < argv.length; indice += 1) {
     if (argv[indice] === '--pasta') opcoes.pasta = argv[indice + 1];
     else if (argv[indice] === '--arquivo') opcoes.arquivo = argv[indice + 1];
     else if (argv[indice] === '--falhar-rapido') opcoes.falharRapido = true;
+    else if (argv[indice] === '--retomar') opcoes.retomar = true;
   }
   return opcoes;
 }
@@ -28,7 +29,7 @@ async function main() {
     process.exit(1);
   }
 
-  const { pasta, arquivo, falharRapido } = lerArgumentos(process.argv.slice(2));
+  const { pasta, arquivo, falharRapido, retomar } = lerArgumentos(process.argv.slice(2));
   if (!pasta) {
     console.error(
       'uso: npm run totalizacao:carregar -- --pasta <diretório> [--arquivo <nome.zip|nome.7z>] [--falhar-rapido]',
@@ -68,6 +69,7 @@ async function main() {
       try {
         const resultado = await carregarZip(db, path.join(pasta, nome), {
           falharRapido,
+          retomar,
           aoProgredir: ({ etapa, atual, total }) => {
             if (etapa === 'secao' && (atual % 100 === 0 || atual === total)) {
               console.log(`${nome}: ${atual}/${total} seções (${segundos(inicio)}s)`);

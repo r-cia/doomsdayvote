@@ -576,7 +576,7 @@ describe('carga dos zips de totalização por UF', () => {
       secao: PREFIXO,
       prefixo: PREFIXO,
       erro_codigo: CODIGO_ERRO_BER.INVALIDO,
-      erro_mensagem: 'tipo de voto desconhecido: 9',
+      erro_mensagem: expect.stringMatching(/^fonte=RDV; offset=\d+; tipo de voto desconhecido: 9$/),
     });
     expect(eventos.some((evento) => evento.evento === 'lote_falhou')).toBe(false);
 
@@ -596,7 +596,10 @@ describe('carga dos zips de totalização por UF', () => {
       prefixo: PREFIXO,
       sg_uf: CENARIO.uf,
       codigo: CODIGO_ERRO_BER.INVALIDO,
-      mensagem: 'tipo de voto desconhecido: 9',
+      mensagem: expect.stringMatching(/^fonte=RDV; offset=\d+; tipo de voto desconhecido: 9$/),
+      cd_municipio_tse: CENARIO.municipio,
+      nr_zona: CENARIO.zona,
+      nr_secao: CENARIO.secao,
     });
     expect(await contar('totalizacao_secao', { coluna: 'lote_id', valor: resultado.lote_id })).toBe(0);
   }, 120000);
@@ -617,7 +620,7 @@ describe('carga dos zips de totalização por UF', () => {
       arquivo: NOME_ZIP,
       secao: PREFIXO,
       erro_codigo: CODIGO_ERRO_BER.INVALIDO,
-      erro_mensagem: 'tipo de voto desconhecido: 9',
+      erro_mensagem: expect.stringMatching(/^fonte=RDV; offset=\d+; tipo de voto desconhecido: 9$/),
       status: 'falhou',
     });
 
