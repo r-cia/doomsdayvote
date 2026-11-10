@@ -71,8 +71,14 @@ function lerGrupo(buffer, tlv, votos) {
   exigirSequencia(tlv, 'grupo de votos');
   const campos = filhos(buffer, tlv);
 
+  if (campos.some((item) => ehContexto(item, 2) && !item.construido)) return;
+
   const cargoTlv = campos.find((item) => ehContexto(item, 1) && !item.construido);
-  if (!cargoTlv) throw invalido(tlv.inicio, 'grupo sem cargo');
+  if (!cargoTlv) {
+    const lista = campos.find((item) => ehUniversal(item, TAG.SEQUENCE) && item.construido);
+    if (!lista || filhos(buffer, lista).length === 0) return;
+    throw invalido(tlv.inicio, 'grupo sem cargo');
+  }
   const cargo = lerInteiroImplicito(buffer, cargoTlv);
 
   const listaTlv = campos.find((item) => ehUniversal(item, TAG.SEQUENCE) && item.construido);

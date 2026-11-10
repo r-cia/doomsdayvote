@@ -353,15 +353,21 @@ export function gerarRdv({ votos = votosDoCenario(), dataHora = CENARIO.dataHora
     const votoBer = sequencia(...campos);
 
     const quantidade = voto.quantidade ?? 1;
-    const lista = porCargo.get(voto.cargo) ?? [];
+    const tag = voto.tag === undefined ? 1 : voto.tag;
+    const chave = `${tag}:${voto.cargo}`;
+    const grupo = porCargo.get(chave) ?? { tag, cargo: voto.cargo, lista: [] };
     for (let indice = 0; indice < quantidade; indice += 1) {
-      lista.push(votoBer);
+      grupo.lista.push(votoBer);
     }
-    porCargo.set(voto.cargo, lista);
+    porCargo.set(chave, grupo);
   }
 
-  const blocos = [...porCargo].map(([cargo, listaVotos]) =>
-    sequencia(sequencia(sequencia(contextoInteiro(1, cargo), sequencia(...listaVotos)))),
+  const blocos = [...porCargo.values()].map(({ tag, cargo, lista }) =>
+    sequencia(
+      sequencia(
+        sequencia(...(tag === null ? [] : [contextoInteiro(tag, cargo)]), sequencia(...lista)),
+      ),
+    ),
   );
 
   return sequencia(sequencia(texto(dataHora)), contextoConstruido(1, ...blocos));

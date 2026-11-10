@@ -123,6 +123,28 @@ function trocarTipo(origem, de, para) {
   return alterado;
 }
 
+describe('grupos de consulta livre do rdv.dat', () => {
+  const consulta = [
+    { cargo: 26, tag: 2, tipo: 1, numero: 1, quantidade: 58 },
+    { cargo: 26, tag: 2, tipo: 1, numero: 2, quantidade: 225 },
+  ];
+
+  it('descarta o grupo cont[2] e mantém os votos dos cargos', () => {
+    const comConsulta = gerarRdv({ votos: [...votosDoCenario(), ...consulta] });
+    expect(decodificarRdv(comConsulta)).toEqual(decodificarRdv(conteudo));
+  });
+
+  it('continua recusando grupo com votos sem cont[1] nem cont[2]', () => {
+    const semTag = gerarRdv({
+      votos: [...votosDoCenario(), { cargo: 9, tag: null, tipo: 1, numero: 1, quantidade: 1 }],
+    });
+    const erro = capturar(() => decodificarRdv(semTag));
+    expect(erro).toBeInstanceOf(BerError);
+    expect(erro.codigo).toBe(CODIGO_ERRO_BER.INVALIDO);
+    expect(erro.message).toBe('grupo sem cargo');
+  });
+});
+
 describe('tipo de voto 6 do rdv.dat', () => {
   const comSeis = trocarTipo(conteudo, 4, 6);
 
