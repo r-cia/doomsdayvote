@@ -73,7 +73,7 @@ async function main() {
         const resultado = await carregarZip(db, path.join(pasta, nome), {
           falharRapido,
           retomar,
-          concorrencia: Math.min(concorrencia, env.DB_POOL_MAX - 1),
+          concorrencia: Math.min(concorrencia, Math.max(1, env.DB_POOL_MAX - 2)),
           aoProgredir: ({ etapa, atual, total }) => {
             if (etapa === 'secao' && (atual % 100 === 0 || atual === total)) {
               console.log(`${nome}: ${atual}/${total} seções (${segundos(inicio)}s)`);

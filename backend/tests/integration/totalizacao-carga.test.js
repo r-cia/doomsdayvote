@@ -9,7 +9,11 @@ import { criarDb } from '../../src/db/index.js';
 import { agregarMetricas } from '../../src/modules/totalizacao/agregacao.js';
 import { CODIGO_ERRO_BER } from '../../src/modules/totalizacao/ber.js';
 import { decodificarBu } from '../../src/modules/totalizacao/bu.js';
-import { carregarZip } from '../../src/modules/totalizacao/carga.js';
+import {
+  carregarZip,
+  marcarLotesOrfaos,
+  travarUnidade,
+} from '../../src/modules/totalizacao/carga.js';
 import { votosDoBu } from '../../src/modules/totalizacao/conferencia-rdv.js';
 import { listarIntervencoes, registrarIntervencao } from '../../src/modules/totalizacao/intervencoes.js';
 import { CODIGO_ERRO_ZIP } from '../../src/modules/totalizacao/zip.js';
@@ -788,6 +792,38 @@ describe('carga dos zips de totalização por UF', () => {
       votos_bu: paralelo.votos_bu,
       votos_rdv: paralelo.votos_rdv,
     });
+  }, 120000);
+
+  it('recusa a carga da unidade já travada e marca como falhou o lote órfão em processando', async () => {
+    const caminho = await escreverZip('trava', [[`${PREFIXO}-bu.dat`, gerarBu()]]);
+    const origem = { sg_uf: CENARIO.uf, ano_eleicao: CENARIO.ano, nr_turno: CENARIO.turno };
+
+    const liberar = await travarUnidade(db, origem);
+    expect(await travarUnidade(db, origem)).toBeNull();
+    await expect(carregarZip(db, caminho)).rejects.toMatchObject({ codigo: 'CARGA_EM_ANDAMENTO' });
+    await liberar();
+
+    const orfao = await db
+      .insertInto('totalizacao_lote')
+      .values({
+        nome_arquivo: 'orfao-AC.zip',
+        ...origem,
+        sha256: 'f'.repeat(64),
+        status: 'processando',
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+    expect(await marcarLotesOrfaos(db, origem)).toBe(1);
+    const lote = await db
+      .selectFrom('totalizacao_lote')
+      .select('status')
+      .where('id', '=', orfao.id)
+      .executeTakeFirstOrThrow();
+    expect(lote.status).toBe('falhou');
+    await db.deleteFrom('totalizacao_lote').where('id', '=', orfao.id).execute();
+
+    const resultado = await carregarZip(db, caminho);
+    expect(resultado.status).toBe('concluido');
   }, 120000);
 
   it('registra a janela do turno quando o log traz eventos de outro turno e a janela não identificada quando não coincide', async () => {

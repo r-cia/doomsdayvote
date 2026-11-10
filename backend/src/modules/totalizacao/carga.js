@@ -400,7 +400,67 @@ export async function carregarZip(db, caminhoArquivo, opcoes = {}) {
   }
 }
 
-async function carregarZipAberto(
+export async function travarUnidade(db, origem) {
+  const cliente = await db.pool.connect();
+  const chaveTurno = origem.ano_eleicao * 10 + origem.nr_turno;
+  const chaveUf = origem.sg_uf.charCodeAt(0) * 256 + origem.sg_uf.charCodeAt(1);
+
+  try {
+    const { rows } = await cliente.query('select pg_try_advisory_lock($1, $2) as obtido', [
+      chaveTurno,
+      chaveUf,
+    ]);
+    if (!rows[0].obtido) {
+      cliente.release();
+      return null;
+    }
+  } catch (erro) {
+    cliente.release();
+    throw erro;
+  }
+
+  return async () => {
+    try {
+      await cliente.query('select pg_advisory_unlock($1, $2)', [chaveTurno, chaveUf]);
+    } finally {
+      cliente.release();
+    }
+  };
+}
+
+export async function marcarLotesOrfaos(db, origem) {
+  const marcados = await db
+    .updateTable('totalizacao_lote')
+    .set({ status: 'falhou' })
+    .where('sg_uf', '=', origem.sg_uf)
+    .where('ano_eleicao', '=', origem.ano_eleicao)
+    .where('nr_turno', '=', origem.nr_turno)
+    .where('status', '=', 'processando')
+    .returning('id')
+    .execute();
+  return marcados.length;
+}
+
+async function carregarZipAberto(db, caminhoArquivo, formatoZip, opcoes = {}) {
+  const origem = derivarOrigem(path.basename(caminhoArquivo));
+  const liberar = await travarUnidade(db, origem);
+  if (!liberar) {
+    const erro = new Error(
+      `carga em andamento para ${origem.sg_uf} ${origem.ano_eleicao} ${origem.nr_turno}t`,
+    );
+    erro.codigo = 'CARGA_EM_ANDAMENTO';
+    throw erro;
+  }
+
+  try {
+    await marcarLotesOrfaos(db, origem);
+    return await carregarZipTravado(db, caminhoArquivo, formatoZip, opcoes);
+  } finally {
+    await liberar();
+  }
+}
+
+async function carregarZipTravado(
   db,
   caminhoArquivo,
   { formato, zip },
