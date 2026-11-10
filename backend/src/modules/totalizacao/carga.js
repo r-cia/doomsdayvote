@@ -12,7 +12,7 @@ import { conferirBuRdv, votosDoBu } from './conferencia-rdv.js';
 import { registrarDivergencias } from './divergencias.js';
 import { decodificarRdv } from './rdv.js';
 import { parsearLogJez } from './log.js';
-import { registrarEleitores, registrarIncidentes } from './metricas.js';
+import { contarSemPar, registrarEleitores, registrarIncidentes } from './metricas.js';
 import {
   abrirZipArquivo,
   detectarFormatoArquivo,
@@ -249,6 +249,18 @@ async function inserirSecao(trx, grupo, extrair, destino) {
         fonte: 'LOG',
         posicao: `${janela.abertura} a ${janela.encerramento}`,
         ...descricaoDaJanela(janela, todosEventos.length),
+      });
+    }
+    const semPar = contarSemPar(eventos);
+    if (semPar.habilitacoesSemVoto > 0 || semPar.votosSemHabilitacao > 0) {
+      await registrarIntervencao(trx, {
+        loteId: destino.lote_id,
+        prefixo: destino.prefixo,
+        fonte: 'LOG',
+        tipo: 'ELEITOR_SEM_PAR',
+        descricao:
+          'Habilitações sem voto computado e votos computados sem habilitação não entram nas métricas por eleitor.',
+        impacto: `${semPar.habilitacoesSemVoto} habilitações sem voto; ${semPar.votosSemHabilitacao} votos sem habilitação.`,
       });
     }
     await registrarEleitores(trx, secao.id, eventos);

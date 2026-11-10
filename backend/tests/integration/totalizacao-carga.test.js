@@ -796,6 +796,28 @@ describe('carga dos zips de totalização por UF', () => {
       .execute();
     expect(divergencias).toEqual([]);
 
+    const comOrfaos = await escreverZip('sem-par', [
+      [`${PREFIXO}-bu.dat`, gerarBu()],
+      [
+        `${PREFIXO}-log.jez`,
+        gerarLogJez({
+          eventos: [
+            ...eventosDoCenario().slice(0, -1),
+            { instante: '2026-10-04T16:59:00', texto: 'Eleitor foi habilitado' },
+            ...eventosDoCenario().slice(-1),
+          ],
+        }),
+      ],
+    ]);
+    const orfaos = await carregarZip(db, comOrfaos);
+    expect(await listarIntervencoes(db, orfaos.lote_id)).toMatchObject([
+      {
+        tipo: 'ELEITOR_SEM_PAR',
+        fonte: 'LOG',
+        impacto: '1 habilitações sem voto; 0 votos sem habilitação.',
+      },
+    ]);
+
     const semCoincidencia = await escreverZip('janela-nao-identificada', [
       [`${PREFIXO}-bu.dat`, gerarBu({ abertura: '20261004T070002' })],
       [`${PREFIXO}-log.jez`, gerarLogJez()],

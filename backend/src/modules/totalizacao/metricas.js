@@ -70,6 +70,22 @@ export function parearEleitores(eventos) {
   return pares;
 }
 
+export function contarSemPar(eventos) {
+  let habilitacoesSemVoto = 0;
+  let votosSemHabilitacao = 0;
+
+  for (const janela of janelasDaSessao(eventos)) {
+    const habilitados = janela.filter(
+      (evento) => evento.tipo === TIPO_EVENTO.ELEITOR_HABILITADO,
+    ).length;
+    const computados = janela.filter((evento) => evento.tipo === TIPO_EVENTO.VOTO_COMPUTADO).length;
+    habilitacoesSemVoto += Math.max(0, habilitados - computados);
+    votosSemHabilitacao += Math.max(0, computados - habilitados);
+  }
+
+  return { habilitacoesSemVoto, votosSemHabilitacao };
+}
+
 export function tempoDeVoto(eventos) {
   const duracoes = parearEleitores(eventos)
     .map((eleitor) => eleitor.duracaoMs)

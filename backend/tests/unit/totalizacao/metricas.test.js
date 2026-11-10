@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { parsearLogJez } from '../../../src/modules/totalizacao/log.js';
+import { parsearLogJez, TIPO_EVENTO } from '../../../src/modules/totalizacao/log.js';
 import {
   biometriaPorFaixa,
+  contarSemPar,
   incidentesDaSessao,
   parearEleitores,
   tempoDeVoto,
@@ -24,6 +25,17 @@ describe('métricas da sessão de votação', () => {
       expect(Number.isInteger(eleitor.qt_teclas_indevidas)).toBe(true);
       expect([1, 2, 3]).toContain(eleitor.tp_habilitacao);
     }
+  });
+
+  it('conta habilitações sem voto e votos sem habilitação', () => {
+    expect(contarSemPar(eventos)).toEqual({ habilitacoesSemVoto: 0, votosSemHabilitacao: 0 });
+
+    const comOrfaos = [
+      { tipo: TIPO_EVENTO.VOTO_COMPUTADO, instante: '2026-10-04T07:00:05' },
+      ...eventos,
+      { tipo: TIPO_EVENTO.ELEITOR_HABILITADO, instante: '2026-10-04T16:59:00' },
+    ];
+    expect(contarSemPar(comOrfaos)).toEqual({ habilitacoesSemVoto: 1, votosSemHabilitacao: 1 });
   });
 
   it('resume o tempo de voto dos três eleitores', () => {
