@@ -32,7 +32,6 @@ const SUFIXOS = Object.freeze([
   ['.rdv', 'rdv'],
   ['.logjez', 'log'],
 ]);
-const CODIGO_SEM_BU = 'SEM_BU';
 const CODIGO_INTERNO = 'ERRO_INTERNO';
 
 let municipios;
