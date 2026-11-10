@@ -29,11 +29,23 @@ export async function secoesCompactas(db, { eleicaoId, cargo, corte = { tipo: 'f
   const onde = sql.join(filtros, sql` and `);
   const ordem = sql`order by m.cd_tipo_votavel, m.nr_votavel`;
 
+  const { rows: dicionario } = await sql`
+    select m.nm_votavel, m.sg_partido
+    from mv_secao_candidato_final m
+    where ${onde}
+    group by m.nm_votavel, m.sg_partido
+    order by m.nm_votavel nulls first, m.sg_partido nulls first
+  `.execute(db);
+
+  if (dicionario.length === 0) return { secoes: [], votaveis: [] };
+
+  const valoresDic = sql.join(
+    dicionario.map(
+      (votavel, ref) => sql`(${votavel.nm_votavel}::text, ${votavel.sg_partido}::text, ${ref}::int)`,
+    ),
+  );
+
   const { rows } = await sql`
-    with dic as (
-      select nm_votavel, sg_partido, (row_number() over (order by nm_votavel nulls first, sg_partido nulls first) - 1)::int as ref
-      from (select distinct m.nm_votavel, m.sg_partido from mv_secao_candidato_final m where ${onde}) distintos
-    )
     select
       m.secao_id,
       max(m.sg_uf) as sg_uf,
@@ -56,16 +68,11 @@ export async function secoesCompactas(db, { eleicaoId, cargo, corte = { tipo: 'f
       array_agg(m.votos ${ordem})::int[] as votos,
       array_agg(d.ref ${ordem})::int[] as refs
     from mv_secao_candidato_final m
-    join dic d on m.nm_votavel is not distinct from d.nm_votavel and m.sg_partido is not distinct from d.sg_partido
+    join (values ${valoresDic}) as d(nm_votavel, sg_partido, ref)
+      on m.nm_votavel is not distinct from d.nm_votavel and m.sg_partido is not distinct from d.sg_partido
     where ${onde}
     group by m.secao_id
     order by m.secao_id
-  `.execute(db);
-
-  const { rows: dicionario } = await sql`
-    select nm_votavel, sg_partido
-    from (select distinct m.nm_votavel, m.sg_partido from mv_secao_candidato_final m where ${onde}) distintos
-    order by nm_votavel nulls first, sg_partido nulls first
   `.execute(db);
 
   return { secoes: rows, votaveis: dicionario };
