@@ -509,8 +509,9 @@ export function eventosDoCenario() {
   return eventos;
 }
 
-export function gerarLogJez({ eventos = eventosDoCenario() } = {}) {
-  const linhas = eventos.map((evento) => {
+export function gerarLogJez({ eventos = eventosDoCenario(), corromper = [] } = {}) {
+  const linhas = eventos.map((evento, indice) => {
+    if (corromper.includes(indice)) return '04-10/0006 08:11840\tINDO\t01740981\tTOTA\tVmtm aolfirmado';
     const {
       instante,
       nivel = 'INFO',

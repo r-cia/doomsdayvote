@@ -69,6 +69,19 @@ describe('parser do log.jez', () => {
     expect(desconhecido.textoOriginal).toBe(CENARIO.incidente.texto);
   });
 
+  it('recusa o log corrompido com um único erro de contagem e linhas, sem o texto ilegível', () => {
+    let erro;
+    try {
+      parsearLogJez(gerarLogJez({ corromper: [1, 4] }));
+    } catch (falha) {
+      erro = falha;
+    }
+
+    expect(erro).toBeInstanceOf(Error);
+    expect(erro.message).toBe('log corrompido na origem: 2 linhas ilegíveis (linhas 2, 5)');
+    expect(erro.message).not.toContain('Vmtm');
+  });
+
   it('classifica o nível de cada evento', () => {
     const alertas = eventos.filter((evento) => evento.nivel !== 'INFO');
     expect(alertas).toHaveLength(1);

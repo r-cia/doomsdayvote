@@ -96,9 +96,25 @@ function criarEvento(linha) {
 }
 
 export function parsearLogJez(conteudo) {
-  return extrairLogd(conteudo)
+  const eventos = [];
+  const ilegiveis = [];
+
+  extrairLogd(conteudo)
     .toString('latin1')
     .split('\n')
-    .filter((linha) => linha.trim() !== '')
-    .map((linha) => criarEvento(linha.replace(/\r$/, '')));
+    .forEach((linha, indice) => {
+      if (linha.trim() === '') return;
+      try {
+        eventos.push(criarEvento(linha.replace(/\r$/, '')));
+      } catch {
+        ilegiveis.push(indice + 1);
+      }
+    });
+
+  if (ilegiveis.length > 0) {
+    throw new Error(
+      `log corrompido na origem: ${ilegiveis.length} linhas ilegíveis (linhas ${ilegiveis.join(', ')})`,
+    );
+  }
+  return eventos;
 }
