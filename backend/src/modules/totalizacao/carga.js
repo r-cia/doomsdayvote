@@ -6,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { registrarEventoCarga } from '../../lib/log-carga.js';
 import { decodificarBu } from './bu.js';
 import { conferirBuBweb } from './conferencia-bweb.js';
-import { conferirBuLog } from './conferencia-log.js';
+import { conferirBuLog, janelaDoBu } from './conferencia-log.js';
+import { registrarIntervencao } from './intervencoes.js';
 import { conferirBuRdv, votosDoBu } from './conferencia-rdv.js';
 import { registrarDivergencias } from './divergencias.js';
 import { decodificarRdv } from './rdv.js';
@@ -135,6 +136,23 @@ async function* gruposDoArquivo({ formato, caminhoArquivo, entradas }) {
   }
 }
 
+function descricaoDaJanela(janela, totalEventos) {
+  if (!janela.identificada) {
+    return {
+      tipo: 'JANELA_NAO_IDENTIFICADA',
+      descricao:
+        'O log não tem URNA_PRONTA e ENCERRAMENTO nos horários de abertura e encerramento do BU; nenhum evento foi filtrado.',
+      impacto: `${totalEventos} eventos do log usados sem filtro.`,
+    };
+  }
+  return {
+    tipo: 'JANELA_TURNO',
+    descricao:
+      'Eventos do log fora do intervalo entre a abertura e o encerramento do BU foram excluídos de eleitores, incidentes e conferência.',
+    impacto: `${janela.fora} de ${totalEventos} eventos excluídos (${janela.votosFora} votos computados), de ${janela.primeiroFora} a ${janela.ultimoFora}.`,
+  };
+}
+
 async function inserirSecao(trx, grupo, extrair, destino) {
   const conteudoBu = await extrair(grupo.bu);
   const bu = lerFonte('BU', () => decodificarBu(conteudoBu));
@@ -221,7 +239,18 @@ async function inserirSecao(trx, grupo, extrair, destino) {
 
   if (grupo.log) {
     const conteudoLog = await extrair(grupo.log);
-    const eventos = lerFonte('LOG', () => parsearLogJez(conteudoLog), localizacaoErro);
+    const todosEventos = lerFonte('LOG', () => parsearLogJez(conteudoLog), localizacaoErro);
+    const janela = janelaDoBu(todosEventos, bu);
+    const eventos = janela.eventos;
+    if (!janela.identificada || janela.fora > 0) {
+      await registrarIntervencao(trx, {
+        loteId: destino.lote_id,
+        prefixo: destino.prefixo,
+        fonte: 'LOG',
+        posicao: `${janela.abertura} a ${janela.encerramento}`,
+        ...descricaoDaJanela(janela, todosEventos.length),
+      });
+    }
     await registrarEleitores(trx, secao.id, eventos);
     await registrarIncidentes(trx, secao.id, eventos);
     await registrarDivergencias(

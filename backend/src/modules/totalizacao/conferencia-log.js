@@ -17,6 +17,41 @@ function primeiroInstante(eventos, tipo) {
   return eventos.find((evento) => evento.tipo === tipo)?.instante ?? 'ausente';
 }
 
+export function janelaDoBu(eventos, bu) {
+  const abertura = instanteBu(bu.abertura);
+  const encerramento = instanteBu(bu.encerramento);
+  const inicio = eventos.findIndex(
+    (evento) => evento.tipo === TIPO_EVENTO.URNA_PRONTA && evento.instante === abertura,
+  );
+  const fim =
+    inicio < 0
+      ? -1
+      : eventos.findIndex(
+          (evento, indice) =>
+            indice > inicio &&
+            evento.tipo === TIPO_EVENTO.ENCERRAMENTO &&
+            evento.instante === encerramento,
+        );
+
+  if (fim < 0) {
+    return { eventos, identificada: false, abertura, encerramento, fora: 0, votosFora: 0 };
+  }
+
+  const dentro = eventos.slice(inicio, fim + 1);
+  const fora = [...eventos.slice(0, inicio), ...eventos.slice(fim + 1)];
+  const instantes = fora.map((evento) => evento.instante).sort();
+  return {
+    eventos: dentro,
+    identificada: true,
+    abertura,
+    encerramento,
+    fora: fora.length,
+    votosFora: contar(fora, TIPO_EVENTO.VOTO_COMPUTADO),
+    primeiroFora: instantes[0] ?? null,
+    ultimoFora: instantes[instantes.length - 1] ?? null,
+  };
+}
+
 export function conferirBuLog({ bu, eventos, sgUf, cdMunicipioTse, nrZona, nrSecao }) {
   const comparacoes = [
     {

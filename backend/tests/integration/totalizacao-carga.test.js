@@ -15,6 +15,7 @@ import { listarIntervencoes, registrarIntervencao } from '../../src/modules/tota
 import { CODIGO_ERRO_ZIP } from '../../src/modules/totalizacao/zip.js';
 import {
   CENARIO,
+  eventosDoCenario,
   gerarBu,
   gerarLogJez,
   gerarRdv,
@@ -754,6 +755,55 @@ describe('carga dos zips de totalização por UF', () => {
       sgUf: CENARIO.uf,
     });
     expect(agregado.complementares).toMatchObject({ secoes: 1, aptos: CENARIO.aptos });
+  }, 120000);
+
+  it('registra a janela do turno quando o log traz eventos de outro turno e a janela não identificada quando não coincide', async () => {
+    const turnoAnterior = [
+      { instante: '2026-09-27T07:00:01', modulo: 'URNA', texto: 'Urna pronta para receber votos' },
+      { instante: '2026-09-27T07:00:10', texto: 'Eleitor foi habilitado' },
+      { instante: '2026-09-27T07:00:40', texto: 'O voto do eleitor foi computado' },
+      { instante: '2026-09-27T16:59:00', texto: 'Eleitor foi habilitado' },
+    ];
+    const caminho = await escreverZip('janela', [
+      [`${PREFIXO}-bu.dat`, gerarBu()],
+      [`${PREFIXO}-log.jez`, gerarLogJez({ eventos: [...turnoAnterior, ...eventosDoCenario()] })],
+    ]);
+
+    const resultado = await carregarZip(db, caminho);
+    expect(resultado.status).toBe('concluido');
+    expect(await listarIntervencoes(db, resultado.lote_id)).toMatchObject([
+      {
+        prefixo: PREFIXO,
+        fonte: 'LOG',
+        tipo: 'JANELA_TURNO',
+        posicao: '2026-10-04T07:00:01 a 2026-10-04T17:00:00',
+        impacto: '4 de 21 eventos excluídos (1 votos computados), de 2026-09-27T07:00:01 a 2026-09-27T16:59:00.',
+      },
+    ]);
+    const secao = await db
+      .selectFrom('totalizacao_secao')
+      .select('id')
+      .where('lote_id', '=', resultado.lote_id)
+      .executeTakeFirstOrThrow();
+    expect(await contar('totalizacao_eleitor', { coluna: 'totalizacao_secao_id', valor: secao.id })).toBe(
+      CENARIO.comparecimento,
+    );
+    const divergencias = await db
+      .selectFrom('totalizacao_divergencia')
+      .select('campo')
+      .where('lote_id', '=', resultado.lote_id)
+      .where('fonte', '=', 'log')
+      .execute();
+    expect(divergencias).toEqual([]);
+
+    const semCoincidencia = await escreverZip('janela-nao-identificada', [
+      [`${PREFIXO}-bu.dat`, gerarBu({ abertura: '20261004T070002' })],
+      [`${PREFIXO}-log.jez`, gerarLogJez()],
+    ]);
+    const outro = await carregarZip(db, semCoincidencia);
+    expect(await listarIntervencoes(db, outro.lote_id)).toMatchObject([
+      { tipo: 'JANELA_NAO_IDENTIFICADA', fonte: 'LOG', impacto: '17 eventos do log usados sem filtro.' },
+    ]);
   }, 120000);
 
   it('registra a intervenção por ponteiro e contagem e reverte junto com a transação', async () => {
