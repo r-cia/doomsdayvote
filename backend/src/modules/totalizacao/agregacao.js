@@ -8,11 +8,11 @@ const FILTROS_OPCIONAIS = Object.freeze([
   ['nrSecao', 'nr_secao'],
 ]);
 
-function filtroDoRecorte(recorte, alias) {
+function filtroDoRecorte(recorte, alias, lotes) {
   const condicoes = [
     sql`${sql.ref(`${alias}.ano_eleicao`)} = ${recorte.anoEleicao}`,
     sql`${sql.ref(`${alias}.nr_turno`)} = ${recorte.nrTurno}`,
-    filtroLoteVigente(recorte, alias),
+    filtroLotes(lotes, alias),
   ];
 
   for (const [chave, coluna] of FILTROS_OPCIONAIS) {
@@ -25,35 +25,50 @@ function filtroDoRecorte(recorte, alias) {
   return sql.join(condicoes, sql` and `);
 }
 
-export function filtroLoteVigente(recorte, alias) {
-  const lote = sql.ref(`${alias}.lote_id`);
+const STATUS_VIGENTES = ['concluido', 'parcial'];
+
+export async function lotesVigentes(db, recorte) {
+  let consulta = db
+    .selectFrom('totalizacao_lote as l')
+    .select('l.id')
+    .where('l.status', 'in', STATUS_VIGENTES)
+    .where('l.ano_eleicao', '=', recorte.anoEleicao)
+    .where('l.nr_turno', '=', recorte.nrTurno);
+
+  if (recorte.sgUf) consulta = consulta.where('l.sg_uf', '=', recorte.sgUf);
 
   if (recorte.loteId !== undefined && recorte.loteId !== null) {
-    return sql`exists (
-      select 1 from totalizacao_lote l
-      where l.id = ${lote} and l.status in ('concluido', 'parcial')
-    )`;
+    consulta = consulta.where('l.id', '=', recorte.loteId);
+  } else {
+    consulta = consulta.where(({ not, exists, selectFrom }) =>
+      not(
+        exists(
+          selectFrom('totalizacao_lote as n')
+            .select('n.id')
+            .whereRef('n.sg_uf', '=', 'l.sg_uf')
+            .whereRef('n.ano_eleicao', '=', 'l.ano_eleicao')
+            .whereRef('n.nr_turno', '=', 'l.nr_turno')
+            .where('n.status', 'in', STATUS_VIGENTES)
+            .whereRef('n.iniciado_em', '>', 'l.iniciado_em'),
+        ),
+      ),
+    );
   }
 
-  return sql`exists (
-    select 1 from totalizacao_lote l
-    where l.id = ${lote}
-      and l.status in ('concluido', 'parcial')
-      and not exists (
-        select 1 from totalizacao_lote n
-        where n.sg_uf = l.sg_uf
-          and n.ano_eleicao = l.ano_eleicao
-          and n.nr_turno = l.nr_turno
-          and n.status in ('concluido', 'parcial')
-          and n.iniciado_em > l.iniciado_em
-      )
-  )`;
+  return (await consulta.execute()).map((lote) => lote.id);
+}
+
+export function filtroLotes(lotes, alias) {
+  if (lotes.length === 0) return sql`false`;
+  return sql`${sql.ref(`${alias}.lote_id`)} in (${sql.join(lotes)})`;
 }
 
 export async function agregarMetricas(db, recorte) {
   if (recorte?.anoEleicao === undefined || recorte?.nrTurno === undefined) {
     throw new Error('recorte exige anoEleicao e nrTurno');
   }
+
+  const lotes = await lotesVigentes(db, recorte);
 
   const [tempoBiometria, incidentes, complementares] = await Promise.all([
     sql`
@@ -70,13 +85,13 @@ export async function agregarMetricas(db, recorte) {
         (count(*) filter (where e.tp_habilitacao = 3))::int as manual
       from totalizacao_eleitor e
       join totalizacao_secao s on s.id = e.totalizacao_secao_id
-      where ${filtroDoRecorte(recorte, 's')}
+      where ${filtroDoRecorte(recorte, 's', lotes)}
     `.execute(db),
     sql`
       select count(*)::int as total
       from totalizacao_incidente i
       join totalizacao_secao s on s.id = i.totalizacao_secao_id
-      where ${filtroDoRecorte(recorte, 's')}
+      where ${filtroDoRecorte(recorte, 's', lotes)}
     `.execute(db),
     sql`
       select
@@ -93,7 +108,7 @@ export async function agregarMetricas(db, recorte) {
         from totalizacao_eleitor e
         where e.totalizacao_secao_id = s.id
       ) eleitor on true
-      where ${filtroDoRecorte(recorte, 's')}
+      where ${filtroDoRecorte(recorte, 's', lotes)}
     `.execute(db),
   ]);
 

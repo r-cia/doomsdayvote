@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { agregarMetricas, filtroLoteVigente } from '../modules/totalizacao/agregacao.js';
+import { agregarMetricas, filtroLotes, lotesVigentes } from '../modules/totalizacao/agregacao.js';
 import { TTL_CACHE_ESTATICO, tamanhoPagina } from './comum.js';
 
 const recorteSchema = z.object({
@@ -52,26 +52,19 @@ function aplicarLocalidade(consulta, recorte, alias) {
   return filtrada;
 }
 
-function baseIncidentes(db, recorte) {
-  let consulta = db
+function baseIncidentes(db, recorte, lotes) {
+  const consulta = db
     .selectFrom('totalizacao_incidente as i')
     .innerJoin('totalizacao_secao as s', 's.id', 'i.totalizacao_secao_id')
     .where('s.ano_eleicao', '=', recorte.anoEleicao)
     .where('s.nr_turno', '=', recorte.nrTurno);
 
-  if (recorte.loteId !== undefined) consulta = consulta.where('s.lote_id', '=', recorte.loteId);
-  return aplicarLocalidade(consulta, recorte, 's').where(filtroLoteVigente(recorte, 's'));
+  return aplicarLocalidade(consulta, recorte, 's').where(filtroLotes(lotes, 's'));
 }
 
-function baseDivergencias(db, recorte) {
-  let consulta = db
-    .selectFrom('totalizacao_divergencia as d')
-    .innerJoin('totalizacao_lote as l', 'l.id', 'd.lote_id')
-    .where('l.ano_eleicao', '=', recorte.anoEleicao)
-    .where('l.nr_turno', '=', recorte.nrTurno);
-
-  if (recorte.loteId !== undefined) consulta = consulta.where('d.lote_id', '=', recorte.loteId);
-  return aplicarLocalidade(consulta, recorte, 'd').where(filtroLoteVigente(recorte, 'd'));
+function baseDivergencias(db, recorte, lotes) {
+  const consulta = db.selectFrom('totalizacao_divergencia as d');
+  return aplicarLocalidade(consulta, recorte, 'd').where(filtroLotes(lotes, 'd'));
 }
 
 export function registrarTotalizacao({ app, db, cacheado }) {
@@ -87,9 +80,10 @@ export function registrarTotalizacao({ app, db, cacheado }) {
     cacheado('totalizacao-incidentes', 60, incidentesSchema, async (query) => {
       const tamanho = tamanhoPagina(app, { page_size: query.tamanho });
       const recorte = recorteDe(query);
+      const lotes = await lotesVigentes(db, recorte);
 
       const [itens, total] = await Promise.all([
-        baseIncidentes(db, recorte)
+        baseIncidentes(db, recorte, lotes)
           .select([
             'i.dt_incidente as instante',
             'i.nivel',
@@ -105,7 +99,7 @@ export function registrarTotalizacao({ app, db, cacheado }) {
           .limit(tamanho)
           .offset((query.pagina - 1) * tamanho)
           .execute(),
-        baseIncidentes(db, recorte)
+        baseIncidentes(db, recorte, lotes)
           .select((eb) => eb.fn.countAll().as('total'))
           .executeTakeFirst(),
       ]);
@@ -119,11 +113,12 @@ export function registrarTotalizacao({ app, db, cacheado }) {
     cacheado('totalizacao-divergencias', 60, divergenciasSchema, async (query) => {
       const tamanho = tamanhoPagina(app, { page_size: query.tamanho });
       const recorte = recorteDe(query);
+      const lotes = await lotesVigentes(db, recorte);
       const comFonte = (consulta) =>
         query.fonte === undefined ? consulta : consulta.where('d.fonte', '=', query.fonte);
 
       const [itens, total] = await Promise.all([
-        comFonte(baseDivergencias(db, recorte))
+        comFonte(baseDivergencias(db, recorte, lotes))
           .selectAll('d')
           .orderBy('d.sg_uf')
           .orderBy('d.cd_municipio_tse')
@@ -135,7 +130,7 @@ export function registrarTotalizacao({ app, db, cacheado }) {
           .limit(tamanho)
           .offset((query.pagina - 1) * tamanho)
           .execute(),
-        comFonte(baseDivergencias(db, recorte))
+        comFonte(baseDivergencias(db, recorte, lotes))
           .select((eb) => eb.fn.countAll().as('total'))
           .executeTakeFirst(),
       ]);
