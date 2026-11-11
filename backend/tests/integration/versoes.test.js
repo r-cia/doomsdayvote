@@ -73,4 +73,105 @@ describe('versões de BU', () => {
     expect(v).toHaveProperty('lote');
     expect(v).toHaveProperty('conteudo_sha256');
   });
+
+  it('aplica o corte ao boletim, aos resultados e às versões', async () => {
+    const anterior = await db
+      .selectFrom('boletim_versao as bv')
+      .selectAll('bv')
+      .where('bv.ativo', '=', true)
+      .orderBy('bv.secao_id')
+      .executeTakeFirstOrThrow();
+
+    await db
+      .updateTable('boletim_versao')
+      .set({
+        dt_bu_recebido_ts: new Date('2026-01-01T10:00:00Z'),
+        dt_bu_recebido_data: null,
+        precisao_dt_bu_recebido: 'DATA_HORA',
+      })
+      .where('id', '=', anterior.id)
+      .execute();
+
+    await db
+      .updateTable('boletim_versao')
+      .set({ ativo: false })
+      .where('id', '=', anterior.id)
+      .execute();
+
+    const { id: _id, ...campos } = anterior;
+    const atual = await db
+      .insertInto('boletim_versao')
+      .values({
+        ...campos,
+        versao: anterior.versao + 1,
+        ativo: true,
+        substitui_versao_id: anterior.id,
+        conteudo_sha256: 'e'.repeat(64),
+        dt_bu_recebido_ts: new Date('2026-01-01T12:00:00Z'),
+        dt_bu_recebido_data: null,
+        precisao_dt_bu_recebido: 'DATA_HORA',
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+
+    const resultados = await db
+      .selectFrom('resultado_votavel')
+      .selectAll()
+      .where('boletim_versao_id', '=', anterior.id)
+      .execute();
+    expect(resultados.length).toBeGreaterThan(0);
+    await db
+      .insertInto('resultado_votavel')
+      .values(
+        resultados.map(({ id: _resultadoId, ...resultado }) => ({
+          ...resultado,
+          boletim_versao_id: atual.id,
+        })),
+      )
+      .execute();
+
+    const base = `election_id=${eleicao}&cargo=${cargo}`;
+    const antes = await app.inject({
+      method: 'GET',
+      url: `/api/sections/${anterior.secao_id}?${base}&as_of=2026-01-01T11:00:00Z`,
+    });
+    expect(antes.statusCode).toBe(200);
+    const corpoAntes = antes.json();
+    expect(corpoAntes.status.status).toBe('sem_bu');
+    expect(corpoAntes.boletim).toBeNull();
+    expect(corpoAntes.resultados).toEqual([]);
+    expect(corpoAntes.versoes_anteriores).toBe(0);
+
+    const depois = await app.inject({
+      method: 'GET',
+      url: `/api/sections/${anterior.secao_id}?${base}&as_of=2026-01-01T13:00:00Z`,
+    });
+    expect(depois.statusCode).toBe(200);
+    const corpoDepois = depois.json();
+    expect(corpoDepois.status.status).toBe('bu_recebido');
+    expect(corpoDepois.boletim.id).toBe(atual.id);
+    expect(corpoDepois.resultados.length).toBe(resultados.length);
+
+    const versoesAntes = await app.inject({
+      method: 'GET',
+      url: `/api/sections/${anterior.secao_id}/versions?${base}&as_of=2026-01-01T11:00:00Z`,
+    });
+    expect(versoesAntes.statusCode).toBe(200);
+    const corpoVersoesAntes = versoesAntes.json();
+    expect(corpoVersoesAntes.versoes).toHaveLength(1);
+    expect(corpoVersoesAntes.versoes[0].id).toBe(anterior.id);
+    expect(corpoVersoesAntes.comparacao).toBeNull();
+
+    const versoesDepois = await app.inject({
+      method: 'GET',
+      url: `/api/sections/${anterior.secao_id}/versions?${base}&as_of=2026-01-01T13:00:00Z`,
+    });
+    expect(versoesDepois.statusCode).toBe(200);
+    const corpoVersoesDepois = versoesDepois.json();
+    expect(corpoVersoesDepois.versoes).toHaveLength(2);
+    expect(corpoVersoesDepois.comparacao).toMatchObject({
+      anterior: anterior.versao,
+      atual: anterior.versao + 1,
+    });
+  });
 });

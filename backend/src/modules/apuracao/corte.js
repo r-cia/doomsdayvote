@@ -68,30 +68,7 @@ export function aplicarEscopo(qb, escopo = {}) {
   return consulta;
 }
 
-export function aplicarFiltroCorte(qb, corte) {
-  let consulta = qb
-    .where('bv.ativo', '=', true)
-    .where('bv.cd_tipo_urna', '=', 1)
-    .where(CARGO_EM_ESCOPO);
-
-  if (corte.tipo === 'recebimento_intradiario') {
-    consulta = consulta
-      .where('bv.precisao_dt_bu_recebido', '=', 'DATA_HORA')
-      .where('bv.dt_bu_recebido_ts', '<=', corte.instante);
-  }
-
-  if (corte.tipo === 'recebimento_diario') {
-    consulta = consulta.where(sql`(
-      (bv.precisao_dt_bu_recebido = 'DATA_HORA' AND (bv.dt_bu_recebido_ts AT TIME ZONE ${FUSO_EXIBICAO})::date <= ${corte.data})
-      OR (bv.precisao_dt_bu_recebido = 'DATA' AND bv.dt_bu_recebido_data <= ${corte.data})
-    )`);
-  }
-
-  return consulta;
-}
-
-// Mesma regra de aplicarFiltroCorte, sobre as colunas de mv_secao_candidato_final (que já traz ativo, urna 1 e cargo).
-export function condicaoCorteMv(corte, alias = null) {
+export function condicaoRecebimentoCorte(corte, alias = 'bv') {
   const coluna = (nome) => sql.ref(alias ? `${alias}.${nome}` : nome);
 
   if (corte.tipo === 'recebimento_intradiario') {
@@ -106,6 +83,23 @@ export function condicaoCorteMv(corte, alias = null) {
   }
 
   return null;
+}
+
+export function aplicarFiltroCorte(qb, corte) {
+  let consulta = qb
+    .where('bv.ativo', '=', true)
+    .where('bv.cd_tipo_urna', '=', 1)
+    .where(CARGO_EM_ESCOPO);
+
+  const recebimento = condicaoRecebimentoCorte(corte);
+  if (recebimento) consulta = consulta.where(recebimento);
+
+  return consulta;
+}
+
+// Mesma regra de aplicarFiltroCorte, sobre as colunas de mv_secao_candidato_final (que já traz ativo, urna 1 e cargo).
+export function condicaoCorteMv(corte, alias = null) {
+  return condicaoRecebimentoCorte(corte, alias);
 }
 
 export function aplicarCorteMv(qb, corte, alias = null) {

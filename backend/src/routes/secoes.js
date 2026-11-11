@@ -132,7 +132,7 @@ export function registrarSecoes({ app, db, cache, cacheado }) {
     const secao = await buscarSecao(db, query.id);
     if (!secao) throw new AppError('NOT_FOUND', 404, 'Seção não encontrada');
 
-    const versoes = await versoesDaSecao(db, { eleicaoId: eleicao.id, secaoId: query.id, cargo: query.cargo });
+    const versoes = await versoesDaSecao(db, { eleicaoId: eleicao.id, secaoId: query.id, cargo: query.cargo, corte });
 
     const atual = versoes.find((v) => v.ativo) ?? versoes[versoes.length - 1] ?? null;
     let anterior = null;

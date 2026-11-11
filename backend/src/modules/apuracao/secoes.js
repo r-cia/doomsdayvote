@@ -1,5 +1,6 @@
 import { sql } from 'kysely';
 import { ordenarSql } from '../../lib/ordenacao.js';
+import { condicaoRecebimentoCorte } from './corte.js';
 import { horariosDoBu } from './status-secao.js';
 
 export const COLUNAS_SECOES = {
@@ -178,14 +179,18 @@ export function buscarSecao(db, secaoId) {
 }
 
 export async function detalheDoBoletim(db, { eleicaoId, secaoId, cargo, corte }) {
-  const boletim = await db
-    .selectFrom('boletim_versao')
-    .selectAll()
-    .where('secao_id', '=', secaoId)
-    .where('eleicao_id', '=', eleicaoId)
-    .where('cd_cargo_pergunta', '=', cargo)
-    .where('ativo', '=', true)
-    .executeTakeFirst();
+  let consultaBoletim = db
+    .selectFrom('boletim_versao as bv')
+    .selectAll('bv')
+    .where('bv.secao_id', '=', secaoId)
+    .where('bv.eleicao_id', '=', eleicaoId)
+    .where('bv.cd_cargo_pergunta', '=', cargo)
+    .where('bv.ativo', '=', true);
+
+  const recebimento = condicaoRecebimentoCorte(corte);
+  if (recebimento) consultaBoletim = consultaBoletim.where(recebimento);
+
+  const boletim = await consultaBoletim.executeTakeFirst();
 
   const statusBu = boletim
     ? await db
@@ -228,15 +233,19 @@ export async function detalheDoBoletim(db, { eleicaoId, secaoId, cargo, corte })
   };
 }
 
-export async function versoesDaSecao(db, { eleicaoId, secaoId, cargo }) {
-  const versoesRows = await db
-    .selectFrom('boletim_versao')
-    .selectAll()
-    .where('secao_id', '=', secaoId)
-    .where('eleicao_id', '=', eleicaoId)
-    .where('cd_cargo_pergunta', '=', cargo)
-    .orderBy('versao', 'asc')
-    .execute();
+export async function versoesDaSecao(db, { eleicaoId, secaoId, cargo, corte }) {
+  let consulta = db
+    .selectFrom('boletim_versao as bv')
+    .selectAll('bv')
+    .where('bv.secao_id', '=', secaoId)
+    .where('bv.eleicao_id', '=', eleicaoId)
+    .where('bv.cd_cargo_pergunta', '=', cargo)
+    .orderBy('bv.versao', 'asc');
+
+  const recebimento = condicaoRecebimentoCorte(corte);
+  if (recebimento) consulta = consulta.where(recebimento);
+
+  const versoesRows = await consulta.execute();
 
   const ids = versoesRows.map((v) => v.id);
   const resultados = ids.length
