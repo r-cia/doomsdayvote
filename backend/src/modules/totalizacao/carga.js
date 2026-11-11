@@ -33,6 +33,7 @@ const SUFIXOS = Object.freeze([
   ['.rdv', 'rdv'],
   ['.logjez', 'log'],
 ]);
+const CODIGO_SEM_BU = 'SEM_BU';
 const CODIGO_INTERNO = 'ERRO_INTERNO';
 
 let municipios;
@@ -468,7 +469,7 @@ async function carregarZipTravado(
     aoProgredir,
     registrarEvento = registrarEventoCarga,
     falharRapido = false,
-    retomar = false,
+    retomar,
     concorrencia = 1,
   } = {},
 ) {
@@ -500,7 +501,7 @@ async function carregarZipTravado(
 
   const destino = { ...origem, nome_arquivo: nomeArquivo };
   const lote = existente
-    ? retomar
+    ? (retomar ?? existente.status === 'falhou')
       ? await retomarLote(db, existente, destino)
       : await reiniciarLote(db, existente, destino, sha256)
     : await db
@@ -538,6 +539,10 @@ async function carregarZipTravado(
         sgUf: origem.sg_uf,
       }),
     };
+
+    if (!contextoSecao.bwebDaUf) {
+      registrarEvento('conferencia_ignorada', { ...contexto, motivo: 'bweb_ausente', lote_id: lote.id });
+    }
 
     let indice = 0;
     let falhaFatal = null;
@@ -609,6 +614,9 @@ async function carregarZipTravado(
 
       if (!grupo.bu) {
         secoesIgnoradas += 1;
+        const semBu = new Error(`seção ${prefixo} sem -bu.dat`);
+        semBu.codigo = CODIGO_SEM_BU;
+        await registrarSecaoErro(db, { loteId: lote.id, sgUf: origem.sg_uf, prefixo }, semBu);
         continue;
       }
 
