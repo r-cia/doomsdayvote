@@ -10,20 +10,27 @@ const TP_HABILITACAO = Object.freeze({
 
 function janelasDaSessao(eventos) {
   const janelas = [];
-  let atual = [];
+  let atual = null;
 
   for (const evento of eventos) {
-    atual.push(evento);
-    if (evento.tipo === TIPO_EVENTO.VOTO_COMPUTADO) {
+    const jaHabilitado =
+      evento.tipo === TIPO_EVENTO.ELEITOR_HABILITADO &&
+      atual?.some((item) => item.tipo === TIPO_EVENTO.ELEITOR_HABILITADO);
+    if (jaHabilitado) {
       janelas.push(atual);
       atual = [];
     }
+
+    if (!atual) atual = [];
+    atual.push(evento);
+
+    if (evento.tipo === TIPO_EVENTO.VOTO_COMPUTADO) {
+      janelas.push(atual);
+      atual = null;
+    }
   }
 
-  if (atual.length > 0) {
-    if (janelas.length > 0) janelas[janelas.length - 1].push(...atual);
-    else janelas.push(atual);
-  }
+  if (atual) janelas.push(atual);
 
   return janelas;
 }
