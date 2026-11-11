@@ -76,15 +76,15 @@ watch(
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(i, indice) in itens" :key="`${i.secao_id}-${i.regra}-${indice}`">
-              <td>{{ i.sg_uf }}</td>
-              <td>{{ i.nm_municipio || i.cd_municipio_tse }}</td>
-              <td class="num">{{ i.nr_zona }}</td>
-              <td class="num">{{ i.nr_secao }}</td>
+            <tr v-for="(i, indice) in itens" :key="`${i.secao.id}-${i.regra}-${indice}`">
+              <td>{{ i.secao.sg_uf }}</td>
+              <td>{{ i.secao.nm_municipio || i.secao.cd_municipio_tse }}</td>
+              <td class="num">{{ i.secao.nr_zona }}</td>
+              <td class="num">{{ i.secao.nr_secao }}</td>
               <td>{{ REGRAS.includes(i.regra) ? $t(`consistencia.regras.${i.regra}`) : i.regra }}</td>
               <td class="num">{{ formatarNumero(i.diferenca) }}</td>
               <td>
-                <button type="button" class="button button--ghost button--compacto" @click="$emit('abrir-secao', i.secao_id)">{{ $t('comum.abrirSecao') }}</button>
+                <button type="button" class="button button--ghost button--compacto" @click="$emit('abrir-secao', i.secao.id)">{{ $t('comum.abrirSecao') }}</button>
               </td>
             </tr>
           </tbody>

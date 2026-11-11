@@ -10,7 +10,7 @@ vi.mock('../src/views/SecaoView.vue', () => ({ default: { props: ['idProp'], tem
 const consistencia = {
   cobertura: { consideradas: 10, avaliadas: 9, com_divergencia: 2, sem_divergencia: 7 },
   page: 1, page_size: 50, total: 1,
-  itens: [{ secao_id: 's1', sg_uf: 'AC', cd_municipio_tse: 1, nm_municipio: 'Rio Branco', nr_zona: 1, nr_secao: 5, regra: 'comparecimento_vs_aptos', diferenca: -3 }],
+  itens: [{ secao: { id: 's1', sg_uf: 'AC', cd_municipio_tse: 1, nm_municipio: 'Rio Branco', nr_zona: 1, nr_secao: 5 }, regra: 'comparecimento_vs_aptos', diferenca: -3 }],
 }
 const secao = { id: 's2', sg_uf: 'AC', cd_municipio_tse: 1, nm_municipio: 'Rio Branco', nr_zona: 1, nr_secao: 6 }
 const item = { secao, share_lider: 0.8, margem_absoluta: 50, margem_pp: 40, lider: { nm_votavel: 'Fulano', sg_partido: 'PT' }, contexto: { share_lider_percentil: 90 } }
@@ -38,6 +38,8 @@ describe('SecoesDestaquePanel', () => {
     const w = await abrir('Consistência aritmética')
     expect(w.text()).toContain('Comparecimento × aptos')
     expect(w.text()).toContain('2 com divergência')
+    expect(w.text()).toContain('AC')
+    expect(w.text()).toContain('Rio Branco')
     expect(w.find('a').exists()).toBe(false)
     await w.find('tbody button').trigger('click')
     expect(w.find('.secao-modal-stub').text()).toBe('s1')
