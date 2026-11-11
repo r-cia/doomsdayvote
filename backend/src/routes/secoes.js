@@ -109,7 +109,7 @@ export function registrarSecoes({ app, db, cache, cacheado }) {
     return {
       secao,
       status: { ...statusBu, horarios: horariosDoBu(boletim ?? null) },
-      boletim,
+      boletim: boletim ?? null,
       resultados: ordenarLista(resultados, COLUNAS_RESULTADOS, lerOrdenacao(query)),
       lote,
       versoes_anteriores: Number(anteriores.total),
