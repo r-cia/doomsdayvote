@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount } from 'vue'
 import StateBlock from '../components/StateBlock.vue'
 import VersoesBoletimPanel from '../components/VersoesBoletimPanel.vue'
 
@@ -28,12 +28,27 @@ import { t } from '../i18n'
 import { useFiltersStore } from '../stores/filters'
 
 const store = useFiltersStore()
+const snapshot = {
+  electionId: store.electionId,
+  cargo: store.cargo,
+  asOfInput: store.asOfInput,
+  uf: store.uf,
+  municipio: store.municipio,
+}
 
 if (props.electionIdProp) store.electionId = String(props.electionIdProp)
 if (props.cargoProp) store.cargo = Number(props.cargoProp)
 if (props.asOfProp) store.asOfInput = paraInputSaoPaulo(String(props.asOfProp))
 if (props.ufProp) store.uf = String(props.ufProp)
 if (props.municipioProp) store.municipio = Number(props.municipioProp)
+
+onBeforeUnmount(() => {
+  store.electionId = snapshot.electionId
+  store.cargo = snapshot.cargo
+  store.asOfInput = snapshot.asOfInput
+  store.uf = snapshot.uf
+  store.municipio = snapshot.municipio
+})
 
 const id = computed(() => String(props.idProp))
 const consulta = useSecao(id)
