@@ -29,17 +29,21 @@
     "result:baixar": "node --env-file-if-exists=.env src/scripts/baixar-result.js"
   },
   "dependencies": {
-    "fastify": "^5.2.1",
-    "ioredis": "^6.0.0",
-    "kysely": "^0.28.2",
-    "pg": "^8.13.1",
-    "pg-copy-streams": "^7.0.0",
-    "pino": "^9.6.0",
-    "zod": "^3.24.1"
+    "fastify": "5.12.8",
+    "ioredis": "6.0.0",
+    "kysely": "0.29.5",
+    "pg": "8.23.0",
+    "pg-copy-streams": "7.0.0",
+    "pino": "9.14.0",
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^3.0.5",
-    "mapshaper": "^0.7.101",
-    "vitest": "^3.0.5"
+    "@vitest/coverage-v8": "5.0.4",
+    "mapshaper": "0.7.83",
+    "vitest": "5.0.4"
+  },
+  "overrides": {
+    "vite": "8.3.4",
+    "rolldown": "1.2.12"
   }
 }
