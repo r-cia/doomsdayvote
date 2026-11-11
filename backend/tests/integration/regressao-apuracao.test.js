@@ -125,7 +125,6 @@ describe('regressão da apuração', () => {
       expect(Number(versoesDepois.total)).toBe(Number(versoesAntes.total));
       expect(secoesAntes).toBe(SECOES);
     },
-    { timeout: 180000 },
   );
 
   it(
@@ -143,6 +142,5 @@ describe('regressão da apuração', () => {
         }),
       ).toBe(0);
     },
-    { timeout: 120000 },
   );
 });

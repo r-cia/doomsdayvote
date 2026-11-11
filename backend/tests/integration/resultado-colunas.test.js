@@ -59,6 +59,5 @@ describe('colunas de resultado_votavel', () => {
 
       expect(colunas.map((coluna) => coluna.column_name)).not.toContain('bruto');
     },
-    { timeout: 120000 },
   );
 });

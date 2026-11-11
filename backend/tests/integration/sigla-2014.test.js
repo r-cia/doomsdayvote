@@ -62,6 +62,5 @@ describe('sigla do partido em 2014 sem sg_partido', () => {
       `.execute(db);
       expect(rows[0]).toEqual({ votos_final: 0, totais_area: 0, secao_candidato: 0 });
     },
-    { timeout: 120000 },
   );
 });

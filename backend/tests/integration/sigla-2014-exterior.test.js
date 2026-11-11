@@ -71,6 +71,5 @@ describe('sigla do exterior (ZZ) em 2014', () => {
         expect([linha.nm_partido, null]).toContain(porId.get(linha.id));
       }
     },
-    { timeout: 120000 },
   );
 });

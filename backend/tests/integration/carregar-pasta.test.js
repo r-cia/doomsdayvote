@@ -64,7 +64,6 @@ describe('worker de carga manual', () => {
       expect(segundo.importados).toBe(0);
       expect(segundo.ignorados).toBe(ARQUIVOS.length);
     },
-    { timeout: 240000 },
   );
 
   it(
@@ -75,7 +74,6 @@ describe('worker de carga manual', () => {
       expect(resumo.ignorados_extensao).toContain('leiame.pdf');
       expect(resumo.arquivos).toBe(ARQUIVOS.length);
     },
-    { timeout: 240000 },
   );
 
   it(
@@ -92,7 +90,6 @@ describe('worker de carga manual', () => {
         erro: 'MUDANCA_LEIAUTE',
       });
     },
-    { timeout: 240000 },
   );
 
   it('falha quando a pasta de entrada não existe', async () => {

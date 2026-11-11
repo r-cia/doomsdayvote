@@ -135,7 +135,6 @@ describe('API de totalização', () => {
 
     expect(resposta.statusCode).toBe(200);
     expect(resposta.json()).toEqual({
-      escopo: 'municipio',
       tempo: {
         quantidade: 3,
         mediaMs: 20000,

@@ -87,7 +87,6 @@ describe('API de leitura', () => {
       expect(timeline.statusCode).toBe(200);
       expect(timeline.json().pontos.length).toBeGreaterThan(0);
     },
-    { timeout: 120000 },
   );
 
   it(
@@ -110,7 +109,6 @@ describe('API de leitura', () => {
       expect(eleicao).toBeTruthy();
       expect(eleicao.cargos).toContainEqual({ cd_cargo_pergunta: 9, ds_cargo_pergunta: 'PRESIDENTE' });
     },
-    { timeout: 120000 },
   );
 
   it(
@@ -161,7 +159,6 @@ describe('API de leitura', () => {
       expect(porMunicipio.statusCode).toBe(200);
       expect(porMunicipio.json().total).toBe(SECOES);
     },
-    { timeout: 120000 },
   );
 
   it(
@@ -211,7 +208,6 @@ describe('API de leitura', () => {
       expect(corpoSeries.series[0].pontos.length).toBeGreaterThan(0);
       expect(corpoSeries.series[0].pontos[0].votos_acumulados).toBeGreaterThan(0);
     },
-    { timeout: 120000 },
   );
 
   it(
@@ -239,6 +235,5 @@ describe('API de leitura', () => {
       expect(corpo.outliers.secoes[0].score_if).toBeGreaterThanOrEqual(0);
       expect(corpo.outliers.secoes[0].score_if).toBeLessThanOrEqual(1);
     },
-    { timeout: 120000 },
   );
 });

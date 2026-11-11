@@ -83,6 +83,5 @@ describe('geometria do mapa', () => {
       const semGeometriaOutraUf = await localidadesSemGeometria(db, { sgUf: 'SP' });
       expect(semGeometriaOutraUf).toEqual([]);
     },
-    { timeout: 120000 },
   );
 });

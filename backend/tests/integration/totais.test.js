@@ -101,7 +101,6 @@ describe('somas e métricas', () => {
       });
       expect(metricasAntes.bus_considerados).toBe(0);
     },
-    { timeout: 120000 },
   );
 
   it(
@@ -135,6 +134,5 @@ describe('somas e métricas', () => {
         expect(votos).toEqual([]);
       }
     },
-    { timeout: 120000 },
   );
 });

@@ -1,7 +1,8 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import pg from 'pg';
-import { FileMigrationProvider, Kysely, Migrator, PostgresDialect } from 'kysely';
+import { Kysely, PostgresDialect } from 'kysely';
+import { FileMigrationProvider, Migrator } from 'kysely/migration';
 import { DIRETORIO_MIGRACOES } from '../../src/db/migracoes.js';
 
 export default async function () {

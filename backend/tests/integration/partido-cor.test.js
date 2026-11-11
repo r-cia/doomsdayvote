@@ -107,6 +107,5 @@ describe('cores de partido', () => {
       const votos = await somarVotos(db, { eleicaoId, cargo, corte: { tipo: 'final' } });
       expect(votos.filter((voto) => voto.categoria === 'nominal').every((voto) => voto.cor_hex)).toBe(true);
     },
-    { timeout: 120000 },
   );
 });

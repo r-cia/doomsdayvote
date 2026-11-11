@@ -72,6 +72,5 @@ describe('carga de CSV comprimido', () => {
       expect(repetido.ignorados).toBe(1);
       expect(repetido.importados).toBe(0);
     },
-    { timeout: 120000 },
   );
 });

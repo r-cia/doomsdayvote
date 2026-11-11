@@ -83,6 +83,5 @@ describe('importação fora de ordem', () => {
       expect(await contar('boletim_versao')).toBe(versoes);
       expect(await contar('resultado_votavel')).toBe(resultados);
     },
-    { timeout: 180000 },
   );
 });

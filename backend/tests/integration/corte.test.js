@@ -130,7 +130,6 @@ describe('corte temporal', () => {
       const avisos = await avisosCorte(db, { eleicaoId: eid, cargo }, { tipo: 'final' });
       expect(avisos.map((a) => a.codigo)).not.toContain('CORTE_INDISPONIVEL');
     },
-    { timeout: 120000 },
   );
 
   it(
@@ -158,7 +157,6 @@ describe('corte temporal', () => {
       expect(await contarCorte(eid, cargo, resolverCorte({ as_of_date: diaAnterior(min) }))).toBe(0);
       expect(await contarCorte(eid, cargo, resolverCorte({ as_of_date: max }))).toBe(final);
     },
-    { timeout: 120000 },
   );
 
   it(
@@ -177,6 +175,5 @@ describe('corte temporal', () => {
       const avisos = await avisosCorte(db, { eleicaoId: eid, cargo }, corte);
       expect(avisos.map((a) => a.codigo)).toContain('CORTE_INDISPONIVEL');
     },
-    { timeout: 120000 },
   );
 });

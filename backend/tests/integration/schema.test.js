@@ -2,14 +2,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import pg from 'pg';
-import {
-  FileMigrationProvider,
-  Kysely,
-  Migrator,
-  NO_MIGRATIONS,
-  PostgresDialect,
-  sql,
-} from 'kysely';
+import { Kysely, PostgresDialect, sql } from 'kysely';
+import { FileMigrationProvider, Migrator, NO_MIGRATIONS } from 'kysely/migration';
 import { DIRETORIO_MIGRACOES } from '../../src/db/migracoes.js';
 
 const urlOwner = process.env.TEST_DATABASE_MIGRATION_URL;

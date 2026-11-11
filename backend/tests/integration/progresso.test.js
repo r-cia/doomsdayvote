@@ -79,6 +79,5 @@ describe('seções com BU', () => {
         }),
       ).toBe(final);
     },
-    { timeout: 120000 },
   );
 });

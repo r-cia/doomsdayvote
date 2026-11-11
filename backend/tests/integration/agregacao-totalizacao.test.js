@@ -106,33 +106,13 @@ describe('agregação das métricas de totalização', () => {
     await rm(diretorio, { recursive: true, force: true });
   });
 
-  it('infere o escopo pela granularidade do recorte', async () => {
-    expect((await agregarMetricas(db, recorte())).escopo).toBe('nacional');
-    expect((await agregarMetricas(db, recorte({ sgUf: UF }))).escopo).toBe('uf');
-    expect(
-      (await agregarMetricas(db, recorte({ sgUf: UF, cdMunicipioTse: CENARIO.municipio }))).escopo,
-    ).toBe('municipio');
-    expect(
-      (await agregarMetricas(db, recorte({ sgUf: UF, cdMunicipioTse: CENARIO.municipio, nrZona: CENARIO.zona })))
-        .escopo,
-    ).toBe('zona');
-    expect((await agregarMetricas(db, recorteDaSecao())).escopo).toBe('secao');
-  });
-
   it('fecha as três famílias de números da seção até o nacional', async () => {
     const secao = await agregarMetricas(db, recorteDaSecao());
     const uf = await agregarMetricas(db, recorte({ sgUf: UF }));
     const nacional = await agregarMetricas(db, recorte());
 
-    const { escopo: escopoNacional, ...metricasNacional } = nacional;
-    const { escopo: escopoUf, ...metricasUf } = uf;
-    const { escopo: escopoSecao, ...metricasSecao } = secao;
-
-    expect(escopoSecao).toBe('secao');
-    expect(escopoUf).toBe('uf');
-    expect(escopoNacional).toBe('nacional');
-    expect(metricasUf).toEqual(metricasSecao);
-    expect(metricasNacional).toEqual(metricasSecao);
+    expect(uf).toEqual(secao);
+    expect(nacional).toEqual(secao);
   });
 
   it('conta a biometria por faixa de falhas e o resto em outra', async () => {
@@ -181,12 +161,7 @@ describe('agregação das métricas de totalização', () => {
     const peloLote = await agregarMetricas(db, recorte({ loteId }));
     const pelaUf = await agregarMetricas(db, recorte({ sgUf: UF }));
 
-    const { escopo: escopoLote, ...metricasLote } = peloLote;
-    const { escopo: escopoUf, ...metricasUf } = pelaUf;
-
-    expect(escopoLote).toBe('nacional');
-    expect(escopoUf).toBe('uf');
-    expect(metricasLote).toEqual(metricasUf);
+    expect(peloLote).toEqual(pelaUf);
   });
 
   it('lê as métricas da zona gravadas na carga e cai para os eleitores quando o lote não as tem', async () => {

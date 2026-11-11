@@ -93,6 +93,5 @@ describe('importação dos cenários sintéticos com proveniência', () => {
       expect(segundo.ignorado).toBe(true);
       expect(await contar(db, 'lote_importacao')).toBe(ARQUIVOS.length);
     },
-    { timeout: 180000 },
   );
 });
