@@ -288,11 +288,10 @@ export function concentracaoPura(secoes, { top = 20, minimoGrupo = 5, bandas = 4
         const diff = (b.share_lider ?? 0) - (a.share_lider ?? 0);
         if (diff !== 0) return diff;
         return (b.margem_absoluta ?? 0) - (a.margem_absoluta ?? 0);
-      })
-      .slice(0, top),
+      }),
     COLUNAS_CONCENTRACAO,
     ordenacaoShare,
-  );
+  ).slice(0, top);
 
   const topMargem = ordenarLista(
     [...secoesFinais]
