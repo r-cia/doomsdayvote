@@ -42,14 +42,15 @@ function appCom(db) {
 describe('API de totalização', () => {
   it('devolve o agregado do recorte com os números convertidos', async () => {
     const db = criarDbFalso([
+      [{ id: 'lote-1' }],
+      [],
       [
         {
-          quantidade: 4,
-          media_ms: 1500,
+          qt_duracao: 4,
+          soma_ms: 6000,
           mediana_ms: 1400,
           mais_rapido_ms: 900,
           mais_demora_ms: 2100,
-          total: 5,
           falhou_1: 1,
           falhou_2: 0,
           falhou_3: 0,
@@ -113,6 +114,7 @@ describe('API de totalização', () => {
   it('pagina os incidentes com o recorte aplicado', async () => {
     const instante = new Date('2026-10-04T12:00:00.000Z');
     const db = criarDbFalso([
+      [],
       [
         {
           instante,
@@ -170,7 +172,7 @@ describe('API de totalização', () => {
       registrado_em: new Date('2026-10-04T12:00:00.000Z'),
     };
 
-    const semFonte = await appCom(criarDbFalso([[linha], [{ total: 1 }]])).inject({
+    const semFonte = await appCom(criarDbFalso([[], [linha], [{ total: 1 }]])).inject({
       method: 'GET',
       url: '/api/totalizacao/divergencias?ano=2026&turno=1',
     });
@@ -182,7 +184,7 @@ describe('API de totalização', () => {
       registrado_em: '2026-10-04T12:00:00.000Z',
     });
 
-    const comFonte = await appCom(criarDbFalso([[], [{ total: 0 }]])).inject({
+    const comFonte = await appCom(criarDbFalso([[], [], [{ total: 0 }]])).inject({
       method: 'GET',
       url: '/api/totalizacao/divergencias?ano=2026&turno=1&fonte=bweb',
     });

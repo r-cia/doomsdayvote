@@ -34,5 +34,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.js'],
     css: false,
+    coverage: {
+      provider: 'v8',
+    },
   },
 })

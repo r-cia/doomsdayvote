@@ -2,8 +2,8 @@ import { DummyDriver, Kysely, PostgresAdapter, PostgresIntrospector, PostgresQue
 import { describe, expect, it } from 'vitest';
 import { baseSecaoCandidato } from '../../../src/modules/analise/estatisticas.js';
 
-// secoesCompactas lê as seções e o dicionário de votáveis em duas consultas.
-const QUERIES_POR_CARGA = 2;
+// O dicionário vazio encerra secoesCompactas antes da consulta das seções.
+const QUERIES_POR_CARGA = 1;
 
 function bancoQueContaConsultas() {
   const consultas = [];
